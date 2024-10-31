@@ -128,17 +128,17 @@ docker login ghcr.io -u TU-USUARIO-DE-GITHUB -p TU-TOKEN
 
 3. Pull de la imagen:
 ```bash
-docker pull ghcr.io/tup-frc-utn/tpi-dabd-integration-app:latest
+docker pull ghcr.io/tup-frc-utn/tpi-dabd-integration-app-2w1:latest
 ```
 
 4. Ejecutar la imagen:
 ```bash
-docker run -d -p 4200:4200 ghcr.io/tup-frc-utn/tpi-dabd-integration-app:latest
+docker run -d -p 4200:4200 ghcr.io/tup-frc-utn/tpi-dabd-integration-app-2w1:latest
 ```
 
 ## 📝 Notas Importantes
 
-- La imagen se publica en: `ghcr.io/tup-frc-utn/tpi-dabd-integration-app`
+- La imagen se publica en: `ghcr.io/tup-frc-utn/tpi-dabd-integration-app-2w1`
 - Se generan tags basados en:
   - Nombre de la rama (`main`, `develop`)
   - SHA del commit
@@ -153,7 +153,7 @@ docker run -d -p 4200:4200 ghcr.io/tup-frc-utn/tpi-dabd-integration-app:latest
 
 2. Verifica la imagen publicada:
    - Ve a la pestaña "Packages"
-   - Busca la imagen `tpi-dabd-integration-app`
+   - Busca la imagen `tpi-dabd-integration-app-2w1`
 
 ## 🛠️ Troubleshooting
 
