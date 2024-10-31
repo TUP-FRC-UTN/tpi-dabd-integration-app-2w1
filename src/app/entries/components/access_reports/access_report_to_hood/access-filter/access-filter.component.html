@@ -1,0 +1,26 @@
+<div class="container mt-3">
+    <form (ngSubmit)="onSubmit()" class="row g-3 align-items-end">
+      <div class="col-auto">
+        <label for="anio" class="form-label">Año</label>
+        <select class="form-select form-select-sm" id="anio" [(ngModel)]="selectedAnio" name="anio" required>
+          <option [ngValue]="null">Seleccione</option>
+          <option *ngFor="let anio of anios" [ngValue]="anio">{{ anio }}</option>
+        </select>
+        <div *ngIf="formSubmitted && !selectedAnio" class="text-danger">Por favor, seleccione un año.</div>
+      </div>
+  
+      <div class="col-auto">
+        <label for="mes" class="form-label">Mes</label>
+        <select class="form-select form-select-sm" id="mes" [(ngModel)]="selectedMes" name="mes" required>
+          <option [ngValue]="null">Seleccione</option>
+          <option *ngFor="let mes of meses" [ngValue]="mes">{{ mes }}</option>
+        </select>
+        <div *ngIf="formSubmitted && !selectedMes" class="text-danger">Por favor, seleccione un mes.</div>
+      </div>
+  
+      <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Buscar</button>
+      </div>
+    </form>
+  </div>
+  

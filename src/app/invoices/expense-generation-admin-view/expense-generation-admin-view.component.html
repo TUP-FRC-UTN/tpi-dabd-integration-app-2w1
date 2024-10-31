@@ -1,0 +1,524 @@
+<div class="container-fluid py-4 bg-light min-vh-100">
+  <div class="row">
+    <div class="col-12">
+      <!-- Main Container -->
+      <div class="container p-3 border border-2 rounded shadow-lg">
+        <!-- Filter Row -->
+        <div class="row mb-3">
+          <!-- Search Type and Input -->
+          <div class="col-md-4 position-relative">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <select class="form-select flex-grow-0 w-auto" [(ngModel)]="searchType">
+                  <option value="name">Nombre</option>
+                  <option value="dni">DNI</option>
+                  <option value="plot">Lote</option>
+                </select>
+              </div>
+              <input 
+                type="text" 
+                class="form-control"
+                [(ngModel)]="searchTerm"
+                [placeholder]="searchType === 'plot' ? 'Ingrese número de lote' : (searchType === 'dni' ? 'Ingrese DNI' : 'Ingrese nombre')"
+                (ngModelChange)="buscarUsuarios()"
+                #searchInput
+              >
+              <button class="btn btn-outline-secondary" type="button" (click)="clearSearch()">
+                <i class="bi bi-x-lg"></i>
+              </button>
+            </div>
+            <!-- Filtered Users Dropdown -->
+            <div class="position-absolute mt-1 w-100 z-1" *ngIf="filteredUsers.length > 0 && searchTerm.length > 0">
+              <div class="list-group shadow">
+                <button 
+                  type="button"
+                  class="list-group-item list-group-item-action"
+                  *ngFor="let owner of filteredUsers"
+                  (click)="seleccionarUsuario(owner)"
+                >
+                  {{ owner.name }} {{ owner.lastname }} - DNI: {{ owner.dni }}
+                  <small class="d-block text-muted" *ngIf="owner.plots && owner.plots.length > 0">
+                    Lotes: {{ getPlotNumbers(owner) }}
+                  </small>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Status Select -->
+          <div class="col-md-2">
+            <select 
+              class="form-select"
+              [(ngModel)]="filtros.estado" 
+              (ngModelChange)="buscarBoletas()"
+            >
+              <option value="">Todos los estados</option>
+              <option *ngFor="let estado of estados" [value]="estado">{{ estado }}</option>
+            </select>
+          </div>
+
+          <!-- Date Range -->
+          <div class="col-md-4">
+            <div class="input-group">
+              <input 
+                type="date" 
+                class="form-control"
+                [(ngModel)]="filtros.desde" 
+                (ngModelChange)="validateDates(); buscarBoletas()"
+                [max]="maxDate"
+                placeholder="Fecha desde"
+              >
+              <input 
+                type="date" 
+                class="form-control"
+                [(ngModel)]="filtros.hasta" 
+                (ngModelChange)="validateDates(); buscarBoletas()"
+                [min]="filtros.desde"
+                [max]="maxDate"
+                placeholder="Fecha hasta"
+              >
+            </div>
+          </div>
+          
+          <!-- Action Buttons -->
+          <div class="col-md-3 d-flex gap-3 justify-content-end">
+            <div class="d-flex gap-1">
+              <button class="btn btn-primary" data-bs-toggle="modal" title="Filtros Avanzados" data-bs-target="#filtrosAvanzados">
+                <i class="bi bi-sort-down-alt"></i>
+              </button>
+              <button class="btn btn-primary bi bi-trash" title="Limpiar Filtros" (click)="limpiarFiltros()"></button>
+            </div>
+            <div>
+              <button class="btn btn-warning"  (click)="openModal()" style="color: white;">Facturación</button>
+            </div>
+            <div class="d-flex gap-1">
+              <button class="btn btn-success bi bi-file-earmark-excel" title="Exportar a Excel" (click)="exportToExcel()"></button>
+              <button class="btn btn-danger bi bi-file-earmark-pdf" title="Exportar a PDF" (click)="exportToPDF()"></button>
+            </div>
+            <!-- <button class="btn btn-warning bi bi-gear " title="Actualizar Multiplicadores" (click)="openModal()" style="color: white;"></button> -->
+
+          </div>
+          
+          
+>
+
+        <!-- Results Table -->
+        <div class="table-responsive">
+          <table class="table table-hover border">
+            <thead class="table-light">
+              <tr>
+                <th class="text-nowrap">Periodo</th>
+                <th>Propietario</th>
+                <th class="text-start text-nowrap">Monto Primer Pago</th>
+                <th class="text-start text-nowrap">Monto Segundo Pago</th>
+                <th class="text-start text-nowrap">Monto Pagado</th>
+                <th>Estado</th>
+                <th class="text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let expense of pagedExpenses">
+                <td class="text-nowrap font-monospace">{{ expense.period }}</td>
+
+                <td>
+                  <span class="badge rounded-pill" 
+                        [ngClass]="{
+                          'text-bg-warning': expense.status === 'Pendiente',
+                          'text-bg-success': expense.status === 'Pago',
+                          'text-bg-danger': expense.status === 'Exceptuado'
+                        }">
+                    {{expense.status}}
+                  </span>
+                </td>
+                <td class="text-nowrap">{{ getOwnerName(expense.owner_id) }}</td>
+                <td class="text-nowrap">{{ getOwnerDni(expense.owner_id) }}</td>
+                <td class="text-nowrap">{{ getOwnerPlots(expense.owner_id) }}</td>
+                <td class="text-nowrap text-end">$ {{ expense.first_expiration_amount | number:'1.2-2' }}</td>
+                <td class="text-nowrap text-end">$ {{ expense.second_expiration_amount | number:'1.2-2' }}</td>
+                <td class="text-nowrap text-end">$ {{ expense.amount_payed | number:'1.2-2' }}</td>
+
+                <td class="text-center">
+                  <button 
+                    class="btn btn-light btn-sm" 
+                    data-bs-toggle="modal"
+                    data-bs-target="#detallesModal"
+                    (click)="verDetalles(expense)"
+                  >
+                    Más info
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        
+          <!-- Pagination controls -->
+          <div class="d-flex justify-content-between align-items-center border-top pt-3">
+            <!-- Items per page dropdown -->
+            <div class="d-flex align-items-center">
+              <span class="me-2">Mostrar</span>
+              <select 
+                class="form-select form-select-sm" 
+                style="width: auto"
+                [(ngModel)]="itemsPerPage" 
+                (change)="onItemsPerPageChange()">
+                <option [value]="10">10</option>
+                <option [value]="25">25</option>
+                <option [value]="50">50</option>
+              </select>
+            </div>
+        
+            <!-- Pagination buttons -->
+            <nav aria-label="Page navigation" *ngIf="totalPages > 0">
+              <ul class="pagination pagination-sm mb-0">
+                <!-- First page -->
+                <li class="page-item" [class.disabled]="currentPage === 1">
+                  <a class="page-link" (click)="goToPage(1)" [style.cursor]="currentPage === 1 ? 'not-allowed' : 'pointer'">
+                    <i class="bi bi-chevron-double-left"></i>
+                  </a>
+                </li>
+                
+                <!-- Previous page -->
+                <li class="page-item" [class.disabled]="currentPage === 1">
+                  <a class="page-link" (click)="goToPage(currentPage - 1)" [style.cursor]="currentPage === 1 ? 'not-allowed' : 'pointer'">
+                    <i class="bi bi-chevron-left"></i>
+                  </a>
+                </li>
+                
+                <!-- Page numbers -->
+                <li class="page-item" *ngFor="let page of visiblePages" [class.active]="page === currentPage">
+                  <a class="page-link" (click)="goToPage(page)" style="cursor: pointer">{{ page }}</a>
+                </li>
+                
+                <!-- Next page -->
+                <li class="page-item" [class.disabled]="currentPage === totalPages">
+                  <a class="page-link" (click)="goToPage(currentPage + 1)" [style.cursor]="currentPage === totalPages ? 'not-allowed' : 'pointer'">
+                    <i class="bi bi-chevron-right"></i>
+                  </a>
+                </li>
+                
+                <!-- Last page -->
+                <li class="page-item" [class.disabled]="currentPage === totalPages">
+                  <a class="page-link" (click)="goToPage(totalPages)" [style.cursor]="currentPage === totalPages ? 'not-allowed' : 'pointer'">
+                    <i class="bi bi-chevron-double-right"></i>
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div *ngIf="isLoading" class="text-center my-4">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+          </div>
+        </div>
+
+        <!-- Error Message -->
+        <div *ngIf="error" class="alert alert-danger" role="alert">
+          {{error}}
+        </div>
+
+        <!-- No Results Message -->
+        <div *ngIf="!isLoading && !error && expenses.length === 0" class="alert alert-info text-center">
+          No se encontraron resultados
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+ <!-- Cambiar Multiplicadores -->
+
+          <!-- Modal Principal de Multiplicadores -->
+          <div class="modal fade" id="multipliersModal" tabindex="-1" aria-labelledby="multipliersModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="multipliersModalLabel">Configuración de Expensas</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <!-- Spinner de carga -->
+                  <div *ngIf="isLoadingMultipliers" class="text-center my-3">
+                    <div class="spinner-border text-primary" role="status">
+                      <span class="visually-hidden">Cargando...</span>
+                    </div>
+                  </div>
+      
+                  <!-- Mensaje de error -->
+                  <div *ngIf="multiplierError" class="alert alert-danger">
+                    {{ multiplierError }}
+                  </div>
+      
+                  <!-- Formulario -->
+                  <div [class.d-none]="isLoadingMultipliers">
+                    <!-- Día de Generación -->
+                    <div class="mb-4">
+                      <label for="generationDayInput" class="form-label">Día de Generación de Expensas:</label>
+                      <div class="input-group">
+                        <input
+                          type="number"
+                          id="generationDayInput"
+                          [(ngModel)]="generationDay"
+                          class="form-control"
+                          min="1"
+                          max="28"
+                          [class.is-invalid]="!isValidGenerationDay()"
+                        />
+                        <span class="input-group-text">del mes</span>
+                      </div>
+                      <div class="form-text" [class.text-danger]="!isValidGenerationDay()">
+                        El día debe estar entre 1 y 28
+                      </div>
+                    </div>
+      
+                    <hr class="my-4">
+      
+                    <!-- Multiplicadores -->
+                    <div class="mb-3">
+                      <label for="latePaymentInput" class="form-label">Porcentaje de pagos atrasados:</label>
+                      <div class="input-group">
+                        <input
+                          type="number"
+                          id="latePaymentInput"
+                          [(ngModel)]="latePaymentPercentage"
+                          class="form-control"
+                          min="0"
+                          max="100"
+                          (ngModelChange)="updateMultiplierFromPercentage('latePayment', $event)"
+                        />
+                        <span class="input-group-text">%</span>
+                      </div>
+                    </div>
+      
+                    <div class="mb-3">
+                      <label for="expirationInput" class="form-label">Porcentaje de vencimiento:</label>
+                      <div class="input-group">
+                        <input
+                          type="number"
+                          id="expirationInput"
+                          [(ngModel)]="expirationPercentage"
+                          class="form-control"
+                          min="0"
+                          max="100"
+                          (ngModelChange)="updateMultiplierFromPercentage('expiration', $event)"
+                        />
+                        <span class="input-group-text">%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                  <button
+                    type="button"
+                    class="btn btn-primary"
+                    (click)="handleSaveClick()"
+                    [disabled]="isLoadingMultipliers || (!hasChanges() && generationDay === originalGenerationDay) || !isValidGenerationDay()"
+                  >
+                    Guardar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+      
+          <!-- Modal de Observación -->
+          <div class="modal fade" id="observationModal" tabindex="-1" aria-labelledby="observationModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="observationModalLabel">Justificación de los Cambios</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <div class="mb-3">
+                    <label for="observationInput" class="form-label">Por favor, explique el motivo de los cambios:</label>
+                    <textarea
+                      id="observationInput"
+                      [(ngModel)]="observation"
+                      class="form-control"
+                      rows="3"
+                      required
+                    ></textarea>
+                  </div>
+                  <!-- Resumen de cambios -->
+                  <div class="mt-3 p-3 bg-light rounded" *ngIf="getChangeSummary().length > 0">
+                    <h6>Resumen de cambios:</h6>
+                    <ul class="mb-0">
+                      <li *ngFor="let change of getChangeSummary()">{{ change }}</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                  <button
+                    type="button"
+                    class="btn btn-primary"
+                    (click)="saveChanges()"
+                    [disabled]="!observation.trim()">
+                    Confirmar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Modal de Observación de Expensa -->
+          <div class="modal fade" id="observationModalExpenses" tabindex="-1" data-bs-backdrop="static">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Justificación de los Cambios</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <div class="mb-3">
+                    <label for="observationInput" class="form-label">Por favor, explique el motivo de los cambios:</label>
+                    <textarea
+                      id="observationInput"
+                      [(ngModel)]="observation"
+                      class="form-control"
+                      rows="3"
+                      required></textarea>
+                  </div>
+                  <!-- Resumen de cambios -->
+                  <div class="mt-3 p-3 bg-light rounded" *ngIf="getChangeSummaryExpenses().length > 0">
+                    <h6>Resumen de cambios:</h6>
+                    <ul class="mb-0">
+                      <li *ngFor="let change of getChangeSummaryExpenses()">{{ change }}</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                  <button
+                    type="button"
+                    class="btn btn-primary"
+                    (click)="saveChangesExpenses()"
+                    [disabled]="!observation.trim()">
+                    Confirmar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+<!-- Advanced Filters Modal -->
+<div class="modal fade" id="filtrosAvanzados" tabindex="-1" aria-labelledby="filtrosAvanzadosLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="filtrosAvanzadosLabel">Filtros Avanzados</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Min Amount -->
+        <div class="mb-3">
+          <label for="montoMinimo" class="form-label">Monto Mínimo</label>
+          <input 
+            type="number" 
+            class="form-control"
+            id="montoMinimo"
+            [(ngModel)]="filtros.montoMinimo" 
+            name="montoMinimo"
+          >
+        </div>
+        <div class="mb-3">
+          <label for="periodo" class="form-label">Periodo</label>
+          <select 
+            class="form-select" 
+            id="periodo"
+            [(ngModel)]="filtros.periodo"
+            name="periodo"
+          >
+            <option [ngValue]="null">Todos los periodos</option>
+            <option *ngFor="let periodo of periodos" [value]="periodo">
+              {{periodo}}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-primary" (click)="buscarBoletas()" data-bs-dismiss="modal">Aplicar</button>
+        <button type="button" class="btn btn-primary bi bi-trash" title="Limpiar Filtros" (click)="limpiarFiltros()"></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Details Modal -->
+<div class="modal fade" id="detallesModal" tabindex="-1" aria-labelledby="detallesModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="detallesModalLabel">Detalles del Gasto</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedExpense">
+        <div class="container">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <h6 class="mb-2">Información General</h6>
+              <p class="mb-1"><strong>Período:</strong> {{selectedExpense.period}}</p>
+              <p class="mb-1"><strong>Fecha de Emisión:</strong> {{selectedExpense.issueDate | date:'dd/MM/yyyy'}}</p>
+              <p class="mb-1"><strong>Estado:</strong> 
+                <span class="badge rounded-pill" 
+                      [ngClass]="{
+                        'text-bg-warning': selectedExpense.status === 'Pendiente',
+                        'text-bg-success': selectedExpense.status === 'Pago',
+                        'text-bg-danger': selectedExpense.status === 'Exceptuado'
+                      }">
+                  {{selectedExpense.status}}
+                </span>
+              </p>
+            </div>
+            <div class="col-md-6">
+              <h6 class="mb-2">Información de Pago</h6>
+              <p class="mb-1"><strong>1er Vencimiento:</strong> {{selectedExpense.first_expiration_date | date:'dd/MM/yyyy'}}</p>
+              <p class="mb-1"><strong>Monto 1er Vencimiento:</strong> ${{selectedExpense.first_expiration_amount}}</p>
+              <p class="mb-1"><strong>2do Vencimiento:</strong> {{selectedExpense.second_expiration_date | date:'dd/MM/yyyy'}}</p>
+              <p class="mb-1"><strong>Monto 2do Vencimiento:</strong> ${{selectedExpense.second_expiration_amount}}</p>
+            </div>
+          </div>
+
+          <!-- Payment Information (if paid) -->
+          <div class="row mb-3" *ngIf="selectedExpense.status === 'Pago'">
+            <div class="col-12">
+              <h6 class="mb-2">Detalles del Pago</h6>
+              <p class="mb-1"><strong>Método de Pago:</strong> {{selectedExpense.payment_method || 'No especificado'}}</p>
+              <p class="mb-1"><strong>Plataforma:</strong> {{selectedExpense.payment_platform || 'No especificada'}}</p>
+              <p class="mb-1"><strong>Monto Pagado:</strong> ${{selectedExpense.amount_payed}}</p>
+              <p class="mb-1"><strong>Fecha de Pago:</strong> {{selectedExpense.paymentDate | date:'dd/MM/yyyy'}}</p>
+            </div>
+          </div>
+
+          <!-- Document Buttons -->
+          <div class="row">
+            <div class="col-12">
+              <div class="d-flex gap-2">
+                <button class="btn btn-outline-danger" (click)="openPdf(selectedExpense.id)">
+                  <i class="bi bi-file-earmark-pdf"></i>
+                  Ver Factura
+                </button>
+                <p *ngIf="!selectedExpense.payment_id">Payment ID no disponible</p> <!-- Temporal para depuración -->
+                <button 
+                  class="btn btn-outline-primary" 
+                  *ngIf="selectedExpense.payment_id"
+                  (click)="openReceipt(selectedExpense)">
+                  <i class="bi bi-file-earmark-text"></i>
+                  Ver Comprobante
+                  </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,44 @@
+<section class="py-5">
+  <div class="container p-3 border border-2 rounded shadow-lg">
+    <!-- Botón de agregar -->
+    <div class="row mb-3 text-end">
+      <div class="col">
+        <button class="btn btn-primary" (click)="addCategory()">
+          <span class="bi-plus-lg"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Fila de botones de filtro -->
+    <div class="row mb-3">
+      <!-- Barra de busqueda -->
+      <div class="col">
+        <input
+          type="text"
+          placeholder="Buscar"
+          class="form-control"
+          [(ngModel)]="searchTerm"
+          (input)="onSearch($event)"
+        >
+      </div>
+
+      <!-- Botones de exportar -->
+      <div class="col-auto d-flex gap-1 text-end">
+        <button (click)="exportToExcel()" id="exportExcelBtn" class="btn btn-success bi-file-earmark-excel"></button>
+        <button (click)="exportToPDF()" id="exportPdfBtn" class="btn btn-danger bi-file-earmark-pdf"></button>
+      </div>
+    </div>
+
+    <table id="myTable" class="table table-striped border border-3 rounded">
+      <thead></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
+<app-expenses-view-category-details [category]="categorySelected" ></app-expenses-view-category-details>
+<app-expenses-edit-category [category]="categorySelected"
+(eventSucces)="loadAlertAndFilter('Se actualizo la categoria con exito')"
+(eventError)="showErrorAlert('La categoria no se pudo actualizar')"></app-expenses-edit-category>
+<app-expense-register-category 
+(eventSucces)="loadAlertAndFilter('Se registro la categoria con exito')"
+(eventError)="showErrorAlert('La categoria no puedo registrarse')"></app-expense-register-category>

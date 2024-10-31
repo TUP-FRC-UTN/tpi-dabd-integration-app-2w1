@@ -1,0 +1,9 @@
+<input type="file" class="file-input" style="display: none;"
+(change)="selectFile($event)"  accept=".jpg, .jpeg, .png" #fileUpload multiple>
+
+<div>
+    <button type="button" class="btn btn-success rounded-pill"  (click)="fileUpload.click()" name="file-upload">
+        Adjuntar <i class="bi bi-paperclip"></i>
+    </button>
+</div>
+<app-file *ngFor="let file of files; let i = index" [file]="file" [index]="i" (selected)="eliminateImg(i)"></app-file>

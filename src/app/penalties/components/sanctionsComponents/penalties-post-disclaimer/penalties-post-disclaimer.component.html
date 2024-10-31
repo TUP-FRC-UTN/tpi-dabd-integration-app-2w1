@@ -1,0 +1,103 @@
+<section class="py-5">
+  <div class="container p-3 border border-2 rounded shadow-lg">
+    <!-- Datos de la multa -->
+    <div class="row mb-3">
+      <h4>Datos de la multa</h4>
+      
+      <!-- Select Motivo -->
+      <div class="col-lg-6 mb-3">
+        <div class="row">
+          <label class="col-2 col-form-label">Motivo</label>
+          <div class="col-10">
+            <select class="form-select" disabled>
+              <option value="" selected>
+                {{ fine?.report.reportReason.reportReason }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Input fecha -->
+      <div class="col-lg-6 mb-3">
+        <div class="row">
+          <label class="col-2 col-form-label">Fecha</label>
+          <div class="col-10">
+            <input
+              type="datetime-local"
+              class="form-control"
+              [value]="fine?.createdDate"
+              disabled
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Input Descripcion -->
+      <div class="col-lg-12 mb-3">
+        <div class="row">
+          <label class="col-2 col-lg-1 col-form-label">Descripcion</label>
+          <div class="col-10 col-lg-11">
+            <textarea
+              class="form-control"
+              rows="8"
+              style="resize: none"
+              [value]="fine?.report.description"
+              disabled
+            ></textarea>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    
+
+    <div class="row">
+    
+      <h4>Descargo</h4>
+      
+      <form (ngSubmit)="onSubmit()" [formGroup]="reactiveForm">
+        <div class="row">
+          <div class="col-lg-12 mb-3">
+            <div class="row">
+              <label class="col-2 col-lg-1 col-form-label">Motivo</label>
+              <div class="col-10 col-lg-11">
+                <textarea
+                  class="form-control"
+                  name="textarea"
+                  id="textarea"
+                  rows="8"
+                  formControlName="disclaimerControl"
+                  style="resize: none"
+                  [ngClass]="onValidate('disclaimerControl')"
+                ></textarea>
+                <div class="invalid-feedback">
+                  {{ showError("disclaimerControl") }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="buttons-box d-flex justify-content-end">
+          <div class="submit-box">
+            <button
+              type="button"
+              class="btn btn-secondary me-3"
+              [routerLink]="'/home/sanctions/sanctionsList'"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              class="btn btn-success"
+              [disabled]="reactiveForm.invalid"
+            >
+              Enviar
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>

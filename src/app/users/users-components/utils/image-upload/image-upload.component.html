@@ -1,0 +1,19 @@
+<input type="file" class="file-input" style="display: none;"
+(change)="selectFile($event)"  accept=".jpg, .jpeg, .png" #fileUpload multiple>
+
+<div class="d-flex justify-content-between">
+    <img src="" alt="" (click)="fileUpload.click()">
+    @if(files.length > 0){
+        <div class="position-relative" id="contenedor">
+            <div class="position-absolute top-50 start-0 translate-middle-y">
+                <i class="bi bi-image ps-2" style="font-size: x-large;"></i>
+            </div>
+            <div class="position-absolute top-50 start-50 translate-middle ps-2">
+                <span style="padding-right: 5px; font-size:medium;">{{files[0].name.slice(0,6)}}</span>
+            </div>
+            <div class="position-absolute top-50 end-0 translate-middle-y">
+                <button type="button" class="btn-close pe-3 mt-1" aria-label="Close" (click)="eliminateImg(0)"></button>
+            </div>
+        </div>
+    }
+</div>

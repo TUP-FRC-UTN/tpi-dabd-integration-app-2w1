@@ -1,0 +1,109 @@
+<div class="modal-content border border-2">
+  <div class="modal-header">
+    <h1 class="modal-title fs-5" id="complaintModal">CONSULTA DENUNCIA</h1>
+    <button type="button" class="btn-close" (click)="close()"></button>
+  </div>
+  <div class="modal-body">
+
+    <div class="row">
+
+      <!-- Select Motivo -->
+      <div class="col-lg-6 mb-3">
+        <div class="row">
+          <label class="col-2 col-form-label">Motivo</label>
+          <div class="col-10">
+            <select class="form-select" disabled>
+              <option value="" selected>{{complaint?.complaintType}}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Input fecha -->
+      <div class="col-lg-6 mb-3">
+        <div class="row">
+          <label class="col-2 col-form-label">Fecha</label>
+          <div class="col-10">
+            <input type="datetime-local" class="form-control" [value]="complaint?.createdDate" disabled>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Input Descripcion -->
+      <div class="col-lg-12 mb-3">
+        <div class="row">
+          <label class="col-2 col-lg-1 col-form-label">Descripcion</label>
+          <div class="col-10 col-lg-11">
+            <textarea class="form-control" rows="8" style="resize: none;" [value]="complaint?.description"
+              disabled></textarea>
+          </div>
+        </div>
+      </div>
+
+
+
+      <!-- Select Estado -->
+      <div class="col-lg-6 mb-3">
+        <div class="row">
+          <label class="col-2 col-form-label">Estado</label>
+          <div class="col-10">
+            <select class="form-select" disabled>
+              <option value="" disabled selected>{{complaint?.complaintState}}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Input Motivo del estado -->
+      <div class="col-lg-6 mb-3">
+        <div class="row">
+          <label class="col-2 col-form-label">Razon</label>
+          <div class="col-10">
+            <input type="text" class="form-control" [value]="complaint?.stateReason" disabled>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Input del denunciante -->
+      <div class="col-lg-6 mb-3">
+        <div class="row">
+          <label class="col-2 col-form-label">Denunciante</label>
+          <div class="col-10">
+            <input type="text" class="form-control" [value]="complaint?.userId" disabled>
+          </div>
+        </div>
+      </div>
+
+      <!-- Input adjuntos -->
+      <div class="col-lg-6 mb-3">
+        <div class="row">
+          <label class="col-2 col-form-label">Pruebas</label>
+          <div class="col-10">
+            <!-- Listado de archivos -->
+            <div class="list-group">
+              @for (file of this.files; track file) {
+              <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                  <i class="bi-file-earmark-text me-3 text-primary fs-5"></i>
+                  <span>{{file.name.length > 40 ? file.name.slice(0, 40)+'...' :
+                    file.name}}</span>
+                </div>
+                <span>{{ (file.size / (1024 * 1024)).toFixed(2) }} MB</span>
+              </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="close()">Cerrar</button>
+  </div>
+</div>

@@ -1,0 +1,195 @@
+
+body {
+    background-color: #FFFFFF;
+    font-family: Arial, sans-serif;
+}
+
+.header {
+    background-color: #000000;
+    color: #FFFFFF;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+}
+
+.user-info .bi {
+    margin-right: 8px;
+    font-size: 1.5rem;
+    color: #FFFFFF;
+}
+
+.notification-icons .bi {
+    font-size: 1.5rem;
+    color: #FFFFFF;
+    cursor: pointer;
+}
+
+
+.notification-list {
+    margin-top: 20px;
+}
+
+.notification-card {
+    background-color: #FFFFFF;
+    border: 1px solid #000000;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 10px;
+}
+
+.notification-card h5 {
+    margin: 0 0 10px 0;
+    color: #000000;
+}
+
+.notification-card p {
+    margin: 0 0 10px 0;
+    color: #000000;
+}
+
+.notification-card .btn-dark {
+    background-color: #000000;
+    color: #FFFFFF;
+}
+
+.modal-content {
+    background-color: #FFFFFF;
+    border-radius: 5px;
+}
+
+.modal-header {
+    background-color: #000000;
+    color: #FFFFFF;
+    border-bottom: none;
+}
+
+.modal-title {
+    color: #FFFFFF;
+}
+
+.modal-body {
+    padding: 20px;
+    background-color: #FFFFFF;
+    color: #000000;
+}
+
+.modal-body .details {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-footer {
+    background-color: #FFFFFF;
+    border-top: none;
+}
+
+.btn-primary {
+    background-color: #000000;
+    border-color: #000000;
+}
+
+.btn-primary:hover {
+    background-color: #333333;
+    border-color: #333333;
+}
+
+.btn-secondary {
+    background-color: #000000;
+    border-color: #000000;
+}
+
+.btn-secondary:hover {
+    background-color: #333333;
+    border-color: #333333;
+}
+
+.icons {
+    font-size: 1.2rem;
+    color: #000000;
+}
+
+@media (max-width: 768px) {
+    .header, .modal-content {
+        padding: 10px;
+    }
+
+    .user-info, .notification-icons {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+
+.empty-state {
+    position: absolute;
+    top: 50px;
+    right: 20px;
+    z-index: 1050;
+}
+
+.custom-alert {
+    background-color: #FFFFFF;
+    border: 1px solid #000000;
+    border-radius: 5px;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.custom-alert .bi {
+    margin-right: 10px;
+    font-size: 1.5rem;
+    color: #000000;
+}
+
+.btn-dark {
+    background-color: #000000;
+    color: #FFFFFF;
+}
+
+.btn-close {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    color: #000000;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 1000;
+    display: block;
+    float: left;
+    min-width: 10rem;
+    padding: 0.5rem 0;
+    margin: 0.125rem 0 0;
+    font-size: 1rem;
+    color: #212529;
+    text-align: left;
+    list-style: none;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 0.25rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.175);
+  }
+
+  

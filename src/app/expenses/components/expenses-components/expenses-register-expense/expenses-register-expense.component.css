@@ -1,0 +1,16 @@
+.modal {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  
+  .modal-header .btn-close-white {
+    filter: brightness(0) invert(1);
+  }
+  
+  /* Asegurarse de que el modal esté por encima del backdrop */
+  .modal {
+    z-index: 1050;
+  }
+  
+  .modal-backdrop {
+    z-index: 1040;
+  }

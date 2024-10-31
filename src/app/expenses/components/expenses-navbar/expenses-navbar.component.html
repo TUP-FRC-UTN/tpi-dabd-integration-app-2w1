@@ -1,0 +1,35 @@
+<div class="mb-5">
+    <!-- Background opacity  -->
+    <div class="overlay-off" [class]="!expand ? 'overlay-off' : 'overlay-on'"></div>
+    <!-- NavBar -->
+    <nav class="navbar mynav d-flex justify-content-between shadow z-3 fixed-top text-bg-dark mb-5">
+        <button class="btn text-light fs-4" (click)="changeState()">
+            <i [class]="expand ? 'bi bi-x-lg' : 'bi bi-list'"></i>
+        </button>
+        <h3>{{pageTitle}}</h3>
+        <button class="btn btn-dark" (click)="redirect('home/profile')">Nombre de usuario<i class="bi-person" style="width: 50px; height: 50px;"></i></button>
+    </nav>
+    <!-- SideBar -->
+        <aside class="myside text-bg-dark z-2 h-100 pt-5 fixed-top animation"
+            [class]="expand ? 'side-expanded' : 'side-compressed'">
+            <div class="pt-3 fs-5 d-flex flex-column h-100">
+                <ul class="nav flex-column">
+                    <li class="nav-item mb-2">
+                        @for (button of buttonsList; track $index) {
+                            <app-expenses-side-button [expanded]="expand" [info]="button" [userRoles]="userRoles" (sendTitle)="setTitle($event)" ></app-expenses-side-button>
+                        }
+                    </li>
+                </ul>
+                <div class="nav-item mt-auto">
+                    <button class="nav-link d-flex text-light w-100 px-3 py-2">
+                        <i class="bi-info-circle"></i>
+                        @if (expand) {<span class="ms-2">Ayuda</span>}
+                    </button>
+                    <button class="nav-link d-flex text-light w-100 px-3 py-2" (click)="redirect('login')">
+                        <i class="bi-box-arrow-left"></i>
+                        @if (expand) {<span class="ms-2">Salir</span>}
+                    </button>
+                </div>
+            </div>
+        </aside>
+</div>

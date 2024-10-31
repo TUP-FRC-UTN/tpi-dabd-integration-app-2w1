@@ -1,0 +1,94 @@
+<div class="container d-flex flex-column justify-content-center align-items-center">
+  <form [formGroup]="proveedorForm" (ngSubmit)="onSubmit()" class="mt-3 bg-white shadow p-3" style="max-width: 500px">
+    <h1>Proveedores</h1>
+
+    <div class="row">
+      <div class="col-sm-6">
+        <div class="mb-3">
+          <label class="form-label">Razon social</label>
+          <input type="text" formControlName="name" class="form-control" [ngClass]="{'is-invalid': isFieldInvalid('name')}"/>
+          <div *ngIf="isFieldInvalid('name')" class="invalid-feedback">
+            Este campo es obligatorio.
+          </div>
+        </div>
+      </div>
+
+      <div class="col-sm-6">
+        <div class="mb-3">
+          <label class="form-label">Obra social</label>
+          <input type="text" formControlName="healthInsurance" class="form-control" [ngClass]="{'is-invalid': isFieldInvalid('healthInsurance')}"/>
+          <div *ngIf="isFieldInvalid('healthInsurance')" class="invalid-feedback">
+            Este campo es obligatorio.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-6">
+        <div class="mb-3">
+          <label class="form-label">Telefono</label>
+          <input type="text" formControlName="phoneNumber" class="form-control" [ngClass]="{'is-invalid': isFieldInvalid('phoneNumber')}"/>
+          <div *ngIf="isFieldInvalid('phoneNumber')" class="invalid-feedback">
+            Debe ingresar un número válido.
+          </div>
+        </div>
+      </div>
+
+      <div class="col-sm-6">
+        <div class="mb-3">
+          <label class="form-label">Email</label>
+          <input type="email" formControlName="email" class="form-control" [ngClass]="{'is-invalid': isFieldInvalid('email')}"/>
+          <div *ngIf="isFieldInvalid('email')" class="invalid-feedback">
+            Debe ingresar un correo electrónico válido.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-6">
+        <div class="mb-3">
+          <label class="form-label">Tipo proveedor</label>
+          <select formControlName="supplierType" class="form-select" [ngClass]="{'is-invalid': isFieldInvalid('supplierType')}">
+            <option value="" disabled selected>Seleccionar tipo</option>
+            <option value="OTHER">Otro</option>
+            <option value="OUTSOURCED_SERVICE">Servicio externo</option>
+            <option value="INVENTORY_SUPPLIER">Proveedor de Inventario</option>
+          </select>
+          <div *ngIf="isFieldInvalid('supplierType')" class="invalid-feedback">
+            Este campo es obligatorio.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <div class="mb-3">
+          <label class="form-label">Descripcion</label>
+          <textarea formControlName="description" class="form-control"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <div class="form-check">
+          <input type="checkbox" formControlName="authorized" class="form-check-input" />
+          <label class="form-check-label">Autorizado</label>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="row">
+      <div class="col">
+        <button type="button" class="btn btn-secondary" (click)="back()">Volver</button>
+      </div>
+      <div class="col text-end">
+        <button type="submit" class="btn btn-success" [disabled]="proveedorForm.invalid">Modificar</button>
+      </div>
+    </div>
+  </form>
+</div>

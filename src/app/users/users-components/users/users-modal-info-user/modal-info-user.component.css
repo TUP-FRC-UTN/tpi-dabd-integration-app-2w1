@@ -1,0 +1,10 @@
+.btn-style{
+    background-color: var(--color-nav);
+    height: 50px;
+    color: #E8E8E8;
+}
+
+.btn-hoover:hover{
+    background-color: var(--color-side)!important;
+    color: #E8E8E8;
+}

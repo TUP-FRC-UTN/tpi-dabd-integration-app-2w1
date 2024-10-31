@@ -1,0 +1,40 @@
+<div class="modal fade" id="complaintModal" tabindex="-1" aria-labelledby="complaintModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="complaintModalLabel">Gestión de denuncias <i
+                        class="bi bi-question-circle ms-2" data-bs-toggle="tooltip" data-bs-placement="right"
+                        [title]="tooltipTitle"></i></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Tipo de Denuncia</th>
+                            <th>Estado</th>
+                            <th>Fecha</th>
+                            <th>Seleccionar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let complaint of complaints">
+                            <td>{{ complaint.complaintType }}</td>
+                            <td>{{ complaint.complaintState }}</td>
+                            <td>{{ complaint.createdDate | date }}</td>
+                            <td class="text-center">
+                                <input type="checkbox" [(ngModel)]="complaint.selected">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                    (click)="attachSelectedComplaintsToList()">Seleccionar
+                    denuncias</button>
+            </div>
+        </div>
+    </div>
+</div>

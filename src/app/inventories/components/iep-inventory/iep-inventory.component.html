@@ -1,0 +1,245 @@
+<!-- Estilos CSS generales para el documento -->
+<style>
+
+</style>
+
+<!-- Título del documento -->
+
+<body>
+  <!-- Inicio del formulario principal -->
+  <form class="form">
+    <!-- Contenedor principal -->
+    <div class="container">
+      <!-- Encabezado con título y botón de información -->
+      <div class="row mb-3">
+        <div class="col">
+          <h2 class="titulo">Inventario</h2>
+        </div>
+        <div class="col-1">
+          <!-- Botón para abrir el modal de información -->
+          <button class="btn btn-primary info-button" data-bs-toggle="modal" data-bs-target="#infoModal"
+            style="background-color: rgb(0, 68, 255)">
+            <!-- Ícono de información -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="28" fill="currentColor"
+              class="bi bi-info-circle">
+              <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+              <path
+                d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal para información adicional sobre el inventario -->
+      <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <!-- Encabezado del modal -->
+            <div class="modal-header">
+              <h5 class="modal-title" id="infoModalLabel">Información</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <!-- Contenido del modal -->
+            <div class="modal-body">
+              Esta página de inventario te permite realizar las siguientes acciones:
+
+              <ul>
+                <li><strong>Visualizar el inventario completo:</strong> Observa el listado de todos los productos
+                  almacenados en el inventario, incluyendo detalles como su disponibilidad, estado y categoría.</li>
+
+                <li><strong>Filtrar productos:</strong> Usa los filtros para afinar la búsqueda según:
+                  <ul>
+                    <li>Si el producto es <em>Reusable</em> (Sí o No).</li>
+                    <li>La <em>Categoría</em> del producto.</li>
+                    <li><em>Cantidad mínima</em> y <em>máxima</em>, para definir el rango de cantidades.</li>
+                    <li><em>Nombre</em> del producto.</li>
+                  </ul>
+                  Además, puedes limpiar los filtros seleccionados con el botón de "Limpiar filtros".
+                </li>
+
+                <li><strong>Estado de productos por categoría:</strong> Visualiza un resumen del estado actual de los
+                  productos (disponibles, en uso o en mantenimiento) por categoría, en la tabla de estado de productos.
+                </li>
+
+                <li><strong>Exportar datos:</strong> Genera y descarga informes en formato PDF o Excel para el listado
+                  de productos.</li>
+
+                <li><strong>Añadir nuevos productos:</strong> Usa el botón "Nuevo" para abrir el formulario de agregar
+                  producto y registrar un nuevo artículo en el inventario.</li>
+
+                <li><strong>Volver al menú principal:</strong> Usa el botón "Volver" para regresar a la página de inicio
+                  o menú principal.</li>
+              </ul>
+            </div>
+            <!-- Pie del modal con botón para cerrar -->
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Filtros de búsqueda: Reusable, Categoría, Cantidad, Nombre -->
+      <div class="row m-3" style="width: 100%">
+        <!-- SELECTS -->
+        <div class="row mb-3">
+          <div class="col-1">
+            <label for="Reusable" class="form-label">Reusable</label>
+          </div>
+          <div class="col-5">
+            <!-- Selector de reutilizables -->
+            <select name="Reusable" id="Reusable" class="form-select" [(ngModel)]="reusable" #Reusable="ngModel"
+              (ngModelChange)="aplicarFiltros()">
+              <option value="0"></option>
+              <option [value]="1">Si</option>
+              <option [value]="2">No</option>
+            </select>
+          </div>
+          <!-- Selector de categorías -->
+          <div class="col-1">
+            <label for="Categorias" class="form-label">Categoria</label>
+          </div>
+          <div class="col-5">
+            <select name="Categorias" id="Categorias" class="form-select" [(ngModel)]="categoria" #Categorias="ngModel"
+              (ngModelChange)="aplicarFiltros()">
+              <option value="0"></option>
+              @for (c of categorias; track $index) {
+              <option [value]="c.id">{{ c.category }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <!-- Campos de entrada para cantidad mínima y máxima -->
+        <div class="row mb-3">
+          <div class="col-1">
+            <label for="CantMinima" class="form-label">Cant. minima</label>
+          </div>
+          <div class="col-5">
+            <input type="number" name="CantMinima" id="CantMinima" class="form-control" [(ngModel)]="cantMinima"
+              #CantMinima="ngModel" min="0" (ngModelChange)="aplicarFiltros()" />
+            <div *ngIf="!validoMin" class="error-container mt-1">
+              La cantidad mínima no puede ser mayor a la cantidad máxima
+            </div>
+          </div>
+          <div class="col-1">
+            <label for="CantMaxima" class="form-label">Cant. máxima</label>
+          </div>
+          <div class="col-5">
+            <input type="number" name="CantMaxima" id="CantMaxima" class="form-control" [(ngModel)]="cantMaxima"
+              #CantMaxima="ngModel" min="0" (ngModelChange)="aplicarFiltros()" />
+            <div *ngIf="!validoMax" class="error-container mt-1">
+              La cantidad máxima no puede ser menor a la cantidad mínima
+            </div>
+          </div>
+        </div>
+
+        <!-- Filtro por nombre -->
+        <div class="row mb-3">
+          <div class="col-1">
+            <label for="Nombre" class="form-label">Nombre</label>
+          </div>
+          <div class="col-5">
+            <input type="text" id="Nombre" name="Nombre" class="form-control" [(ngModel)]="nombre" #Nombre="ngModel"
+              (ngModelChange)="aplicarFiltros()" />
+          </div>
+          <!-- Botón para limpiar filtros -->
+          <div class="col-6" style="text-align: end">
+            <button class="btn btn-primary" (click)="cleanFilters()">
+              <i class="bi bi-trash"></i></button>
+          </div>
+          
+        </div>
+      </div>
+
+      <!-- Tabla con el estado de productos según la categoría -->
+<!--       <div class="container row mb-3">
+        <div class="row">
+          <div class="col-10">
+            <label>Estado de productos</label>
+          </div>
+          <table class="table" style="font-size: small">
+            <thead>
+              <th scope="col">Categoría</th>
+              <th scope="col">Disponibles</th>
+              <th scope="col">En uso</th>
+              <th scope="col">En mantenimiento</th>
+              <th></th>
+            </thead>
+            <tbody>
+              @for(c of categorias; track $index) {
+              <tr>
+                <th scope="row">{{ c.category }}</th>
+                <td>{{ getCountByategoryAndState(c.id, "Disponible") }}</td>
+                <td>{{ getCountByategoryAndState(c.id, "Prestado") }}</td>
+                <td>{{ getCountByategoryAndState(c.id, "Mantenimiento") }}</td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div> -->
+
+      <!-- Tabla de productos y botones para generar PDF o Excel -->
+      <div class="container row">
+        <div class="col">
+          <h4>Productos</h4>
+        </div>
+        <div class="col d-flex justify-content-end">
+          <button class="btn btn-success me-2" (click)="generarExcel()">
+            <i class="fa-solid fa-file-excel"></i>
+          </button>
+          <button class="btn btn-danger" (click)="generarPdf()">
+            <i class="fas fa-file-pdf"></i>
+          </button>
+        </div>
+        
+        <table class="table table-striped" id="productsList"></table>
+      </div>
+
+      <!-- Botones de navegación: Volver y agregar nuevo producto -->
+      <div class="row volver">
+        <div class="col text-end">
+          <!-- Botón de "Volver" -->
+          <button class="btn btn-secondary me-2" (click)="irMenu()">
+            Volver</button><!-- Botón de "Nuevo Producto" -->
+          <button class="btn btn-outline-primary" (click)="irAgregarProducto()" data-bs-toggle="modal"
+            data-bs-target="#nuevoProductoModal">
+            Nuevo
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</body>
+
+
+
+<!-- Modal para aumento de stock -->
+<div class="modal fade" 
+     [class.show]="showAumentoStockModal" 
+     [style.display]="showAumentoStockModal ? 'block' : 'none'"
+     id="aumentoStockModal" 
+     tabindex="-1" 
+     aria-labelledby="aumentoStockModalLabel" 
+     [attr.aria-modal]="showAumentoStockModal"
+     [attr.aria-hidden]="!showAumentoStockModal"
+     (click)="handleModalBackdropClick($event)">
+  <div class="modal-dialog modal-lg" style="max-width: 75%;" (click)="$event.stopPropagation()">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Agregar Aumento de Stock</h5>
+        <button type="button" class="btn-close" (click)="cerrarModalAumentoStock()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <app-iep-stock-increase *ngIf="showAumentoStockModal"></app-iep-stock-increase>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop fade" 
+     [class.show]="showNuevoProductoModal || showAumentoStockModal"
+     *ngIf="showNuevoProductoModal || showAumentoStockModal"
+     (click)="handleModalBackdropClick($event)"></div>

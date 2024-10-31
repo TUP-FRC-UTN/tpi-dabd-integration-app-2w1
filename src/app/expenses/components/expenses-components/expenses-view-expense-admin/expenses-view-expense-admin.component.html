@@ -1,0 +1,204 @@
+<button class="floating-btn btn btn-primary" (click)="redirect('/registerExpense')"><span class="bi-plus-lg"></span></button>
+<section class="py-5">
+  <div class="container p-3 border border-2 rounded shadow-lg">
+
+   
+     <!-- <div class="row mb-3 text-end">
+      <div class="col">
+        <button class="btn btn-primary" (click)="redirect('/registerExpense')">
+          <span class="bi-plus-lg"></span>
+        </button>
+      </div>
+    </div>  -->
+
+    <!-- Fila de botones de filtro -->
+    <div class="row mb-3">
+
+      <!-- Barra de busqueda -->
+      <div class="col">
+        <input type="text" placeholder="Buscar" class="form-control" [(ngModel)]="searchTerm"
+          (input)="onSearch($event)">
+      </div>
+
+      <!-- Filtro de fechas -->
+      <div class="col d-flex gap-3">
+        <div class="col">
+          <input (change)="filterDataOnChange()" [(ngModel)]="dateFrom" class="form-control" type="date">
+        </div>
+        <div class="col">
+          <input (change)="filterDataOnChange()" [(ngModel)]="dateTo" class="form-control" type="date">
+        </div>
+      </div>
+
+      <!-- BOTON DE FILTRO PARA QUIENES LO NECESITEN -->
+      <!-- <div class="col-auto">
+        <button class="btn btn-primary bi-funnel-fill">Filtros</button>
+      </div> -->
+
+      <!-- Botones de exportar -->
+      <div class="col-auto d-flex gap-1 text-end">
+        <button (click)="exportToExcel()" id="exportExcelBtn" class="btn btn-success bi-file-earmark-excel"></button>
+        <button  (click)="exportToPDF()" id="exportPdfBtn" class="btn btn-danger bi-file-earmark-pdf"></button>
+      </div>
+    </div>
+
+    <table id="myTable" class="table table-striped border border-3 rounded">
+      <thead>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+</section>
+
+<app-expense-view [expense]="selectedExpense"></app-expense-view>
+<!-- Modal de info -->
+<div class="modal fade" id="infoModal" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Título de tu modal</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <!-- body con tus inputs -->
+        Ejemplo modal
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div>
+   <!-- Modal Confirm Delete -->
+   <div
+   #modalConfirmDelete
+   class="modal"
+   id="modalConfirrmationDeleteExpense"
+   tabindex="-1"
+   role="dialog"
+ >
+   <div class="modal-dialog" role="document">
+     <div class="modal-content">
+       <div class="modal-header">
+         <h5 class="modal-title">Confirmación</h5>
+       </div>
+       <div class="modal-body">
+         ¿Está seguro de eliminar el gasto?
+       </div>
+       <div class="modal-footer">
+        <button
+        type="button"
+        class="btn btn-danger"
+        (click)="confirmDeleteExpense()"
+      >
+        Eliminar
+      </button>
+         <button
+           type="button"
+           class="btn btn-secondary"
+           (click)="closeModal(modalConfirmDelete)"
+         >
+           Cancelar
+         </button>
+       </div>
+     </div>
+   </div>
+ </div>
+  <!--Modal show operation successfuly-->
+  <div
+  #operationSuccessfullyDelete
+  class="modal"
+  id="operationSuccessfully"
+  tabindex="-1"
+  role="dialog"
+ >
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirmación</h5>
+      </div>
+      <div class="modal-body">
+        Se realizo con exito la eliminacion del gasto
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary">
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary">
+          Aceptar
+        </button>
+      </div>
+    </div>
+  </div>
+ </div>
+ 
+ <!-- Modal Note Credit -->
+ <div
+   #modalNoteCredit
+   class="modal"
+   id="showModalNoteCredit"
+   tabindex="-1"
+   role="dialog"
+ >
+   <div class="modal-dialog" role="document">
+     <div class="modal-content">
+       <div class="modal-header">
+         <h5 class="modal-title">Nota de crédito</h5>
+       </div>
+       <div class="modal-body">
+         El gasto ya está cobrado. ¿Desea realizar una nota de crédito?
+       </div>
+       <div class="modal-footer">
+         <button
+           type="button"
+           class="btn btn-secondary"
+           (click)="closeModal(modalNoteCredit)"
+         >
+           Cancelar
+         </button>
+         <button
+           type="button"
+           class="btn btn-danger"
+           (click)="deleteWithNoteCredit()"
+         >
+           Eliminar
+         </button>
+       </div>
+     </div>
+   </div>
+ </div>
+   <!-- Modal Error Delete -->
+   <div
+   #modalError
+   class="modal"
+   id="modalError"
+   tabindex="-1"
+   role="dialog"
+ >
+   <div class="modal-dialog" role="document">
+     <div class="modal-content">
+       <div class="modal-header">
+         <h5 class="modal-title">Error</h5>
+       </div>
+       <div class="modal-body">
+         Se produjo un error al eliminar el gasto
+       </div>
+       <div class="modal-footer">
+         <button
+           type="button"
+           class="btn btn-primary"
+           (click)="closeModal(modalError)"
+         >
+           Aceptar
+         </button>
+       </div>
+     </div>
+   </div>
+   </div>
+
+

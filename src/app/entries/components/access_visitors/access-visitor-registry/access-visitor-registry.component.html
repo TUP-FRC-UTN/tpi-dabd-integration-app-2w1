@@ -1,0 +1,208 @@
+<div class="container-fluid p-1 mt-2 mb-2">
+
+
+  <div class="container-fluid m-1 p-2">
+    <div class="container-fluid col-10 shadow p-3 mb-5 bg-body rounded"> <!-- Contenedor con sombra -->
+      <div class>
+        <h4 class="text-left">Registro de Ingreso/Egreso</h4>
+      </div>
+      <!-- Contenedor para los botones alineados a la derecha -->
+      <div class="d-flex justify-content-end botones">
+        <label>
+          <button 
+            class="btn btn-primary me-2" 
+            (click)="toggleAllVisitors()"
+            [ngClass]="{'active': allVisitorsChecked}">
+            <i class="bi bi-person-raised-hand"></i> 
+          </button>
+        </label>
+        <label>
+          <button 
+            class="btn btn-warning me-2" 
+            (click)="toggleAllEmployers()"
+            [ngClass]="{'active': allEmployersChecked}">
+            <i class="bi bi-tools"></i> 
+          </button>
+        </label>
+        <label>
+          <button 
+            class="btn btn-success me-2" 
+            (click)="toggleAllOwner()"
+            [ngClass]="{'active': allOwnersChecked}">
+            <i class="bi bi-house-fill"></i> 
+          </button>
+        </label>
+
+        <button
+          class="btn btn-primary me-2"
+          data-bs-toggle="modal"
+          data-bs-target="#qrScannerModal"
+        >
+          <i class="bi bi-qr-code-scan"></i>
+        </button>
+        <!-- Botón para cargar imagen de QR -->
+        <button class="btn btn-primary me-2" (click)="uploadQrImage()">
+          <i class="bi bi-file-earmark-arrow-up"></i>
+        </button>
+        <input
+          type="file"
+          accept="image/*"
+          #qrInput
+          hidden
+          (change)="onFileSelected($event)"
+        />
+      </div>
+
+      <table
+        id="visitorsTable"
+        class="table table-bordered table-striped"
+      >
+        <thead>
+          <tr>
+            <th scope="col">Nombre</th>
+            <th scope="col">Tipo Doc.</th>
+            <th scope="col">Documento</th>
+            <th scope="col">Acción</th>
+            <th scope="col">Observaciones</th>
+            <th scope="col">Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Aquí iría la lógica para mostrar los visitantes -->
+        </tbody>
+      </table>
+
+      <div class="row align-items-center">
+        <!-- Aquí puedes incluir el botón para agregar visitantes si es necesario -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal del escáner QR -->
+<div
+  class="modal fade"
+  id="qrScannerModal"
+  tabindex="-1"
+  aria-labelledby="qrScannerModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="qrScannerModalLabel">Escanear Código QR</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+          (click)="stopScanner()"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <ngx-scanner-qrcode
+          #scanner
+          (event)="handleQrScan($event)"
+        ></ngx-scanner-qrcode>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-bs-dismiss="modal"
+          (click)="stopScanner()"
+        >
+          Cerrar
+        </button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="startScanner()"
+        >
+          Escanear
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Información del Visitante -->
+<div
+  class="modal"
+  id="visitorInfoModal"
+  tabindex="-1"
+  aria-labelledby="visitorInfoModalLabel"
+  aria-hidden="true"
+  [class.show]="isModalOpen"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="visitorInfoModalLabel">
+          Información de la Persona
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+          (click)="closeModal()"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div *ngIf="selectedVisitor">
+          <p>
+            <strong>Nombre:</strong> {{ selectedVisitor.name }} {{ selectedVisitor.last_name }}
+          </p>
+          <p><strong>Tipo de Persona:</strong> 
+            {{ 
+              selectedVisitor.userType.description === 'Emplooyed' ? 'Empleado' : 
+              selectedVisitor.userType.description === 'Visitor' ? 'Visitante' : 
+              selectedVisitor.userType.description === 'Owner' ? 'Propietario' : 
+              selectedVisitor.userType.description === 'Tenant' ? 'Inquilino' : 
+              selectedVisitor.userType.description 
+            }}
+          </p>
+          <p>
+            <strong>Tipo de documento:</strong> {{ getDocumentType(selectedVisitor) }}
+          </p>
+          <p><strong>Documento:</strong> {{ selectedVisitor.document }}</p>
+          <p><strong>Email:</strong> {{ selectedVisitor.email }}</p>
+
+          <p><strong>Información del vehículo:</strong></p>
+          <div *ngIf="hasVehicles(selectedVisitor); else noVehicle">
+            <ul *ngFor="let vehicle of getVehicles(selectedVisitor)">
+              <li><strong>Patente:</strong> {{ vehicle.plate }}</li>
+              <li><strong>Tipo:</strong> 
+                {{ 
+                  vehicle.vehicle_Type.description === 'Car' ? 'Coche' : 
+                  vehicle.vehicle_Type.description === 'MotorBike' ? 'Motocicleta' : 
+                  vehicle.vehicle_Type.description === 'Truck' ? 'Camión' : 
+                  vehicle.vehicle_Type.description 
+                }}
+              </li>
+            </ul>
+          </div>
+          <ng-template #noVehicle>
+            <p>No tiene registro</p>
+          </ng-template>
+
+          <p><strong>Rango de fechas:</strong></p>
+          <div *ngIf="selectedVisitor.authRanges.length > 0; else noDays">
+            <ul *ngFor="let auth of selectedVisitor.authRanges">
+              <li>
+                <strong>Desde:</strong> {{ auth.init_date | date : "dd/MM/yyyy" }}<br />
+              </li>
+              <li>
+                <strong>Hasta:</strong> {{ auth.end_date | date : "dd/MM/yyyy" }}
+              </li>
+            </ul>
+          </div>
+          <ng-template #noDays>
+            <p>No hay fecha cargada.</p>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

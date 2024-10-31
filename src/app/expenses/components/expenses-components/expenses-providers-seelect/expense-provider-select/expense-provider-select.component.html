@@ -1,0 +1,8 @@
+<select class="form-select" name="selectprovider" 
+[(ngModel)]="selectedProviderId" (ngModelChange)="onProviderChange($event)" 
+id="selectprovider" aria-label="Seleccione un proveedor:">
+  <option value="0" selected></option>
+  @for (item of providersList; track $index) {
+    <option [value]="item.id">{{item.description}}</option>
+  }
+</select>

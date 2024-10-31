@@ -1,0 +1,87 @@
+<div class="modal fade" id="expenseModal" tabindex="-1" aria-labelledby="expenseModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="expenseModalLabel">Detalle del gasto</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col">
+              <p><strong>Tipo:</strong> {{ expense?.typeExpense }}</p>
+            </div>
+            <div class="col">
+              <p><strong>Fecha:</strong> {{ expense?.expenseDate | date: 'dd/MM/yyyy' }}</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <p><strong>Proveedor:</strong> {{ expense?.providerName }}</p>
+            </div>
+            <div class="col">
+              <p><strong>Categoría:</strong> {{ expense?.categoryName}}</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <p><strong>N° Comprobante:</strong> {{ expense?.invoiceNumber }}</p>
+            </div>
+            <div class="col">
+              @if(expense?.fileId){
+                <button >Descargar</button>
+              }
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <p><strong>Monto:</strong> {{ expense?.amount | currency }}</p>
+            </div>
+            <div class="col">
+              <p><strong>N° Cuotas:</strong> {{ expense?.installments}}</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <p><strong>Descripción :</strong> {{ expense?.description}}</p>
+            </div>
+          </div>
+          <hr/>
+          <div class="row">
+            <p><strong>Cuotas:</strong>
+          @for (item of expense?.installmentList; track $index) {
+            <div class="row justify-content-between mx-auto">
+              <div class="col">
+                <p><strong>N° Cuota:</strong> {{ item?.installmentNumber}}</p>
+              </div>
+              <div class="col">
+                <p><strong>Fecha de cobro:</strong> {{ item?.paymentDate | date: 'dd/MM/yyyy'}}</p>
+              </div>
+            </div>
+          }
+          </div>
+          
+          
+          @if(hasDistribution()){
+            <hr/>
+            <div class="row">
+              <p><strong>Distribución:</strong>
+            @for (item of expense?.distributionList; track $index) {
+              <div class="row justify-content-between mx-auto">
+                <div class="col">
+                  <p><strong>Propietario:</strong> {{ item?.owenerFullName}}</p>
+                </div>
+                <div class="col">
+                  <p><strong>Porcentaje:</strong> {{ item?.proportion | percent}}</p>
+                </div>
+              </div>
+            }
+            </div>
+          }
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>

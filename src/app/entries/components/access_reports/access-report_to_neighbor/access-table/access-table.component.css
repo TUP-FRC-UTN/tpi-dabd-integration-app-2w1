@@ -1,0 +1,190 @@
+.filter-toggle {
+    border: 1px solid black !important;
+}
+
+.export-btn {
+    border: 1px solid black !important;
+}
+
+.btn-primary {
+    border: 1px solid black !important;
+}
+
+.dropdown-menu .dropdown-item {
+    background-color: white !important;
+}
+
+.dropdown-menu .dropdown-item:hover {
+    background-color: #a3a3a3 !important;
+}
+
+.dropdown-menu {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+
+
+#myTable th, #myTable td {
+    padding: 8px;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#myTable tr:nth-child(odd) td:not(:first-child) {
+    background-color: #f0f0f0 !important;
+}
+
+#myTable tr:nth-child(even) td:not(:first-child) {
+    background-color: #ffffff !important;
+}
+
+/* Centrado de botones en las celdas */
+#myTable td .btn {
+    min-width: 100px;
+}
+
+.filter-section {
+    margin-bottom: 1rem;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+/* Estilos para los botones de acción */
+.export-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.export-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.filter-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.filter-toggle:hover {
+    background-color: #5a6268;
+}
+
+.advanced-filters {
+    background-color: #c2c9d1;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-top: 1rem;
+    display: none;
+    animation: slideDown 0.3s ease-out;
+}
+
+.advanced-filters.show {
+    display: block;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-control, 
+.btn-secondary {
+    height: 38px;
+}
+
+/* Estilos base de la tabla */
+/* Estilos base de la tabla */
+#myTable {
+    width: auto !important; /* Cambiado de 100% a auto */
+    white-space: nowrap;
+    table-layout: fixed;
+    border-top: 1px solid black !important;
+    background-color: #f9f9f9;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+#myTable th, #myTable td {
+    padding: 8px;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 120px !important; /* Ancho fijo para todas las columnas */
+}
+
+.table-responsive {
+    overflow-x: auto;
+    white-space: nowrap;
+}
+/* Estilos para los botones de estado en la tabla */
+#myTable td .btn.rounded-pill {
+    padding: 4px 15px;
+    font-size: 14px;
+    margin: 0 auto;
+    display: block;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+}
+
+#myTable td .btn.btn-success.rounded-pill {
+    background-color: #28a745;
+    border-color: #28a745;
+    color: white;
+}
+
+#myTable td .btn.btn-danger.rounded-pill {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+/* Ajuste de columnas automáticas */
+.col-auto {
+    flex: 0 0 auto;
+    width: auto;
+}
+
+.responsive-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}

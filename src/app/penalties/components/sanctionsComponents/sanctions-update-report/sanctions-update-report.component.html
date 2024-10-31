@@ -1,0 +1,73 @@
+<div class="container p-3">
+    <div class="post-complaint-section p-4 border shadow-lg p-3 mb-5 bg-white rounded">
+        <h2 class="text-center mb-5">MODIFICAR REPORTE</h2>
+        <form #formDenuncia="ngForm" novalidate>
+            <div class="row mb-4">
+                <div class="col-1">
+                    <label for="selectOption" class="col-form-label">Estado</label>
+                </div>
+                <div class="col-5">
+                    <input type="text" id="selectOption" class="form-control" name="reportState" required disabled
+                        [(ngModel)]="reportState" />
+                </div>
+                <div class="col-1">
+                    <label for="dateInput" class="col-form-label text-end">Fecha</label>
+                </div>
+                <div class="col-5">
+                    <input type="date" id="dateInput" name="dateInput" class="form-control bg-body-secondary" [(ngModel)]="selectedDate" disabled>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-1">
+                    <label for="textareaMessage" class="col-form-label">Descripción</label>
+                </div>
+                <div class="col-11">
+                    <textarea class="form-control" name="textareaMessage" id="textareaMessage"
+                        [placeholder]="textareaPlaceholder" [(ngModel)]="description" #textArea="ngModel" required
+                        minlength="10" maxlength="500" rows="8" style="resize: none;"></textarea>
+                    @if (textArea.invalid && (textArea.dirty || textArea.touched)) {
+                    <div class="form-text text-danger mt-1">
+                        @if (textArea.errors?.['required']) {
+                        <span>Por favor, ingrese un mensaje.</span>
+                        }
+                        @if (textArea.errors?.['minlength']) {
+                        <span>El mensaje debe tener al menos 10 caracteres.</span>
+                        }
+                    </div>
+                    }
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-1">
+                    <label for="infractorInput" class="col-form-label">Infractor</label>
+                </div>
+                <div class="col-5">
+                    <div class="d-flex align-items-center">
+                        <input type="text" id="infractorInput" class="form-control me-3" disabled
+                            [placeholder]="infractorPlaceholder" style="width: 100%;">
+                        <button class="btn btn-info" style="white-space: nowrap;" (click)="development()">Ver más</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-1"></div>
+                <div class="col-5">
+                    <button type="button" class="btn btn-warning" (click)="openModal()">
+                        Gestionar denuncias <i class="bi bi-file-earmark-text"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end">
+                <button type="button" class="btn btn-secondary me-3" [routerLink]="'../reportList'">Cancelar</button>
+                <button type="button" class="btn btn-success" [disabled]="formDenuncia.invalid"
+                    (click)="updateReport()">Actualizar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<app-modal-complaints-list (selectedComplaints)="handleSelectedComplaints($event)"></app-modal-complaints-list>

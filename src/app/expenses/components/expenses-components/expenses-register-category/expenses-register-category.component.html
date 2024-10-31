@@ -1,0 +1,23 @@
+<div class="modal fade" id="categoryRegisterModal" tabindex="-1" aria-labelledby="expenseModalLabel" aria-hidden="true">
+    <div class="modal-dialog ">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="expenseModalLabel">Registrar Categoria</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col">
+              <p>Descripcion:</p><input class="form-control"
+              required
+              [(ngModel)]="category.description" 
+              type="text">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-success" data-bs-dismiss="modal" (click)="save()">Guardar</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </div>

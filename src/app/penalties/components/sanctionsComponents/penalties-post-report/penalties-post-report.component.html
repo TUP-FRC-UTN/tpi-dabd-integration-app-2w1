@@ -1,0 +1,70 @@
+<div class="container p-3">
+    <div class="post-complaint-section p-4 border shadow-lg p-3 mb-5 bg-white rounded">
+        <h2 class="text-center">NUEVO INFORME</h2>
+        <form #formDenuncia="ngForm" (ngSubmit)="onSubmit()" novalidate>
+            <div class="d-flex justify-content-between w-100 mb-4">
+                <div class="input-box w-50">
+                    <label for="selectOption" class="form-label">Motivo</label>
+                    <select id="selectOption" class="form-select w-100" name="option" [(ngModel)]="selectedReasonId"
+                        #optionField="ngModel" required>
+                        <option value="" selected="true">Seleccione una opción</option>
+                        @for (reason of reportReasons; track $index) {
+                        <option [value]="reason.id">{{reason.reportReason}}</option>
+                        }
+                    </select>
+                    @if (optionField.invalid && (optionField.dirty || optionField.touched)) {
+                    <div class="text-danger">
+                        @if (optionField.errors?.['required']) {
+                        <span>Por favor, ingrese una opción</span>
+                        }
+                    </div>
+                    }
+                </div>
+
+                <div class="input-box">
+                    <label for="dateInput" class="form-label">Fecha</label>
+                    <input type="date" id="dateInput" name="dateInput" class="form-control bg-body-secondary"
+                        [(ngModel)]="dateView" #dateField="ngModel" disabled>
+                </div>
+            </div>
+
+            <div class="input-box d-flex flex-column gap-2 mb-4">
+                <label for="textareaMessage" class="form-label">Descripción</label>
+                <textarea class="form-control" name="textareaMessage" id="textareaMessage"
+                    [placeholder]="textareaPlaceholder" [(ngModel)]="description" #textArea="ngModel" required
+                    minlength="10" maxlength="500" rows="8" style="resize: none;"></textarea>
+                @if (textArea.invalid && (textArea.dirty || textArea.touched)) {
+                @if (textArea.errors?.['required']) {
+                <span class="text-danger">
+                    Por favor, ingrese un mensaje.
+                </span>
+                }
+                @if (textArea.errors?.['minlength']) {
+                <span class="text-danger">
+                    El mensaje debe tener al menos 10 caracteres.
+                </span>
+                }
+                }
+            </div>
+
+            <div class="buttons-box d-flex justify-content-between">
+                <div class="actions-box">
+                    <label for="infractorInput" class="form-label">Infractor</label>
+                    <div class="d-flex align-items-center mb-3">
+                        <input type="text" id="infractorInput" class="form-control me-3" disabled
+                            placeholder="Infractor">
+                        <button class="btn btn-success" style="white-space: nowrap;" type="button">Ver más</button>
+                    </div>
+                    <button type="button" class="btn btn-warning" (click)="openSelectComplaints()">Gestionar denuncias
+                        <i class="bi bi-file-earmark-text"></i></button>
+                </div>
+            </div>
+            <div class="submit-box d-flex justify-content-end">
+                <button type="button" class="btn btn-secondary me-3" [routerLink]="'/list'">Cancelar</button>
+                <button type="submit" class="btn btn-success" [disabled]="formDenuncia.invalid">Crear</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<app-modal-complaints-list (selectedComplaints)="handleSelectedComplaints($event)"></app-modal-complaints-list>

@@ -1,0 +1,9 @@
+section{
+    box-shadow: 5px 0px 15px rgba(0, 0, 0, 0.2)
+}
+
+
+.pre-icon:hover{
+    cursor: pointer;
+    background-color: rgb(85, 85, 85);
+}

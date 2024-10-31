@@ -1,0 +1,51 @@
+body {
+    background: #efefef;
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  input {
+    background: 0;
+    border: 0;
+    outline: none;
+    width: 80vw;
+    max-width: 400px;
+    font-size: 1.2em;
+    transition: padding 0.3s 0.2s ease;
+  }
+  
+  input:focus {
+    padding-bottom: 5px;
+  }
+  
+  input:focus + .line:after {
+    transform: scaleX(1);
+  }
+  
+  .field {
+    position: relative;
+    margin-bottom: 20px;
+  }
+  
+  .line {
+    width: 100%;
+    height: 3px;
+    position: absolute;
+    bottom: -8px;
+    background: #bdc3c7;
+  }
+  
+  .line:after {
+    content: " ";
+    position: absolute;
+    width: 100%;
+    height: 3px;
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+    background: #596cc5;
+  }
+
+  

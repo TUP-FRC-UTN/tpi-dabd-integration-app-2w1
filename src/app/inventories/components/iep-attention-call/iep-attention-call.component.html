@@ -1,0 +1,137 @@
+<div class="container">
+  <form [formGroup]="wakeUpCallForm" (ngSubmit)="onSubmit()" class="wake-up-call-form needs-validation">
+    <!-- Fecha -->
+    <div class="mb-3 position-relative">
+      <label for="fecha" class="form-label">Fecha <span class="text-danger">*</span></label>
+      <div class="input-group has-validation">
+        <input 
+          id="fecha" 
+          formControlName="fecha" 
+          type="date" 
+          class="form-control"
+          [class.is-invalid]="wakeUpCallForm.get('fecha')?.invalid && (wakeUpCallForm.get('fecha')?.touched || formSubmitted)"
+          [class.is-valid]="wakeUpCallForm.get('fecha')?.valid && wakeUpCallForm.get('fecha')?.touched"
+        
+        />
+        <div class="valid-feedback">
+          <i class="bi bi-check-lg"></i> Fecha válida
+        </div>
+        <div class="invalid-feedback">
+          <i class="bi bi-exclamation-circle"></i> La fecha es requerida
+        </div>
+      </div>
+    </div>
+
+    <!-- Búsqueda de Empleado -->
+    <div class="mb-3 position-relative">
+      <label class="form-label">Buscar Empleado</label>
+      <div class="input-group has-validation">
+        <span class="input-group-text">
+          <i class="bi bi-search"></i>
+        </span>
+        <input 
+          type="text" 
+          formControlName="searchTerm" 
+          placeholder="Ingrese al menos 3 letras" 
+          class="form-control"
+          [class.is-invalid]="wakeUpCallForm.get('searchTerm')?.invalid && wakeUpCallForm.get('searchTerm')?.touched"
+          [class.is-valid]="wakeUpCallForm.get('searchTerm')?.valid && wakeUpCallForm.get('searchTerm')?.value?.length >= 3"
+        />
+        <div class="valid-feedback">
+          <i class="bi bi-check-lg"></i> Búsqueda válida
+        </div>
+        <div class="invalid-feedback">
+          <i class="bi bi-exclamation-circle"></i> Ingrese al menos 3 caracteres para buscar
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista de Empleados -->
+    <div class="mb-3 position-relative">
+      <label class="form-label">Empleados <span class="text-danger">*</span></label>
+      <div class="card" [class.border-danger]="selectedEmployeeIds.size === 0 && formSubmitted">
+        <div class="card-body employee-list" style="max-height: 200px; overflow-y: auto;">
+          <div *ngFor="let employee of filteredEmployees" class="form-check">
+            <input 
+              type="checkbox" 
+              class="form-check-input"
+              [id]="'employee-' + employee.id"
+              (change)="toggleEmployeeSelection(employee.id)"
+              [checked]="selectedEmployeeIds.has(employee.id)"
+            />
+            <label [for]="'employee-' + employee.id" class="form-check-label">
+              {{ employee.fullName }} - {{ employee.position }}
+            </label>
+          </div>
+          <div *ngIf="filteredEmployees.length === 0" class="text-muted">
+            No se encontraron empleados
+          </div>
+        </div>
+      </div>
+      <div class="invalid-feedback d-block" *ngIf="selectedEmployeeIds.size === 0 && formSubmitted">
+        <i class="bi bi-exclamation-circle"></i> Debe seleccionar al menos un empleado
+      </div>
+      <div class="valid-feedback" *ngIf="selectedEmployeeIds.size > 0">
+        <i class="bi bi-check-lg"></i> Empleados seleccionados correctamente
+      </div>
+    </div>
+
+    <!-- Desempeño -->
+    <div class="mb-3 position-relative">
+      <label class="form-label">Desempeño <span class="text-danger">*</span></label>
+      <div class="btn-group w-100" role="group">
+        <input type="radio" class="btn-check" formControlName="desempeno" value="LEVE" id="leve">
+        <label class="btn btn-outline-primary" for="leve">Leve</label>
+
+        <input type="radio" class="btn-check" formControlName="desempeno" value="MODERADO" id="moderado">
+        <label class="btn btn-outline-primary" for="moderado">Moderado</label>
+
+        <input type="radio" class="btn-check" formControlName="desempeno" value="SEVERO" id="severo">
+        <label class="btn btn-outline-primary" for="severo">Severo</label>
+      </div>
+      <div class="invalid-feedback d-block" *ngIf="wakeUpCallForm.get('desempeno')?.invalid && (wakeUpCallForm.get('desempeno')?.touched || formSubmitted)">
+        <i class="bi bi-exclamation-circle"></i> Seleccione un nivel de desempeño
+      </div>
+      <div class="valid-feedback" *ngIf="wakeUpCallForm.get('desempeno')?.valid && wakeUpCallForm.get('desempeno')?.touched">
+        <i class="bi bi-check-lg"></i> Desempeño seleccionado
+      </div>
+    </div>
+
+    <!-- Observaciones -->
+    <div class="mb-3 position-relative">
+      <label for="observaciones" class="form-label">Observaciones <span class="text-danger">*</span></label>
+      <textarea 
+        id="observaciones" 
+        formControlName="observaciones" 
+        class="form-control" 
+        rows="4"
+        [class.is-invalid]="wakeUpCallForm.get('observaciones')?.invalid && (wakeUpCallForm.get('observaciones')?.touched || formSubmitted)"
+        [class.is-valid]="wakeUpCallForm.get('observaciones')?.valid && wakeUpCallForm.get('observaciones')?.touched"
+      ></textarea>
+      <div class="valid-feedback">
+        <i class="bi bi-check-lg"></i> Observaciones válidas
+      </div>
+      <div class="invalid-feedback">
+        <i class="bi bi-exclamation-circle"></i> Las observaciones son requeridas
+      </div>
+    </div>
+
+    <!-- Mensajes de Alerta -->
+    <div class="alert alert-success alert-dismissible fade show" role="alert" *ngIf="showConfirmation">
+      <i class="bi bi-check-circle me-2"></i>{{ confirmationMessage }}
+      <button type="button" class="btn-close" (click)="showConfirmation = false"></button>
+    </div>
+
+    <div class="alert alert-danger alert-dismissible fade show" role="alert" *ngIf="showError">
+      <i class="bi bi-exclamation-triangle me-2"></i>{{ errorMessage }}
+      <button type="button" class="btn-close" (click)="showError = false"></button>
+    </div>
+
+    <!-- Botones -->
+    <div class="d-flex justify-content-end gap-2 mt-4">
+      <button type="submit" class="btn btn-primary" [disabled]="wakeUpCallForm.invalid && formSubmitted">
+        <i class="bi bi-check-lg me-2"></i>Confirmar
+      </button>
+    </div>
+  </form>
+</div>

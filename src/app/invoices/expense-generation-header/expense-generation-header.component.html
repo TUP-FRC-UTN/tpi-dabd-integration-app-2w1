@@ -1,0 +1,78 @@
+<!-- Sidevar del menu-->
+<!-- User Navbar -->
+<div class="container-fluid p-0">
+    <div class="row m-0 bg-dark" style="height: 60px;">
+      <div class="col-12 d-flex justify-content-between align-items-center">
+        <button class="btn my-btn d-lg-none ms-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar" aria-controls="offcanvasSidebar">
+          <i class="fas fa-bars"></i>
+        </button>
+        <h1 class="text-white mx-auto">Mis Boletas</h1>
+      </div>
+    </div>
+  </div>
+  
+  <!--  Sidebar cuando la pantalla es pequeña -->
+  <div class="offcanvas offcanvas-start bg-secondary d-lg-none" tabindex="-1" id="offcanvasSidebar" aria-labelledby="offcanvasSidebarLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title text-center" id="offcanvasSidebarLabel">MENU</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link-sm active" href="#" title="Inicio">
+            <i class="fas fa-home fw-"></i>
+            <span class="nav-text-sm">Inicio</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link-sm" href="#" title="Mis Boletas">
+            <i class="fas fa-file-invoice"></i>
+            <span class="nav-text-sm">Mis boletas</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link-sm" href="#" title="Reportes">
+            <i class="fas fa-chart-pie"></i>
+            <span class="nav-text-sm">Reportes</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link-sm" href="#" title="Configuración">
+            <i class="fas fa-cog"></i>
+            <span class="nav-text-sm">Configuración</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  
+<!-- Sidebar cuando la pantalla es grande -->
+<div class="sidebar bg-dark d-none d-lg-flex flex-column align-items-center">
+  <ul class="nav flex-column">
+    <li class="nav-item">
+      <a class="nav-link active" href="#" title="Inicio">
+        <i class="fas fa-home"></i>
+        <span class="nav-text">Inicio</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#" title="Mis Boletas">
+        <i class="fas fa-file-invoice"></i>
+        <span class="nav-text">Mis Boletas</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#" title="Reportes">
+        <i class="fas fa-chart-pie"></i>
+        <span class="nav-text">Reportes</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" (click)="ChangeAdminView()" title="Configuración">
+        <i class="fas fa-cog"></i>
+        <span class="nav-text" >Configuración</span>
+      </a>
+    </li>
+  </ul>
+</div>

@@ -1,0 +1,240 @@
+<div class="filter-section">
+    <div class="row align-items-end">
+        <div class="col-md-3">
+            <label class="form-label">Tipo de entrada</label>
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle w-100" type="button" id="dropdownEntryExit" data-bs-toggle="dropdown" aria-expanded="false">
+                    Seleccionar tipos de entrada
+                    <span class="selected-count"></span>
+                </button>
+                <ul class="dropdown-menu w-100" aria-labelledby="dropdownEntryExit">
+                    <li>
+                        <label class="dropdown-item">
+                            <input type="checkbox" class="form-check-input me-2" value="entry"> Entrada
+                        </label>
+                    </li>
+                    <li>
+                        <label class="dropdown-item">
+                            <input type="checkbox" class="form-check-input me-2" value="exit"> Salida
+                        </label>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Tipo de Ingresante</label>
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle w-100" type="button" id="dropdownTipoIngresante" data-bs-toggle="dropdown" aria-expanded="false">
+                    Seleccionar tipos de ingresante
+                    <span class="selected-count"></span>
+                </button>
+                <ul class="dropdown-menu w-100" aria-labelledby="dropdownTipoIngresante">
+                    <li>
+                        <label class="dropdown-item">
+                            <input type="checkbox" class="form-check-input me-2" value="neighbour"> Vecino
+                        </label>
+                    </li>
+                    <li>
+                        <label class="dropdown-item">
+                            <input type="checkbox" class="form-check-input me-2" value="visitor"> Visitante
+                        </label>
+                    </li>
+                    <li>
+                        <label class="dropdown-item">
+                            <input type="checkbox" class="form-check-input me-2" value="delivery"> Delivery
+                        </label>
+                    </li>
+                    <li>
+                        <label class="dropdown-item">
+                            <input type="checkbox" class="form-check-input me-2" value="constructionworker"> Obrero
+                        </label>
+                    </li>
+                    <li>
+                        <label class="dropdown-item">
+                            <input type="checkbox" class="form-check-input me-2" value="suplier"> Proveedor
+                        </label>
+                    </li>
+                    <li>
+                        <label class="dropdown-item">
+                            <input type="checkbox" class="form-check-input me-2" value="employee"> Empleado
+                        </label>
+                    </li>
+                    <li>
+                        <label class="dropdown-item">
+                            <input type="checkbox" class="form-check-input me-2" value="services"> Servicios
+                        </label>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Nombre del Ingresante</label>
+            <input type="text" class="form-control" id="nombreIngresanteFilter" placeholder="Buscar por nombre">
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Documento</label>
+            <input type="text" class="form-control" id="documentoFilter" placeholder="Buscar por documento">
+        </div>
+
+        <div class="col-md-2 d-flex align-items-center gap-2">
+            <button class="btn btn-secondary filter-toggle" 
+                    [class.active]="showFilters" 
+                    (click)="toggleAdvancedFilters()"
+                    data-bs-toggle="tooltip" 
+                    data-bs-placement="top" 
+                    title="Filtros avanzados">
+                <i class="fa-solid fa-filter"></i>
+            </button>
+            <button class="btn btn-primary responsive-btn"
+            (click)="clearFilters()"
+            data-bs-toggle="tooltip" 
+            data-bs-placement="top" 
+            title="Limpiar filtros">
+            <i class="fa-regular fa-trash-can"></i>
+            </button>
+            <button id="excelBtn" 
+                    class="export-btn btn btn-success" 
+                    disabled
+                    data-bs-toggle="tooltip" 
+                    data-bs-placement="top" 
+                    title="Exportar a Excel">
+                <i class="fas fa-file-excel"></i>
+            </button>
+            <button id="pdfBtn" 
+                    class="export-btn btn btn-danger" 
+                    disabled
+                    data-bs-toggle="tooltip" 
+                    data-bs-placement="top" 
+                    title="Exportar a PDF">
+                <i class="fas fa-file-pdf"></i>
+            </button>
+          
+        </div>
+    </div>
+
+    <div id="advancedFilters" class="advanced-filters mt-3">
+        <div class="row">
+            <div class="col-md-3 mb-2">
+                <label class="form-label">Tipo de Vehículo</label>
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle w-100" type="button" id="dropdownTypecar" data-bs-toggle="dropdown" aria-expanded="false">
+                        Seleccionar tipo de vehículo
+                        <span class="selected-count"></span>
+                    </button>
+                    <ul class="dropdown-menu w-100" aria-labelledby="dropdownTypecar">
+                        <li>
+                            <label class="dropdown-item">
+                                <input type="checkbox" class="form-check-input me-2" value="car"> Auto
+                            </label>
+                        </li>
+                        <li>
+                            <label class="dropdown-item">
+                                <input type="checkbox" class="form-check-input me-2" value="motorcycle"> Moto
+                            </label>
+                        </li>
+                        <li>
+                            <label class="dropdown-item">
+                                <input type="checkbox" class="form-check-input me-2" value="truck"> Camión
+                            </label>
+                        </li>
+                        <li>
+                            <label class="dropdown-item">
+                                <input type="checkbox" class="form-check-input me-2" value="bike"> Bicicleta
+                            </label>
+                        </li>
+                        <li>
+                            <label class="dropdown-item">
+                                <input type="checkbox" class="form-check-input me-2" value="van"> Camioneta
+                            </label>
+                        </li>
+                        <li>
+                            <label class="dropdown-item">
+                                <input type="checkbox" class="form-check-input me-2" value="walk"> Sin vehículo
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-3 mb-2">
+                <label class="form-label">Estado de Horario</label>
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle w-100" type="button" id="dropdownLateInRange" data-bs-toggle="dropdown" aria-expanded="false">
+                        Seleccionar estado
+                        <span class="selected-count"></span>
+                    </button>
+                    <ul class="dropdown-menu w-100" aria-labelledby="dropdownLateInRange">
+                        <li>
+                            <label class="dropdown-item">
+                                <input type="checkbox" class="form-check-input me-2" value="inrange"> En horario
+                            </label>
+                        </li>
+                        <li>
+                            <label class="dropdown-item">
+                                <input type="checkbox" class="form-check-input me-2" value="late"> Tarde
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-3 mb-2">
+                <label class="form-label">Placa</label>
+                <input type="text" class="form-control" id="placaFilter" placeholder="Buscar por placa">
+            </div>
+
+            <div class="col-md-3 mb-2">
+                <label class="form-label">Propietario</label>
+                <input type="text" class="form-control" id="propietarioFilter" placeholder="Buscar por propietario">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3 mb-2">
+                <label class="form-label">Día</label>
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle w-50" type="button" id="dropdownDays" data-bs-toggle="dropdown" aria-expanded="false">
+                        Seleccionar día
+                        <span class="selected-count"></span>
+                    </button>
+                    <ul class="dropdown-menu w-100" aria-labelledby="dropdownDays">
+                        <ng-container *ngFor="let day of days">
+                            <li>
+                                <label class="dropdown-item">
+                                    <input type="checkbox" class="form-check-input me-2" [value]="day"> {{ day }}
+                                </label>
+                            </li>
+                        </ng-container>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabla -->
+<div class="table-responsive">
+    <table id="myTable" class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Tipo de Entrada</th>
+                <th>Tipo de Ingresante</th>
+                <th>Nombre</th>
+                <th>Documento</th>
+                <th>Observaciones</th>
+                <th>Tipo de Vehículo</th>
+                <th>Placa</th>
+                <th>Propietario</th>
+                <th>Guardia</th>
+                <th>Estado de horario</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>

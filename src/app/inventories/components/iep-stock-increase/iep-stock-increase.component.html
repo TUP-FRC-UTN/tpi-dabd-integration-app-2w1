@@ -1,0 +1,68 @@
+<title>Formulario Aumento Stock</title>
+<div class="container mt-5">
+  <div class="row form">
+    <form [formGroup]="stockForm" (ngSubmit)="onSubmit()">
+      <!-- Mostrar el nombre del producto -->
+      <div class="mb-3">
+        <label for="productName" class="form-label">Producto</label>
+        <div id="productName" class="form-control" readonly>{{ productName }}</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="supplierId" class="form-label">Proveedor</label>
+        <select id="supplierId" formControlName="supplierId" class="form-select">
+          <option value="" disabled selected>Selecciona un proveedor</option>
+          <option *ngFor="let supplier of suppliers" [value]="supplier.id">{{ supplier.name }}</option>
+        </select>
+        <div *ngIf="stockForm.get('supplierId')?.invalid && stockForm.get('supplierId')?.touched" class="text-danger">
+          Proveedor es requerido
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="quantity" class="form-label">Cantidad</label>
+        <input id="quantity" type="number" formControlName="quantity" class="form-control">
+        <div *ngIf="stockForm.get('quantity')?.invalid && stockForm.get('quantity')?.touched" class="text-danger">
+          Cantidad es requerida y debe ser mayor que 0
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="unitPrice" class="form-label">Precio Unitario</label>
+        <input id="unitPrice" type="number" formControlName="unitPrice" class="form-control">
+        <div *ngIf="stockForm.get('unitPrice')?.invalid && stockForm.get('unitPrice')?.touched" class="text-danger">
+          El precio unitario es requerido y debe ser mayor que 0 
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="description" class="form-label">Descripción</label>
+        <input id="description" formControlName="description" class="form-control">
+        <div *ngIf="stockForm.get('description')?.invalid && stockForm.get('description')?.touched" class="text-danger">
+          Descripción es requerida
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="justification" class="form-label">Justificación</label>
+        <textarea id="justification" formControlName="justification" class="form-control" rows="3"></textarea>
+        <div *ngIf="stockForm.get('justification')?.invalid && stockForm.get('justification')?.touched" class="text-danger">
+          La justificación es requerida.
+        </div>
+      </div>
+
+      <div class="mb-3 mt-4 row">
+        <div class="d-flex justify-content-end">
+          <button type="submit" class="btn btn-primary" [disabled]="!stockForm.valid">Confirmar</button>
+        </div>        
+      </div>
+    </form>
+  </div>
+
+  <!-- Mostrar mensaje de éxito o error -->
+  <div class="card-footer">
+    <div *ngIf="message" class="alert" [ngClass]="{'alert-success': !error, 'alert-danger': error}" role="alert">
+      {{ message }}
+    </div>
+  </div>
+</div>

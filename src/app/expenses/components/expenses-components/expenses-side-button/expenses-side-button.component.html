@@ -1,0 +1,27 @@
+@for(userRole of userRoles; track $index)
+{
+    @if(info.roles.includes(userRole)){
+        @if(!info.childButtons){
+            <button class="nav-link d-flex text-light w-100" (click)="redirect(info.route!, info.title)" [title]="info.title">
+                <i [ngClass]="info.icon"></i>
+                @if (expanded) {<span class="ms-2">{{info.title}}</span>}
+            </button>    
+        }
+        @else {
+            <button class="nav-link d-flex text-light w-100" data-bs-toggle="collapse" [attr.data-bs-target]="'#' + info.title" [title]="info.title">
+                <i [ngClass]="info.icon"></i>
+                @if (expanded) {<span class="ms-2">{{info.title}}</span>}
+            </button>
+            @for (child of info.childButtons; track $index) {
+                @if(child.roles.includes(userRole)){
+                    <div class="sub-menu collapse fs-6 animation" [class]="expanded ? 'side-expanded' : 'side-compressed'" id="{{info.title}}"  [title]="child.title">
+                        <button class="nav-link d-flex text-light w-100" (click)="redirect(child.route!, child.title)">
+                            <i [ngClass]="child.icon"></i>
+                            @if (expanded) {<span class="ms-2">{{child.title}}</span>}
+                        </button>
+                    </div>
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,30 @@
+.dropdown-menu {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.dropdown-item {
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+.dropdown-toggle {
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.form-check-input {
+    margin-top: 0;
+}
+
+.selected-count {
+    margin-left: 8px;
+    font-size: 0.9em;
+    color: #ffffff;
+}

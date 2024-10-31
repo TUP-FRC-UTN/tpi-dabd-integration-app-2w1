@@ -1,0 +1,61 @@
+.card-container {
+    position: relative;
+}
+
+.card {
+    border: 1px solid #e0e0e0;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+    padding: 5px;
+    margin-left: 3%;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: block;
+}
+
+.card-body {
+    padding: 15px;
+    transition: all 0.5s ease;
+    border-radius: inherit;
+}
+
+
+
+.card:hover {
+    background-color: #e7f0f1;
+    color: black;
+    cursor: pointer;
+}
+
+.card:active {
+    transform: translateY(2px);
+}
+
+.red-shadow {
+    box-shadow: 0px 4px 8px #df7474;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.btn {
+    z-index: 1;
+}
+
+.text-danger {
+    color: #dc3545 !important;
+}
+
+.color-card {
+    background-color: #a6adadbe;
+    color: black;
+}

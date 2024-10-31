@@ -1,0 +1,11 @@
+<select class="form-select" name="categoryId" 
+  [(ngModel)]="selectedCategoryId" (ngModelChange)="onCategoryChange($event)" 
+  id="categoryId" aria-label="Seleccione una Categoria:"
+  #internalCategoryId="ngModel"  [required]="true">
+  @if(!removeEmpty){
+    <option value="0" selected></option>
+  }
+  @for (item of categoryList; track $index) {
+    <option [value]="item.id">{{item.description}}</option>
+  }
+</select>

@@ -1,0 +1,13 @@
+section{
+    box-shadow: 5px 0px 15px rgba(0, 0, 0, 0.2)
+}
+
+.btn-hover:hover{
+    cursor: pointer;
+    color: rgb(83, 83, 83);
+    
+}
+
+.hover:hover{
+    cursor: pointer;
+}

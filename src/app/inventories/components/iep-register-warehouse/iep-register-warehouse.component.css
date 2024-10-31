@@ -1,0 +1,98 @@
+body {
+    background-color: #D3D3D3;
+  }
+  
+  .custom-form {
+    background-color: #F8F9FA;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .custom-form legend {
+    color: #212529;
+    font-weight: bold;
+    display: inline-block;
+  }
+  
+  .custom-form label {
+    color: #495057;
+    font-weight: bold;
+  }
+  
+  
+  .custom-form .form-control,
+  .custom-form .form-select {
+    color: #495057;
+    border-color: #CED4DA;
+  }
+  
+  .custom-form .btn-outline-secondary {
+    color: white;
+    border-color: #6C757D;
+  }
+  
+  .custom-form .btn-secondary {
+    background-color: #495057;
+    color: white;
+    border: none;
+  }
+  
+  .custom-form .btn-primary {
+    color: white;
+    border: none;
+  }
+  
+  .form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .form-group label {
+    width: 20%; /* Ajusta el ancho según tus necesidades */
+    text-align: left; /* Alinea el texto del label a la izquierda */
+  }
+  
+  .form-group input{
+    flex: 1; /* Ajusta el ancho según tus necesidades */
+  }
+  
+  .btn-outline-secondary {
+    background-color: #6C757D;
+    color: white;
+    border: none;
+  }
+  
+  
+  .info-button {
+    float: right;
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+  }
+  
+  .title-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .title-section button {
+    margin-left: 15px;
+  }
+  
+  .text-danger {
+    color: #DC3545;
+    font-size: small;
+  }
+  
+  .error-container {
+    min-height: 20px;
+  }
+  
+  .modal.show {
+  display: block;
+  background-color: rgba(0, 0, 0, 0.5);  /* Fondo semi-transparente */
+  }

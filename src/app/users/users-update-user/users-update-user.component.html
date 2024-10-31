@@ -1,0 +1,110 @@
+<section class="container p-5 border rounded border-3 border-secundary" style="min-height: 70vh;">
+    <h3>Editar Usuario</h3>
+
+    <form [formGroup]="updateForm" (ngSubmit)="updateUser()">
+        <div class="row mb-3">
+            <div class="col-md-6 d-flex flex-column">
+                <div class="d-flex align-items-center text-end">
+                    <label class="form-label mb-0 me-3" style="width: 150px;">Nombre</label>
+                    <input type="text" class="form-control"
+                    [ngClass]="{'is-invalid': updateForm.controls['name'].invalid && (updateForm.get('name')?.dirty || updateForm.get('name')?.touched), 'is-valid': updateForm.controls['name'].valid }" 
+                    formControlName="name">
+                </div>
+                <div *ngIf="updateForm.controls['name'].invalid && (updateForm.get('name')?.dirty || updateForm.get('name')?.touched)" class="text-danger">
+                    Ingrese su nombre
+                </div>
+            </div>
+            <div class="col-md-6 d-flex flex-column">
+                <div class="d-flex align-items-center text-end">
+                    <label class="form-label mb-0 me-3" style="width: 150px;">Apellido</label>
+                    <input type="text" class="form-control"
+                    [ngClass]="{'is-invalid': updateForm.controls['lastname'].invalid && (updateForm.get('lastname')?.dirty || updateForm.get('lastname')?.touched), 'is-valid': updateForm.controls['lastname'].valid }" 
+                    formControlName="lastname">
+                </div>
+                <div *ngIf="updateForm.controls['lastname'].invalid && (updateForm.get('lastname')?.dirty || updateForm.get('lastname')?.touched)" class="text-danger">
+                    Ingrese su apellido
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6 d-flex flex-column">
+                <div class="d-flex align-items-center text-end">
+                    <label class="form-label mb-0 me-3" style="width: 150px;">DNI</label>
+                    <input type="number" class="form-control"
+                    [ngClass]="{'is-invalid': updateForm.controls['dni'].invalid && (updateForm.get('dni')?.dirty || updateForm.get('dni')?.touched), 'is-valid': updateForm.controls['dni'].valid }" 
+                    formControlName="dni">
+                </div>
+                <div *ngIf="updateForm.controls['dni'].invalid && (updateForm.get('dni')?.dirty || updateForm.get('dni')?.touched)" class="text-danger">
+                    Ingrese su DNI
+                </div>
+            </div>
+            <div class="col-md-6 d-flex flex-column">
+                <div class="d-flex align-items-center text-end">
+                    <label class="form-label mb-0 me-3" style="width: 150px;">Teléfono</label>
+                    <input type="number" class="form-control"
+                    [ngClass]="{'is-invalid': updateForm.controls['phoneNumber'].invalid && (updateForm.get('phoneNumber')?.dirty || updateForm.get('phoneNumber')?.touched), 'is-valid': updateForm.controls['phoneNumber'].valid }" 
+                    formControlName="phoneNumber">
+                </div>
+                <div *ngIf="updateForm.controls['phoneNumber'].invalid && (updateForm.get('phoneNumber')?.dirty || updateForm.get('phoneNumber')?.touched)" class="text-danger">
+                    Ingrese su teléfono
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6 d-flex flex-column">
+                <div class="d-flex align-items-center text-end">
+                    <label class="form-label mb-0 me-3" style="width: 150px;">Email</label>
+                    <input type="text" class="form-control"
+                    [ngClass]="{'is-invalid': updateForm.controls['email'].invalid && (updateForm.get('email')?.dirty || updateForm.get('email')?.touched), 'is-valid': updateForm.controls['email'].valid }" 
+                    formControlName="email">
+                </div>
+                <div *ngIf="updateForm.controls['email'].invalid && (updateForm.get('email')?.dirty || updateForm.get('email')?.touched)" class="text-danger">
+                    Ingrese su email
+                </div>
+            </div>
+            <div class="col-md-6 d-flex flex-column">
+                <div class="d-flex align-items-center text-end">
+                    <label class="form-label mb-0 me-3" style="width: 150px;">Fecha de Nacimiento</label>
+                    <input type="date" class="form-control"
+                    [ngClass]="{'is-invalid': updateForm.controls['datebirth'].invalid && (updateForm.get('datebirth')?.dirty || updateForm.get('datebirth')?.touched), 'is-valid': updateForm.controls['datebirth'].valid }" 
+                    formControlName="datebirth">
+                </div>
+                <div *ngIf="updateForm.controls['datebirth'].invalid && (updateForm.get('datebirth')?.dirty || updateForm.get('datebirth')?.touched)" class="text-danger">
+                    Ingrese su fecha de nacimiento
+                </div>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="d-flex align-items-center">
+                    <label class="form-label me-2 text-end" style="width: 150px; margin-bottom: 0; margin-right: 10px;">Rol</label>
+                    <div class="d-flex" style="flex: 1;">
+                        <select class="form-select me-2" id="selectType" required formControlName="roles" style="width: 418px;">
+                            <option value="">Seleccione un rol</option>
+                            <option *ngFor="let rol of roles" [value]="rol.description">{{rol.description}}</option>
+                        </select>
+                        <button type="button" class="btn btn-secondary" (click)="aniadirRol()">Añadir</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <ul>
+                <p *ngIf="rolesInput.length > 0" class="mx-3">Roles añadidos: </p>
+                <li *ngFor="let rol of rolesInput" class="mx-5">{{rol}} 
+                    <button type="button" class="btn btn-secondary" (click)="quitarRol(rol)">Quitar</button>
+                </li>
+            </ul>
+        </div>
+        <div class="row mb-3 justify-content-end">
+            <div class="col-auto">
+                <button type="button" class="btn btn-secondary" (click)="redirectList()">Cancelar</button>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+        </div>
+    </form>
+</section>

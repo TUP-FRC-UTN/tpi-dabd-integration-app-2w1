@@ -1,0 +1,54 @@
+
+.botones{
+  position: relative;
+  top: 35px;
+  left: 460px;
+  width: 600px;
+}
+
+
+/* Estilo para la cabecera de la tabla */
+.table thead {
+  border-top: 2px solid black !important; /* Línea negra en la parte superior */
+}
+
+
+
+/* Opcional: mejorar el contraste de las cabeceras */
+.table thead th {
+  background-color: #f8f9fa; /* Color de fondo suave */
+  color: #343a40; /* Color del texto */
+}
+
+.modal {
+  display: none; /* Escondido por defecto */
+  position: fixed; /* Fijo en la pantalla */
+  background-color: rgba(0, 0, 0, 0.4); /* Fondo negro con opacidad */
+}
+
+.modal.show {
+  display: block; /* Mostrar el modal cuando isModalOpen es verdadero */
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto; /* 15% desde la parte superior y centrado */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%; /* Ancho del modal */
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+

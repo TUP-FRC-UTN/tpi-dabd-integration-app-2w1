@@ -1,0 +1,59 @@
+.container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.search-container {
+  margin-bottom: 20px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.data-table th,
+.data-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.data-table th {
+  background-color: #f5f5f5;
+  cursor: pointer;
+  user-select: none;
+}
+
+.data-table th:hover {
+  background-color: #e5e5e5;
+}
+
+.data-table tbody tr:hover {
+  background-color: #f9f9f9;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro con opacidad */
+  z-index: 1040; /* Asegúrate de que el z-index esté por debajo del modal */
+}
+
+.modal {
+  z-index: 1050; /* Asegúrate de que el modal esté por encima de la superposición */
+}

@@ -1,0 +1,31 @@
+
+<div class="modal fade" id="categoryViewModal" tabindex="-1" aria-labelledby="expenseModalLabel" aria-hidden="true">
+  <div class="modal-dialog ">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="expenseModalLabel">Detalle de la Categoria</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col">
+            <p><strong>Descripcion:</strong> {{ category?.description }}</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <p><strong>Fecha de modificacion:</strong> {{category?.lastUpdatedDatetime | date : 'dd/MM/yyyy'}}</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <p><strong>Estado:</strong> {{ category?.state }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>

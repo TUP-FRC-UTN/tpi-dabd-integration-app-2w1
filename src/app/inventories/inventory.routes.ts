@@ -1,26 +1,102 @@
 import { Routes } from "@angular/router";
 import { InventoryEmployeeProviderHomeComponent } from "./inventory-employee-provider-home/inventory-employee-provider-home.component";
-import { EmployeeFormComponent } from "./components/employee/employee-form/employee-form.component";
-import { EmployeeListComponent } from "./components/employee/employee-list/employee-list.component";
-import { ArticleFormComponent } from "./components/inventory/inventory_articles/inventory_articles_form/inventory_articles_form.component";
-import { InventoryTableComponent } from "./components/inventory/inventory_inventories/inventory_inventories.component";
-import { TransactionComponentForm } from "./components/inventory/inventory_transaction/inventory_transaction_form/inventory_transaction_form.component";
-import { InventoryTransactionTableComponent } from "./components/inventory/inventory_transaction/inventory_transaction_table/inventory_transaction_table.component";
-import { ProviderFormComponent } from "./components/provider/provider-form/provider-form.component";
-import { ProviderListComponent } from "./components/provider/provider-list/provider-list.component";
+import { IepAttentionCallComponent } from "./components/iep-attention-call/iep-attention-call.component";
+import { IepChargesComponent } from "./components/iep-charges/iep-charges.component";
+import { IepDetailTableComponent } from "./components/iep-detail-table/iep-detail-table.component";
+import { IEPFormPostEmployeesComponent } from "./components/iep-form-post-employees/iep-form-post-employees.component";
+import { IepInventoryComponent } from "./components/iep-inventory/iep-inventory.component";
+import { IepListEmployeesComponent } from "./components/iep-list-employees/iep-list-employees.component";
+import { IepPerformancelistComponent } from "./components/iep-performancelist/iep-performancelist.component";
+import { IepProductComponent } from "./components/iep-product/iep-product.component";
+import { IepPutEmployeesComponent } from "./components/iep-put-employees/iep-put-employees.component";
+import { IepStockIncreaseComponent } from "./components/iep-stock-increase/iep-stock-increase.component";
+import { IepSupplierListComponent } from "./components/iep-supplier-list/iep-supplier-list.component";
+import { IepSupplierUpdateComponent } from "./components/iep-supplier-update/iep-supplier-update.component";
+import { IepSuppliersFormComponent } from "./components/iep-suppliers-form/iep-suppliers-form.component";
+import { IepTableComponent } from "./components/iep-table/iep-table.component";
+import { IepWarehouseMovementSearchComponent } from "./components/iep-warehouse-movement-search/iep-warehouse-movement-search.component";
 
 export const INVENTORY_ROUTES: Routes = [
     { path: '', component: InventoryEmployeeProviderHomeComponent },
-    { path: 'employees/list', component: EmployeeListComponent },
-    { path: 'employees/form', component: EmployeeFormComponent },
-    { path: 'employees/form/:id', component: EmployeeFormComponent },
-    { path: 'providers/list', component: ProviderListComponent },
-    { path: 'providers/form', component: ProviderFormComponent },
-    { path: 'providers/form/:id', component: ProviderFormComponent },
-    { path: 'articles/article', component: ArticleFormComponent },
-    { path: 'articles/article/:id', component: ArticleFormComponent },
-    { path: 'inventories', component: InventoryTableComponent },
-    { path: 'transactions/:id', component: TransactionComponentForm },
-    { path: 'inventories/transactions/:inventoryId', component: InventoryTransactionTableComponent },
-    { path: '', redirectTo: '/employees', pathMatch: 'full' }
+    {
+        path: 'stock-aumento',  // SANTI
+        component: IepStockIncreaseComponent,
+        title: 'Aumento de stock'
+    },
+    {
+        path: 'registro-productos', // TOMAS
+        component: IepProductComponent,
+        title: 'Registro de productos'
+    },
+    {
+        path: 'inventario',     // AGUSTIN
+        component: IepInventoryComponent,
+        title: 'Inventario'
+    },
+    {
+        path: 'detalle-inventario',     // MARTIN
+        component: IepDetailTableComponent,
+        title: 'Detalle de inventario'
+    },
+    {
+        path: 'historial-modificaciones-stock',     // ENZO
+        component: IepTableComponent,
+        title: 'Historial de modificacion de stock'
+    },
+    {
+        path: 'listado-empleados',     // ENZO
+        component: IepListEmployeesComponent,
+        title: 'Listado de empleados'
+    },
+    {
+        path: 'wake-up-call',
+        component: IepAttentionCallComponent,
+        title: 'Llamada de atención'
+    },
+    {
+        path: 'warehouse-movements',
+        component: IepWarehouseMovementSearchComponent,
+        title: 'Ver almacenes'
+    },
+    {
+        path: 'desempeño',
+        component: IepPerformancelistComponent,
+        title: 'desempeño'
+    },
+
+    {
+        path: "suppliers",
+        component: IepSupplierListComponent,
+        title: "proveedores"
+    },
+    {
+        path: "create-supplier",
+        component: IepSuppliersFormComponent,
+        title: "Crear proveedor"
+    },
+    {
+        path: "supplier-update/:id",
+        component: IepSupplierUpdateComponent,
+        title: "Modificar proveedor"
+      }
+    ,
+    {
+        path:"employee-post",
+        component:IEPFormPostEmployeesComponent,
+        title:"Crear empleado"
+    },
+    {
+        path: 'cargos',
+        component: IepChargesComponent,
+        title: 'Gestión de Cargos'
+    },
+    {
+        
+      path: 'empleados/modificar/:id',  // TOMAS H
+      component:IepPutEmployeesComponent,
+      title: 'Modificar empleado'
+        
+
+    }
+  
 ];

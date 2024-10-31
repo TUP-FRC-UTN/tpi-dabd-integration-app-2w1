@@ -1,0 +1,26 @@
+<div class="modal-content border border-2">
+  <div class="modal-header">
+    <h1 class="modal-title fs-5" id="complaintModal">MOTIVO DE CAMBIO DE ESTADO</h1>
+    <button type="button" class="btn-close" (click)="close()"></button>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+
+      <!-- Input Descripcion -->
+      <div class="col mb-3">
+        <div class="row">
+          <label class="col-3 col-form-label">Descripcion</label>
+          <div class="col-9">
+            <textarea class="form-control" rows="3" style="resize: none;" [(ngModel)]="reasonText"></textarea>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-success" (click)="putComplaint()">Confirmar</button>
+    <button type="button" class="btn btn-danger" (click)="close()">Cancelar</button>
+  </div>
+</div>

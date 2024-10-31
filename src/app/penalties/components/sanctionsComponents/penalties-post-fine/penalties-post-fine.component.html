@@ -1,0 +1,172 @@
+<div class="container p-3">
+  <div
+    class="post-Fine-section p-4 pe-0 border shadow-lg p-3 mb-5 bg-white rounded"
+  >
+    <h2 class="text-start">Generar Nueva Infracción</h2>
+    <hr />
+
+    <form #formPostFine="ngForm" (ngSubmit)="onSubmit()" novalidate>
+      <div class="container pe-5">
+        <div class="row">
+          <div class="col d-flex">
+            <div class="row">
+              <div class="col-2">
+                <label for="" class="m-2">Infractor: </label>
+              </div>
+              <div class="col">
+                <div class="input-group">
+                  <input
+                    type="text"
+                    class="form-control bg-body-secondary"
+                    [value]="report?.plotId"
+                    disabled
+                    
+                  />
+                  <!--TODO: agregar el [(ngModel)]="" para traer el lote del usuario-->
+                  <span class="input-group-text bg-body-secondary">
+                    <i class="bi bi-lock"></i>
+                  </span>
+                </div>
+              </div>
+              <div class="col-3 clearfix">
+                <button type="button" class="btn btn-info ms-3 float-end">
+                  Ver más
+                </button>
+              </div>
+            </div>
+            <div class="col d-flex">
+              <div class="row ms-auto">
+                <div class="col d-flex">
+                  <label for="date" class="m-2">Fecha:</label>
+                  <input
+                    type="date"
+                    class="form-control"
+                    id="date"
+                    name="date"
+                    [(ngModel)]="selectedDate"
+                    required
+                    #date="ngModel"
+                    [ngClass]="{ 'is-invalid': date.invalid && date.touched }"
+                    disabled
+                  />
+                  <div *ngIf="date.invalid && date.touched" class="invalid-feedback">
+                    La fecha es requerida.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    
+        <div class="row mt-4">
+          <div class="col-6 d-flex">
+            <label for="" class="m-2">Motivo: </label>
+            <div class="input-group w-100">
+              <input
+                type="text"
+                class="form-control ms-2"
+                name="reportState"
+                [value]="report?.reportReason.reportReason"
+                required
+                minlength="5"
+                disabled
+              />
+              <!-- <div *ngIf="reportState.invalid && reportState.touched" class="invalid-feedback">
+                <div *ngIf="reportState.errors?.['required']">El motivo es requerido.</div>
+                <div *ngIf="reportState.errors?.['minlength']">Debe tener al menos 5 caracteres.</div>
+              </div> -->
+            </div>
+          </div>
+    
+          <div class="col d-flex">
+            <div class="row ms-auto m-2">
+              <div class="col">
+                <label for="reportReason" class="me-2">Tipo de Infracción: </label>
+              </div>
+              <div class="col d-flex">
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="flexRadioDefault"
+                    id="flexRadioDefault1"
+                    (change)="showAmountToPay('fine')"
+                  />
+                  <label class="form-check-label me-4" for="flexRadioDefault1">
+                    Multa
+                  </label>
+                </div>
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="flexRadioDefault"
+                    id="flexCheckChecked2"
+                    checked
+                    (change)="showAmountToPay('warning')"
+                  />
+                  <label class="form-check-label" for="flexRadioDefault2">
+                    Advertencia
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    
+        <div class="row mt-4">
+          <div class="col d-flex">
+            <label for="description" class="m-2">Descripción: </label>
+            <textarea
+              id="description"
+              class="form-control"
+              name="description"
+              [value]="report?.description"
+              required
+              minlength="10"
+              disabled
+            ></textarea>
+            <!-- <div *ngIf="description.invalid && description.touched" class="invalid-feedback">
+              <div *ngIf="description.errors?.['required']">La descripción es requerida.</div>
+              <div *ngIf="description.errors?.['minlength']">Debe tener al menos 10 caracteres.</div>
+            </div> -->
+          </div>
+        </div>
+    
+        <div class="clearfix mt-2">
+          <div class="float-end d-flex">
+            <label *ngIf="newFine" for="" class="me-2 mt-3">Importe:</label>
+            <div *ngIf="newFine" class="input-group mt-2 mb-3">
+              <span class="input-group-text" id="basic-addon1">$</span>
+              <input
+                type="number"
+                class="form-control text-end"
+                placeholder="0.00"
+                style="max-width: 220px"
+                name="baseAmount"
+                [(ngModel)]="newAmount"
+                required
+                min="{{report.baseAmount}}"
+                #baseAmount="ngModel"
+                [ngClass]="{ 'is-invalid': baseAmount.invalid && baseAmount.touched }"
+              />
+              <div *ngIf="baseAmount.invalid && baseAmount.touched" class="invalid-feedback">
+                <div *ngIf="baseAmount.errors?.['required']">El importe es requerido.</div>
+                <div *ngIf="baseAmount.errors?.['minlength']">El importe debe ser mayor o igual a {{report.baseAmount}}.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+    
+        <div class="clearfix mt-1">
+          <button type="button" class="btn btn-danger float-start" [routerLink]="'/reportList'">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-success float-end" [disabled]="formPostFine.invalid">
+            Aceptar
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

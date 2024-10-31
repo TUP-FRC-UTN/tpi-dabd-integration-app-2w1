@@ -1,0 +1,122 @@
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header text-black">
+      <h2 class="mb-0">Cargos</h2>
+    </div>
+    <div class="card-body">
+      <!-- Fila de opciones (Filtro, Exportar, Nuevo) -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <!-- Filtro de búsqueda a la izquierda -->
+        <div class="col-md-4">
+          <div class="input-group">
+            <input type="text" class="form-control" placeholder="Buscar..." [value]="searchTerm"
+              (input)="filterData($event)">
+          </div>
+        </div>
+
+        <!-- Botones a la derecha -->
+        <div>
+          <button class="btn btn-success me-2" (click)="exportToExcel()">
+            <i class="fa-solid fa-file-excel"></i>
+          </button>
+          <button class="btn btn-danger me-2" (click)="exportToPdf()">
+            <i class="fas fa-file-pdf"></i>
+          </button>
+          <button class="btn btn-primary" (click)="abrirModalNuevo()">Nuevo Cargo</button>
+        </div>
+      </div>
+
+      <!-- Tabla de cargos -->
+      <table id="cargosTable" class="table table-striped">
+        <thead>
+          <tr>
+            <th>Cargo</th>
+            <th>Descripción</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal para Nuevo/Editar Cargo -->
+  <div *ngIf="isModalOpen" class="modal" [ngClass]="{'show': isModalOpen}" style="display: block;">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ modoEdicion ? 'Modificar Cargo' : 'Nuevo Cargo' }}</h5>
+          <button type="button" class="btn-close" (click)="onCancel()"></button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="cargoForm" (ngSubmit)="onSubmit()">
+            <div class="mb-3">
+              <label for="charge" class="form-label">Cargo</label>
+              <input type="text" class="form-control" id="charge" formControlName="charge"
+                placeholder="Ingrese el cargo" pattern="^[a-zA-ZÀ-ÿ\u00f1\u00d1\s]+$"
+                title="Solo se permiten letras y espacios.">
+              <div *ngIf="cargoForm.get('charge')?.invalid && cargoForm.get('charge')?.touched" class="text-danger">
+                <small>El cargo es requerido y debe contener solo letras y espacios</small>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="description" class="form-label">Descripción</label>
+              <textarea class="form-control" id="description" formControlName="description" rows="3"
+                placeholder="Ingrese la descripción del cargo"></textarea>
+              <div *ngIf="cargoForm.get('description')?.invalid && cargoForm.get('description')?.touched"
+                class="text-danger">
+                <small>La descripción es requerida</small>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancelar</button>
+              <button type="submit" class="btn btn-primary" [disabled]="cargoForm.invalid">
+                {{ modoEdicion ? 'Actualizar' : 'Crear' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Modal de Confirmación de Eliminación -->
+  <div *ngIf="isConfirmDeleteModalOpen" class="modal" [ngClass]="{'show': isConfirmDeleteModalOpen}"
+    style="display: block;">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Confirmación de Eliminación</h5>
+          <button type="button" class="btn-close" (click)="isConfirmDeleteModalOpen = false"></button>
+        </div>
+        <div class="modal-body">
+          <p>¿Está seguro que desea eliminar este cargo?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger"
+            (click)="selectedCargo && selectedCargo.id !== undefined && eliminarCargo(selectedCargo.id)">
+            Eliminar
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="isConfirmDeleteModalOpen = false">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Error -->
+  <div *ngIf="isErrorModalOpen" class="modal" [ngClass]="{'show': isErrorModalOpen}" style="display: block;">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-danger">Error</h5>
+          <button type="button" class="btn-close" (click)="isErrorModalOpen = false"></button>
+        </div>
+        <div class="modal-body">
+          <p>{{ errorMessage }}</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="isErrorModalOpen = false">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>

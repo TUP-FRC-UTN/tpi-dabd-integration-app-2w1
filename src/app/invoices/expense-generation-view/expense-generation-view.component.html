@@ -1,0 +1,9 @@
+<!-- <app-expense-generation-user-view ngSkipHydration /> -->
+
+@if(status == 1){
+    <app-expense-generation-user-view ngSkipHydration (status)="reciveStatus($event)"/>
+   
+}
+@else {
+     <app-expense-generation-payment-form  (status)="reciveStatus($event)" [paymentMethod]="status"/>
+ }

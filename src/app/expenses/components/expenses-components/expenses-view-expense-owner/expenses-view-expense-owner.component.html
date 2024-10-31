@@ -1,0 +1,55 @@
+<section class="py-5">
+  <div class="container p-3 border border-2 rounded shadow-lg">
+
+    <!-- BOTON DE AGREGAR ITEM AL LISTADO PARA QUIENES LO NECESITEN -->
+    <!-- <div class="row mb-3 text-end">
+      <div class="col">
+        <button class="btn btn-primary" (click)="redirect('/home/complaints/postComplaint')">
+          <span class="bi-plus-lg"></span>
+        </button>
+      </div>
+    </div> -->
+
+    <!-- Fila de botones de filtro -->
+    <div class="row mb-3">
+
+      <!-- Barra de busqueda -->
+      <div class="col">
+        <input type="text" placeholder="Buscar" class="form-control" [(ngModel)]="searchTerm"
+          (input)="onSearch($event)">
+      </div>
+
+      <!-- Filtro de fechas -->
+      <div class="col d-flex gap-3">
+        <div class="col">
+          <input (change)="filterDataOnChange()" [(ngModel)]="fechaDesde" class="form-control" type="date">
+        </div>
+        <div class="col">
+          <input (change)="filterDataOnChange()" [(ngModel)]="fechaHasta" class="form-control" type="date">
+        </div>
+
+      </div>
+
+      <!-- BOTON DE FILTRO PARA QUIENES LO NECESITEN -->
+      <!-- <div class="col-auto">
+        <button class="btn btn-primary bi-funnel-fill">Filtros</button>
+      </div> -->
+
+      <!-- Botones de exportar -->
+      <div class="col-auto d-flex gap-1 text-end">
+        <button (click)="exportToExcel()" id="exportExcelBtn" class="btn btn-success bi-file-earmark-excel"></button>
+        <button  (click)="exportToPDF()" id="exportPdfBtn" class="btn btn-danger bi-file-earmark-pdf"></button>
+      </div>
+    </div>
+
+    <table id="myTable" class="table table-striped border border-3 rounded">
+      <thead>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+</section>
+<app-expense-view [expense]="selectedExpense"></app-expense-view>
+
+

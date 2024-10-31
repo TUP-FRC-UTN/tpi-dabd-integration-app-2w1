@@ -1,0 +1,36 @@
+<div class="notification-icons" style="display: flex; gap: 40px">
+  <div class="dropdown">
+    <i class="bi bi-bell-fill" (click)="toggleNotificationsAndFetch()"></i>
+    <div
+      *ngIf="showNotificationsDropdown"
+      class="dropdown-menu dropdown-menu-end"
+    >
+      <h6 class="dropdown-header">Notificaciones</h6>
+      <div *ngIf="notifications.length === 0" class="dropdown-item">
+        No hay notificaciones nuevas.
+      </div>
+      <div *ngFor="let notification of notifications" class="dropdown-item">
+        <div class="notification-item">
+          <small>{{
+            notification.date || notification.created_datetime
+          }}</small>
+          <h6>
+            <b> {{ notification.subject }}</b>
+          </h6>
+          <p>{{ notification.message || notification.description }}</p>
+        </div>
+      </div>
+      <button
+        type="button"
+        class="btn btn-link"
+        (click)="showNotifications()"
+        [title]="info"
+        
+      >
+        Mostrar todas
+      </button>
+    </div>
+  </div>
+  @if (userRole.endsWith("Admin")) {
+  <i class="bi bi-mailbox" (click)="showSendNotificationsAdmin()"></i>}
+</div>
