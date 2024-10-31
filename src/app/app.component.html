@@ -1,0 +1,37 @@
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">AppName</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="entries" routerLinkActive="active" href="#">Accesos</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="invoices" routerLinkActive="active" href="#">Boletas - Cobros</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="expenses" routerLinkActive="active" href="#">Gastos</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="inventories" routerLinkActive="active" href="#">Inventario - Empleados - Proveedores</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="penalties" routerLinkActive="active" href="#">Multas</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="notifications" routerLinkActive="active" href="#">Notificaciones</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="users" routerLinkActive="active" href="#">Usuarios</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+<router-outlet />
