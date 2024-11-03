@@ -435,7 +435,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
       case 'Rechazado':
         return 'text-bg-secondary';
       case 'Finalizado':
-        return 'text-bg-secondary';
+        return 'text-bg-primary';
       default:
         return '';
     }

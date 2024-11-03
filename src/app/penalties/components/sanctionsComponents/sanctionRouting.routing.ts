@@ -6,6 +6,7 @@ import { PenaltiesPostDisclaimerComponent } from './penalties-post-disclaimer/pe
 import { PenaltiesSanctionsListComponent } from './penalties-list-sanctions/penalties-list-sanctions.component';
 import { ReportModifyComponent } from './sanctions-update-report/sanctions-update-report.component';
 import { NewReportComponent } from './penalties-post-report/penalties-post-report.component';
+import { PenaltiesUpdateFineComponent } from './penalties-update-fine/penalties-update-fine.component';
 
 export const routes: Routes = [
   {
@@ -31,6 +32,10 @@ export const routes: Routes = [
   {
     path: 'postReport',
     component: NewReportComponent
+  },
+  {
+    path: 'putFine/:fineId',
+    component: PenaltiesUpdateFineComponent
   }
 ];
 

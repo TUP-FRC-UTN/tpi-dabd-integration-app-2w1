@@ -59,6 +59,9 @@ export class PenaltiesSanctionsListComponent implements OnInit {
         case 'changeState':
           that.changeState(id, state);
           break;
+        case 'updateFine':
+          that.updateFine(id);
+          break;
       }
     });
   }
@@ -135,7 +138,7 @@ export class PenaltiesSanctionsListComponent implements OnInit {
           className: 'align-middle',
           render: (data) => {
             const amountValue = data != null ? '$' + data : '';
-            return `<div class="text-start">${amountValue}</div>`;
+            return `<div class="text-end">${amountValue}</div>`;
           }
         },
         {
@@ -163,6 +166,7 @@ export class PenaltiesSanctionsListComponent implements OnInit {
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" data-action="changeState" data-id="${data.id}" data-state='PENDING'>Marcar como Pendiente</a></li>
                             <li><a class="dropdown-item" data-action="changeState" data-id="${data.id}" data-state='PAYED'>Marcar como Pagada</a></li>
+                            <li><a class="dropdown-item" data-action="updateFine" data-id="${data.id}"'>Modificar Multa</a></li>
                             ${data.hasSubmittedDisclaimer ? `` : `<li><a class="dropdown-item" data-action="newDisclaimer" data-id="${data.id}">Realizar Descargo</a></li>`}
                           </ul>
                         </div>
@@ -322,6 +326,10 @@ export class PenaltiesSanctionsListComponent implements OnInit {
 
   changeState(id: number, state:string) {
     this.openModalStateReason(id, state);
+  }
+
+  updateFine(id: number) {
+    this.router.navigate([`/home/sanctions/putFine/${id}`])
   }
 
   
