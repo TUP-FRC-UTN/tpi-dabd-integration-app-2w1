@@ -3,6 +3,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { PenaltiesSanctionsServicesService } from '../../../services/sanctionsService/sanctions.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-penalties-post-disclaimer',
@@ -51,16 +52,41 @@ export class PenaltiesPostDisclaimerComponent implements OnInit {
       disclaimer: this.reactiveForm.value.disclaimerControl
     };
 
-    //Envio de formulario
-    this.penaltiesService.addDisclaimer(disclaimerData).subscribe({
-      next: (response) => {
-        console.log('Reclamo enviado correctamente', response);
+    // Confirmación antes de enviar el formulario
+Swal.fire({
+  title: '¿Estás seguro?',
+  text: "¿Deseas confirmar el envío del descargo?",
+  icon: 'warning',
+  showCancelButton: true,
+  confirmButtonText: 'Confirmar',
+  cancelButtonText: 'Cancelar',
+  customClass: {
+    confirmButton: 'btn btn-success',
+    cancelButton: 'btn btn-danger'
+  },
+}).then((result: any) => {
+  if (result.isConfirmed) {
+    // Envío de formulario solo después de la confirmación
+    this.penaltiesService.addDisclaimer(disclaimerData).subscribe( res => {
+        Swal.fire({
+          title: '¡Descargo enviado!',
+          text: 'El descargo ha sido enviado correctamente.',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false
+        });
         this.router.navigate(['/home/sanctions/sanctionsList']);
-      },
-      error: (error) => {
-        console.error('Error al enviar el reclamo', error);
-      }
-    });
+      }, error => {
+        console.error('Error al enviar el descargo', error);
+        Swal.fire({
+          title: 'Error',
+          text: 'No se pudo enviar el descargo. Inténtalo de nuevo.',
+          icon: 'error',
+          confirmButtonText: 'Aceptar'
+        });
+      })
+    };
+  });
   }
 
   //Retorna una clase para poner el input en verde o rojo dependiendo si esta validado

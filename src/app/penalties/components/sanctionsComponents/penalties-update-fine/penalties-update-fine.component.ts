@@ -3,6 +3,7 @@ import { PenaltiesSanctionsServicesService } from '../../../services/sanctionsSe
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import Swal from 'sweetalert2';
 @Component({
   selector: 'app-penalties-update-fine',
   standalone: true,
@@ -46,16 +47,40 @@ export class PenaltiesUpdateFineComponent implements OnInit {
       userId: 10
     };
     //Envio de formulario
-    //Deberia ir al endpoint de putFine
-    this.penaltiesService.updateFine(fineData).subscribe({
-      next: (response) => {
-        console.log('Multa actualizada correctamente', response);
-        this.router.navigate(['/home/sanctions/sanctionsList']);
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: "¿Deseas confirmar la actualización de la multa?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Confirmar',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        confirmButton: 'btn btn-success',
+        cancelButton: 'btn btn-danger'
       },
-      error: (error) => {
-        console.error('Error al enviar la multa', error);
-      }
-    });
+    }).then((result: any) => {
+      if (result.isConfirmed) {
+        // Envío de formulario solo después de la confirmación
+        this.penaltiesService.updateFine(fineData).subscribe( res => {
+            Swal.fire({
+              title: '¡Multa actualizada!',
+              text: 'La multa  ha sido actualizada correctamente.',
+              icon: 'success',
+              timer: 1500,
+              showConfirmButton: false
+            });
+            this.router.navigate(['/home/sanctions/sanctionsList']);
+          }, error => {
+            console.error('Error al actualizar la multa', error);
+            Swal.fire({
+              title: 'Error',
+              text: 'No se pudo actualizar la multa. Inténtalo de nuevo.',
+              icon: 'error',
+              confirmButtonText: 'Aceptar'
+            });
+          })
+        };
+      });
   }
   //Retorna una clase para poner el input en verde o rojo dependiendo si esta validado
   onValidate(controlName: string) {

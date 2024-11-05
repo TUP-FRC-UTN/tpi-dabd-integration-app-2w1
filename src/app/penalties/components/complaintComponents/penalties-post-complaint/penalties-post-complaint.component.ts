@@ -3,6 +3,7 @@ import { ComplaintService } from '../../../services/complaintsService/complaints
 import { Router, RouterModule } from '@angular/router';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-penalties-post-complaint',
@@ -47,18 +48,42 @@ export class PenaltiesPostComplaintComponent implements OnInit {
         complaintType: formData.typeControl,
         description: formData.descriptionControl,
         pictures: this.files
-      }
+      };
 
-      this.complaintService.add(data).subscribe({
-        next: (response) => {
-          //Redireccion a otra ruta
-          console.log('Denuncia enviada correctamente', response);
-          this.router.navigate(['home/complaints/listComplaint']);
+      Swal.fire({
+        title: '¿Estás seguro?',
+        text: "¿Deseas confirmar el envío de la denuncia?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Confirmar',
+        cancelButtonText: 'Cancelar',
+        customClass: {
+          confirmButton: 'btn btn-success',
+          cancelButton: 'btn btn-danger'
         },
-        error: (error) => {
-          console.error('Error al enviar la denuncia', error);
-        }
-      });
+      }).then((result: any) => {
+        if (result.isConfirmed) {
+          // Envío de formulario solo después de la confirmación
+          this.complaintService.add(data).subscribe( res => {
+              Swal.fire({
+                title: '¡Denuncia enviada!',
+                text: 'La denuncia ha sido enviada correctamente.',
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false
+              });
+              this.router.navigate(['/home/complaints/listComplaint']);
+            }, error => {
+              console.error('Error al enviar la denuncia', error);
+              Swal.fire({
+                title: 'Error',
+                text: 'No se pudo enviar la denuncia. Inténtalo de nuevo.',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+              });
+            })
+          };
+        });
     }
   }
 
