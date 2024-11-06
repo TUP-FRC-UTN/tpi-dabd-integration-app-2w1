@@ -2,7 +2,7 @@
   <div class="container p-3 border border-2 rounded shadow-lg">
 
     <!-- BOTON DE AGREGAR ITEM AL LISTADO PARA QUIENES LO NECESITEN -->
-    <button type="button" class="floating-btn btn btn-primary" (click)="redirecting()">
+    <button type="button" class="floating-btn btn btn-primary" (click)="postRedirect()">
       <span class="bi-plus-lg"></span>
     </button>
 
@@ -43,6 +43,12 @@
       <!-- <div class="col-auto">
         <button class="btn btn-primary bi-funnel-fill">Filtros</button>
       </div> -->
+
+       <!-- BOTON DE BORRAR FILTROS -->
+       <div class="col-auto">
+        <button class="btn btn-secondary bi-trash" (click)="eraseFilters()"></button>
+      </div>
+
 
       <!-- Botones de exportar -->
       <div class="col-auto d-flex gap-1 text-end">

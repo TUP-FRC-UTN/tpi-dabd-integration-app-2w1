@@ -92,7 +92,7 @@ export class NewReportComponent {
             timer: 1500,
             showConfirmButton: false
           });
-          this.routingService.redirect("main/penalties/sanctions/report-list", "Listado de Informes")
+          this.routingService.redirect("main/sanctions/report-list", "Listado de Informes")
         },
         error: (error) => {
           console.error('Error al enviar la denuncia', error);
@@ -107,7 +107,7 @@ export class NewReportComponent {
   }
 
   cancel(){
-    this.routingService.redirect("main/penalties/sanctions/report-list/", "Listado de Informes")
+    this.routingService.redirect("main/sanctions/report-list/", "Listado de Informes")
   }
 
   validateParams(): boolean {

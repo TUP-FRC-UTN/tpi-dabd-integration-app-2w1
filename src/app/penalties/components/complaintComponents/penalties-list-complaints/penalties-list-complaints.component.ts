@@ -28,6 +28,7 @@ import { ComplaintService } from '../../../services/complaintsService/complaints
 import { ComplaintDto } from '../../../models/complaint';
 import { RoutingService } from '../../../../common/services/routing.service';
 import { CustomSelectComponent } from "../../../../common/components/custom-select/custom-select.component";
+import moment from 'moment';
 
 @Component({
   selector: 'app-penalties-list-complaint',
@@ -37,6 +38,9 @@ import { CustomSelectComponent } from "../../../../common/components/custom-sele
   styleUrl: './penalties-list-complaints.component.scss',
 })
 export class PenaltiesListComplaintComponent implements OnInit {
+eraseFilters() {
+throw new Error('Method not implemented.');
+}
   //Variables
   Complaint: ComplaintDto[] = [];                 //Fuente de datos
   filterComplaint: ComplaintDto[] = [];           //Fuente de datos a mostrar
@@ -88,7 +92,7 @@ export class PenaltiesListComplaintComponent implements OnInit {
     if ($.fn.dataTable.isDataTable('#complaintsTable')) {
       $('#complaintsTable').DataTable().clear().destroy();
     }
-
+    $.fn.dataTable.ext.type.order['date-moment-pre'] = (d: string) => moment(d, 'DD/MM/YYYY').unix()
     let table = this.table = $('#complaintsTable').DataTable({
       //Atributos de la tabla
       paging: true,
@@ -103,9 +107,8 @@ export class PenaltiesListComplaintComponent implements OnInit {
       columns: [
         {
           data: 'createdDate',
-          className: 'align-middle',
-          render: (data) =>
-            `<div>${this.complaintService.formatDate(data)}</div>`
+          render: (data) =>  moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY'),
+          type: 'date-moment'
         },
         {
           data: 'complaintState',
@@ -321,8 +324,8 @@ export class PenaltiesListComplaintComponent implements OnInit {
       });
   }
 
-  redirecting() {
-    this.routingService.redirect("main/penalties/complaints/post-complaint", "Registrar Denuncia")
+  postRedirect() {
+    this.routingService.redirect("main/complaints/post-complaint", "Registrar Denuncia")
   }
 }
 

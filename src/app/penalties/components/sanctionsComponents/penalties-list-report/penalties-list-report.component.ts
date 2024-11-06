@@ -244,11 +244,11 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
   }
 
   newSanction(id: number) {
-    this.routingService.redirect(`main/penalties/sanctions/post-fine/${id}`, "Registrar Multa")
+    this.routingService.redirect(`main/sanctions/post-fine/${id}`, "Registrar Multa")
   }
 
-  redirecting(){
-    this.routingService.redirect("main/penalties/sanctions/post-report","Registrar Informe")
+  postRedirect(){
+    this.routingService.redirect("main/sanctions/post-report", "Registrar Informe")
   }
 
 
@@ -288,7 +288,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
 
     //REVISAR ROUTING
     if (selectedReport) {
-      this.router.navigate(['/main/penalties/sanctions/put-report'], {
+      this.router.navigate(['/main/sanctions/put-report'], {
         queryParams: {
           id: selectedReport.id,
           createdDate: selectedReport.createdDate,

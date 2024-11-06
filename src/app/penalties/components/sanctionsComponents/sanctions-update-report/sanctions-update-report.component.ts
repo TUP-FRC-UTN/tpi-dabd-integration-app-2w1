@@ -91,7 +91,7 @@ export class ReportModifyComponent implements OnInit {
             timer: 1500,
             showConfirmButton: false
           });
-          this.routingService.redirect("main/penalties/sanctions/report-list", "Listado de Informes")
+          this.routingService.redirect("main/sanctions/report-list", "Listado de Informes")
         }, error => {
           console.error('Error al actualizar el informe', error);
           Swal.fire({
@@ -103,7 +103,7 @@ export class ReportModifyComponent implements OnInit {
         });
       }
   cancel(){
-    this.routingService.redirect("main/penalties/sanctions/report-list", "Listado de Informes")
+    this.routingService.redirect("main/sanctions/report-list", "Listado de Informes")
   }
 
   openModal(): void {

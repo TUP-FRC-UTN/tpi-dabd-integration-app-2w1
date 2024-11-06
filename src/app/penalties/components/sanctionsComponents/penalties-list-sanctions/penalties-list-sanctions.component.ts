@@ -328,7 +328,7 @@ export class PenaltiesSanctionsListComponent implements OnInit {
   }
 
   newDisclaimer(id: number) {
-    this.routingService.redirect(`main/penalties/sanctions/post-disclaimer/${id}`, "Registrar Descargo")
+    this.routingService.redirect(`main/sanctions/post-disclaimer/${id}`, "Registrar Descargo")
   }
 
   changeState(id: number, state:string) {
@@ -336,7 +336,7 @@ export class PenaltiesSanctionsListComponent implements OnInit {
   }
 
   updateFine(id: number) {
-    this.routingService.redirect(`main/penalties/sanctions/put-fine/${id}`, "Actualizar Multa")
+    this.routingService.redirect(`main/sanctions/put-fine/${id}`, "Actualizar Multa")
   }
 
   
