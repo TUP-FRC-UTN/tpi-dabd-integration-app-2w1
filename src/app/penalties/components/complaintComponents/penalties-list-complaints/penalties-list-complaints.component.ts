@@ -137,7 +137,7 @@ export class PenaltiesListComplaintComponent implements OnInit {
                      <li><a class="dropdown-item" onclick="viewComplaint(${data.id})">Ver más</a></li>
                       ${data.complaintState == "Pendiente" ? `
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" onclick="changeState('REJECTED', ${data.id}, ${data.userId})">Marcar como Rechazada</a></li>` : ``}
+                        <li><a class="dropdown-item" onclick="changeState('REJECTED', ${data.id}, ${data.userId})">Rechazar</a></li>` : ``}
                       </ul>
                  </div>
               </div>

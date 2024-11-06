@@ -52,19 +52,7 @@ export class PenaltiesPostComplaintComponent implements OnInit {
         pictures: this.files
       };
 
-      Swal.fire({
-        title: '¿Estás seguro?',
-        text: "¿Deseas confirmar el envío de la denuncia?",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Confirmar',
-        cancelButtonText: 'Cancelar',
-        customClass: {
-          confirmButton: 'btn btn-success',
-          cancelButton: 'btn btn-danger'
-        },
-      }).then((result: any) => {
-        if (result.isConfirmed) {
+      
           // Envío de formulario solo después de la confirmación
           this.complaintService.add(data).subscribe( res => {
               Swal.fire({
@@ -85,8 +73,6 @@ export class PenaltiesPostComplaintComponent implements OnInit {
               });
             })
           };
-        });
-    }
   }
 
   cancel(){

@@ -90,19 +90,6 @@ export class PenaltiesPostFineComponent implements OnInit {
         createdUser: 1
       };
 
-      Swal.fire({
-        title: '¿Estás seguro?',
-        text: "¿Deseas confirmar el envío de la multa?",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Confirmar',
-        cancelButtonText: 'Cancelar',
-        customClass: {
-          confirmButton: 'btn btn-success',
-          cancelButton: 'btn btn-danger'
-        },
-      }).then((result: any) => {
-        if (result.isConfirmed) {
           // Envío de formulario solo después de la confirmación
           this.penaltiesService.postFine(fineData).subscribe( res => {
               Swal.fire({
@@ -122,9 +109,8 @@ export class PenaltiesPostFineComponent implements OnInit {
                 confirmButtonText: 'Aceptar'
               });
             })
-          };
-        });
-    }
+          }
+
     else{
 
       const warningData = {
@@ -132,20 +118,7 @@ export class PenaltiesPostFineComponent implements OnInit {
         createdUser: 1
       };
 
-        //SWEET ALERT!!!
-        Swal.fire({
-          title: '¿Estás seguro?',
-          text: "¿Deseas confirmar el envío de la advertencia?",
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonText: 'Confirmar',
-          cancelButtonText: 'Cancelar',
-          customClass: {
-            confirmButton: 'btn btn-success',
-            cancelButton: 'btn btn-danger'
-          },
-        }).then((result: any) => {
-          if (result.isConfirmed) {
+
             // Envío de formulario solo después de la confirmación
             this.penaltiesService.postWarning(warningData).subscribe( res => {
                 Swal.fire({
@@ -165,11 +138,8 @@ export class PenaltiesPostFineComponent implements OnInit {
                   confirmButtonText: 'Aceptar'
                 });
               })
-            };
-          });
-    }
-      
-  }
+            };     
+      }
 
   cancel(){
     this.routingService.redirect("main/penalties/sanctions/report-list", "Listado de Informes")
