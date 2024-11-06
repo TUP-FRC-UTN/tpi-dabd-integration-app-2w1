@@ -30,7 +30,7 @@
             <div class="input-box d-flex flex-column gap-2 mb-4">
                 <label for="textareaMessage" class="form-label">Descripción</label>
                 <textarea class="form-control" name="textareaMessage" id="textareaMessage"
-                    [placeholder]="textareaPlaceholder" [(ngModel)]="description" #textArea="ngModel" required
+                     [(ngModel)]="description" #textArea="ngModel" required
                     minlength="10" maxlength="500" rows="8" style="resize: none;"></textarea>
                 @if (textArea.invalid && (textArea.dirty || textArea.touched)) {
                 @if (textArea.errors?.['required']) {
