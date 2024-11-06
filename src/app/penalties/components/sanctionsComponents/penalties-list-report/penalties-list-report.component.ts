@@ -13,6 +13,7 @@ import 'datatables.net-buttons-bs5'; // Botones con estilos de Bootstrap 5
 import 'datatables.net-buttons/js/buttons.html5';
 import 'datatables.net-buttons/js/buttons.print';
 import { RoutingService } from '../../../../common/services/routing.service';
+import moment from 'moment';
 
 
 
@@ -24,15 +25,21 @@ import { RoutingService } from '../../../../common/services/routing.service';
   styleUrl: './penalties-list-report.component.scss'
 })
 export class PenaltiesSanctionsReportListComponent implements OnInit {
+eraseFilters() {
+throw new Error('Method not implemented.');
+}
   //Variables
   report: ReportDTO[] = [];                       //
   reportfilter: ReportDTO[] = [];                 //
-  filterDateStart: Date = new Date();             //
-  filterDateEnd: Date = new Date();               //
+  // filterDateStart: Date = new Date();             //
+  // filterDateEnd: Date = new Date();               //
   states: { key: string; value: string }[] = [];  //
   table: any;                                     //Tabla base
   searchTerm: string = '';                        //Valor de la barra de busqueda
-
+  filterDateStart: string='';
+  filterDateEnd: string ='';
+  
+  selectedState: string = '';
 
   //Constructor
   constructor(
@@ -62,6 +69,21 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
           break;
       }
     })
+    this.resetDates()
+  }
+
+  // Función para convertir la fecha al formato `YYYY-MM-DD`
+  private formatDateToString(date: Date): string {
+    return date.toISOString().split('T')[0];
+  }
+
+  resetDates(){
+    const today = new Date();
+    this.filterDateEnd = this.formatDateToString(today);
+
+    const previousMonthDate = new Date();
+    previousMonthDate.setMonth(previousMonthDate.getMonth() - 1);
+    this.filterDateStart = this.formatDateToString(previousMonthDate);
   }
 
 
@@ -85,14 +107,14 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
     if ($.fn.dataTable.isDataTable('#reportsTable')) {
       $('#reportsTable').DataTable().clear().destroy();
     }
-    
+    $.fn.dataTable.ext.type.order['date-moment-pre'] = (d: string) => moment(d, 'DD/MM/YYYY').unix()
     let table = this.table = $('#reportsTable').DataTable({
       // Atributos de la tabla
       paging: true,
       searching: true,
       ordering: true,
       lengthChange: true,
-      order: [0, 'asc'],
+      order: [0, 'desc'],
       lengthMenu: [10, 25, 50],
       pageLength: 10,
       data: this.reportfilter, // Fuente de datos
@@ -101,8 +123,8 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
         {
           data: 'createdDate',
           className: 'align-middle',
-          render: (data) =>
-            `<div>${data}</div>`
+           render: (data) =>  moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY'),
+          type: 'date-moment'
         },
         {
           data: 'reportState',
@@ -237,6 +259,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
         this.report = response;
         this.reportfilter = this.report;
         this.updateDataTable()
+        this.filterDate()
       }, error => {
         alert(error)
       }

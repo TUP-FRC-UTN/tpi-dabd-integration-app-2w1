@@ -43,19 +43,35 @@ throw new Error('Method not implemented.');
   //Variables
   Complaint: ComplaintDto[] = [];                 //Fuente de datos
   filterComplaint: ComplaintDto[] = [];           //Fuente de datos a mostrar
-  filterDateStart: Date = new Date();             //valor fecha inicio
-  filterDateEnd: Date = new Date();               //valor fecha fin
+  //filterDateStart: Date = new Date();             //valor fecha inicio
+  //filterDateEnd: Date = new Date();               //valor fecha fin
   states: { key: string; value: string }[] = [];  //Mapa de estados para el select
   table: any;                                     //Tabla base
   searchTerm: string = '';                        //Valor de la barra de busqueda
-
+  filterDateStart: string='';
+  filterDateEnd: string ='';
+  
+  selectedState: string = '';
 
   //Init
   ngOnInit(): void {
     this.refreshData();
     this.getTypes()
+    this.resetDates()
   }
 
+  // Función para convertir la fecha al formato `YYYY-MM-DD`
+  private formatDateToString(date: Date): string {
+    return date.toISOString().split('T')[0];
+  }
+  resetDates(){
+    const today = new Date();
+    this.filterDateEnd = this.formatDateToString(today);
+
+    const previousMonthDate = new Date();
+    previousMonthDate.setMonth(previousMonthDate.getMonth() - 1);
+    this.filterDateStart = this.formatDateToString(previousMonthDate);
+  }
 
   //Constructor
   constructor(
@@ -98,7 +114,7 @@ throw new Error('Method not implemented.');
       searching: true,
       ordering: true,
       lengthChange: true,
-      order: [0, 'asc'],
+      order: [0, 'desc'],
       lengthMenu: [10, 25, 50],
       pageLength: 10,
       data: this.filterComplaint, //Fuente de datos
@@ -267,6 +283,7 @@ throw new Error('Method not implemented.');
       this.Complaint = data;
       this.filterComplaint = [...data];
       this.updateDataTable();
+      this.filterDate()
     });
   }
 
