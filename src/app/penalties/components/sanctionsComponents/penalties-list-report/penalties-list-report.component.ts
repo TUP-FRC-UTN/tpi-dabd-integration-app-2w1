@@ -42,7 +42,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
      private routingService: RoutingService
 
     ) {
-    // (window as any).viewComplaint = (id: number) => this.viewComplaint(id);
+    (window as any).viewReport = (id: number) => this.viewReport(id);
     (window as any).editReport = (id: number) => this.editReport(id);
   }
 
@@ -134,7 +134,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
                 <div class="dropdown">
                   <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
                   <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" onclick="viewComplaint(${data.id})">Ver más</a></li>
+                    <li><a class="dropdown-item" onclick="viewReport(${data.id})">Ver más</a></li>
                     ${data.reportState === 'Abierto' || data.reportState === 'Nuevo' || data.reportState === 'Pendiente' ?
                       `<li><hr class="dropdown-divider"></li> <li><a class="dropdown-item" onclick="editReport(${data.id})">Editar</a></li>` : ''}
                       ${data.reportState === 'Abierto' || data.reportState === 'Pendiente' ?
@@ -398,21 +398,20 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
   //   });
   // }
 
-
-  // viewComplaint(i: number) {
-  //   const modal = this._modal.open(PenaltiesModalReportComponent, {
-  //     size: 'xl',
-  //     keyboard: false,
-  //   });
-  //   modal.componentInstance.id = i;
-  //   modal.result
-  //     .then((result) => { })
-  //     .catch((error) => {
-  //       console.log('Modal dismissed with error:', error);
-  //     });
   }
 
-
+  viewReport(i: number) {
+     const modal = this._modal.open(PenaltiesModalReportComponent, {
+       size: 'xl',
+       keyboard: false,
+     });
+     modal.componentInstance.id = i;
+     modal.result
+       .then((result) => { })
+       .catch((error) => {
+         console.log('Modal dismissed with error:', error);
+       });
+      }
 
 
   getTypes(): void {

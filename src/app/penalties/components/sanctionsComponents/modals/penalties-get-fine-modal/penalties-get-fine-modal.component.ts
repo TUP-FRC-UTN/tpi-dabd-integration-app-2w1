@@ -12,6 +12,7 @@ import { PenaltiesUpdateStateReasonModalComponent } from '../penalties-update-st
 })
 export class PenaltiesModalFineComponent implements OnInit {
   //Variables
+  tooltipTitle: string = 'Se podrá consultar el descargo del propietario y, con base en ello, aceptarlo o rechazarlo.'
   @Input() fineId!: number;
   files: File[] = [];
   fine: any;
@@ -50,11 +51,16 @@ export class PenaltiesModalFineComponent implements OnInit {
       });
   }
 
+  ngAfterViewInit(): void {
+    const tooltipTriggerList = Array.from(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.forEach((tooltipTriggerEl) => {
+      new (window as any).bootstrap.Tooltip(tooltipTriggerEl);
+    });
+  }
+
   //Cambiar el estado de la multa segun lo que decide el consejo 
   //acerca del descargo proporcionado por el usuario
   
-    
-
   
 
   changeState(state:string) {
