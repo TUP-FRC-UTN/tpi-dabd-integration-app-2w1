@@ -27,6 +27,7 @@ import { PenaltiesModalStateReasonComponent } from '../modals/penalties-update-s
 import { ComplaintService } from '../../../services/complaintsService/complaints.service';
 import { ComplaintDto } from '../../../models/complaint';
 import { RoutingService } from '../../../../common/services/routing.service';
+import moment from 'moment';
 
 @Component({
   selector: 'app-penalties-list-complaint',
@@ -36,6 +37,9 @@ import { RoutingService } from '../../../../common/services/routing.service';
   styleUrl: './penalties-list-complaints.component.scss',
 })
 export class PenaltiesListComplaintComponent implements OnInit {
+eraseFilters() {
+throw new Error('Method not implemented.');
+}
   //Variables
   Complaint: ComplaintDto[] = [];                 //Fuente de datos
   filterComplaint: ComplaintDto[] = [];           //Fuente de datos a mostrar
@@ -87,7 +91,7 @@ export class PenaltiesListComplaintComponent implements OnInit {
     if ($.fn.dataTable.isDataTable('#complaintsTable')) {
       $('#complaintsTable').DataTable().clear().destroy();
     }
-
+    $.fn.dataTable.ext.type.order['date-moment-pre'] = (d: string) => moment(d, 'DD/MM/YYYY').unix()
     let table = this.table = $('#complaintsTable').DataTable({
       //Atributos de la tabla
       paging: true,
@@ -102,9 +106,8 @@ export class PenaltiesListComplaintComponent implements OnInit {
       columns: [
         {
           data: 'createdDate',
-          className: 'align-middle',
-          render: (data) =>
-            `<div>${this.complaintService.formatDate(data)}</div>`
+          render: (data) =>  moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY'),
+          type: 'date-moment'
         },
         {
           data: 'complaintState',
