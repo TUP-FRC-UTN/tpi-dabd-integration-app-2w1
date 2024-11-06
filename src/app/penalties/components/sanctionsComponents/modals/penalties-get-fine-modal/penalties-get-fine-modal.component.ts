@@ -2,11 +2,12 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { NgbActiveModal, NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { PenaltiesSanctionsServicesService } from '../../../../services/sanctionsService/sanctions.service';
 import { PenaltiesUpdateStateReasonModalComponent } from '../penalties-update-state-reason-modal/penalties-update-state-reason-modal.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-penalties-modal-fine',
   standalone: true,
-  imports: [NgbModule],
+  imports: [NgbModule, CommonModule],
   templateUrl: './penalties-get-fine-modal.component.html',
   styleUrl: './penalties-get-fine-modal.component.scss'
 })

@@ -11,7 +11,7 @@
     <div class="row mb-3">
         <div class="col-md-6">
             <p><strong>Motivo:</strong> {{ fine?.report.reportReason.reportReason || 'N/A' }}</p>
-            <p><strong>Fecha:</strong> {{ fine?.createdDate || 'N/A' }}</p>
+            <p><strong>Fecha:</strong> {{ fine?.createdDate | date:"dd/MM/yyyy" || 'N/A' }}</p>
         </div>
     
         <div class="col-md-6">
