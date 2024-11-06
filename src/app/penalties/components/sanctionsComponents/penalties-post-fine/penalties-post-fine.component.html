@@ -165,7 +165,12 @@
           <div class="col d-flex justify-content-end gap-3">
               <button type="button" class="btn btn-secondary me-3"
                   (click)="cancel()">Cancelar</button>
-              <button type="submit" class="btn btn-success" [disabled]="formPostFine.invalid">Registrar</button>
+                <button 
+                  type="submit" 
+                  class="btn btn-success" 
+                  [disabled]="formPostFine.invalid || (newFine && newAmount === 0)">
+                Registrar
+              </button>
           </div>
       </div>
 
