@@ -4,11 +4,11 @@ import { PenaltiesListComplaintComponent } from './penalties-list-complaints/pen
 
 export const routes: Routes = [
   {
-    path: 'listComplaint',
+    path: 'list-complaint',
     component: PenaltiesListComplaintComponent,
   },
   {
-    path: 'postComplaint',
+    path: 'post-complaint',
     component: PenaltiesPostComplaintComponent,
   }
 ];

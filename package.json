@@ -27,7 +27,6 @@
     "@types/datatables.net-buttons": "^2.2.0",
     "angular-datatables": "^18.0.0",
     "angular-google-charts": "^16.0.1",
-    "boostrap": "^2.0.0",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
     "datatables.net": "^2.1.8",
