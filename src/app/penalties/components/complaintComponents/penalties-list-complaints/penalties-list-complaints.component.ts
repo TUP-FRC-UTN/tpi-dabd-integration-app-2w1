@@ -132,11 +132,10 @@ export class PenaltiesListComplaintComponent implements OnInit {
                    <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
                    <ul class="dropdown-menu">
                      <li><a class="dropdown-item" onclick="viewComplaint(${data.id})">Ver más</a></li>
-                     <li><hr class="dropdown-divider"></li>
-                     <li><a class="dropdown-item" onclick="changeState('ATTACHED', ${data.id}, ${data.userId})">Marcar como Anexada</a></li>
-                     <li><a class="dropdown-item" onclick="changeState('REJECTED', ${data.id}, ${data.userId})">Marcar como Rechazada</a></li>
-                     <li><a class="dropdown-item" onclick="changeState('PENDING', ${data.id}, ${data.userId})">Marcar como Pendiente</a></li>
-                   </ul>
+                      ${data.complaintState == "Pendiente" ? `
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" onclick="changeState('REJECTED', ${data.id}, ${data.userId})">Marcar como Rechazada</a></li>` : ``}
+                      </ul>
                  </div>
               </div>
              </div>`
