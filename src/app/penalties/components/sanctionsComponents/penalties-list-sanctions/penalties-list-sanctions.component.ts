@@ -166,10 +166,8 @@ export class PenaltiesSanctionsListComponent implements OnInit {
                           <ul class="dropdown-menu">
                             <li><a class="dropdown-item" onclick="viewFine(${data.id})">Ver más</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" data-action="changeState" data-id="${data.id}" data-state='PENDING'>Marcar como Pendiente</a></li>
-                            <li><a class="dropdown-item" data-action="changeState" data-id="${data.id}" data-state='PAYED'>Marcar como Pagada</a></li>
                             <li><a class="dropdown-item" data-action="updateFine" data-id="${data.id}"'>Modificar Multa</a></li>
-                            ${data.hasSubmittedDisclaimer ? `` : `<li><a class="dropdown-item" data-action="newDisclaimer" data-id="${data.id}">Realizar Descargo</a></li>`}
+                            ${data.fineState == "Pendiente" ? `<li><a class="dropdown-item" data-action="newDisclaimer" data-id="${data.id}">Realizar Descargo</a></li>` : ``}
                           </ul>
                         </div>
                       </div>

@@ -148,7 +148,6 @@ export class PenaltiesPostFineComponent implements OnInit {
   }
 
   cancel(){
-    alert("")
     this.routingService.redirect("main/penalties/sanctions/report-list", "Listado de Informes")
   }
 
