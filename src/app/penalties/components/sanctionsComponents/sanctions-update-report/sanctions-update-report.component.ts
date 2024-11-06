@@ -6,6 +6,7 @@ import { ComplaintService } from '../../../services/complaintsService/complaints
 import { PenaltiesSanctionsServicesService } from '../../../services/sanctionsService/sanctions.service';
 import { ModalComplaintsListComponent } from '../../complaintComponents/modals/penalties-list-complaints-modal/penalties-list-complaints-modal.component';
 import { RoutingService } from '../../../../common/services/routing.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-report-modify',
@@ -83,7 +84,7 @@ export class ReportModifyComponent implements OnInit {
     };
 
         this.reportService.updateReport(reportDTO).subscribe(res => {
-          (window as any).Swal.fire({
+          Swal.fire({
             title: '¡Actualización exitosa!',
             text: 'El informe ha sido actualizado correctamente.',
             icon: 'success',
@@ -93,7 +94,7 @@ export class ReportModifyComponent implements OnInit {
           this.routingService.redirect("main/penalties/sanctions/report-list", "Listado de Informes")
         }, error => {
           console.error('Error al actualizar el informe', error);
-          (window as any).Swal.fire({
+          Swal.fire({
             title: 'Error',
             text: 'No se pudo actualizar el informe. Inténtalo de nuevo.',
             icon: 'error',
