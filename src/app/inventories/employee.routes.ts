@@ -16,13 +16,12 @@ import { IepSuppliersFormComponent } from "./components/iep-suppliers-form/iep-s
 import { IepTableComponent } from "./components/iep-table/iep-table.component";
 import { IepWarehouseMovementSearchComponent } from "./components/iep-warehouse-movement-search/iep-warehouse-movement-search.component";
 
-export const INVENTORY_ROUTES: Routes = [
-    { path: 'inventory', component: IepInventoryComponent },
-    { path: 'inventory-detail', component: IepDetailTableComponent },
-    { path: 'register-product', component: IepProductComponent },
-    { path: 'stock-increase', component: IepStockIncreaseComponent },
-    { path: 'stock-movements-history', component: IepTableComponent },
-    { path: 'warehouse-movements', component: IepWarehouseMovementSearchComponent },
-    { path: 'categories', component: InventoryEmployeeProviderHomeComponent }, //Remplazar por el componente del listad de categorias
+export const EMPLOYEE_ROUTES: Routes = [
+    { path: 'employees', component: IepListEmployeesComponent },
+    { path: "register-employee", component: IEPFormPostEmployeesComponent },
+    { path: 'attention-call', component: IepAttentionCallComponent },
+    { path: 'performance', component: IepPerformancelistComponent },
+    { path: 'employee/update/:id', component: IepPutEmployeesComponent },
+    { path: 'charges', component: IepChargesComponent },
     { path: 'dashboard', component: InventoryEmployeeProviderHomeComponent }, // Cambiar por el componente correspondiente
 ];

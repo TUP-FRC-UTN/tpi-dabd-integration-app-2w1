@@ -9,23 +9,13 @@ import { UsersProfileComponent } from "./users-components/users/users-profile/us
 import { LandingPageComponent } from "../common/components/users-landing-page/landing-page.component";
 import { LoginComponent } from "../common/components/users-login/login.component";
 import { UsersRecoveryPasswordComponent } from "../common/components/users-recovery-password/users-recovery-password.component";
-import { ListUsersComponent } from "./users-components/users/users-list-users/list-users.component";
-import { NewUserComponent } from "./users-components/users/users-new-user/new-user.component";
-import { UsersUpdateUserComponent } from "./users-components/users/users-update-user/users-update-user.component";
+import { UsersListOwnersComponent } from "./users-components/owners/users-list-owners/users-list-owners.component";
+import { UsuariosNewOwnerComponent } from "./users-components/owners/users-new-owner/usuarios-new-owner.component";
+import { UsersUpdateOwnerComponent } from "./users-components/owners/users-update-owner/users-update-owner.component";
 
-export const USER_ROUTES: Routes = [
-  {
-    path: 'profile',
-    component: UsersProfileComponent,
-    data: { roles: ['SuperAdmin', 'Gerente', 'Propietario'] }
-  },
-  {
-    path: 'family',
-    component: UsersFamiliarGroupComponent,
-    data: { roles: ['Propietario', 'Familiar mayor'] }
-  },
-  { path: 'list', component: ListUsersComponent, data: { roles: ['Gerente', 'SuperAdmin'] } },
-  { path: 'add', component: NewUserComponent },
-  { path: 'edit/:id', component: UsersUpdateUserComponent },
-  { path: 'dashboard', component: UserHomeComponent } // Cambiar por el componente correspondiente
+export const OWNER_ROUTES: Routes = [
+  { path: 'list', component: UsersListOwnersComponent },
+  { path: 'add', component: UsuariosNewOwnerComponent },
+  { path: 'edit/:id', component: UsersUpdateOwnerComponent },
+  { path: 'dashboard', component: UserHomeComponent }, // Cambiar por el componente correspondiente
 ];
