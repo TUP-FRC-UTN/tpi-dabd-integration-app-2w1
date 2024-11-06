@@ -44,8 +44,8 @@
 
       <!-- Botones de exportar -->
       <div class="col-auto d-flex gap-1 text-end">
-        <button id="exportExcelBtn" class="btn btn-success bi-file-earmark-excel"></button>
-        <button id="exportPdfBtn" class="btn btn-danger bi-file-earmark-pdf"></button>
+        <button id="exportExcelBtn" class="btn btn-success bi-file-earmark-excel" (click)="exportToExcel  ()"></button>
+        <button id="exportPdfBtn" class="btn btn-danger bi-file-earmark-pdf" (click)="exportToPDF()"></button>
       </div>
     </div>
 
