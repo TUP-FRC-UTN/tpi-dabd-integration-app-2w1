@@ -12,6 +12,7 @@ import 'datatables.net-bs5'; // DataTables con Bootstrap 5
 import 'datatables.net-buttons-bs5'; // Botones con estilos de Bootstrap 5
 import 'datatables.net-buttons/js/buttons.html5';
 import 'datatables.net-buttons/js/buttons.print';
+import { RoutingService } from '../../../../common/services/routing.service';
 
 
 
@@ -34,7 +35,13 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
 
 
   //Constructor
-  constructor(private reportServodes: PenaltiesSanctionsServicesService, private _modal: NgbModal, private router: Router) {
+  constructor(
+    private reportServodes: PenaltiesSanctionsServicesService,
+     private _modal: NgbModal, 
+     private router: Router,
+     private routingService: RoutingService
+
+    ) {
     // (window as any).viewComplaint = (id: number) => this.viewComplaint(id);
     (window as any).editReport = (id: number) => this.editReport(id);
   }
@@ -238,7 +245,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
   }
 
   newSanction(id: number) {
-    this.router.navigate([`/home/sanctions/postFine/${id}`])
+    this.routingService.redirect(`main/penalties/sanctions/post-fine/${id}`, "Registrar Multa")
   }
 
 
@@ -279,7 +286,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
     const selectedReport = this.report.find(report => report.id === id);
 
     if (selectedReport) {
-      this.router.navigate(['/home/sanctions/putReport'], {
+      this.router.navigate(['/main/penalties/sanctions/put-report'], {
         queryParams: {
           id: selectedReport.id,
           createdDate: selectedReport.createdDate,

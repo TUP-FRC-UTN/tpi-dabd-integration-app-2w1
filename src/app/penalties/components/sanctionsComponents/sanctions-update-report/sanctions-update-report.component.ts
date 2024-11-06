@@ -5,6 +5,7 @@ import { PutReportDTO } from '../../../models/PutReportDTO';
 import { ComplaintService } from '../../../services/complaintsService/complaints.service';
 import { PenaltiesSanctionsServicesService } from '../../../services/sanctionsService/sanctions.service';
 import { ModalComplaintsListComponent } from '../../complaintComponents/modals/penalties-list-complaints-modal/penalties-list-complaints-modal.component';
+import { RoutingService } from '../../../../common/services/routing.service';
 
 @Component({
   selector: 'app-report-modify',
@@ -24,7 +25,11 @@ export class ReportModifyComponent implements OnInit {
   selectedComplaints: any[] = [];
   private route: ActivatedRoute;
 
-  constructor(private complaintService: ComplaintService, private reportService: PenaltiesSanctionsServicesService, private router: Router, route: ActivatedRoute) {
+  constructor(private complaintService: ComplaintService,
+     private reportService: PenaltiesSanctionsServicesService,
+       route: ActivatedRoute,
+       private routingService: RoutingService
+      ) {
     this.route = route;
   }
 
@@ -98,7 +103,7 @@ export class ReportModifyComponent implements OnInit {
             timer: 1500,
             showConfirmButton: false
           });
-          this.router.navigate(['/home/sanctions/reportList']);
+          this.routingService.redirect("main/penalties/sanctions/report-list", "Listado de Informes")
         }, error => {
           console.error('Error al actualizar el informe', error);
           (window as any).Swal.fire({
@@ -110,6 +115,9 @@ export class ReportModifyComponent implements OnInit {
         });
       }
     });
+  }
+  cancel(){
+    this.routingService.redirect("main/penalties/sanctions/report-list", "Listado de Informes")
   }
 
   openModal(): void {

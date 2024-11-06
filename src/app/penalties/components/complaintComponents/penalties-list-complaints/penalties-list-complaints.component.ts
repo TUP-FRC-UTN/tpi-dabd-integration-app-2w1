@@ -141,14 +141,7 @@ export class PenaltiesListComplaintComponent implements OnInit {
               </div>
              </div>`
          },
-         {
-           data: null,
-            className: 'align-middle',
-            render: (data) =>
-              `<div class="text-center">
-                <input class="form-check-input border border-2 p-2" type="checkbox" value="" id="flexCheckDefault">
-              </div>`
-          },
+         
        ],
        dom:
          '<"mb-3"t>' +                           //Tabla

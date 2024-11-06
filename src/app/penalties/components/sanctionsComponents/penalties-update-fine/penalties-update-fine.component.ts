@@ -4,6 +4,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import Swal from 'sweetalert2';
+import { RoutingService } from '../../../../common/services/routing.service';
 @Component({
   selector: 'app-penalties-update-fine',
   standalone: true,
@@ -16,7 +17,12 @@ export class PenaltiesUpdateFineComponent implements OnInit {
   fineIdFromList: number;
   fine: any;
   reactiveForm:FormGroup;
-  constructor(private penaltiesService: PenaltiesSanctionsServicesService,private router: Router, private route: ActivatedRoute, formBuilder:FormBuilder){
+  constructor(private penaltiesService: PenaltiesSanctionsServicesService,
+    private router: Router,
+     private route: ActivatedRoute,
+      formBuilder:FormBuilder,
+      private routingService: RoutingService
+    ){
     this.userId = 1;
     this.fineIdFromList = 0; //Esto deberia venir del listado
     this.reactiveForm = formBuilder.group({
@@ -69,7 +75,7 @@ export class PenaltiesUpdateFineComponent implements OnInit {
               timer: 1500,
               showConfirmButton: false
             });
-            this.router.navigate(['/home/sanctions/sanctionsList']);
+            this.routingService.redirect("main/penalties/sanctions/sanctions-list", "Listado de Infracciones")
           }, error => {
             console.error('Error al actualizar la multa', error);
             Swal.fire({
@@ -81,6 +87,10 @@ export class PenaltiesUpdateFineComponent implements OnInit {
           })
         };
       });
+  }
+
+  cancel(){
+    this.routingService.redirect("main/penalties/sanctions/sanctions-list", "Listado de Infracciones")
   }
   //Retorna una clase para poner el input en verde o rojo dependiendo si esta validado
   onValidate(controlName: string) {

@@ -34,7 +34,7 @@ export const routes: Routes = [
     component: NewReportComponent
   },
   {
-    path: 'putFine/:fineId',
+    path: 'put-fine/:fineId',
     component: PenaltiesUpdateFineComponent
   }
 ];

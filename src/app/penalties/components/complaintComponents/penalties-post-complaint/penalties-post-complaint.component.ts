@@ -4,6 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import Swal from 'sweetalert2';
+import { RoutingService } from '../../../../common/services/routing.service';
 
 @Component({
   selector: 'app-penalties-post-complaint',
@@ -23,7 +24,8 @@ export class PenaltiesPostComplaintComponent implements OnInit {
   constructor(
     private complaintService: ComplaintService,
     private router: Router,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private routingService : RoutingService
   ) { 
     this.reactiveForm = this.formBuilder.group({  //Usen las validaciones que necesiten, todo lo de aca esta puesto a modo de ejemplo
       typeControl: new FormControl('', [Validators.required]),
@@ -72,7 +74,7 @@ export class PenaltiesPostComplaintComponent implements OnInit {
                 timer: 1500,
                 showConfirmButton: false
               });
-              this.router.navigate(['/home/complaints/listComplaint']);
+              this.routingService.redirect("main", "Página Principal")
             }, error => {
               console.error('Error al enviar la denuncia', error);
               Swal.fire({
@@ -85,6 +87,10 @@ export class PenaltiesPostComplaintComponent implements OnInit {
           };
         });
     }
+  }
+
+  cancel(){
+    this.routingService.redirect("main", "Página Principal")
   }
 
 

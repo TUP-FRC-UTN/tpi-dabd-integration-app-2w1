@@ -1,6 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { RouterLink, Router, Routes } from '@angular/router';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RouterLink, Router, Routes, RouterModule } from '@angular/router';
 // import { MockapiService } from '../../../services/mock/mockapi.service';
 import { PostReportDTO } from '../../../models/PostReportDTO';
 import { ReportReasonDto } from '../../../models/ReportReasonDTO';
@@ -8,12 +8,13 @@ import { ReportService } from '../../../services/report.service';
 import { error } from 'jquery';
 import { routes } from '../sanctionRouting.routing';
 import { ModalComplaintsListComponent } from '../../complaintComponents/modals/penalties-list-complaints-modal/penalties-list-complaints-modal.component';
-
+import { RoutingService } from '../../../../common/services/routing.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-new-report',
   standalone: true,
-  imports: [FormsModule, RouterLink, ModalComplaintsListComponent],
+  imports: [FormsModule, RouterLink, ModalComplaintsListComponent, RouterModule],
   templateUrl: './penalties-post-report.component.html',
   styleUrl: './penalties-post-report.component.scss'
 })
@@ -28,7 +29,10 @@ export class NewReportComponent {
   complaintsList: any[] = [];
   selectedComplaints: any[] = [];
 
-  constructor(private reportService: ReportService, private router: Router) {
+  constructor(private reportService: ReportService,
+     private router: Router,
+     private routingService: RoutingService
+    ) {
     this.dateView = this.setTodayDate();
   }
 
@@ -82,14 +86,14 @@ export class NewReportComponent {
       console.log(reportDTO);
       this.reportService.postReport(reportDTO).subscribe({
         next: (response) => {
-          (window as any).Swal.fire({
+          Swal.fire({
             title: '¡Informe creado!',
             text: 'El informe ha sido creado correctamente.',
             icon: 'success',
             timer: 1500,
             showConfirmButton: false
           });
-          this.router.navigate(["home/sanctions/reportList"]);
+          this.routingService.redirect("main/penalties/sanctions/report-list", "Listado de Informes")
         },
         error: (error) => {
           console.error('Error al enviar la denuncia', error);
@@ -101,6 +105,10 @@ export class NewReportComponent {
       console.log("Los campos no estab validados")
     }
 
+  }
+
+  cancel(){
+    this.routingService.redirect("main/penalties/sanctions/report-list/", "Listado de Informes")
   }
 
   validateParams(): boolean {

@@ -15,6 +15,7 @@ import 'datatables.net-bs5'; // DataTables con Bootstrap 5
 import 'datatables.net-buttons-bs5'; // Botones con estilos de Bootstrap 5
 import 'datatables.net-buttons/js/buttons.html5';
 import 'datatables.net-buttons/js/buttons.print';
+import { RoutingService } from '../../../../common/services/routing.service';
 
 @Component({
   selector: 'app-penalties-sanctions-list',
@@ -72,6 +73,7 @@ export class PenaltiesSanctionsListComponent implements OnInit {
     private router: Router,
     private _modal: NgbModal,
     private sanctionService: PenaltiesSanctionsServicesService,
+    private routingService: RoutingService
   ) {
     //Esto es importante para llamar los funciones dentro del data table con onClick
     (window as any).viewFine = (id: number) => this.viewFine(id);
@@ -131,7 +133,7 @@ export class PenaltiesSanctionsListComponent implements OnInit {
           data: 'plotId',
           className: 'align-middle',
           render: (data) =>
-            `<div class="text-start">Nro: ${data}</div>`
+            `<div class="text-end">${data}</div>`
         },
         {
           data: 'amount',
@@ -321,7 +323,7 @@ export class PenaltiesSanctionsListComponent implements OnInit {
   }
 
   newDisclaimer(id: number) {
-    this.router.navigate([`/home/sanctions/postDisclaimer/${id}`])
+    this.routingService.redirect(`main/penalties/sanctions/post-disclaimer/${id}`, "Registrar Descargo")
   }
 
   changeState(id: number, state:string) {
@@ -329,7 +331,7 @@ export class PenaltiesSanctionsListComponent implements OnInit {
   }
 
   updateFine(id: number) {
-    this.router.navigate([`/home/sanctions/putFine/${id}`])
+    this.routingService.redirect(`main/penalties/sanctions/put-fine/${id}`, "Actualizar Multa")
   }
 
   

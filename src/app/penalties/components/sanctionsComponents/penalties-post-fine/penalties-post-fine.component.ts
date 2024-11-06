@@ -5,6 +5,7 @@ import { ActivatedRoute, Router,RouterLink } from '@angular/router';
 import { ReportDTO, plotOwner } from '../../../models/reportDTO';
 import { PenaltiesSanctionsServicesService } from '../../../services/sanctionsService/sanctions.service';
 import Swal from 'sweetalert2';
+import { RoutingService } from '../../../../common/services/routing.service';
 @Component({
   selector: 'app-penalties-post-fine',
   standalone: true,
@@ -35,7 +36,12 @@ export class PenaltiesPostFineComponent implements OnInit {
   newAmount: number=0
   reportId: number=0;
 
-  constructor(private router: Router, private penaltiesService: PenaltiesSanctionsServicesService,private route: ActivatedRoute) { }
+  constructor(
+    private router: Router,
+     private penaltiesService: PenaltiesSanctionsServicesService,
+     private route: ActivatedRoute,
+     private routingService: RoutingService
+    ) { }
 
   ngOnInit() {
     this.setTodayDate()
@@ -106,7 +112,7 @@ export class PenaltiesPostFineComponent implements OnInit {
                 timer: 1500,
                 showConfirmButton: false
               });
-              this.router.navigate(['/home/sanctions/sanctionsList']);
+              this.routingService.redirect("main/penalties/sanctions/sanctions-list", "Listado de Infracciones")
             }, error => {
               console.error('Error al actualizar la multa', error);
               Swal.fire({
@@ -125,7 +131,7 @@ export class PenaltiesPostFineComponent implements OnInit {
         reportId: 1,
         createdUser: 1
       };
-
+        //SWEET ALERT!!!
       this.penaltiesService.postWarning(warningData).subscribe({
         next: (response) => {
           
@@ -139,6 +145,11 @@ export class PenaltiesPostFineComponent implements OnInit {
 
     }
       
+  }
+
+  cancel(){
+    alert("")
+    this.routingService.redirect("main/penalties/sanctions/report-list", "Listado de Informes")
   }
 
 }
