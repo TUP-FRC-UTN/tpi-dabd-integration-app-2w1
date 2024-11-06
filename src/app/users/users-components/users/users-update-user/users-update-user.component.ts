@@ -8,7 +8,7 @@ import { UserPut } from '../../../users-models/users/UserPut';
 import { data } from 'jquery';
 import { Router, ActivatedRoute } from '@angular/router';
 import { UsersSelectMultipleComponent } from '../../utils/users-select-multiple/users-select-multiple.component';
-import { LoginComponent } from '../../utils/users-login/login.component';
+import { LoginComponent } from '../../../../common/components/users-login/login.component';
 import { DateService } from '../../../users-servicies/date.service';
 import { AuthService } from '../../../users-servicies/auth.service';
 import Swal from 'sweetalert2';

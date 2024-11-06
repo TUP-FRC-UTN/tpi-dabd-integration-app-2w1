@@ -51,16 +51,15 @@
       </div>
     </div>
 
-    <table id="sanctionsTable" class="table table-striped border border-3 rounded">
+    <table id="sanctionsTable" class="table table-striped table-hover border border-3 rounded">
       <thead>
-        <tr class="text-center">
+        <tr>
           <th scope="col">Fecha</th>
           <th scope="col">Estado</th>
-          <th scope="col">Lote infractor</th>
+          <th scope="col">Lote</th>
           <th scope="col">Monto</th>
           <th scope="col">Mensaje</th>
-          <th scope="col">Acciones</th>
-          <!-- <th scope="col">Seleccionar</th> -->
+          <th scope="col" class="text-center">Acciones</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -75,12 +74,19 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Título de tu modal</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Listado de Sanciones</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <!-- body con tus inputs -->
-        Ejemplo modal
+        <p>
+          En este listado podrá buscar datos de su interés relacionados con las sanciones que posea.
+        </p>
+        <p>
+          Contará con la posibilidad de ver más detalles sobre las multas aplicadas.
+        </p>
+        <p>
+          Además, si se encuentra dentro de los 7 días hábiles desde que recibió la multa, podrá realizar un descargo.
+        </p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>

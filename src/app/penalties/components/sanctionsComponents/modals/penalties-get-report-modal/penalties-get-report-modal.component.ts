@@ -14,29 +14,29 @@ import { DatePipe } from '@angular/common';
 export class PenaltiesModalReportComponent implements OnInit{
 
 
-  data:any;
   formattedDate:any;
   public service = inject(PenaltiesSanctionsServicesService)
   @Input() id:number = 0
+  report: any;
   constructor(public activeModal: NgbActiveModal){
 
   }
   ngOnInit(): void {
     //throw new Error('Method not implemented.');
-    this.getComplaint()
+    this.getReport()
     //alert(this.data.createdDate) 
   }
   close(){
     this.activeModal.close()
   }
-  getComplaint(){
+  getReport(){
     this.service.getById(this.id)
     .subscribe(
       (respuesta) => {
         console.log(respuesta); 
-        this.data = respuesta
-        console.log(this.data.createdDate)
-        this.formattedDate = new Date(this.service.formatDate(this.data.createdDate))
+        this.report = respuesta
+        console.log(this.report)
+        this.formattedDate = new Date(this.service.formatDate(this.report.createdDate))
       },
       (error) => {
         console.error('Error:', error);

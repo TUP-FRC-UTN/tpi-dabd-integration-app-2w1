@@ -7,20 +7,9 @@ import { UsersNavbarComponent } from "./components/users-navbar/users-navbar.com
 import { roleGuard } from "./guard";
 
 export const NOTIFICATION_ROUTES: Routes = [
-    { path: '', component: NotificationHomeComponent },
-    { path: "", redirectTo: "/home", pathMatch: "full" },
+  { path: "notifications/:rol", component: NotificationComponent },
+  { path: "admin-post-notification", component: PostNotificationAdminComponent },
+  { path: "admin-all-notifications", component: AllNotificationComponent}, //canActivate: [roleGuard], data: ["SuperAdmin", "Gerente"]
 
-  {
-    path: "home", component: UsersNavbarComponent,
-    children: [
-      { path: "notifications/:rol", component: NotificationComponent },
-      {
-        path: "admin-post-notification",
-        component: PostNotificationAdminComponent,
-      },
-      { path: "admin-all-notifications", component: AllNotificationComponent,canActivate: [roleGuard] },
-    ],
-  },
-  {path: "allNotification", component: AllNotificationComponent},
-    
+  { path: 'dashboard', component: NotificationHomeComponent }, // Cambiar por el componente correspondiente
 ];

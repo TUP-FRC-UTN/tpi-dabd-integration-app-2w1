@@ -17,86 +17,12 @@ import { IepTableComponent } from "./components/iep-table/iep-table.component";
 import { IepWarehouseMovementSearchComponent } from "./components/iep-warehouse-movement-search/iep-warehouse-movement-search.component";
 
 export const INVENTORY_ROUTES: Routes = [
-    { path: '', component: InventoryEmployeeProviderHomeComponent },
-    {
-        path: 'stock-aumento',  // SANTI
-        component: IepStockIncreaseComponent,
-        title: 'Aumento de stock'
-    },
-    {
-        path: 'registro-productos', // TOMAS
-        component: IepProductComponent,
-        title: 'Registro de productos'
-    },
-    {
-        path: 'inventario',     // AGUSTIN
-        component: IepInventoryComponent,
-        title: 'Inventario'
-    },
-    {
-        path: 'detalle-inventario',     // MARTIN
-        component: IepDetailTableComponent,
-        title: 'Detalle de inventario'
-    },
-    {
-        path: 'historial-modificaciones-stock',     // ENZO
-        component: IepTableComponent,
-        title: 'Historial de modificacion de stock'
-    },
-    {
-        path: 'listado-empleados',     // ENZO
-        component: IepListEmployeesComponent,
-        title: 'Listado de empleados'
-    },
-    {
-        path: 'wake-up-call',
-        component: IepAttentionCallComponent,
-        title: 'Llamada de atención'
-    },
-    {
-        path: 'warehouse-movements',
-        component: IepWarehouseMovementSearchComponent,
-        title: 'Ver almacenes'
-    },
-    {
-        path: 'desempeño',
-        component: IepPerformancelistComponent,
-        title: 'desempeño'
-    },
-
-    {
-        path: "suppliers",
-        component: IepSupplierListComponent,
-        title: "proveedores"
-    },
-    {
-        path: "create-supplier",
-        component: IepSuppliersFormComponent,
-        title: "Crear proveedor"
-    },
-    {
-        path: "supplier-update/:id",
-        component: IepSupplierUpdateComponent,
-        title: "Modificar proveedor"
-      }
-    ,
-    {
-        path:"employee-post",
-        component:IEPFormPostEmployeesComponent,
-        title:"Crear empleado"
-    },
-    {
-        path: 'cargos',
-        component: IepChargesComponent,
-        title: 'Gestión de Cargos'
-    },
-    {
-        
-      path: 'empleados/modificar/:id',  // TOMAS H
-      component:IepPutEmployeesComponent,
-      title: 'Modificar empleado'
-        
-
-    }
-  
+    { path: 'inventory', component: IepInventoryComponent },
+    { path: 'inventory-detail', component: IepDetailTableComponent },
+    { path: 'register-product', component: IepProductComponent },
+    { path: 'stock-increase', component: IepStockIncreaseComponent },
+    { path: 'stock-movements-history', component: IepTableComponent },
+    { path: 'warehouse-movements', component: IepWarehouseMovementSearchComponent },
+    { path: 'categories', component: InventoryEmployeeProviderHomeComponent }, //Remplazar por el componente del listad de categorias
+    { path: 'dashboard', component: InventoryEmployeeProviderHomeComponent }, // Cambiar por el componente correspondiente
 ];

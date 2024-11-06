@@ -26,6 +26,7 @@ import { PenaltiesModalConsultComplaintComponent } from '../modals/penalties-get
 import { PenaltiesModalStateReasonComponent } from '../modals/penalties-update-stateReason-modal/penalties-update-stateReason-modal.component';
 import { ComplaintService } from '../../../services/complaintsService/complaints.service';
 import { ComplaintDto } from '../../../models/complaint';
+import { RoutingService } from '../../../../common/services/routing.service';
 
 @Component({
   selector: 'app-penalties-list-complaint',
@@ -56,7 +57,9 @@ export class PenaltiesListComplaintComponent implements OnInit {
   constructor(
     private router: Router,
     private _modal: NgbModal,
-    private complaintService: ComplaintService
+    private complaintService: ComplaintService,
+    private routingService: RoutingService
+
   ) {
     (window as any).viewComplaint = (id: number) => this.viewComplaint(id);
     (window as any).changeState = (state: string, id: number, userId: number) =>
@@ -81,121 +84,113 @@ export class PenaltiesListComplaintComponent implements OnInit {
   //Manejo del Datatable
   updateDataTable() {
     //TODO: Revisar si es necesario UTILIZAR ESTA CONFIGURACION
-    // if ($.fn.dataTable.isDataTable('#complaintsTable')) {
-    //   $('#complaintsTable').DataTable().clear().destroy();
-    // }
+     if ($.fn.dataTable.isDataTable('#complaintsTable')) {
+       $('#complaintsTable').DataTable().clear().destroy();
+     }
 
-    // let table = this.table = $('#complaintsTable').DataTable({
-    //   //Atributos de la tabla
-    //   paging: true,
-    //   searching: true,
-    //   ordering: true,
-    //   lengthChange: true,
-    //   order: [0, 'asc'],
-    //   lengthMenu: [10, 25, 50],
-    //   pageLength: 10,
-    //   data: this.filterComplaint, //Fuente de datos
-    //   //Columnas de la tabla
-    //   columns: [
-    //     {
-    //       data: 'createdDate',
-    //       className: 'align-middle',
-    //       render: (data) =>
-    //         `<div>${this.complaintService.formatDate(data)}</div>`
-    //     },
-    //     {
-    //       data: 'complaintState',
-    //       className: 'align-middle',
-    //       render: (data) =>
-    //         `<div class="btn ${this.getStatusClass(data)} border rounded-pill w-75">${data}</div>`
-    //     },
-    //     {
-    //       data: 'description',
-    //       className: 'align-middle',
-    //       render: (data) => 
-    //         `<div>${data}</div>`
-    //     },
-    //     {
-    //       data: 'fileQuantity',
-    //       className: 'align-middle',
-    //       render: (data) =>
-    //         `<i class="bi bi-paperclip"></i> ${data} Archivo adjunto`
-    //     },
-    //     {
-    //       data: null,
-    //       className: 'align-middle',
-    //       searchable: false, //Marquen esto en falso si no quieren que se intente filtrar por esta columna tambien
-    //       render: (data) =>
-    //         `<div class="text-center">
-    //           <div class="btn-group">
-    //             <div class="dropdown">
-    //               <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
-    //               <ul class="dropdown-menu">
-    //                 <li><a class="dropdown-item" onclick="viewComplaint(${data.id})">Ver más</a></li>
-    //                 <li><hr class="dropdown-divider"></li>
-    //                 <li><a class="dropdown-item" onclick="changeState('ATTACHED', ${data.id}, ${data.userId})">Marcar como Anexada</a></li>
-    //                 <li><a class="dropdown-item" onclick="changeState('REJECTED', ${data.id}, ${data.userId})">Marcar como Rechazada</a></li>
-    //                 <li><a class="dropdown-item" onclick="changeState('PENDING', ${data.id}, ${data.userId})">Marcar como Pendiente</a></li>
-    //               </ul>
-    //             </div>
-    //           </div>
-    //         </div>`
-    //     },
-    //     // {
-    //     //   data: null,
-    //     //   className: 'align-middle',
-    //     //   render: (data) =>
-    //     //     `<div class="text-center">
-    //     //       <input class="form-check-input border border-2 p-2" type="checkbox" value="" id="flexCheckDefault">
-    //     //     </div>`
-    //     // },
-    //   ],
-    //   dom:
-    //     '<"mb-3"t>' +                           //Tabla
-    //     '<"d-flex justify-content-between"lp>', //Paginacion
-    //   language: {
-    //     lengthMenu:
-    //       `<select class="form-select">
-    //         <option value="10">10</option>
-    //         <option value="25">25</option>
-    //         <option value="50">50</option>
-    //       </select>`,
-    //     zeroRecords: "No se encontraron resultados",
-    //     loadingRecords: "Cargando...",
-    //     processing: "Procesando...",
-    //   },
-    //   //Uso de botones para exportar
-    //   buttons: [
-    //     {
-    //       extend: 'excel',
-    //       text: 'Excel',
-    //       className: 'btn btn-success export-excel-btn',
-    //       title: 'Listado de Denuncias',
-    //       exportOptions: {
-    //         columns: [0, 1, 2, 3], //Esto indica las columnas que se van a exportar a excel
-    //       },
-    //     },
-    //     {
-    //       extend: 'pdf',
-    //       text: 'PDF',
-    //       className: 'btn btn-danger export-pdf-btn',
-    //       title: 'Listado de denuncias',
-    //       exportOptions: {
-    //         columns: [0, 1, 2, 3], //Esto indica las columnas que se van a exportar a pdf
-    //       },
-    //     }
-    //   ]
-    // });
+     let table = this.table = $('#complaintsTable').DataTable({
+       //Atributos de la tabla
+       paging: true,
+       searching: true,
+       ordering: true,
+       lengthChange: true,
+       order: [0, 'asc'],
+       lengthMenu: [10, 25, 50],
+       pageLength: 10,
+       data: this.filterComplaint, //Fuente de datos
+       //Columnas de la tabla
+       columns: [
+         {
+           data: 'createdDate',
+           className: 'align-middle',
+           render: (data) =>
+             `<div>${this.complaintService.formatDate(data)}</div>`
+         },
+         {
+           data: 'complaintState',
+           className: 'align-middle',
+           render: (data) =>
+             `<div class="btn ${this.getStatusClass(data)} border rounded-pill w-75">${data}</div>`
+         },
+         {
+           data: 'description',
+           className: 'align-middle',
+           render: (data) => 
+             `<div>${data}</div>`
+         },
+         {
+           data: 'fileQuantity',
+           className: 'align-middle',
+           render: (data) =>
+             `<i class="bi bi-paperclip"></i> ${data} Archivo adjunto`
+         },
+         {
+           data: null,
+          className: 'align-middle',
+           searchable: false, //Marquen esto en falso si no quieren que se intente filtrar por esta columna tambien
+           render: (data) =>
+             `<div class="text-center">
+               <div class="btn-group">
+                 <div class="dropdown">
+                   <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
+                   <ul class="dropdown-menu">
+                     <li><a class="dropdown-item" onclick="viewComplaint(${data.id})">Ver más</a></li>
+                      ${data.complaintState == "Pendiente" ? `
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" onclick="changeState('REJECTED', ${data.id}, ${data.userId})">Marcar como Rechazada</a></li>` : ``}
+                      </ul>
+                 </div>
+              </div>
+             </div>`
+         },
+         
+       ],
+       dom:
+         '<"mb-3"t>' +                           //Tabla
+         '<"d-flex justify-content-between"lp>', //Paginacion
+       language: {
+         lengthMenu:
+           `<select class="form-select">
+             <option value="10">10</option>
+             <option value="25">25</option>
+             <option value="50">50</option>
+           </select>`,
+         zeroRecords: "No se encontraron resultados",
+         loadingRecords: "Cargando...",
+         processing: "Procesando...",
+       },
+       //Uso de botones para exportar
+       buttons: [
+         {
+           extend: 'excel',
+           text: 'Excel',
+           className: 'btn btn-success export-excel-btn',
+           title: 'Listado de Denuncias',
+           exportOptions: {
+             columns: [0, 1, 2, 3], //Esto indica las columnas que se van a exportar a excel
+           },
+         },
+         {
+           extend: 'pdf',
+           text: 'PDF',
+          className: 'btn btn-danger export-pdf-btn',
+           title: 'Listado de denuncias',
+           exportOptions: {
+             columns: [0, 1, 2, 3], //Esto indica las columnas que se van a exportar a pdf
+           },
+        }
+       ]
+     });
 
 
-    // //Triggers para los botones de exportacion
-    // $('#exportExcelBtn').on('click', function () {
-    //   table.button('.buttons-excel').trigger();
-    // });
+     //Triggers para los botones de exportacion
+     $('#exportExcelBtn').on('click', function () {
+       table.button('.buttons-excel').trigger();
+    });
 
-    // $('#exportPdfBtn').on('click', function () {
-    //   table.button('.buttons-pdf').trigger();
-    // });
+     $('#exportPdfBtn').on('click', function () {
+       table.button('.buttons-pdf').trigger();
+     });
   }
 
 
@@ -323,5 +318,8 @@ export class PenaltiesListComplaintComponent implements OnInit {
       });
   }
 
+  redirecting(){
+    this.routingService.redirect("main/penalties/complaints/post-complaint","Registrar Denuncia")
+  }
 }
 
