@@ -131,18 +131,42 @@ export class PenaltiesPostFineComponent implements OnInit {
         reportId: 1,
         createdUser: 1
       };
-        //SWEET ALERT!!!
-      this.penaltiesService.postWarning(warningData).subscribe({
-        next: (response) => {
-          
-          console.log('Advertencia enviada correctamente', response);
-          this.router.navigate(['home/sanctions/sanctionsList']);
-        },
-        error: (error) => {
-          console.error('Error al enviar la Advertencia', error);
-        }
-      });
 
+        //SWEET ALERT!!!
+        Swal.fire({
+          title: '¿Estás seguro?',
+          text: "¿Deseas confirmar el envío de la advertencia?",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Confirmar',
+          cancelButtonText: 'Cancelar',
+          customClass: {
+            confirmButton: 'btn btn-success',
+            cancelButton: 'btn btn-danger'
+          },
+        }).then((result: any) => {
+          if (result.isConfirmed) {
+            // Envío de formulario solo después de la confirmación
+            this.penaltiesService.postWarning(warningData).subscribe( res => {
+                Swal.fire({
+                  title: '¡Advertencia enviada!',
+                  text: 'La advertencia ha sido enviada correctamente.',
+                  icon: 'success',
+                  timer: 1500,
+                  showConfirmButton: false
+                });
+                this.routingService.redirect("main/penalties/sanctions/sanctions-list", "Listado de Infracciones")
+              }, error => {
+                console.error('Error al enviar la advertencia', error);
+                Swal.fire({
+                  title: 'Error',
+                  text: 'No se pudo enviar la advertencia. Inténtalo de nuevo.',
+                  icon: 'error',
+                  confirmButtonText: 'Aceptar'
+                });
+              })
+            };
+          });
     }
       
   }
