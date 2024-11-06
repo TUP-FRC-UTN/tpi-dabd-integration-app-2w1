@@ -12,6 +12,7 @@ import 'datatables.net-bs5'; // DataTables con Bootstrap 5
 import 'datatables.net-buttons-bs5'; // Botones con estilos de Bootstrap 5
 import 'datatables.net-buttons/js/buttons.html5';
 import 'datatables.net-buttons/js/buttons.print';
+import { RoutingService } from '../../../../common/services/routing.service';
 
 
 
@@ -34,7 +35,13 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
 
 
   //Constructor
-  constructor(private reportServodes: PenaltiesSanctionsServicesService, private _modal: NgbModal, private router: Router) {
+  constructor(
+    private reportServodes: PenaltiesSanctionsServicesService,
+     private _modal: NgbModal, 
+     private router: Router,
+     private routingService: RoutingService
+
+    ) {
     // (window as any).viewComplaint = (id: number) => this.viewComplaint(id);
     (window as any).editReport = (id: number) => this.editReport(id);
   }
@@ -75,126 +82,116 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
 
   //Manejo del Datatable
   updateDataTable() {
-    // if ($.fn.dataTable.isDataTable('#reportsTable')) {
-    //   $('#reportsTable').DataTable().clear().destroy();
-    // }
-
-    // let table = this.table = $('#reportsTable').DataTable({
-    //   //Atributos de la tabla
-    //   paging: true,
-    //   searching: true,
-    //   ordering: true,
-    //   lengthChange: true,
-    //   order: [0, 'asc'],
-    //   lengthMenu: [10, 25, 50],
-    //   pageLength: 10,
-    //   data: this.reportfilter, //Fuente de datos
-    //   //Columnas de la tabla
-    //   columns: [
-    //     {
-    //       data: 'createdDate',
-    //       className: 'align-middle',
-    //       render: (data) =>
-    //         `<div>${data}</div>`
-    //     },
-    //     {
-    //       data: 'reportState',
-    //       className: 'align-middle',
-    //       render: (data) =>
-    //         `<div class="btn ${this.getStatusClass(data)} border rounded-pill w-75">${data}</div>`
-    //     },
-    //     {
-    //       data: 'plotId',
-    //       className: 'align-middle',
-    //       render: (data) =>
-    //         `<div>Nro: ${data}</div>`
-    //     },
-    //     {
-    //       data: 'description',
-    //       className: 'align-middle',
-    //       render: (data) =>
-    //         `<div>${data}</div>`
-    //     },
-    //     {
-    //       data: null,
-    //       className: 'align-middle',
-    //       searchable: false, //Marquen esto en falso si no quieren que se intente filtrar por esta columna tambien
-    //       render: (data) =>
-    //         `<div class="text-center">
-    //           <div class="btn-group">
-    //             <div class="dropdown">
-    //               <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
-    //               <ul class="dropdown-menu">
-    //                 <li><a class="dropdown-item" onclick="viewComplaint(${data.id})">Ver más</a></li>
-    //                 <li><hr class="dropdown-divider"></li>
-    //                 <li><a class="dropdown-item" onclick="changeState('ATTACHED', ${data.id}, ${data.userId})">Marcar como Anexada</a></li>
-    //                 <li><a class="dropdown-item" onclick="changeState('REJECTED', ${data.id}, ${data.userId})">Marcar como Rechazada</a></li>
-    //                 <li><a class="dropdown-item" onclick="changeState('PENDING', ${data.id}, ${data.userId})">Marcar como Pendiente</a></li>
-    //                 <li><hr class="dropdown-divider"></li>
-    //                 ${data.reportState === 'Abierto' || data.reportState === 'Nuevo' || data.reportState === 'Pendiente' ?
-    //                   `<li><a class="dropdown-item" onclick="editReport(${data.id})">Modificar informe</a></li>` : ''}
-    //                 <li><a class="dropdown-item" data-action="newSaction" data-id="${data.id}"">Nueva Infracción</a></li>
-
-    //               </ul>
-    //             </div>
-    //           </div>
-    //         </div>`
-    //     },
-    //     // {
-    //     //   data: null,
-    //     //   className: 'align-middle',
-    //     //   render: (data) =>
-    //     //     `<div class="text-center">
-    //     //       <input class="form-check-input border border-2 p-2" type="checkbox" value="" id="flexCheckDefault">
-    //     //     </div>`
-    //     // },
-    //   ],
-    //   dom:
-    //     '<"mb-3"t>' +                           //Tabla
-    //     '<"d-flex justify-content-between"lp>', //Paginacion
-    //   language: {
-    //     lengthMenu:
-    //       `<select class="form-select">
-    //         <option value="10">10</option>
-    //         <option value="25">25</option>
-    //         <option value="50">50</option>
-    //       </select>`,
-    //     zeroRecords: "No se encontraron resultados",
-    //     loadingRecords: "Cargando...",
-    //     processing: "Procesando...",
-    //   },
-    //   //Uso de botones para exportar
-    //   buttons: [
-    //     {
-    //       extend: 'excel',
-    //       text: 'Excel',
-    //       className: 'btn btn-success export-excel-btn',
-    //       title: 'Listado de Denuncias',
-    //       exportOptions: {
-    //         columns: [0, 1, 2, 3], //Esto indica las columnas que se van a exportar a excel
-    //       },
-    //     },
-    //     {
-    //       extend: 'pdf',
-    //       text: 'PDF',
-    //       className: 'btn btn-danger export-pdf-btn',
-    //       title: 'Listado de denuncias',
-    //       exportOptions: {
-    //         columns: [0, 1, 2, 3], //Esto indica las columnas que se van a exportar a pdf
-    //       },
-    //     }
-    //   ]
-    // });
-
-
-    // //Triggers para los botones de exportacion
-    // $('#exportExcelBtn').on('click', function () {
-    //   table.button('.buttons-excel').trigger();
-    // });
-
-    // $('#exportPdfBtn').on('click', function () {
-    //   table.button('.buttons-pdf').trigger();
-    // });
+    if ($.fn.dataTable.isDataTable('#reportsTable')) {
+      $('#reportsTable').DataTable().clear().destroy();
+    }
+    
+    let table = this.table = $('#reportsTable').DataTable({
+      // Atributos de la tabla
+      paging: true,
+      searching: true,
+      ordering: true,
+      lengthChange: true,
+      order: [0, 'asc'],
+      lengthMenu: [10, 25, 50],
+      pageLength: 10,
+      data: this.reportfilter, // Fuente de datos
+      // Columnas de la tabla
+      columns: [
+        {
+          data: 'createdDate',
+          className: 'align-middle',
+          render: (data) =>
+            `<div>${data}</div>`
+        },
+        {
+          data: 'reportState',
+          className: 'align-middle',
+          render: (data) =>
+            `<div class="btn ${this.getStatusClass(data)} border rounded-pill w-75">${data}</div>`
+        },
+        {
+          data: 'plotId',
+          className: 'align-middle',
+          render: (data) =>
+            `<div>Nro: ${data}</div>`
+        },
+        {
+          data: 'description',
+          className: 'align-middle',
+          render: (data) =>
+            `<div>${data}</div>`
+        },
+        {
+          data: null,
+          className: 'align-middle',
+          searchable: false, // Marquen esto en falso si no quieren que se intente filtrar por esta columna tambien
+          render: (data) =>
+            `<div class="text-center">
+              <div class="btn-group">
+                <div class="dropdown">
+                  <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" onclick="viewComplaint(${data.id})">Ver más</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" onclick="changeState('ATTACHED', ${data.id}, ${data.userId})">Marcar como Anexada</a></li>
+                    <li><a class="dropdown-item" onclick="changeState('REJECTED', ${data.id}, ${data.userId})">Marcar como Rechazada</a></li>
+                    <li><a class="dropdown-item" onclick="changeState('PENDING', ${data.id}, ${data.userId})">Marcar como Pendiente</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    ${data.reportState === 'Abierto' || data.reportState === 'Nuevo' || data.reportState === 'Pendiente' ?
+                      `<li><a class="dropdown-item" onclick="editReport(${data.id})">Modificar informe</a></li>` : ''}
+                    <li><a class="dropdown-item" data-action="newSaction" data-id="${data.id}">Nueva Infracción</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>`
+        }
+      ],
+      dom:
+        '<"mb-3"t>' +                           // Tabla
+        '<"d-flex justify-content-between"lp>', // Paginación
+      language: {
+        lengthMenu:
+          `<select class="form-select">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>`,
+        zeroRecords: "No se encontraron resultados",
+        loadingRecords: "Cargando...",
+        processing: "Procesando...",
+      },
+      // Uso de botones para exportar
+      buttons: [
+        {
+          extend: 'excel',
+          text: 'Excel',
+          className: 'btn btn-success export-excel-btn',
+          title: 'Listado de Denuncias',
+          exportOptions: {
+            columns: [0, 1, 2, 3], // Esto indica las columnas que se van a exportar a excel
+          },
+        },
+        {
+          extend: 'pdf',
+          text: 'PDF',
+          className: 'btn btn-danger export-pdf-btn',
+          title: 'Listado de denuncias',
+          exportOptions: {
+            columns: [0, 1, 2, 3], // Esto indica las columnas que se van a exportar a pdf
+          },
+        }
+      ]
+    });
+    
+    // Triggers para los botones de exportación
+    $('#exportExcelBtn').on('click', function () {
+      table.button('.buttons-excel').trigger();
+    });
+    
+    $('#exportPdfBtn').on('click', function () {
+      table.button('.buttons-pdf').trigger();
+    });
   }
 
   //Metodo para manejar la busqueda
@@ -248,7 +245,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
   }
 
   newSanction(id: number) {
-    this.router.navigate([`/home/sanctions/postFine/${id}`])
+    this.routingService.redirect(`main/penalties/sanctions/post-fine/${id}`, "Registrar Multa")
   }
 
 
@@ -289,7 +286,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
     const selectedReport = this.report.find(report => report.id === id);
 
     if (selectedReport) {
-      this.router.navigate(['/home/sanctions/putReport'], {
+      this.router.navigate(['/main/penalties/sanctions/put-report'], {
         queryParams: {
           id: selectedReport.id,
           createdDate: selectedReport.createdDate,
@@ -445,7 +442,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
       case 'Rechazado':
         return 'text-bg-secondary';
       case 'Finalizado':
-        return 'text-bg-secondary';
+        return 'text-bg-primary';
       default:
         return '';
     }

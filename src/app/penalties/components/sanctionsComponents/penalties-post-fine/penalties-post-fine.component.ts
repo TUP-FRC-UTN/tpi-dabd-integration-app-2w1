@@ -4,7 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router,RouterLink } from '@angular/router';
 import { ReportDTO, plotOwner } from '../../../models/reportDTO';
 import { PenaltiesSanctionsServicesService } from '../../../services/sanctionsService/sanctions.service';
-
+import Swal from 'sweetalert2';
+import { RoutingService } from '../../../../common/services/routing.service';
 @Component({
   selector: 'app-penalties-post-fine',
   standalone: true,
@@ -35,7 +36,12 @@ export class PenaltiesPostFineComponent implements OnInit {
   newAmount: number=0
   reportId: number=0;
 
-  constructor(private router: Router, private penaltiesService: PenaltiesSanctionsServicesService,private route: ActivatedRoute) { }
+  constructor(
+    private router: Router,
+     private penaltiesService: PenaltiesSanctionsServicesService,
+     private route: ActivatedRoute,
+     private routingService: RoutingService
+    ) { }
 
   ngOnInit() {
     this.setTodayDate()
@@ -84,16 +90,40 @@ export class PenaltiesPostFineComponent implements OnInit {
         createdUser: 1
       };
 
-      this.penaltiesService.postFine(fineData).subscribe({
-        next: (response) => {
-          
-          console.log('Multa enviada correctamente', response);
-          this.router.navigate(['home/sanctions/sanctionsList']);
+      Swal.fire({
+        title: '¿Estás seguro?',
+        text: "¿Deseas confirmar el envío de la multa?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Confirmar',
+        cancelButtonText: 'Cancelar',
+        customClass: {
+          confirmButton: 'btn btn-success',
+          cancelButton: 'btn btn-danger'
         },
-        error: (error) => {
-          console.error('Error al enviar la Multa', error);
-        }
-      });
+      }).then((result: any) => {
+        if (result.isConfirmed) {
+          // Envío de formulario solo después de la confirmación
+          this.penaltiesService.postFine(fineData).subscribe( res => {
+              Swal.fire({
+                title: '¡Multa enviada!',
+                text: 'La multa ha sido enviada correctamente.',
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false
+              });
+              this.routingService.redirect("main/penalties/sanctions/sanctions-list", "Listado de Infracciones")
+            }, error => {
+              console.error('Error al actualizar la multa', error);
+              Swal.fire({
+                title: 'Error',
+                text: 'No se pudo actualizar la multa. Inténtalo de nuevo.',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+              });
+            })
+          };
+        });
     }
     else{
 
@@ -101,7 +131,7 @@ export class PenaltiesPostFineComponent implements OnInit {
         reportId: 1,
         createdUser: 1
       };
-
+        //SWEET ALERT!!!
       this.penaltiesService.postWarning(warningData).subscribe({
         next: (response) => {
           
@@ -115,6 +145,11 @@ export class PenaltiesPostFineComponent implements OnInit {
 
     }
       
+  }
+
+  cancel(){
+    alert("")
+    this.routingService.redirect("main/penalties/sanctions/report-list", "Listado de Informes")
   }
 
 }

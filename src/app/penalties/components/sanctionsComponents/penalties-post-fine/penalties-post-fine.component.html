@@ -159,7 +159,8 @@
         </div>
     
         <div class="clearfix mt-1">
-          <button type="button" class="btn btn-danger float-start" [routerLink]="'/reportList'">
+          <button type="button" class="btn btn-danger float-start" (click)="cancel()">
+            REVISAR ROUTING
             Cancelar
           </button>
           <button type="submit" class="btn btn-success float-end" [disabled]="formPostFine.invalid">

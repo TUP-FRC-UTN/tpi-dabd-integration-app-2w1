@@ -9,6 +9,13 @@ import { PenaltiesUpdateStateReasonModalComponent } from '../modals/penalties-up
 import { REACTIVE_NODE } from '@angular/core/primitives/signals';
 import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
+// Imports de DataTable con soporte para Bootstrap 5
+import $ from 'jquery';
+import 'datatables.net-bs5'; // DataTables con Bootstrap 5
+import 'datatables.net-buttons-bs5'; // Botones con estilos de Bootstrap 5
+import 'datatables.net-buttons/js/buttons.html5';
+import 'datatables.net-buttons/js/buttons.print';
+import { RoutingService } from '../../../../common/services/routing.service';
 
 @Component({
   selector: 'app-penalties-sanctions-list',
@@ -53,6 +60,9 @@ export class PenaltiesSanctionsListComponent implements OnInit {
         case 'changeState':
           that.changeState(id, state);
           break;
+        case 'updateFine':
+          that.updateFine(id);
+          break;
       }
     });
   }
@@ -63,6 +73,7 @@ export class PenaltiesSanctionsListComponent implements OnInit {
     private router: Router,
     private _modal: NgbModal,
     private sanctionService: PenaltiesSanctionsServicesService,
+    private routingService: RoutingService
   ) {
     //Esto es importante para llamar los funciones dentro del data table con onClick
     (window as any).viewFine = (id: number) => this.viewFine(id);
@@ -88,137 +99,128 @@ export class PenaltiesSanctionsListComponent implements OnInit {
   ///////////////////////////////////////////////////////////////////////////////////////
   //Manejo del Datatable
   updateDataTable() {
-    // if ($.fn.dataTable.isDataTable('#sanctionsTable')) {
-    //   $('#sanctionsTable').DataTable().clear().destroy();
-    // }
-
-    // let table = this.table = $('#sanctionsTable').DataTable({
-    //   //Atributos de la tabla
-    //   paging: true,
-    //   searching: true,
-    //   ordering: true,
-    //   lengthChange: true,
-    //   order: [0, 'asc'],
-    //   lengthMenu: [10, 25, 50],
-    //   pageLength: 10,
-    //   data: this.sanctionsfilter, //Fuente de datos
-    //   //Columnas de la tabla
-    //   columns: [
-    //     {
-    //       data: 'createdDate',
-    //       className: 'align-middle',
-    //       render: (data) =>
-    //         `<div>${this.sanctionService.formatDate(data)}</div>`
-    //     },
-    //     {
-    //       data: 'fineState',
-    //       className: 'align-middle',
-    //       render: (data) => {
-    //         const displayValue = data === null ? 'Advertencia' : data;
-    //         return `<div class="btn ${this.getStatusClass(displayValue)} border rounded-pill w-75">${displayValue}</div>`
-    //       }
-    //     },
-    //     {
-    //       data: 'plotId',
-    //       className: 'align-middle',
-    //        render: (data) =>
-    //         `<div class="text-start">Nro: ${data}</div>`
-    //     },
-    //     {
-    //       data: 'amount',
-    //       className: 'align-middle',
-    //       render: (data) => {
-    //         //Si es advertencia
-    //         const amountValue = data != null ? '$' + data : '';
-    //         return `<div class="text-start">${amountValue}</div>`;
-    //       }
-    //     },
-    //     {
-    //       data: 'description',
-    //       className: 'align-middle',
-    //       render: (data) => {
-    //         const slicedData = (data.length > 45) ? (data.slice(0, 45) + '...') : (data);
-    //         return `<div>${slicedData}</div>`
-    //       }
-    //     },
-    //     {
-    //       data: null,
-    //       searchable: false,
-    //       className: 'align-middle',
-    //       render: (data) => {
-    //         if (data.amount === null) {
-    //           return '';
-    //         }
-    //         return `<div class="text-center">
-    //                   <div class="btn-group">
-    //                     <div class="dropdown">
-    //                       <button type="button" class="btn btn-light border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
-    //                       <ul class="dropdown-menu">
-    //                         <li><a class="dropdown-item" onclick="viewFine(${data.id})">Ver más</a></li>
-    //                         <li><hr class="dropdown-divider"></li>
-    //                         <li><a class="dropdown-item" data-action="changeState" data-id="${data.id}" data-state='PENDING'>Marcar como Pendiente</a></li>
-    //                         <li><a class="dropdown-item" data-action="changeState" data-id="${data.id}" data-state='PAYED'>Marcar como Pagada</a></li>
-    //                         ${data.hasSubmittedDisclaimer ? `` : `<li><a class="dropdown-item" data-action="newDisclaimer" data-id="${data.id}"">Realizar Descargo</a></li>`}
-    //                       </ul>
-    //                     </div>
-    //                   </div>
-    //                 </div>`;
-    //       }
-    //     },
-    //     // {
-    //     //   data: null,
-    //     //   render: (data) =>
-    //     //     `<div class="text-center">
-    //     //       <input class="form-check-input border border-2 p-2" type="checkbox" value="" id="flexCheckDefault">
-    //     //     </div>`
-    //     // },
-    //   ],
-    //   dom:
-    //     '<"mb-3"t>' +                           //Tabla
-    //     '<"d-flex justify-content-between"lp>', //Paginacion
-    //   language: {
-    //     lengthMenu:
-    //       `<select class="form-select">
-    //         <option value="10">10</option>
-    //         <option value="25">25</option>
-    //         <option value="50">50</option>
-    //       </select>`,
-    //     zeroRecords: "No se encontraron resultados",
-    //     loadingRecords: "Cargando...",
-    //     processing: "Procesando...",
-    //   },
-    //   //Uso de botones para exportar
-    //   buttons: [
-    //     {
-    //       extend: 'excel',
-    //       text: 'Excel',
-    //       className: 'btn btn-success export-excel-btn',
-    //       title: 'Listado de Multas y Advertencias',
-    //       exportOptions: {
-    //         columns: [0, 1, 2, 3, 4], //Esto indica las columnas que se van a exportar a excel
-    //       },
-    //     },
-    //     {
-    //       extend: 'pdf',
-    //       text: 'PDF',
-    //       className: 'btn btn-danger export-pdf-btn',
-    //       title: 'Listado de Multas y Advertencias',
-    //       exportOptions: {
-    //         columns: [0, 1, 2, 3, 4], //Esto indica las columnas que se van a exportar a pdf
-    //       },
-    //     }
-    //   ]
-    // });
-
-
-    // //Triggers para los botones de exportacion
-    // $('#exportExcelBtn').on('click', function () {
-    //   table.button('.buttons-excel').trigger();
-    // });
-
-    // $('#exportPdfBtn').on('click', function () {
-    //   table.button('.buttons-pdf').trigger();
-    // });
+    if ($.fn.dataTable.isDataTable('#sanctionsTable')) {
+      $('#sanctionsTable').DataTable().clear().destroy();
+    }
+    
+    let table = this.table = $('#sanctionsTable').DataTable({
+      // Atributos de la tabla
+      paging: true,
+      searching: true,
+      ordering: true,
+      lengthChange: true,
+      order: [0, 'asc'],
+      lengthMenu: [10, 25, 50],
+      pageLength: 10,
+      data: this.sanctionsfilter, // Fuente de datos
+      // Columnas de la tabla
+      columns: [
+        {
+          data: 'createdDate',
+          className: 'align-middle',
+          render: (data) =>
+            `<div>${this.sanctionService.formatDate(data)}</div>`
+        },
+        {
+          data: 'fineState',
+          className: 'align-middle',
+          render: (data) => {
+            const displayValue = data === null ? 'Advertencia' : data;
+            return `<div class="btn ${this.getStatusClass(displayValue)} border rounded-pill w-75">${displayValue}</div>`;
+          }
+        },
+        {
+          data: 'plotId',
+          className: 'align-middle',
+          render: (data) =>
+            `<div class="text-end">${data}</div>`
+        },
+        {
+          data: 'amount',
+          className: 'align-middle',
+          render: (data) => {
+            const amountValue = data != null ? '$' + data : '';
+            return `<div class="text-end">${amountValue}</div>`;
+          }
+        },
+        {
+          data: 'description',
+          className: 'align-middle',
+          render: (data) => {
+            const slicedData = (data.length > 45) ? (data.slice(0, 45) + '...') : (data);
+            return `<div>${slicedData}</div>`;
+          }
+        },
+        {
+          data: null,
+          searchable: false,
+          className: 'align-middle',
+          render: (data) => {
+            if (data.amount === null) {
+              return '';
+            }
+            return `<div class="text-center">
+                      <div class="btn-group">
+                        <div class="dropdown">
+                          <button type="button" class="btn btn-light border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
+                          <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" onclick="viewFine(${data.id})">Ver más</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" data-action="changeState" data-id="${data.id}" data-state='PENDING'>Marcar como Pendiente</a></li>
+                            <li><a class="dropdown-item" data-action="changeState" data-id="${data.id}" data-state='PAYED'>Marcar como Pagada</a></li>
+                            <li><a class="dropdown-item" data-action="updateFine" data-id="${data.id}"'>Modificar Multa</a></li>
+                            ${data.hasSubmittedDisclaimer ? `` : `<li><a class="dropdown-item" data-action="newDisclaimer" data-id="${data.id}">Realizar Descargo</a></li>`}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>`;
+          }
+        }
+      ],
+      dom: '<"mb-3"t>' + '<"d-flex justify-content-between"lp>', // Tabla y paginación
+      language: {
+        lengthMenu:
+          `<select class="form-select">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>`,
+        zeroRecords: "No se encontraron resultados",
+        loadingRecords: "Cargando...",
+        processing: "Procesando..."
+      },
+      // Uso de botones para exportar
+      buttons: [
+        {
+          extend: 'excel',
+          text: 'Excel',
+          className: 'btn btn-success export-excel-btn',
+          title: 'Listado de Multas y Advertencias',
+          exportOptions: {
+            columns: [0, 1, 2, 3, 4] // Columnas a exportar
+          }
+        },
+        {
+          extend: 'pdf',
+          text: 'PDF',
+          className: 'btn btn-danger export-pdf-btn',
+          title: 'Listado de Multas y Advertencias',
+          exportOptions: {
+            columns: [0, 1, 2, 3, 4] // Columnas a exportar
+          }
+        }
+      ]
+    });
+    
+    // Triggers para los botones de exportación
+    $('#exportExcelBtn').on('click', function () {
+      table.button('.buttons-excel').trigger();
+    });
+    
+    $('#exportPdfBtn').on('click', function () {
+      table.button('.buttons-pdf').trigger();
+    });
+    
   }
   ///////////////////////////////////////////////////////////////////////////////////////
 
@@ -321,11 +323,15 @@ export class PenaltiesSanctionsListComponent implements OnInit {
   }
 
   newDisclaimer(id: number) {
-    this.router.navigate([`/home/sanctions/postDisclaimer/${id}`])
+    this.routingService.redirect(`main/penalties/sanctions/post-disclaimer/${id}`, "Registrar Descargo")
   }
 
   changeState(id: number, state:string) {
     this.openModalStateReason(id, state);
+  }
+
+  updateFine(id: number) {
+    this.routingService.redirect(`main/penalties/sanctions/put-fine/${id}`, "Actualizar Multa")
   }
 
   
