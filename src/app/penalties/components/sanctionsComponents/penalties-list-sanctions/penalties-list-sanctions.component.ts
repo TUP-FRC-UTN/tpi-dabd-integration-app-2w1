@@ -142,8 +142,11 @@ export class PenaltiesSanctionsListComponent implements OnInit {
           data: 'amount',
           className: 'align-middle',
           render: (data) => {
-            const amountValue = data != null ? '$' + data : '';
-            return `<div class="text-end">${amountValue}</div>`;
+            let formattedAmount = data != null ? '$' + new Intl.NumberFormat('es-AR', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            }).format(data) : '';
+            return `<div class="text-end">${formattedAmount}</div>`;
           }
         },
         {
