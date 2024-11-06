@@ -107,8 +107,10 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
         {
           data: 'reportState',
           className: 'align-middle',
-          render: (data) =>
-            `<div class="btn ${this.getStatusClass(data)} border rounded-pill w-75">${data}</div>`
+          render: (data) =>`
+            <div class="text-center">
+              <div class="badge ${this.getStatusClass(data)} border rounded-pill">${data}</div>
+            </div>`
         },
         {
           data: 'plotId',
@@ -436,9 +438,9 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
       case 'Abierto':
         return 'text-bg-success';
       case 'Cerrado':
-        return 'text-bg-danger';
-      case 'Rechazado':
         return 'text-bg-secondary';
+      case 'Rechazado':
+        return 'text-bg-danger';
       case 'Finalizado':
         return 'text-bg-primary';
       default:

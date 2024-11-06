@@ -28,6 +28,7 @@ export class PenaltiesModalStateReasonComponent {
 
   //metodo para enviar
   putComplaint(){
+    alert("Funciona???")
     const ComplaintDto:PutStateComplaintDto = {
       id: this.idComplaint,
       userId: this.userId,

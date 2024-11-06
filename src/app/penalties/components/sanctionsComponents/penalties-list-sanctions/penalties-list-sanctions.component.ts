@@ -126,7 +126,10 @@ export class PenaltiesSanctionsListComponent implements OnInit {
           className: 'align-middle',
           render: (data) => {
             const displayValue = data === null ? 'Advertencia' : data;
-            return `<div class="btn ${this.getStatusClass(displayValue)} border rounded-pill w-75">${displayValue}</div>`;
+            return `
+            <div class="text-center">
+              <div class="badge ${this.getStatusClass(displayValue)} border rounded-pill">${displayValue}</div>
+            </div>`;
           }
         },
         {
@@ -290,9 +293,9 @@ export class PenaltiesSanctionsListComponent implements OnInit {
   getStatusClass(estado: string): string {
     switch (estado) {
       case 'Pendiente':
-        return 'text-bg-secondary';
+        return 'text-bg-warning';
       case 'Apelada':
-        return 'text-bg-info';
+        return 'text-bg-indigo';
       case 'Pendiente de pago':
         return 'text-bg-primary';
       case 'Absuelta':
@@ -300,7 +303,7 @@ export class PenaltiesSanctionsListComponent implements OnInit {
       case 'Pagada':
         return 'text-bg-success';
       case 'Advertencia':
-        return 'text-bg-warning';
+        return 'text-bg-orange';
       default:
         return '';
     }
