@@ -82,19 +82,6 @@ export class ReportModifyComponent implements OnInit {
       complaintsIds: complaintsIds,
     };
 
-    (window as any).Swal.fire({
-      title: '¿Estás seguro?',
-      text: "¿Deseas confirmar la actualización del informe?",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Confirmar',
-      cancelButtonText: 'Cancelar',
-      customClass: {
-        confirmButton: 'btn btn-success',
-        cancelButton: 'btn btn-danger'
-      },
-    }).then((result: any) => {
-      if (result.isConfirmed) {
         this.reportService.updateReport(reportDTO).subscribe(res => {
           (window as any).Swal.fire({
             title: '¡Actualización exitosa!',
@@ -114,8 +101,6 @@ export class ReportModifyComponent implements OnInit {
           });
         });
       }
-    });
-  }
   cancel(){
     this.routingService.redirect("main/penalties/sanctions/report-list", "Listado de Informes")
   }

@@ -1,6 +1,5 @@
 <div class="container p-3">
     <div class="post-complaint-section p-4 border shadow-lg p-3 mb-5 bg-white rounded">
-        <h2 class="text-center mb-5">MODIFICAR REPORTE</h2>
         <form #formDenuncia="ngForm" novalidate>
             <div class="row mb-4">
                 <div class="col-1">
@@ -63,8 +62,8 @@
 
             <div class="d-flex justify-content-end">
                 <button type="button" class="btn btn-secondary me-3" (click)="cancel()">Cancelar</button>
-                <button type="button" class="btn btn-success" [disabled]="formDenuncia.invalid"
-                    (click)="updateReport()">Actualizar</button>
+                <button type="button" class="btn btn-primary" [disabled]="formDenuncia.invalid"
+                    (click)="updateReport()">Guardar</button>
             </div>
         </form>
     </div>

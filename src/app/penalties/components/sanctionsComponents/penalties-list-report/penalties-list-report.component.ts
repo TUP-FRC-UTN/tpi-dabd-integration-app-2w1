@@ -285,6 +285,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
   editReport(id: number) {
     const selectedReport = this.report.find(report => report.id === id);
 
+    //REVISAR ROUTING
     if (selectedReport) {
       this.router.navigate(['/main/penalties/sanctions/put-report'], {
         queryParams: {
