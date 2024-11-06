@@ -3,6 +3,7 @@ import { Component, input, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import * as XLSX from 'xlsx';
 
 // Imports de DataTable con soporte para Bootstrap 5
 import $ from 'jquery';
@@ -28,6 +29,8 @@ import { ComplaintService } from '../../../services/complaintsService/complaints
 import { ComplaintDto } from '../../../models/complaint';
 import { RoutingService } from '../../../../common/services/routing.service';
 import moment from 'moment';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 @Component({
   selector: 'app-penalties-list-complaint',
@@ -343,5 +346,73 @@ throw new Error('Method not implemented.');
   postRedirect() {
     this.routingService.redirect("main/complaints/post-complaint", "Registrar Denuncia")
   }
+
+  /////////////////////////////////////////////////////////////////////
+  //Metodos Para Exportar A pdf y Excel
+  exportToPDF(): void {
+    const doc = new jsPDF();
+    const pageTitle = 'Listado de Denuncias';
+    doc.setFontSize(18);
+    doc.text(pageTitle, 15, 10);
+    doc.setFontSize(12);
+
+    const formattedDesde = this.complaintService.formatDate(this.filterDateStart);
+    const formattedHasta = this.complaintService.formatDate(this.filterDateEnd);
+    doc.text(`Fechas: Desde ${formattedDesde} hasta ${formattedHasta}`, 15, 20);
+
+    const filteredData = this.filterComplaint.map((complaint: ComplaintDto) => {
+      return [
+        this.complaintService.formatDate(complaint.createdDate),
+        complaint.complaintState,
+        complaint.description,
+        complaint.fileQuantity,
+      ];
+    });
+
+    autoTable(doc, {
+      head: [['Fecha de Creación', 'Estado', 'Descripción', 'Cantidad de Archivos']],
+      body: filteredData,
+      startY: 30,
+      theme: 'grid',
+      margin: { top: 30, bottom: 20 },
+    });
+
+    doc.save(`${formattedDesde}-${formattedHasta}_Listado_Denuncias.pdf`);
+  }
+
+  //Exportar a Excel
+  exportToExcel(): void {
+    const encabezado = [
+      ['Listado de Denuncias'],
+      [`Fechas: Desde ${this.complaintService.formatDate(this.filterDateStart)} hasta ${this.complaintService.formatDate(this.filterDateEnd)}`],
+      [],
+      ['Fecha de Creación', 'Estado', 'Descripción', 'Cantidad de Archivos']
+    ];
+  
+    const excelData = this.filterComplaint.map((complaint: ComplaintDto) => {
+      return [
+        this.complaintService.formatDate(complaint.createdDate),
+        complaint.complaintState,
+        complaint.description,
+        complaint.fileQuantity,
+      ];
+    });
+  
+    const worksheetData = [...encabezado, ...excelData];
+    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData)
+    
+    worksheet['!cols'] = [
+      { wch: 20 }, // Fecha de Creación
+      { wch: 20 }, // Estado
+      { wch: 50 }, // Descripción
+      { wch: 20 }, // Cantidad de Archivos
+    ];
+  
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Denuncias');
+  
+    XLSX.writeFile(workbook, `${this.complaintService.formatDate(this.filterDateStart)}-${this.complaintService.formatDate(this.filterDateEnd)}_Listado_Denuncias.xlsx`);
+  }
+
 }
 

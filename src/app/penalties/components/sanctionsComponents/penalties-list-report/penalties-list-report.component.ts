@@ -6,6 +6,7 @@ import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { PenaltiesModalReportComponent } from '../modals/penalties-get-report-modal/penalties-get-report-modal.component';
+import * as XLSX from 'xlsx';
 // Imports de DataTable con soporte para Bootstrap 5
 import $ from 'jquery';
 import 'datatables.net-bs5'; // DataTables con Bootstrap 5
@@ -14,6 +15,8 @@ import 'datatables.net-buttons/js/buttons.html5';
 import 'datatables.net-buttons/js/buttons.print';
 import { RoutingService } from '../../../../common/services/routing.service';
 import moment from 'moment';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 
 
@@ -43,7 +46,7 @@ throw new Error('Method not implemented.');
 
   //Constructor
   constructor(
-    private reportServodes: PenaltiesSanctionsServicesService,
+    private reportServices: PenaltiesSanctionsServicesService,
      private _modal: NgbModal, 
      private router: Router,
      private routingService: RoutingService
@@ -254,7 +257,7 @@ throw new Error('Method not implemented.');
 
   //
   refreshData() {
-    this.reportServodes.getAllReports().subscribe(
+    this.reportServices.getAllReports().subscribe(
       response => {
         this.report = response;
         this.reportfilter = this.report;
@@ -350,7 +353,7 @@ throw new Error('Method not implemented.');
   //     columns: [
   //       {
   //         data: 'createdDate',
-  //         render: (data) => this.reportServodes.formatDate(data),
+  //         render: (data) => this.reportServices.formatDate(data),
   //       },
   //       {
   //         data: 'reportState',
@@ -439,7 +442,7 @@ throw new Error('Method not implemented.');
 
 
   getTypes(): void {
-    this.reportServodes.getState().subscribe({
+    this.reportServices.getState().subscribe({
       next: (data) => {
         this.states = Object.keys(data).map(key => ({
           key,
@@ -472,7 +475,72 @@ throw new Error('Method not implemented.');
     }
   }
 
+  ////////////////////////////////////////////////
+  //Exportar a PDF
+  exportToPDF(): void {
+    const doc = new jsPDF();
+    const pageTitle = 'Listado de Informes';
+    doc.setFontSize(18);
+    doc.text(pageTitle, 15, 10);
+    doc.setFontSize(12);
 
+    const formattedDesde = this.reportServices.formatDate(this.filterDateStart);
+    const formattedHasta = this.reportServices.formatDate(this.filterDateEnd);
+    doc.text(`Fechas: Desde ${formattedDesde} hasta ${formattedHasta}`, 15, 20);
+
+    const filteredData = this.reportfilter.map((report: ReportDTO) => {
+      return [
+        this.reportServices.formatDate(report.createdDate),
+        report.reportState,
+        report.description,
+        report.plotId,
+      ];
+    });
+
+    autoTable(doc, {
+      head: [['Fecha de Creación', 'Estado', 'Descripción','Lote']],
+      body: filteredData,
+      startY: 30,
+      theme: 'grid',
+      margin: { top: 30, bottom: 20 },
+    });
+
+    doc.save(`${formattedDesde}-${formattedHasta}_Listado_Informes.pdf`);
+  }
+
+  //Exportar a Excel
+  exportToExcel(): void {
+    const encabezado = [
+      ['Listado de Informes'],
+      [`Fechas: Desde ${this.reportServices.formatDate(this.filterDateStart)} hasta ${this.reportServices.formatDate(this.filterDateEnd)}`],
+      [],
+      ['Fecha de Creación', 'Estado', 'Descripción','Lote']
+    ];
+  
+    const excelData = this.reportfilter.map((report: ReportDTO) => {
+      return [
+        this.reportServices.formatDate(report.createdDate),
+        report.reportState,
+        report.description,
+        report.plotId,
+      ];
+    });
+  
+    const worksheetData = [...encabezado, ...excelData];
+    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData)
+    
+    worksheet['!cols'] = [
+      { wch: 20 }, // Fecha de Creación
+      { wch: 20 }, // Estado
+      { wch: 50 }, // Descripción
+      { wch: 20 }, // Lote Infractor
+    ];
+  
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Informes');
+  
+    XLSX.writeFile(workbook, `${this.reportServices.formatDate(this.filterDateStart)}-${this.reportServices.formatDate(this.filterDateEnd)}_Listado_Informes.xlsx`);
+  }
 
 
 

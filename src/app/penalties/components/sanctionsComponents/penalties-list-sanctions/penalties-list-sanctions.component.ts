@@ -3,6 +3,7 @@ import { PenaltiesSanctionsServicesService } from '../../../services/sanctionsSe
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import * as XLSX from 'xlsx';
 
 import { PenaltiesModalFineComponent } from '../modals/penalties-get-fine-modal/penalties-get-fine-modal.component';
 import { PenaltiesUpdateStateReasonModalComponent } from '../modals/penalties-update-state-reason-modal/penalties-update-state-reason-modal.component';
@@ -18,6 +19,11 @@ import 'datatables.net-buttons/js/buttons.print';
 import { RoutingService } from '../../../../common/services/routing.service';
 import moment from 'moment';
 
+import jsPDF from 'jspdf';
+import { SanctionsDTO } from '../../../models/SanctionsDTO';
+import autoTable from 'jspdf-autotable';
+
+
 @Component({
   selector: 'app-penalties-sanctions-list',
   standalone: true,
@@ -31,7 +37,7 @@ throw new Error('Method not implemented.');
 }
   //Variables
   sanctionsfilter: any[] = [];                    //
-  sanctions: any[] = [];                          //
+  sanctions: SanctionsDTO[] = [];                          //
   sanctionState: String = '';                     //
   selectedValue: string = '';                     //
   // filterDateStart: Date = new Date();             //
@@ -109,7 +115,7 @@ throw new Error('Method not implemented.');
     const selectedValue = (event.target as HTMLSelectElement).value;
 
     this.sanctionsfilter = this.sanctions.filter(
-      (c) => c.complaintState == selectedValue
+      (s) => s.fineState == selectedValue
     );
     if (selectedValue == '') {
       this.sanctionsfilter = this.sanctions;
@@ -397,5 +403,81 @@ throw new Error('Method not implemented.');
       }
     })
   }
+
+
+  ///////////////////////////////////////////////////////////////////
+    //Metodos Para Exportar A pdf y Excel
+    exportToPDF(): void {
+      const doc = new jsPDF();
+      const pageTitle = 'Listado de Sanciones';
+      doc.setFontSize(18);
+      doc.text(pageTitle, 15, 10);
+      doc.setFontSize(12);
+  
+      const formattedDesde = this.sanctionService.formatDate(this.filterDateStart);
+      const formattedHasta = this.sanctionService.formatDate(this.filterDateEnd);
+      doc.text(`Fechas: Desde ${formattedDesde} hasta ${formattedHasta}`, 15, 20);
+  
+      const filteredData = this.sanctionsfilter.map((sanction: SanctionsDTO) => {
+        return [
+          this.sanctionService.formatDate(sanction.createdDate),
+          sanction.fineState,
+          sanction.description,
+          sanction.plotId,
+          sanction.amount != null 
+            ? '$' + new Intl.NumberFormat('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(sanction.amount) 
+            : '',
+          
+        ];
+      });
+  
+      autoTable(doc, {
+        head: [['Fecha de Creación', 'Estado', 'Descripción','Lote', 'Monto a pagar']],
+        body: filteredData,
+        startY: 30,
+        theme: 'grid',
+        margin: { top: 30, bottom: 20 },
+      });
+  
+      doc.save(`${formattedDesde}-${formattedHasta}_Listado_Sanciones.pdf`);
+    }
+  
+    //Exportar a Excel
+    exportToExcel(): void {
+      const encabezado = [
+        ['Listado de Sanciones'],
+        [`Fechas: Desde ${this.sanctionService.formatDate(this.filterDateStart)} hasta ${this.sanctionService.formatDate(this.filterDateEnd)}`],
+        [],
+        ['Fecha de Creación', 'Estado', 'Descripción','Lote', 'Monto a pagar']
+      ];
+    
+      const excelData = this.sanctionsfilter.map((sanction: SanctionsDTO) => {
+        return [
+          this.sanctionService.formatDate(sanction.createdDate),
+          sanction.fineState,
+          sanction.description,
+          sanction.plotId,
+          sanction.amount != null 
+          ? '$' + new Intl.NumberFormat('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(sanction.amount) 
+          : '',
+        ];
+      });
+    
+      const worksheetData = [...encabezado, ...excelData];
+      const worksheet = XLSX.utils.aoa_to_sheet(worksheetData)
+      
+      worksheet['!cols'] = [
+        { wch: 20 }, // Fecha de Creación
+        { wch: 20 }, // Estado
+        { wch: 50 }, // Descripción
+        { wch: 20 }, // Lote Infractor
+        { wch: 20 }, // Monto a pagar
+      ];
+    
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Sanciones');
+    
+      XLSX.writeFile(workbook, `${this.sanctionService.formatDate(this.filterDateStart)}-${this.sanctionService.formatDate(this.filterDateEnd)}_Listado_Sanciones.xlsx`);
+    }
 
 }
