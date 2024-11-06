@@ -320,8 +320,8 @@ export class PenaltiesListComplaintComponent implements OnInit {
       });
   }
 
-  redirecting() {
-    this.routingService.redirect("main/penalties/complaints/post-complaint", "Registrar Denuncia")
+  postRedirect() {
+    this.routingService.redirect("main/complaints/post-complaint", "Registrar Denuncia")
   }
 }
 

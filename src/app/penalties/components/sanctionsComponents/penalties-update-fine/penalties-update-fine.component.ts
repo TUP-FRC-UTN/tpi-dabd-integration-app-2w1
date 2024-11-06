@@ -63,7 +63,7 @@ export class PenaltiesUpdateFineComponent implements OnInit {
               timer: 1500,
               showConfirmButton: false
             });
-            this.routingService.redirect("main/penalties/sanctions/sanctions-list", "Listado de Infracciones")
+            this.routingService.redirect("main/sanctions/sanctions-list", "Listado de Infracciones")
           }, error => {
             console.error('Error al actualizar la multa', error);
             Swal.fire({
@@ -76,7 +76,7 @@ export class PenaltiesUpdateFineComponent implements OnInit {
         };
 
   cancel(){
-    this.routingService.redirect("main/penalties/sanctions/sanctions-list", "Listado de Infracciones")
+    this.routingService.redirect("main/sanctions/sanctions-list", "Listado de Infracciones")
   }
   //Retorna una clase para poner el input en verde o rojo dependiendo si esta validado
   onValidate(controlName: string) {

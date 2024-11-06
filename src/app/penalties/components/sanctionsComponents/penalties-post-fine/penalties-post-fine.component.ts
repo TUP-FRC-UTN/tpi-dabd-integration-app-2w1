@@ -99,7 +99,7 @@ export class PenaltiesPostFineComponent implements OnInit {
                 timer: 1500,
                 showConfirmButton: false
               });
-              this.routingService.redirect("main/penalties/sanctions/sanctions-list", "Listado de Infracciones")
+              this.routingService.redirect("main/sanctions/sanctions-list", "Listado de Infracciones")
             }, error => {
               console.error('Error al actualizar la multa', error);
               Swal.fire({
@@ -128,7 +128,7 @@ export class PenaltiesPostFineComponent implements OnInit {
                   timer: 1500,
                   showConfirmButton: false
                 });
-                this.routingService.redirect("main/penalties/sanctions/sanctions-list", "Listado de Infracciones")
+                this.routingService.redirect("main/sanctions/sanctions-list", "Listado de Infracciones")
               }, error => {
                 console.error('Error al enviar la advertencia', error);
                 Swal.fire({
@@ -142,7 +142,7 @@ export class PenaltiesPostFineComponent implements OnInit {
       }
 
   cancel(){
-    this.routingService.redirect("main/penalties/sanctions/report-list", "Listado de Informes")
+    this.routingService.redirect("main/sanctions/report-list", "Listado de Informes")
   }
 
 }
