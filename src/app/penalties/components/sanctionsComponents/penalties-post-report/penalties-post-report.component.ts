@@ -6,7 +6,6 @@ import { PostReportDTO } from '../../../models/PostReportDTO';
 import { ReportReasonDto } from '../../../models/ReportReasonDTO';
 import { ReportService } from '../../../services/report.service';
 import { error } from 'jquery';
-import { routes } from '../sanctionRouting.routing';
 import { ModalComplaintsListComponent } from '../../complaintComponents/modals/penalties-list-complaints-modal/penalties-list-complaints-modal.component';
 import { RoutingService } from '../../../../common/services/routing.service';
 import Swal from 'sweetalert2';

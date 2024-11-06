@@ -139,7 +139,7 @@ export class PenaltiesListComplaintComponent implements OnInit {
                      <li><a class="dropdown-item" onclick="viewComplaint(${data.id})">Ver más</a></li>
                       ${data.complaintState == "Pendiente" ? `
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" onclick="changeState('REJECTED', ${data.id}, ${data.userId})">Rechazar</a></li>` : ``}
+                        <li><a class="dropdown-item" onclick="changeState('REJECTED', ${data.id}, ${data.userId})">Marcar como Rechazada</a></li>` : ``}
                       </ul>
                  </div>
               </div>
@@ -150,12 +150,13 @@ export class PenaltiesListComplaintComponent implements OnInit {
         '<"mb-3"t>' +                           //Tabla
         '<"d-flex justify-content-between"lp>', //Paginacion
       language: {
-        lengthMenu:
-          `<select class="form-select">
-             <option value="10">10</option>
-             <option value="25">25</option>
-             <option value="50">50</option>
-           </select>`,
+        lengthMenu:`
+          <select class="form-select">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>`,
         zeroRecords: "No se encontraron resultados",
         loadingRecords: "Cargando...",
         processing: "Procesando...",

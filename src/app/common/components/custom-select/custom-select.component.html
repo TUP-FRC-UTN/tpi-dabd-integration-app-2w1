@@ -1,0 +1,23 @@
+<ng-select
+    [items]="options"
+    [multiple]="multiple"
+    bindLabel="name"
+    [closeOnSelect]="false"
+    bindValue="value"
+    [closeOnSelect]="!multiple"
+    [(ngModel)]="selectedOptions"
+    (ngModelChange)="send()">
+    @if(multiple){
+        <ng-template ng-multi-label-tmp let-items="items">
+            @if(items.length == 1){
+                {{ items[0].name }}
+            }
+            @if(items.length>1){
+                {{ items.length }} seleccionados
+            }
+          </ng-template>
+        <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+            <input class="form-check-input" id={{item.value}} type="checkbox" [ngModel]="item$.selected" /> {{ item.name }}
+        </ng-template>
+    }
+</ng-select>

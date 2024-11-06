@@ -87,7 +87,7 @@ export class RoutingService {
           icon: "bi-envelope-plus-fill",
           name: "Denunciar",
           title: "Nueva denuncia",
-          route: "main/penalties/complaints/post-complaint",
+          route: "main/complaints/post-complaint",
           roles: ["SuperAdmin", "Propietario", "Inquilino"]
         },
         {
@@ -95,7 +95,7 @@ export class RoutingService {
           icon: "bi-envelope-paper-fill",
           name: "Denuncias",
           title: "Listado de denuncias",
-          route: "main/penalties/complaints/list-complaint",
+          route: "main/complaints/list-complaint",
           roles: ["SuperAdmin", "Gerente general", "Gerente multas"]
         },
         {
@@ -103,7 +103,7 @@ export class RoutingService {
           icon: "bi-receipt",
           name: "Infracciones",
           title: "Listado de infracciones",
-          route: "main/penalties/sanctions/sanctions-list",
+          route: "main/sanctions/sanctions-list",
           roles: ["SuperAdmin", "Gerente general", "Gerente multas", "Propietario", "Inquilino"]
         },
         {
@@ -111,7 +111,7 @@ export class RoutingService {
           icon: "bi-clipboard2-fill",
           name: "Informes",
           title: "Listado de informes",
-          route: "main/penalties/sanctions/report-list",
+          route: "main/sanctions/report-list",
           roles: ["SuperAdmin", "Gerente general", "Gerente multas"]
         },
         {
@@ -119,7 +119,7 @@ export class RoutingService {
           icon: "bi-slash-circle",
           name: "Motivos",
           title: "Listado de motivos",
-          route: "main/penalties/sanctions/report-list",
+          route: "main/sanctions/report-list",
           roles: ["SuperAdmin", "Gerente general", "Gerente multas"]
         }
       ]
