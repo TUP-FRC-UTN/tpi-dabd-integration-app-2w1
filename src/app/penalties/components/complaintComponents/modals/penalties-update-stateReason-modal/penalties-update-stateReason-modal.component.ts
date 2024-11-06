@@ -35,7 +35,7 @@ export class PenaltiesModalStateReasonComponent {
       stateReason: this.reasonText
     };
     // Confirmación antes de enviar el formulario
-(window as any).Swal.fire({
+Swal.fire({
   title: '¿Estás seguro?',
   text: "¿Deseas confirmar la actualización de la denuncia?",
   icon: 'warning',
