@@ -84,52 +84,54 @@ export class PenaltiesListComplaintComponent implements OnInit {
   //Manejo del Datatable
   updateDataTable() {
     //TODO: Revisar si es necesario UTILIZAR ESTA CONFIGURACION
-     if ($.fn.dataTable.isDataTable('#complaintsTable')) {
-       $('#complaintsTable').DataTable().clear().destroy();
-     }
+    if ($.fn.dataTable.isDataTable('#complaintsTable')) {
+      $('#complaintsTable').DataTable().clear().destroy();
+    }
 
-     let table = this.table = $('#complaintsTable').DataTable({
-       //Atributos de la tabla
-       paging: true,
-       searching: true,
-       ordering: true,
-       lengthChange: true,
-       order: [0, 'asc'],
-       lengthMenu: [10, 25, 50],
-       pageLength: 10,
-       data: this.filterComplaint, //Fuente de datos
-       //Columnas de la tabla
-       columns: [
-         {
-           data: 'createdDate',
-           className: 'align-middle',
-           render: (data) =>
-             `<div>${this.complaintService.formatDate(data)}</div>`
-         },
-         {
-           data: 'complaintState',
-           className: 'align-middle',
-           render: (data) =>
-             `<div class="btn ${this.getStatusClass(data)} border rounded-pill w-75">${data}</div>`
-         },
-         {
-           data: 'description',
-           className: 'align-middle',
-           render: (data) => 
-             `<div>${data}</div>`
-         },
-         {
-           data: 'fileQuantity',
-           className: 'align-middle',
-           render: (data) =>
-             `<i class="bi bi-paperclip"></i> ${data} Archivo adjunto`
-         },
-         {
-           data: null,
+    let table = this.table = $('#complaintsTable').DataTable({
+      //Atributos de la tabla
+      paging: true,
+      searching: true,
+      ordering: true,
+      lengthChange: true,
+      order: [0, 'asc'],
+      lengthMenu: [10, 25, 50],
+      pageLength: 10,
+      data: this.filterComplaint, //Fuente de datos
+      //Columnas de la tabla
+      columns: [
+        {
+          data: 'createdDate',
           className: 'align-middle',
-           searchable: false, //Marquen esto en falso si no quieren que se intente filtrar por esta columna tambien
-           render: (data) =>
-             `<div class="text-center">
+          render: (data) =>
+            `<div>${this.complaintService.formatDate(data)}</div>`
+        },
+        {
+          data: 'complaintState',
+          className: 'align-middle',
+          render: (data) => `
+              <div class="text-center">
+                <div class="badge ${this.getStatusClass(data)} border rounded-pill">${data}</div>
+              </div>`
+        },
+        {
+          data: 'description',
+          className: 'align-middle',
+          render: (data) =>
+            `<div>${data}</div>`
+        },
+        {
+          data: 'fileQuantity',
+          className: 'align-middle',
+          render: (data) =>
+            `<i class="bi bi-paperclip"></i> ${data} Archivo adjunto`
+        },
+        {
+          data: null,
+          className: 'align-middle',
+          searchable: false, //Marquen esto en falso si no quieren que se intente filtrar por esta columna tambien
+          render: (data) =>
+            `<div class="text-center">
                <div class="btn-group">
                  <div class="dropdown">
                    <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
@@ -142,55 +144,54 @@ export class PenaltiesListComplaintComponent implements OnInit {
                  </div>
               </div>
              </div>`
-         },
-         
-       ],
-       dom:
-         '<"mb-3"t>' +                           //Tabla
-         '<"d-flex justify-content-between"lp>', //Paginacion
-       language: {
-         lengthMenu:
-           `<select class="form-select">
+        },
+      ],
+      dom:
+        '<"mb-3"t>' +                           //Tabla
+        '<"d-flex justify-content-between"lp>', //Paginacion
+      language: {
+        lengthMenu:
+          `<select class="form-select">
              <option value="10">10</option>
              <option value="25">25</option>
              <option value="50">50</option>
            </select>`,
-         zeroRecords: "No se encontraron resultados",
-         loadingRecords: "Cargando...",
-         processing: "Procesando...",
-       },
-       //Uso de botones para exportar
-       buttons: [
-         {
-           extend: 'excel',
-           text: 'Excel',
-           className: 'btn btn-success export-excel-btn',
-           title: 'Listado de Denuncias',
-           exportOptions: {
-             columns: [0, 1, 2, 3], //Esto indica las columnas que se van a exportar a excel
-           },
-         },
-         {
-           extend: 'pdf',
-           text: 'PDF',
+        zeroRecords: "No se encontraron resultados",
+        loadingRecords: "Cargando...",
+        processing: "Procesando...",
+      },
+      //Uso de botones para exportar
+      buttons: [
+        {
+          extend: 'excel',
+          text: 'Excel',
+          className: 'btn btn-success export-excel-btn',
+          title: 'Listado de Denuncias',
+          exportOptions: {
+            columns: [0, 1, 2, 3], //Esto indica las columnas que se van a exportar a excel
+          },
+        },
+        {
+          extend: 'pdf',
+          text: 'PDF',
           className: 'btn btn-danger export-pdf-btn',
-           title: 'Listado de denuncias',
-           exportOptions: {
-             columns: [0, 1, 2, 3], //Esto indica las columnas que se van a exportar a pdf
-           },
+          title: 'Listado de denuncias',
+          exportOptions: {
+            columns: [0, 1, 2, 3], //Esto indica las columnas que se van a exportar a pdf
+          },
         }
-       ]
-     });
-
-
-     //Triggers para los botones de exportacion
-     $('#exportExcelBtn').on('click', function () {
-       table.button('.buttons-excel').trigger();
+      ]
     });
 
-     $('#exportPdfBtn').on('click', function () {
-       table.button('.buttons-pdf').trigger();
-     });
+
+    //Triggers para los botones de exportacion
+    $('#exportExcelBtn').on('click', function () {
+      table.button('.buttons-excel').trigger();
+    });
+
+    $('#exportPdfBtn').on('click', function () {
+      table.button('.buttons-pdf').trigger();
+    });
   }
 
 
@@ -234,11 +235,11 @@ export class PenaltiesListComplaintComponent implements OnInit {
   getStatusClass(estado: string): string {
     switch (estado) {
       case 'Anexada':
-        return 'text-bg-primary';
-      case 'Nueva':
-        return 'text-bg-info';
-      case 'Pendiente':
         return 'text-bg-secondary';
+      case 'Nueva':
+        return 'text-bg-success';
+      case 'Pendiente':
+        return 'text-bg-warning';
       case 'Rechazada':
         return 'text-bg-danger';
       default:
@@ -318,8 +319,8 @@ export class PenaltiesListComplaintComponent implements OnInit {
       });
   }
 
-  redirecting(){
-    this.routingService.redirect("main/penalties/complaints/post-complaint","Registrar Denuncia")
+  redirecting() {
+    this.routingService.redirect("main/penalties/complaints/post-complaint", "Registrar Denuncia")
   }
 }
 
