@@ -31,6 +31,7 @@ export class CustomSelectComponent implements OnInit{
   }
 
   send(){
+    console.log("Options:" + this.selectedOptions)
     this.sendList.emit(this.selectedOptions);
   }
 

@@ -17,7 +17,7 @@
             }
           </ng-template>
         <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
-            <input class="form-check-input" id={{item.value}} type="checkbox" [ngModel]="item$.selected" /> {{ item.name }}
+            <input class="form-check-input text-dark" id={{item.value}} type="checkbox" [ngModel]="item$.selected" /> {{ item.name }}
         </ng-template>
     }
 </ng-select>

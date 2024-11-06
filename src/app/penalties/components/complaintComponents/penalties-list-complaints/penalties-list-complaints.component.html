@@ -23,6 +23,8 @@
           <option [value]="state.value">{{state.value}}</option>
           }
         </select>
+
+        <app-custom-select [options]="states" [optionsChecked]="['NEW', 'PENDING']"></app-custom-select> <!-- Esto esta aqui para testear por ahora -->
       </div>
 
       <!-- Filtro de fechas -->

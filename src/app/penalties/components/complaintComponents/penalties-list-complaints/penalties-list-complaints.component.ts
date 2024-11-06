@@ -27,11 +27,12 @@ import { PenaltiesModalStateReasonComponent } from '../modals/penalties-update-s
 import { ComplaintService } from '../../../services/complaintsService/complaints.service';
 import { ComplaintDto } from '../../../models/complaint';
 import { RoutingService } from '../../../../common/services/routing.service';
+import { CustomSelectComponent } from "../../../../common/components/custom-select/custom-select.component";
 
 @Component({
   selector: 'app-penalties-list-complaint',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, NgbModule],
+  imports: [CommonModule, RouterModule, FormsModule, NgbModule, CustomSelectComponent],
   templateUrl: './penalties-list-complaints.component.html',
   styleUrl: './penalties-list-complaints.component.scss',
 })
@@ -41,7 +42,7 @@ export class PenaltiesListComplaintComponent implements OnInit {
   filterComplaint: ComplaintDto[] = [];           //Fuente de datos a mostrar
   filterDateStart: Date = new Date();             //valor fecha inicio
   filterDateEnd: Date = new Date();               //valor fecha fin
-  states: { key: string; value: string }[] = [];  //Mapa de estados para el select
+  states: { name: string; value: string }[] = [];  //Mapa de estados para el select
   table: any;                                     //Tabla base
   searchTerm: string = '';                        //Valor de la barra de busqueda
 
@@ -273,8 +274,8 @@ export class PenaltiesListComplaintComponent implements OnInit {
     this.complaintService.getState().subscribe({
       next: (data) => {
         this.states = Object.keys(data).map(key => ({
-          key,
-          value: data[key]
+          name: data[key],
+          value: key
         }));
       },
       error: (error) => {
