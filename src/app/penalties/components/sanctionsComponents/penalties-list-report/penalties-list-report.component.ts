@@ -244,7 +244,9 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
     this.routingService.redirect(`main/penalties/sanctions/post-fine/${id}`, "Registrar Multa")
   }
 
-
+  redirecting(){
+    this.routingService.redirect("main/penalties/sanctions/post-report","Registrar Informe")
+  }
 
 
 
@@ -444,9 +446,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
     }
   }
 
-  redirect(path: string) {
-    this.router.navigate([path]);
-  }
+
 
 
 

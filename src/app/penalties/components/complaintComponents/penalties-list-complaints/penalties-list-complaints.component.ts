@@ -26,6 +26,7 @@ import { PenaltiesModalConsultComplaintComponent } from '../modals/penalties-get
 import { PenaltiesModalStateReasonComponent } from '../modals/penalties-update-stateReason-modal/penalties-update-stateReason-modal.component';
 import { ComplaintService } from '../../../services/complaintsService/complaints.service';
 import { ComplaintDto } from '../../../models/complaint';
+import { RoutingService } from '../../../../common/services/routing.service';
 
 @Component({
   selector: 'app-penalties-list-complaint',
@@ -56,7 +57,9 @@ export class PenaltiesListComplaintComponent implements OnInit {
   constructor(
     private router: Router,
     private _modal: NgbModal,
-    private complaintService: ComplaintService
+    private complaintService: ComplaintService,
+    private routingService: RoutingService
+
   ) {
     (window as any).viewComplaint = (id: number) => this.viewComplaint(id);
     (window as any).changeState = (state: string, id: number, userId: number) =>
@@ -315,5 +318,8 @@ export class PenaltiesListComplaintComponent implements OnInit {
       });
   }
 
+  redirecting(){
+    this.routingService.redirect("main/penalties/complaints/post-complaint","Registrar Denuncia")
+  }
 }
 
