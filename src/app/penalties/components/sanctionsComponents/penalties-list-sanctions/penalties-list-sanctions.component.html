@@ -19,6 +19,16 @@
           (input)="onSearch($event)">
       </div>
 
+      <!-- Select de estado -->
+      <div class="col">
+        <select (change)="onFilter($event)" [(ngModel)]="selectedValue" class="form-select" id="estadoSelect">
+          <option value="">Seleccionar Estado</option>
+          @for (state of states; track $index) {
+          <option [value]="state.value">{{state.value}}</option>
+          }
+        </select>
+      </div>
+
       <!-- Filtro de fechas -->
       <div class="col d-flex gap-3">
         <div class="col">
@@ -29,15 +39,7 @@
         </div>
       </div>
 
-      <!-- Select de estado -->
-      <div class="col">
-        <select (change)="onFilter($event)" [(ngModel)]="selectedValue" class="form-select" id="estadoSelect">
-          <option value="">Seleccionar Estado</option>
-          @for (state of states; track $index) {
-          <option [value]="state.value">{{state.value}}</option>
-          }
-        </select>
-      </div>
+
 
       <!-- BOTON DE FILTRO PARA QUIENES LO NECESITEN -->
       <!-- <div class="col-auto">
