@@ -36,19 +36,6 @@ export class PenaltiesUpdateStateReasonModalComponent {
       userId: this.userId
     };
     // Confirmación antes de enviar el formulario
-    Swal.fire({
-      title: '¿Estás seguro?',
-      text: "¿Deseas confirmar la actualización de la multa?",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Confirmar',
-      cancelButtonText: 'Cancelar',
-      customClass: {
-        confirmButton: 'btn btn-success',
-        cancelButton: 'btn btn-danger'
-      },
-    }).then((result: any) => {
-      if (result.isConfirmed) {
         // Envío de formulario solo después de la confirmación
         this.sanctionService.putStateFine(fineDto).subscribe( res => {
             Swal.fire({
@@ -59,6 +46,7 @@ export class PenaltiesUpdateStateReasonModalComponent {
               showConfirmButton: false
               
             });
+            this.sanctionService.triggerRefresh();
             this.close();
           }, error => {
             console.error('Error al enviar la multa', error);
@@ -69,8 +57,7 @@ export class PenaltiesUpdateStateReasonModalComponent {
               confirmButtonText: 'Aceptar'
             });
           })
-        };
-      });
+
     
   }
 }

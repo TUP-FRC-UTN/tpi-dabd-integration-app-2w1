@@ -28,27 +28,12 @@ export class PenaltiesModalStateReasonComponent {
 
   //metodo para enviar
   putComplaint(){
-    alert("Funciona???")
     const ComplaintDto:PutStateComplaintDto = {
       id: this.idComplaint,
       userId: this.userId,
       complaintState: this.complaintState,
       stateReason: this.reasonText
     };
-    // Confirmación antes de enviar el formulario
-Swal.fire({
-  title: '¿Estás seguro?',
-  text: "¿Deseas confirmar la actualización de la denuncia?",
-  icon: 'warning',
-  showCancelButton: true,
-  confirmButtonText: 'Confirmar',
-  cancelButtonText: 'Cancelar',
-  customClass: {
-    confirmButton: 'btn btn-success',
-    cancelButton: 'btn btn-danger'
-  },
-}).then((result: any) => {
-  if (result.isConfirmed) {
     // Envío de formulario solo después de la confirmación
     this.complaintService.putStateComplaint(this.idComplaint, ComplaintDto).subscribe( res => {
         Swal.fire({
@@ -69,8 +54,7 @@ Swal.fire({
           confirmButtonText: 'Aceptar'
         });
       })
-    };
-  });
+
 
 }
 }

@@ -59,20 +59,7 @@ export class PenaltiesPostDisclaimerComponent implements OnInit {
     };
 
     // Confirmación antes de enviar el formulario
-Swal.fire({
-  title: '¿Estás seguro?',
-  text: "¿Deseas confirmar el envío del descargo?",
-  icon: 'warning',
-  showCancelButton: true,
-  confirmButtonText: 'Confirmar',
-  cancelButtonText: 'Cancelar',
-  customClass: {
-    confirmButton: 'btn btn-success',
-    cancelButton: 'btn btn-danger'
-  },
-}).then((result: any) => {
-  if (result.isConfirmed) {
-    // Envío de formulario solo después de la confirmación
+
     this.penaltiesService.addDisclaimer(disclaimerData).subscribe( res => {
         Swal.fire({
           title: '¡Descargo enviado!',
@@ -91,8 +78,7 @@ Swal.fire({
           confirmButtonText: 'Aceptar'
         });
       })
-    };
-  });
+
   }
 
   cancel(){
