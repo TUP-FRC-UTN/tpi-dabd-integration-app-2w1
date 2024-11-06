@@ -114,7 +114,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
           data: 'plotId',
           className: 'align-middle',
           render: (data) =>
-            `<div>Nro: ${data}</div>`
+            `<div class="text-end">${data}</div>`
         },
         {
           data: 'description',
