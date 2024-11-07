@@ -282,7 +282,7 @@ export class RoutingService {
         {
           icon: "bi-list-check",
           name: "Informes",
-          title: "Informes mensuales",
+          title: "Informes Mensuales",
           route: "main/entries/reports",
           roles: ["SuperAdmin", "Gerente general"]
         },
@@ -290,14 +290,14 @@ export class RoutingService {
           //Esto tendria que ir o va a ser un boton flotante???
           icon: "bi-door-open-fill",
           name: "Agregar",
-          title: "Añadir visitante",
+          title: "Añadir Visitante",
           route: "main/entries/register",
           roles: ["SuperAdmin", "Gerente general", "Seguridad", "Propietario", "Inquilino"]
         },
         {
           icon: "bi-pencil-square",
           name: "Modificar",
-          title: "Editar visitante",
+          title: "Editar Visitante",
           route: "main/entries/edit",
           roles: ["SuperAdmin", "Gerente general", "Propietario", "Inquilino"]
         },

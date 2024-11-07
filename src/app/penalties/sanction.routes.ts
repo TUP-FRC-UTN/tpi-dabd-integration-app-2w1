@@ -7,6 +7,7 @@ import { PenaltiesSanctionsListComponent } from "./components/sanctionsComponent
 import { ReportModifyComponent } from "./components/sanctionsComponents/sanctions-update-report/sanctions-update-report.component";
 import { NewReportComponent } from "./components/sanctionsComponents/penalties-post-report/penalties-post-report.component";
 import { PenaltiesUpdateFineComponent } from "./components/sanctionsComponents/penalties-update-fine/penalties-update-fine.component";
+import { PenaltiesFineDashboardComponent } from "./components/sanctionsComponents/penalties-fine-dashboard/penalties-fine-dashboard.component";
 
 
 export const SANCTION_ROUTES: Routes = [
@@ -17,5 +18,5 @@ export const SANCTION_ROUTES: Routes = [
     { path: 'put-report', component: ReportModifyComponent },
     { path: 'post-report', component: NewReportComponent },
     { path: 'put-fine/:fineId', component: PenaltiesUpdateFineComponent },
-    { path: 'dashboard', component: PenaltyHomeComponent }, // Cambiar por el componente correspondiente
+    { path: 'dashboard', component: PenaltiesFineDashboardComponent }, // Cambiar por el componente correspondiente
 ];

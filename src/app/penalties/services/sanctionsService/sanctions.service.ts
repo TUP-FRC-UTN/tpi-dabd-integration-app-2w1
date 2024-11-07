@@ -5,6 +5,7 @@ import { Observable } from 'rxjs/internal/Observable';
 import { SanctionsDTO } from '../../models/SanctionsDTO';
 import { PutReportDTO } from '../../models/PutReportDTO';
 import { Subject } from 'rxjs';
+import { Fine } from '../../models/Dashboard-models';
 
 @Injectable({
   providedIn: 'root'
@@ -91,5 +92,9 @@ export class PenaltiesSanctionsServicesService {
   triggerRefresh() {
     this.refreshSubject.next();
   }
+
+  getAllFines():Observable<Fine[]>{
+    return this.http.get<Fine[]>(this.url + "sanction/allFines")
+  } 
 
 }
