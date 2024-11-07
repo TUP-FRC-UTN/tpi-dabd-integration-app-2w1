@@ -31,6 +31,12 @@ export class PenaltiesSanctionsServicesService {
     return this.http.get(this.url + "report/states")
   }
 
+   ///report/states
+   getStateFines(): Observable<any> {
+    return this.http.get(this.url + "sanction/allFinesState")
+  }
+
+
   //esto es unicamente para mostrar fechas 
   formatDate(date: any): string {
     if (Array.isArray(date)) {

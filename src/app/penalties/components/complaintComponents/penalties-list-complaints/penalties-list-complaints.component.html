@@ -17,11 +17,9 @@
 
       <!-- Select de estado -->
       <div class="col">
-        <select (change)="onFilter($event)" class="form-select" id="estadoSelect">
+        <select [(ngModel)]="selectedState" (change)="onFilter($event)" class="form-select" id="estadoSelect">
           <option value="" selected>Seleccionar Estado</option>
-          @for (state of states; track $index) {
-          <option [value]="state.value">{{state.value}}</option>
-          }
+          <option *ngFor="let state of states" [value]="state.value">{{ state.value }}</option>
         </select>
       </div>
 
@@ -34,6 +32,7 @@
           <input (change)="filterDate()" [(ngModel)]="filterDateEnd" class="form-control" type="date">
         </div>
       </div>
+
 
 
 

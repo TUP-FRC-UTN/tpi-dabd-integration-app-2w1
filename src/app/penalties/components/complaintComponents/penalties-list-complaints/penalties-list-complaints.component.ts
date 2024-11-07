@@ -40,12 +40,10 @@ import autoTable from 'jspdf-autotable';
   styleUrl: './penalties-list-complaints.component.scss',
 })
 export class PenaltiesListComplaintComponent implements OnInit {
-eraseFilters() {
-throw new Error('Method not implemented.');
-}
   //Variables
   Complaint: ComplaintDto[] = [];                 //Fuente de datos
   filterComplaint: ComplaintDto[] = [];           //Fuente de datos a mostrar
+  filterComplaintsecond: ComplaintDto[] = [];           //Fuente de datos a mostrar
   //filterDateStart: Date = new Date();             //valor fecha inicio
   //filterDateEnd: Date = new Date();               //valor fecha fin
   states: { key: string; value: string }[] = [];  //Mapa de estados para el select
@@ -53,8 +51,8 @@ throw new Error('Method not implemented.');
   searchTerm: string = '';                        //Valor de la barra de busqueda
   filterDateStart: string='';
   filterDateEnd: string ='';
-  
   selectedState: string = '';
+  
 
   //Init
   ngOnInit(): void {
@@ -91,18 +89,18 @@ throw new Error('Method not implemented.');
 
 
   //Combo de filtrado de estado
-  onFilter(event: Event) {
-    const selectedValue = (event.target as HTMLSelectElement).value;
+  // onFilter(event: Event) {
+  //   const selectedValue = (event.target as HTMLSelectElement).value;
 
-    this.filterComplaint = this.Complaint.filter(
-      (c) => c.complaintState == selectedValue
-    );
-    if (selectedValue == '') {
-      this.filterComplaint = this.Complaint;
-    }
+  //   this.filterComplaint = this.Complaint.filter(
+  //     (c) => c.complaintState == selectedValue
+  //   );
+  //   if (selectedValue == '') {
+  //     this.filterComplaint = this.Complaint;
+  //   }
 
-    this.updateDataTable();
-  }
+  //   this.updateDataTable();
+  // }
 
   //Manejo del Datatable
   updateDataTable() {
@@ -232,27 +230,57 @@ throw new Error('Method not implemented.');
 
 
   //Metodo para filtrar la tabla en base a las 2 fechas
-  filterDate() {
+  filterComplaintData() {
+    let filteredComplaints = [...this.Complaint];  // Copiar los datos de las que no han sido filtradas aún
+  
+    // Filtrar por estado si se ha seleccionado alguno
+    if (this.selectedState) {
+      filteredComplaints = filteredComplaints.filter(
+        (c) => c.complaintState === this.selectedState
+      );
+    }
+  
+    // Filtrar por fecha si las fechas están definidas
     const startDate = this.filterDateStart ? new Date(this.filterDateStart) : null;
     const endDate = this.filterDateEnd ? new Date(this.filterDateEnd) : null;
-
-    this.filterComplaint = this.Complaint.filter(item => {
+  
+    filteredComplaints = filteredComplaints.filter((item) => {
       const date = new Date(item.createdDate);
-
       if (isNaN(date.getTime())) {
-        console.warn(`Fecha no valida: ${item.createdDate}`);
+        console.warn(`Fecha no válida: ${item.createdDate}`);
         return false;
       }
-
-      //Comprobar limites de fecha
+  
       const afterStartDate = !startDate || date >= startDate;
       const beforeEndDate = !endDate || date <= endDate;
-
-      return afterStartDate && beforeEndDate; //Retorna verdadero solo si ambas condiciones se cumplen
+  
+      return afterStartDate && beforeEndDate;
     });
-
-    this.updateDataTable();
+  
+    // Actualiza los datos de la tabla
+    this.filterComplaint = filteredComplaints;
+    this.updateDataTable(); // Llama a la función para actualizar la tabla
   }
+  
+  // Método para manejar la selección del estado
+  onFilter(event: Event) {
+    const selectedValue = (event.target as HTMLSelectElement).value;
+    this.selectedState = selectedValue; // Actualiza el valor del estado seleccionado
+    this.filterComplaintData(); // Aplica los filtros
+  }
+  
+  // Método para manejar el cambio de fechas
+  filterDate() {
+    this.filterComplaintData(); // Aplica los filtros de fecha y estado
+  }
+
+  eraseFilters(){
+    this.refreshData();
+    this.selectedState = '';
+    this.searchTerm = '';
+    this.resetDates();
+  }
+
 
   //Switch para manejar el estilo de los estados
   getStatusClass(estado: string): string {
