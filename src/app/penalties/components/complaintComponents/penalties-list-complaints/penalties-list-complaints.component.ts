@@ -369,7 +369,7 @@ export class PenaltiesListComplaintComponent implements OnInit {
     });
     modal.componentInstance.denunciaId = i;
     modal.result
-      .then((result) => { })
+      .then((result) => { this.refreshData() })
       .catch((error) => {
         console.log('Modal dismissed with error:', error);
       });

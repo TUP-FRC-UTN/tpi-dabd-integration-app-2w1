@@ -3,6 +3,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ComplaintService } from '../../../../services/complaintsService/complaints.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { PutStateComplaintDto } from '../../../../models/complaint';
 
 @Component({
   selector: 'app-penalties-modal-consult-complaint',
@@ -16,6 +17,7 @@ export class PenaltiesModalConsultComplaintComponent implements OnInit {
   @Input() denunciaId!: number;
   files: File[] = [];
   complaint: any;
+  loggedUserId: number = 1;
 
 
   //Constructor
@@ -44,8 +46,16 @@ export class PenaltiesModalConsultComplaintComponent implements OnInit {
   getComplaint() {
     this.complaintService.getById(this.denunciaId).subscribe(
       (response) => {
-        console.log(response);
         this.complaint = response
+        if (this.complaint.complaintState == "Nueva") {
+          const updatedComplaint: PutStateComplaintDto = {
+            id: this.complaint.id,
+            userId: this.loggedUserId,
+            complaintState: "PENDING",
+            stateReason: "Ya vista"
+          }
+          this.complaintService.putStateComplaint(this.complaint.id, updatedComplaint).subscribe()
+        }
       },
       (error) => {
         console.error('Error:', error);
