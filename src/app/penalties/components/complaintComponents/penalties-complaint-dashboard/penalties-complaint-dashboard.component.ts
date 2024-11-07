@@ -34,12 +34,13 @@ export class PenaltiesComplaintDashboardComponent {
     colors: ['#8A2BE2', '#00BFFF', '#FF4500', '#32CD32'],
     legend: {
       position: 'right',
-      textStyle: { color: '#6c757d', fontSize: 17 }
+      textStyle: { color: '#000000', fontSize: 17 },  // Cambiado a negro
     },
+    pieSliceTextStyle: { color: '#000000' }, // Texto dentro de las porciones en negro
     chartArea: { width: '80%', height: '80%' },
     pieHole: 0.7,
     height: '80%',
-    title: 'Distribución de Tipos de Denuncias'
+    title: 'Distribución de Tipos de Multas'
   };
 
   lineChartOptions = {
@@ -145,7 +146,7 @@ export class PenaltiesComplaintDashboardComponent {
 
   private updatePieChart() {
     const complaintsByType = this.complaintsData.reduce((acc: any, complaint) => {
-      acc[complaint.complaintType] = (acc[complaint.complaintType] || 0) + 1;
+      acc[complaint.complaintReason] = (acc[complaint.complaintReason] || 0) + 1;
       return acc;
     }, {});
     this.pieChartData = Object.entries(complaintsByType)

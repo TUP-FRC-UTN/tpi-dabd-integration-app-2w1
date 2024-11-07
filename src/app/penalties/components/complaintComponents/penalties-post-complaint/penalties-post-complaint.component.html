@@ -5,27 +5,48 @@
             <div class="row">
 
                 <!-- Ejemplo select -->
-                <div class="col-lg-6 mb-3">
+                <div class="col-lg-12 mb-3">
                     <div class="row">
-                        <label class="col-2 col-form-label">Motivo</label>
+                        <label class="col-1 col-form-label">Motivo</label>
                         <div class="col-10">
-                            <select class="form-select" formControlName="typeControl"
-                                [ngClass]="onValidate('typeControl')">
-                                <option value="" disabled selected>Seleccione una opción</option>
-                                @for (type of complaintTypes; track $index) {
-                                <option [value]="type.key">{{type.value}}</option>
-                                }
-                            </select>
-                            <div class="invalid-feedback">{{showError('typeControl')}}</div>
+                            <div class="row">
+                                <div class="col-5">
+                                    <select class="form-select" formControlName="complaintReason"
+                                        [ngClass]="onValidate('complaintReason')">
+                                        <option value="" disabled>Seleccione una opción</option>
+                                        @for (type of complaintTypes; track $index) {
+                                        <option [value]="type">{{type}}</option>
+                                        }
+                                        <option value="Otro" selected>Otro</option>
+                                    </select>
+                                </div>
+                                @if(reactiveForm.value.complaintReason == "Otro"){
+                                <div class="col-7">
+                                    <div class="row">
+                                        <div class="col-3">
+                                            <label>Ingrese un motivo:</label>
+                                        </div>
+                                        <div class="col-9">
+                                            <input type="text" name="otroMotivo" class="form-control"
+                                                formControlName="anotherReason"
+                                                [ngClass]="onValidate('anotherReason')">
+                                            <div class="invalid-feedback">{{showError('anotherReason')}}</div>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                            }
+                            
                         </div>
+                        <div class="invalid-feedback">{{showError('complaintReason')}}</div>
                     </div>
                 </div>
-
+            </div>
 
                 <!-- Ejemplo text area -->
                 <div class="col-lg-12 mb-3">
                     <div class="row">
-                        <label class="col-2 col-lg-1 col-form-label">Descripcion</label>
+                        <label class="col-2 col-lg-1 col-form-label">Descripción</label>
                         <div class="col-10 col-lg-11">
                             <textarea class="form-control" rows="8" formControlName="descriptionControl"
                                 style="resize: none;" [ngClass]="onValidate('descriptionControl')"></textarea>
@@ -84,7 +105,9 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                Aqui la explicacion de la pagina
+                Aquí se puede realizar el alta de una denuncia con sus datos correspondientes. La misma puede contener
+                imágenes como prueba. Al hacer click en enviar, se registrará la nueva denuncia en el sistema. Al tocar
+                cancelar, podrás volver a la lista de denuncias.
             </div>
         </div>
     </div>

@@ -5,6 +5,7 @@ import { AbstractControl, FormBuilder, FormControl, FormGroup, FormsModule, Reac
 import { CommonModule } from '@angular/common';
 import Swal from 'sweetalert2';
 import { RoutingService } from '../../../../common/services/routing.service';
+import { ReportReasonDto } from '../../../models/ReportReasonDTO';
 
 @Component({
   selector: 'app-penalties-post-complaint',
@@ -15,10 +16,10 @@ import { RoutingService } from '../../../../common/services/routing.service';
 })
 export class PenaltiesPostComplaintComponent implements OnInit {
   //Variables
-  complaintTypes: { key: string; value: string }[] = [];
+  complaintTypes: string[] = [];
   reactiveForm: FormGroup;
   files: File[] = [];
-
+  otroSelected: boolean = false;
 
   //Constructor
   constructor(
@@ -28,7 +29,8 @@ export class PenaltiesPostComplaintComponent implements OnInit {
     private routingService : RoutingService
   ) { 
     this.reactiveForm = this.formBuilder.group({  //Usen las validaciones que necesiten, todo lo de aca esta puesto a modo de ejemplo
-      typeControl: new FormControl('', [Validators.required]),
+      complaintReason: new FormControl('', [Validators.required]),
+      anotherReason: new FormControl(''),
       descriptionControl: new FormControl('', [Validators.required, Validators.minLength(10), Validators.maxLength(255)]),
       fileControl: new FormControl(null),
     });
@@ -38,6 +40,20 @@ export class PenaltiesPostComplaintComponent implements OnInit {
   //Init
   ngOnInit(): void {
     this.getTypes();
+
+        // Escuchar cambios en 'complaintReason' para activar o desactivar la validación
+        this.reactiveForm.get('complaintReason')?.valueChanges.subscribe(value => {
+          const anotherReasonControl = this.reactiveForm.get('anotherReason');
+    
+          if (value === 'Otro') {
+            anotherReasonControl?.setValidators([Validators.required,Validators.minLength(10), Validators.maxLength(48)]);
+          } else {
+            anotherReasonControl?.clearValidators();
+          }
+    
+          // Actualizar el estado de validación de 'anotherReason'
+          anotherReasonControl?.updateValueAndValidity();
+        });
   }
 
 
@@ -47,7 +63,8 @@ export class PenaltiesPostComplaintComponent implements OnInit {
       let formData = this.reactiveForm.value;
       let data = {
         userId: 1,
-        complaintType: formData.typeControl,
+        complaintReason: formData.complaintReason,
+        anotherReason: formData.anotherReason,
         description: formData.descriptionControl,
         pictures: this.files
       };
@@ -166,17 +183,14 @@ export class PenaltiesPostComplaintComponent implements OnInit {
   // it will return an error.
 
   getTypes(): void {
-    this.complaintService.getTypes().subscribe({
-      next: (data) => {
-        this.complaintTypes = Object.keys(data).map(key => ({
-          key,
-          value: data[key]
-        }));
+    this.complaintService.getAllReportReasons().subscribe(
+      (reasons: ReportReasonDto[]) => {
+        reasons.forEach((reason) => this.complaintTypes.push(reason.reportReason))
       },
-      error: (error) => {
+      (error) => {
         console.error('error: ', error);
       }
-    })
+    )
   }
 
 

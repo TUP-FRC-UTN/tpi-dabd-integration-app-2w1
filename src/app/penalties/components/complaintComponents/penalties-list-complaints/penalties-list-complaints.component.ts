@@ -137,10 +137,11 @@ export class PenaltiesListComplaintComponent implements OnInit {
       ordering: true,
       lengthChange: true,
       order: [0, 'desc'],
-      lengthMenu: [10, 25, 50],
-      pageLength: 10,
-      data: this.filterComplaint, //Data source
-      //Table columns
+      lengthMenu: [5,10, 25, 50],
+      pageLength: 5,
+      data: this.filterComplaint, //Fuente de datos
+
+      //Columnas de la tabla
       columns: [
         {
           data: 'createdDate',
@@ -180,7 +181,7 @@ export class PenaltiesListComplaintComponent implements OnInit {
                      <li><a class="dropdown-item" onclick="viewComplaint(${data.id})">Ver más</a></li>
                       ${data.complaintState == "Pendiente" ? `
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" onclick="changeState('REJECTED', ${data.id}, ${data.userId})">Marcar como Rechazada</a></li>` : ``}
+                        <li><a class="dropdown-item" onclick="changeState('REJECTED', ${data.id}, ${data.userId})">Rechazar</a></li>` : ``}
                       </ul>
                  </div>
               </div>
@@ -460,7 +461,7 @@ export class PenaltiesListComplaintComponent implements OnInit {
     });
     modal.componentInstance.denunciaId = i;
     modal.result
-      .then((result) => { })
+      .then((result) => { this.refreshData() })
       .catch((error) => {
         console.log('Modal dismissed with error:', error);
       });

@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { provideHttpClient } from '@angular/common/http';
 import { Complaint, ComplaintDto, PutStateComplaintDto } from '../../models/complaint';
+import { ReportReasonDto } from '../../models/ReportReasonDTO';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +12,8 @@ export class ComplaintService {
 
   private readonly http: HttpClient = inject(HttpClient);
   private readonly url = 'http://localhost:8040/api/complaint';
+  private readonly reportReasonUrl = 'http://localhost:8042/api/report-reason';
+
 
 
   //Envia una nueva denuncia
@@ -18,7 +21,8 @@ export class ComplaintService {
     const complaint = new FormData();
   
     complaint.append('userId', complaintData.userId.toString());
-    complaint.append('complaintType', complaintData.complaintType);
+    complaint.append('complaintReason', complaintData.complaintReason);
+    complaint.append('anotherReason', complaintData.anotherReason)
     complaint.append('description', complaintData.description);
   
     if (complaintData.pictures && complaintData.pictures.length > 0) {
@@ -30,10 +34,9 @@ export class ComplaintService {
     return this.http.post(this.url, complaint);
   }
 
-
-  //Obtiene todos los tipos de denuncia (motivos)
-  getTypes(): Observable<any> {
-    return this.http.get(this.url + `/types`);
+  // Obtiene todos los tipos de razones
+  getAllReportReasons(): Observable<any> {
+    return this.http.get<ReportReasonDto[]>(this.reportReasonUrl + "/all");
   }
 
 

@@ -4,6 +4,7 @@ import { ChartType, GoogleChartsModule } from 'angular-google-charts';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Fine } from '../../../models/Dashboard-models';
+import { textShadow } from 'html2canvas/dist/types/css/property-descriptors/text-shadow';
 
 @Component({
   selector: 'app-penalties-fine-dashboard',
@@ -34,8 +35,9 @@ export class PenaltiesFineDashboardComponent {
     colors: ['#8A2BE2', '#00BFFF', '#FF4500', '#32CD32'],
     legend: {
       position: 'right',
-      textStyle: { color: '#6c757d', fontSize: 17 }
+      textStyle: { color: '#000000', fontSize: 17 },  // Cambiado a negro
     },
+    pieSliceTextStyle: { color: '#000000' }, // Texto dentro de las porciones en negro
     chartArea: { width: '80%', height: '80%' },
     pieHole: 0.7,
     height: '80%',

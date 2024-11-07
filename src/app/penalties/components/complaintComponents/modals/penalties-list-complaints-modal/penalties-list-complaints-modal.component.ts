@@ -11,6 +11,8 @@ import { ComplaintService } from '../../../../services/complaintsService/complai
   styleUrl: './penalties-list-complaints-modal.component.scss'
 })
 export class ModalComplaintsListComponent implements OnInit {
+  @Input() reportId: number = 0;
+  @Input() formType: string = '';
   complaints: any[] = [];
   tooltipTitle: string = 'Las denuncias seleccionadas se anexarán al informe. Las que no estén seleccionadas se desanexarán del mismo en caso de estar anexadas.'
   @Output() selectedComplaints = new EventEmitter<any[]>();
@@ -25,10 +27,19 @@ export class ModalComplaintsListComponent implements OnInit {
   // from the database using the service.
   getComplaints(): void {
     this.complaintService.getAllComplaints().subscribe(res => {
-      this.complaints = res.map(complaint => ({
-        ...complaint,
-        selected: complaint.complaintState === 'Anexada'
-      }));
+      this.complaints = res.filter(complaint => {
+        if (this.formType === 'modify') {
+          return complaint.complaintState === 'Nueva' ||
+            complaint.complaintState === 'Pendiente' ||
+            (complaint.reportId === Number(this.reportId) && complaint.complaintState === 'Anexada');
+        } else {
+          return complaint.complaintState === 'Nueva' || complaint.complaintState === 'Pendiente';
+        }
+      })
+        .map(complaint => ({
+          ...complaint,
+          selected: complaint.complaintState === 'Anexada'
+        }));
       console.log('Denuncias:', this.complaints);
     }, error => {
       console.error('Error al obtener denuncias', error);

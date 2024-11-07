@@ -19,12 +19,6 @@
                     </div>
                     }
                 </div>
-
-                <div class="input-box">
-                    <label for="dateInput" class="form-label">Fecha</label>
-                    <input type="date" id="dateInput" name="dateInput" class="form-control bg-body-secondary"
-                        [(ngModel)]="dateView" #dateField="ngModel" disabled>
-                </div>
             </div>
 
             <div class="input-box d-flex flex-column gap-2 mb-4">
@@ -66,4 +60,4 @@
     </div>
 </div>
 
-<app-modal-complaints-list (selectedComplaints)="handleSelectedComplaints($event)"></app-modal-complaints-list>
+<app-modal-complaints-list (selectedComplaints)="handleSelectedComplaints($event)" [formType]="'add'"></app-modal-complaints-list>
