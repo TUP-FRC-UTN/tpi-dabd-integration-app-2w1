@@ -8,13 +8,13 @@
     <h5>Información de la Denuncia</h5>
       <div class="row mb-3">
           <div class="col-md-6">
-              <p><strong>Motivo:</strong> {{ complaint?.complaintType || 'N/A' }}</p>
-              <p><strong>Fecha:</strong> {{ complaint?.createdDate | date:"dd/MM/yyyy" || 'N/A' }}</p>
+              <p><strong>Motivo</strong> {{ complaint?.complaintType || 'N/A' }}</p>
+              <p><strong>Fecha</strong> {{ complaint?.createdDate | date:"dd/MM/yyyy" || 'N/A' }}</p>
           </div>
       
           <div class="col-md-6">
-              <p><strong>Descripcion:</strong> {{ complaint?.description || 'N/A' }}</p>
-              <p><strong>Denunciante:</strong> {{ complaint?.userId || 'N/A' }}</p>
+              <p><strong>Descripción</strong> {{ complaint?.description || 'N/A' }}</p>
+              <p><strong>Denunciante</strong> {{ complaint?.userId || 'N/A' }}</p>
           </div>
       </div>
       <hr>
@@ -22,8 +22,8 @@
       <h5>Estado de la Denuncia</h5>
       <div class="row mb-3">
           <div class="col-md-6">
-              <p><strong>Estado:</strong> {{ complaint?.complaintState || 'N/A' }}</p>
-              <p><strong>Razon</strong> {{ complaint?.stateReason || 'N/A' }}</p>
+              <p><strong>Estado</strong> {{ complaint?.complaintState || 'N/A' }}</p>
+              <p><strong>Razón</strong> {{ complaint?.stateReason || 'N/A' }}</p>
           </div>
       </div>
 

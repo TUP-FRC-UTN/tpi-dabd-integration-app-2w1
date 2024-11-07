@@ -17,7 +17,7 @@ export class PenaltiesPostFineComponent implements OnInit {
 
 
   report:any
-
+  formattedDate: any;
 
   //tengo que llamar al microservicio de usuario para traer el plot usando el plot Id
   @Input() reportDto:ReportDTO={
@@ -58,6 +58,8 @@ export class PenaltiesPostFineComponent implements OnInit {
       (response) => {
         //console.log(response); 
         this.report = response
+        const createdDate = this.report?.createdDate;
+        this.formattedDate = new Date(createdDate).toISOString().split('T')[0];
       },
       (error) => {
         console.error('Error:', error);
