@@ -401,8 +401,8 @@ export class PenaltiesListComplaintComponent implements OnInit {
     this.complaintService.getState().subscribe({
       next: (data) => {
         this.states = Object.keys(data).map(key => ({
-          name: data[key],
-          value: key
+          key,
+          value: data[key]
         }));
       },
       error: (error) => {
