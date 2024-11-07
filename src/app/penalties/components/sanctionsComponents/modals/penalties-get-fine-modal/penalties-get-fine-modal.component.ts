@@ -34,12 +34,20 @@ export class PenaltiesModalFineComponent implements OnInit {
   }
 
 
-  //Boton de cierre del modal
+  //Modal close button
   close() {
     this.activeModal.close()
   }
 
-
+  // Retrieves fine details based on the provided fine ID.
+  
+  // Parameters:
+  // - fineId: number - The unique identifier of the fine to be retrieved.
+  
+  // Subscribes to the fine retrieval observable 
+  // and assigns the response to `fine`.
+  
+  // Logs an error if the retrieval process fails.
   getFine(fineId:number){
     this.sanctionsService.getFineById(fineId)
     .subscribe(
@@ -59,16 +67,28 @@ export class PenaltiesModalFineComponent implements OnInit {
     });
   }
 
-  //Cambiar el estado de la multa segun lo que decide el consejo 
-  //acerca del descargo proporcionado por el usuario
+  // Initiates the process of changing the fine's state.
   
+  // Parameters:
+  // - state The desired state to which 
+  //   the fine should be changed. 
   
-
+  // Opens a modal to allow the user to 
+  // provide a reason for the state change.
   changeState(state:string) {
     this.openModalStateReason(state);
   }
 
   
+
+  // Opens a modal to update the reason for the fine's state change.
+  
+  // Parameters:
+  // - state: The state to which the 
+  //   fine's status will be updated.
+  
+  // Configures modal options, sets the fine ID and new state, and handles the result.
+  // Closes the main modal if the state change modal is confirmed.
   openModalStateReason(state:string) {
     const modal = this._modal.open(PenaltiesUpdateStateReasonModalComponent, {
       size: 'md',

@@ -26,7 +26,15 @@ export class PenaltiesModalStateReasonComponent {
     this.activeModal.close(); 
   }
 
-  //metodo para enviar
+
+  //This method is used to update
+  //the state of a complaint.
+
+  //Returns an alert if the 
+  //state was updated or not.
+
+  //Throws an error if the 
+  //state could not be updated.
   putComplaint(){
     const ComplaintDto:PutStateComplaintDto = {
       id: this.idComplaint,
@@ -34,7 +42,7 @@ export class PenaltiesModalStateReasonComponent {
       complaintState: this.complaintState,
       stateReason: this.reasonText
     };
-    // Envío de formulario solo después de la confirmación
+    // Sends the form only after confirmation.
     this.complaintService.putStateComplaint(this.idComplaint, ComplaintDto).subscribe( res => {
         Swal.fire({
           title: '¡Denuncia actualizada!',

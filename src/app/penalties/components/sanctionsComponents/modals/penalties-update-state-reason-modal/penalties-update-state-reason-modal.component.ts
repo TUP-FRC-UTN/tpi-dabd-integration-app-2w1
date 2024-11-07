@@ -20,14 +20,27 @@ export class PenaltiesUpdateStateReasonModalComponent {
 
   constructor(public activeModal: NgbActiveModal, 
     public sanctionService: PenaltiesSanctionsServicesService) {}
+
+
   ngOnInit(): void {
     console.log(this.id, this.fineState)
   }
+
+
   close() {
     this.activeModal.close(); 
   }
 
-  //metodo para enviar
+  // Sends the updated fine state to the server
+  //
+  // Builds a `fineDto` object with:
+  // - id: Fine ID to update
+  // - fineState: New state to be set
+  // - stateReason: Reason entered by user for the update
+  // - userId: ID of the user making the change
+  //
+  // If successful, refreshes the fine list and closes the modal.
+  // Shows an alert based on the response.
   putFine(){
     const fineDto:any = {
       id: this.id,
@@ -35,8 +48,15 @@ export class PenaltiesUpdateStateReasonModalComponent {
       stateReason: this.reasonText,
       userId: this.userId
     };
-    // Confirmación antes de enviar el formulario
-        // Envío de formulario solo después de la confirmación
+
+        // This method sends the 
+        // fine to the service.
+
+        // If the fine is sent correctly, 
+        // it will show a success message.
+        
+        // If the fine is not sent correctly, 
+        // it will show an error message.
         this.sanctionService.putStateFine(fineDto).subscribe( res => {
             Swal.fire({
               title: 'Multa actualizada!',

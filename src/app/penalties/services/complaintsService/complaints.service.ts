@@ -49,6 +49,13 @@ export class ComplaintService {
   }
 
 
+
+  //Gets the images by their id.
+  getFilesById(id: number): Observable<Map<string, string>> {
+    return this.http.get<Map<string, string>>(this.url + `/getFiles/${id}`);
+  }
+
+
   //Actualiza el estado de una denuncia
   putStateComplaint(idcomplaint: number, updatedData: PutStateComplaintDto): Observable<any> {
     const headers = new HttpHeaders({

@@ -52,8 +52,14 @@ export class PenaltiesPostComplaintComponent implements OnInit {
         pictures: this.files
       };
 
-      
-          // Envío de formulario solo después de la confirmación
+          // This method sends the 
+          // complaint to the service.
+
+          // If the complaint is sent correctly, 
+          // it will show a success message.
+          
+          // If the complaint is not sent correctly, 
+          // it will show an error message.
           this.complaintService.add(data).subscribe( res => {
               Swal.fire({
                 title: '¡Denuncia enviada!',
@@ -80,7 +86,15 @@ export class PenaltiesPostComplaintComponent implements OnInit {
   }
 
 
-  //Retorna una clase para poner el input en verde o rojo dependiendo si esta validado
+  //This method returns a class for the input.
+
+  // Param 'controlName'
+  // The name of the control.
+  // Param 'isValid' Whether the
+  // control is valid or not.
+
+  // Return The class to be applied 
+  // to the input (Green or red).
   onValidate(controlName: string) {
     const control = this.reactiveForm.get(controlName);
     return {
@@ -90,10 +104,20 @@ export class PenaltiesPostComplaintComponent implements OnInit {
   }
 
 
-  //Retorna el primer error encontrado para el input dentro de los posibles
+
+  //This method checks if there is an error in the input.
+
+  // Param 'controlName' The 
+  // name of the control.
+
+  // Returns an error message 
+  // based on the first found error.
+  // If no error is found, it 
+  // returns an empty string.
+
   showError(controlName: string) {
     const control = this.reactiveForm.get(controlName);
-    //Si encuentra un error retorna un mensaje describiendolo
+    
     if (control && control.errors) {
       const errorKey = Object.keys(control!.errors!)[0];
       switch (errorKey) {
@@ -130,7 +154,17 @@ export class PenaltiesPostComplaintComponent implements OnInit {
   }
 
 
-  //Carga de datos del service para el select (Propio del micro de multas)
+
+
+  // This method loads the data from the service
+  // for the select (Own of the fines microservice).
+
+  // If the data is loaded correctly, it will fill 
+  // the select with the data.
+
+  // If the data is not loaded correctly, 
+  // it will return an error.
+
   getTypes(): void {
     this.complaintService.getTypes().subscribe({
       next: (data) => {
@@ -146,7 +180,14 @@ export class PenaltiesPostComplaintComponent implements OnInit {
   }
 
 
-  //Formatea la fecha en yyyy-MM-dd para enviarla al input
+
+  // This method formats a date
+  // to send it to the input.
+
+  // Param 'date' The date to be formatted.
+
+  // Returns the date as a string in the format "yyyy-MM-dd".
+
   formatDate(date: Date): string {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -156,7 +197,9 @@ export class PenaltiesPostComplaintComponent implements OnInit {
   }
 
 
-  //Evento para actualizar el listado de files a los seleccionados actualmente
+  
+  // This method updates the list of 
+  // files to the currently selected ones.
   onFileChange(event: any) {
     this.files = Array.from(FileList = event.target.files); //Convertir FileList a Array
   }
