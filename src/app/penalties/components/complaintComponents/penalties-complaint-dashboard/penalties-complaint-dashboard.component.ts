@@ -146,7 +146,7 @@ export class PenaltiesComplaintDashboardComponent {
 
   private updatePieChart() {
     const complaintsByType = this.complaintsData.reduce((acc: any, complaint) => {
-      acc[complaint.complaintType] = (acc[complaint.complaintType] || 0) + 1;
+      acc[complaint.complaintReason] = (acc[complaint.complaintReason] || 0) + 1;
       return acc;
     }, {});
     this.pieChartData = Object.entries(complaintsByType)
