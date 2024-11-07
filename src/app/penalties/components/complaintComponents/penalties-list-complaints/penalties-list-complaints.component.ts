@@ -120,8 +120,8 @@ export class PenaltiesListComplaintComponent implements OnInit {
       ordering: true,
       lengthChange: true,
       order: [0, 'desc'],
-      lengthMenu: [10, 25, 50],
-      pageLength: 10,
+      lengthMenu: [5,10, 25, 50],
+      pageLength: 5,
       data: this.filterComplaint, //Fuente de datos
       //Columnas de la tabla
       columns: [

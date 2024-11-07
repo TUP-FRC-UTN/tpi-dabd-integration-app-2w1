@@ -118,8 +118,8 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
       ordering: true,
       lengthChange: true,
       order: [0, 'desc'],
-      lengthMenu: [10, 25, 50],
-      pageLength: 10,
+      lengthMenu: [5,10, 25, 50],
+      pageLength: 5,
       data: this.reportfilter, // Fuente de datos
       // Columnas de la tabla
       columns: [
