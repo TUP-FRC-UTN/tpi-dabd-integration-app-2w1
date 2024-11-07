@@ -32,9 +32,6 @@ import autoTable from 'jspdf-autotable';
   styleUrl: './penalties-list-sanctions.component.scss'
 })
 export class PenaltiesSanctionsListComponent implements OnInit {
-eraseFilters() {
-throw new Error('Method not implemented.');
-}
   //Variables
   sanctionsfilter: any[] = [];                    //
   sanctions: SanctionsDTO[] = [];                          //
@@ -57,7 +54,7 @@ throw new Error('Method not implemented.');
       this.refreshData();
     });
 
-    
+    this.getTypes()
     this.refreshData()
     //Esto es para acceder al metodo desde afuera del datatable
     const that = this; // para referenciar metodos afuera de la datatable
@@ -110,19 +107,7 @@ throw new Error('Method not implemented.');
     //   this.selectState(state, id, userId);
   }
 
-  //Combo de filtrado de estado
-  onFilter(event: Event) {
-    const selectedValue = (event.target as HTMLSelectElement).value;
 
-    this.sanctionsfilter = this.sanctions.filter(
-      (s) => s.fineState == selectedValue
-    );
-    if (selectedValue == '') {
-      this.sanctionsfilter = this.sanctions;
-    }
-
-    this.updateDataTable();
-  }
 
 
   ///////////////////////////////////////////////////////////////////////////////////////
@@ -297,29 +282,68 @@ throw new Error('Method not implemented.');
     }
   }
 
+  // Método para filtrar la tabla en base a las 2 fechas y estado
+filterData() {
+  let filteredComplaints = [...this.sanctions];  // Copiar los datos de las sanciones que no han sido filtradas aún
 
-  //Metodo para filtrar la tabla en base a las 2 fechas
-  filterDate() {
-    const startDate = this.filterDateStart ? new Date(this.filterDateStart) : null;
-    const endDate = this.filterDateEnd ? new Date(this.filterDateEnd) : null;
-
-    this.sanctionsfilter = this.sanctions.filter(item => {
-      const date = new Date(item.createdDate);
-
-      if (isNaN(date.getTime())) {
-        console.warn(`Fecha no valida: ${item.createdDate}`);
-        return false;
-      }
-
-      //Comprobar limites de fecha
-      const afterStartDate = !startDate || date >= startDate;
-      const beforeEndDate = !endDate || date <= endDate;
-
-      return afterStartDate && beforeEndDate; //Retorna verdadero solo si ambas condiciones se cumplen
-    });
-
-    this.updateDataTable();
+  // Filtrar por estado si se ha seleccionado alguno
+  if (this.selectedState) {
+    if (this.selectedState === 'Advertencia') {
+      // Filtrar por estado 'Advertencia' y por elementos con fineState == null
+      filteredComplaints = filteredComplaints.filter(
+        (c) => c.fineState === this.selectedState || c.fineState === null
+      );
+    } else {
+      // Filtrar por el estado seleccionado (no 'Advertencia')
+      filteredComplaints = filteredComplaints.filter(
+        (c) => c.fineState === this.selectedState
+      );
+    }
   }
+
+  // Filtrar por fecha si las fechas están definidas
+  const startDate = this.filterDateStart ? new Date(this.filterDateStart) : null;
+  const endDate = this.filterDateEnd ? new Date(this.filterDateEnd) : null;
+
+  filteredComplaints = filteredComplaints.filter((item) => {
+    const date = new Date(item.createdDate);
+    if (isNaN(date.getTime())) {
+      console.warn(`Fecha no válida: ${item.createdDate}`);
+      return false;
+    }
+
+    const afterStartDate = !startDate || date >= startDate;
+    const beforeEndDate = !endDate || date <= endDate;
+
+    return afterStartDate && beforeEndDate;
+  });
+
+  // Actualiza los datos filtrados en la tabla
+  this.sanctionsfilter = filteredComplaints;
+  this.updateDataTable(); // Llama a la función para actualizar la tabla
+}
+
+  
+  // Método para manejar la selección del estado
+  onFilter(event: Event) {
+    const selectedValue = (event.target as HTMLSelectElement).value;
+    this.selectedState = selectedValue; // Actualiza el valor del estado seleccionado
+    this.filterData(); // Aplica los filtros
+  }
+ 
+  
+  // Método para manejar el cambio de fechas
+  filterDate() {
+    this.filterData(); // Aplica los filtros de fecha y estado
+  }
+
+  eraseFilters(){
+    this.refreshData();
+    this.selectedState = '';
+    this.searchTerm = '';
+    this.resetDates();
+  }
+
 
 
   //ToDo: Esto esta desactualizado o son los de los informes (arreglar mas tarde)
@@ -389,7 +413,7 @@ throw new Error('Method not implemented.');
   }
   
   getTypes(): void {
-    this.sanctionService.getState().subscribe({
+    this.sanctionService.getStateFines().subscribe({
       next: (data) => {
         this.states = Object.keys(data).map(key => ({
           key,

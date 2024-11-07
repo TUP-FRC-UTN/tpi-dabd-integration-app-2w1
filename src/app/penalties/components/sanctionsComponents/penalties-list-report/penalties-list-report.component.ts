@@ -28,9 +28,6 @@ import autoTable from 'jspdf-autotable';
   styleUrl: './penalties-list-report.component.scss'
 })
 export class PenaltiesSanctionsReportListComponent implements OnInit {
-eraseFilters() {
-throw new Error('Method not implemented.');
-}
   //Variables
   report: ReportDTO[] = [];                       //
   reportfilter: ReportDTO[] = [];                 //
@@ -91,18 +88,18 @@ throw new Error('Method not implemented.');
 
 
   //Combo de filtrado de estado
-  onFilter(event: Event) {
-    const selectedValue = (event.target as HTMLSelectElement).value;
+  // onFilter(event: Event) {
+  //   const selectedValue = (event.target as HTMLSelectElement).value;
 
-    this.reportfilter = this.report.filter(
-      (c) => c.reportState == selectedValue
-    );
-    if (selectedValue == '') {
-      this.reportfilter = this.report;
-    }
+  //   this.reportfilter = this.report.filter(
+  //     (c) => c.reportState == selectedValue
+  //   );
+  //   if (selectedValue == '') {
+  //     this.reportfilter = this.report;
+  //   }
 
-    this.updateDataTable();
-  }
+  //   this.updateDataTable();
+  // }
 
 
   //Manejo del Datatable
@@ -232,26 +229,55 @@ throw new Error('Method not implemented.');
 
 
   //Metodo para filtrar la tabla en base a las 2 fechas
-  filterDate() {
+  filterData() {
+    let filteredComplaints = [...this.report];  // Copiar los datos de las que no han sido filtradas aún
+  
+    // Filtrar por estado si se ha seleccionado alguno
+    if (this.selectedState) {
+      filteredComplaints = filteredComplaints.filter(
+        (c) => c.reportState === this.selectedState
+      );
+    }
+  
+    // Filtrar por fecha si las fechas están definidas
     const startDate = this.filterDateStart ? new Date(this.filterDateStart) : null;
     const endDate = this.filterDateEnd ? new Date(this.filterDateEnd) : null;
-
-    this.reportfilter = this.report.filter(item => {
+  
+    filteredComplaints = filteredComplaints.filter((item) => {
       const date = new Date(item.createdDate);
-
       if (isNaN(date.getTime())) {
-        console.warn(`Fecha no valida: ${item.createdDate}`);
+        console.warn(`Fecha no válida: ${item.createdDate}`);
         return false;
       }
-
-      //Comprobar limites de fecha
+  
       const afterStartDate = !startDate || date >= startDate;
       const beforeEndDate = !endDate || date <= endDate;
-
-      return afterStartDate && beforeEndDate; //Retorna verdadero solo si ambas condiciones se cumplen
+  
+      return afterStartDate && beforeEndDate;
     });
+  
+    // Actualiza los datos de la tabla
+    this.reportfilter = filteredComplaints;
+    this.updateDataTable(); // Llama a la función para actualizar la tabla
+  }
+  
+  // Método para manejar la selección del estado
+  onFilter(event: Event) {
+    const selectedValue = (event.target as HTMLSelectElement).value;
+    this.selectedState = selectedValue; // Actualiza el valor del estado seleccionado
+    this.filterData(); // Aplica los filtros
+  }
+  
+  // Método para manejar el cambio de fechas
+  filterDate() {
+    this.filterData(); // Aplica los filtros de fecha y estado
+  }
 
-    this.updateDataTable();
+  eraseFilters(){
+    this.refreshData();
+    this.selectedState = '';
+    this.searchTerm = '';
+    this.resetDates();
   }
 
 
