@@ -114,14 +114,14 @@ export class RoutingService {
           route: "main/sanctions/report-list",
           roles: ["SuperAdmin", "Gerente general", "Gerente multas"]
         },
-        {
-          //Listado de motivos de infracciones
-          icon: "bi-slash-circle",
-          name: "Motivos",
-          title: "Listado de Motivos",
-          route: "main/sanctions/report-list",
-          roles: ["SuperAdmin", "Gerente general", "Gerente multas"]
-        }
+        // {
+        //   //Listado de motivos de infracciones
+        //   icon: "bi-slash-circle",
+        //   name: "Motivos",
+        //   title: "Listado de Motivos",
+        //   route: "main/sanctions/report-list",
+        //   roles: ["SuperAdmin", "Gerente general", "Gerente multas"]
+        // }
       ]
     },
     ///////////////////////////////////////////////////////////////////////////////
