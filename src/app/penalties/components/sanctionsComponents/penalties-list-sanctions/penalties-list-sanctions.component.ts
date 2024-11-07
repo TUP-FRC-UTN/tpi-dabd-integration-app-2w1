@@ -78,12 +78,15 @@ export class PenaltiesSanctionsListComponent implements OnInit {
     this.resetDates()
   }
 
-  resetDates(){
+  resetDates() {
     const today = new Date();
+    today.setDate(today.getDate() + 1); 
     this.filterDateEnd = this.formatDateToString(today);
-
+  
     const previousMonthDate = new Date();
     previousMonthDate.setMonth(previousMonthDate.getMonth() - 1);
+    previousMonthDate.setDate(1); 
+    previousMonthDate.setDate(previousMonthDate.getDate() + 1); 
     this.filterDateStart = this.formatDateToString(previousMonthDate);
   }
 

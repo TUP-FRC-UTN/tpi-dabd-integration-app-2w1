@@ -66,12 +66,15 @@ export class PenaltiesListComplaintComponent implements OnInit {
   private formatDateToString(date: Date): string {
     return date.toISOString().split('T')[0];
   }
-  resetDates(){
+  resetDates() {
     const today = new Date();
+    today.setDate(today.getDate() + 1); 
     this.filterDateEnd = this.formatDateToString(today);
-
+  
     const previousMonthDate = new Date();
     previousMonthDate.setMonth(previousMonthDate.getMonth() - 1);
+    previousMonthDate.setDate(1); 
+    previousMonthDate.setDate(previousMonthDate.getDate() + 1); 
     this.filterDateStart = this.formatDateToString(previousMonthDate);
   }
 

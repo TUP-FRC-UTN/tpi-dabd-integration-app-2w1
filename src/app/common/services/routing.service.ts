@@ -86,7 +86,7 @@ export class RoutingService {
           //Denuncias
           icon: "bi-envelope-plus-fill",
           name: "Denunciar",
-          title: "Nueva denuncia",
+          title: "Registrar Denuncia",
           route: "main/complaints/post-complaint",
           roles: ["SuperAdmin", "Propietario", "Inquilino"]
         },
@@ -94,15 +94,15 @@ export class RoutingService {
           //botón listado denuncia
           icon: "bi-envelope-paper-fill",
           name: "Denuncias",
-          title: "Listado de denuncias",
+          title: "Listado de Denuncias",
           route: "main/complaints/list-complaint",
           roles: ["SuperAdmin", "Gerente general", "Gerente multas"]
         },
         {
           //Listado multas y advertencias
           icon: "bi-receipt",
-          name: "Infracciones",
-          title: "Listado de infracciones",
+          name: "Multas/Advertencias",
+          title: "Listado de Multas y Advertencias",
           route: "main/sanctions/sanctions-list",
           roles: ["SuperAdmin", "Gerente general", "Gerente multas", "Propietario", "Inquilino"]
         },
@@ -110,7 +110,7 @@ export class RoutingService {
           //Listado Informes
           icon: "bi-clipboard2-fill",
           name: "Informes",
-          title: "Listado de informes",
+          title: "Listado de Informes",
           route: "main/sanctions/report-list",
           roles: ["SuperAdmin", "Gerente general", "Gerente multas"]
         },
@@ -118,7 +118,7 @@ export class RoutingService {
           //Listado de motivos de infracciones
           icon: "bi-slash-circle",
           name: "Motivos",
-          title: "Listado de motivos",
+          title: "Listado de Motivos",
           route: "main/sanctions/report-list",
           roles: ["SuperAdmin", "Gerente general", "Gerente multas"]
         }
@@ -138,14 +138,14 @@ export class RoutingService {
       //Boton General para el Administrador (padre)
       icon: "bi-person-gear",
       name: "Gastos",
-      title: "Gestion de gastos",
+      title: "Gestion de Gastos",
       roles: ["SuperAdmin", "Gerente general", "Gerente finanzas"],
       childButtons: [
         {
           //botón Listar Gastos para el Administrador
           icon: "bi-receipt-cutoff",
           name: "Listado",
-          title: "Listado de gastos",
+          title: "Listado de Gastos",
           route: "main/expenses/view-expense-admin",
           roles: ["SuperAdmin", "Gerente general", "Gerente finanzas"]
         },
@@ -153,7 +153,7 @@ export class RoutingService {
           //botón Lista Categoria de Gastos
           icon: "bi-list-task",
           name: "Categorias",
-          title: "Gestion categoria gastos",
+          title: "Gestion Categoria gastos",
           route: "main/expenses/view-category",
           roles: ["SuperAdmin", "Gerente general", "Gerente finanzas"]
         },
@@ -172,14 +172,14 @@ export class RoutingService {
     {
       icon: "bi-wallet",
       name: "Boletas",
-      title: "Mis boletas (owner)",
+      title: "Mis Boletas (owner)",
       route: "main/invoices/expense-generation-user-view",
       roles: ["SuperAdmin", "Propietario", "Inquilino"],
     },
     {
       icon: "bi-person-lines-fill",
       name: "Boletas",
-      title: "Lista de boletas (Gerente)",
+      title: "Lista de Boletas (Gerente)",
       route: "main/invoices/expense-generation-admin-view",
       roles: ["SuperAdmin", "Gerente general", "Gerente finanzas"],
     },
@@ -201,28 +201,28 @@ export class RoutingService {
         {
           icon: "bi-inboxes-fill",
           name: "Productos",
-          title: "Listado de productos",
+          title: "Listado de Productos",
           roles: ["SuperAdmin", "Gerente general", "Gerente inventario"],
           route: "main/inventories/inventory",
         },
         {
           icon: "bi-arrow-down-up",
           name: "Historial",
-          title: "Historial de stock",
+          title: "Historial de Stock",
           route: "main/inventories/stock-movements-history",
           roles: ["SuperAdmin", "Gerente general", "Gerente inventario"]
         },
         {
           icon: "bi-arrow-left-right",
           name: "Movimientos",
-          title: "Movimientos de inventario",
+          title: "Movimientos de Inventario",
           route: "main/inventories/warehouse-movements",
           roles: ["SuperAdmin", "Gerente general", "Gerente inventario"]
         },
         {
           icon: "bi-truck",
           name: "Proveedores",
-          title: "Listado de proveedores",
+          title: "Listado de Proveedores",
           route: "main/providers/suppliers",
           roles: ["SuperAdmin", "Gerente general", "Gerente inventario"]
         },
@@ -230,7 +230,7 @@ export class RoutingService {
         {
           icon: "bi-tags-fill",
           name: "Categorias",
-          title: "Cateogorías de productos",
+          title: "Cateogorías de Productos",
           route: "main/inventories/categories-list",
           roles: ["SuperAdmin", "Gerente general", "Gerente inventario"]
         }
@@ -245,21 +245,21 @@ export class RoutingService {
         {
           icon: "bi-person-lines-fill",
           name: "Listado",
-          title: "Listado de empleados",
+          title: "Listado de Empleados",
           route: "main/employees/employees",
           roles: ["SuperAdmin", "Gerente general", "Gerente empleados"]
         },
         {
           icon: "bi-card-checklist",
           name: "Desempeño",
-          title: "Historial de desempeño",
+          title: "Historial de Desempeño",
           route: "main/employees/performance",
           roles: ["SuperAdmin", "Gerente general", "Gerente empleados"]
         },
         {
           icon: "bi-person-badge-fill",
           name: "Cargos",
-          title: "Cargos de empleados",
+          title: "Cargos de Empleados",
           route: "main/employees/charges",
           roles: ["SuperAdmin", "Gerente general", "Gerente empleados"]
         }
