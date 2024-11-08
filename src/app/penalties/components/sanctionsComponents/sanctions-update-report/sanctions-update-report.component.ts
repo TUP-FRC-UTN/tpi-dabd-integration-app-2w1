@@ -6,6 +6,7 @@ import { ComplaintService } from '../../../services/complaintsService/complaints
 import { PenaltiesSanctionsServicesService } from '../../../services/sanctionsService/sanctions.service';
 import { ModalComplaintsListComponent } from '../../complaintComponents/modals/penalties-list-complaints-modal/penalties-list-complaints-modal.component';
 import { RoutingService } from '../../../../common/services/routing.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-report-modify',
@@ -82,31 +83,18 @@ export class ReportModifyComponent implements OnInit {
       complaintsIds: complaintsIds,
     };
 
-    (window as any).Swal.fire({
-      title: '¿Estás seguro?',
-      text: "¿Deseas confirmar la actualización del informe?",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Confirmar',
-      cancelButtonText: 'Cancelar',
-      customClass: {
-        confirmButton: 'btn btn-success',
-        cancelButton: 'btn btn-danger'
-      },
-    }).then((result: any) => {
-      if (result.isConfirmed) {
         this.reportService.updateReport(reportDTO).subscribe(res => {
-          (window as any).Swal.fire({
+          Swal.fire({
             title: '¡Actualización exitosa!',
             text: 'El informe ha sido actualizado correctamente.',
             icon: 'success',
             timer: 1500,
             showConfirmButton: false
           });
-          this.routingService.redirect("main/penalties/sanctions/report-list", "Listado de Informes")
+          this.routingService.redirect("main/sanctions/report-list", "Listado de Informes")
         }, error => {
           console.error('Error al actualizar el informe', error);
-          (window as any).Swal.fire({
+          Swal.fire({
             title: 'Error',
             text: 'No se pudo actualizar el informe. Inténtalo de nuevo.',
             icon: 'error',
@@ -114,10 +102,8 @@ export class ReportModifyComponent implements OnInit {
           });
         });
       }
-    });
-  }
   cancel(){
-    this.routingService.redirect("main/penalties/sanctions/report-list", "Listado de Informes")
+    this.routingService.redirect("main/sanctions/report-list", "Listado de Informes")
   }
 
   openModal(): void {

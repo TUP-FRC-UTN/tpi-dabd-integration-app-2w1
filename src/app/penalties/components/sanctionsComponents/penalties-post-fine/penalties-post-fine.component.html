@@ -1,7 +1,5 @@
 <section class="py-5">
   <div class="container p-3 border border-2 rounded shadow-lg">
-    <h2 class="text-start">Generar Nueva Infracción</h2>
-    <hr />
 
     <form #formPostFine="ngForm" (ngSubmit)="onSubmit()" novalidate>
       <div class="container pe-5">
@@ -18,39 +16,14 @@
                   <!-- Input redondeado en la izquierda -->
                   <input
                     type="text"
-                    class="form-control rounded-start"
+                    class="form-control rounded"
                     [value]="report?.plotId"
                     disabled
-                  />
-            
-                  <!-- Icono redondeado en la derecha -->
-                  <span class="input-group-text bg-body-secondary rounded-end">
-                    <i class="bi bi-lock"></i>
-                  </span>
-            
+                  />          
                   <!-- Botón con espacio y bordes redondeados -->
                   <button type="button" class="btn btn-info rounded ms-3">
                     Ver más
                   </button>
-                </div>
-              </div>
-            </div>
-            
-            
-
-            <div class="col d-flex">
-              <!-- Input fecha -->
-              <div class="offset-7 mb-3">
-                <div class="row">
-                  <label class="col-2 col-form-label">Fecha</label>
-                  <div class="col-10">
-                    <input
-                      type="datetime-local"
-                      class="form-control"
-                      [value]="report?.createdDate"
-                      disabled
-                    />
-                  </div>
                 </div>
               </div>
             </div>
@@ -75,7 +48,7 @@
             <div class="row ms-auto m-2">
               <div class="col">
                 <label for="reportReason" class="me-2"
-                  >Tipo de Infracción:
+                  >Tipo de Infracción
                 </label>
               </div>
               <div class="col d-flex">
@@ -113,7 +86,7 @@
           <!-- Input Descripcion -->
           <div class="col-lg-12 mb-3">
             <div class="row">
-              <label class="col-2 col-lg-1 col-form-label">Descripcion</label>
+              <label class="col-2 col-lg-1 col-form-label">Descripción</label>
               <div class="col-10 col-lg-11">
                 <textarea
                   class="form-control"
@@ -129,9 +102,8 @@
 
         <div class="clearfix mt-2">
           <div class="float-end d-flex">
-            <label *ngIf="newFine" for="" class="me-2 mt-3">Importe:</label>
+            <label *ngIf="newFine" for="" class="me-2 mt-3">Importe</label>
             <div *ngIf="newFine" class="input-group mt-2 mb-3">
-              <span class="input-group-text" id="basic-addon1">$</span>
               <input
                 type="number"
                 class="form-control text-end"
@@ -165,7 +137,12 @@
           <div class="col d-flex justify-content-end gap-3">
               <button type="button" class="btn btn-secondary me-3"
                   (click)="cancel()">Cancelar</button>
-              <button type="submit" class="btn btn-success" [disabled]="formPostFine.invalid">Registrar</button>
+                <button 
+                  type="submit" 
+                  class="btn btn-success" 
+                  [disabled]="formPostFine.invalid || (newFine && newAmount === 0)">
+                Registrar
+              </button>
           </div>
       </div>
 

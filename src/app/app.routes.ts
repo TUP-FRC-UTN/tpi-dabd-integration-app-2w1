@@ -50,8 +50,12 @@ export const routes: Routes = [
                 loadChildren: () => import("./inventories/inventory.routes").then((m) => m.INVENTORY_ROUTES)
             },
             {
-                path: 'penalties',
-                loadChildren: () => import("./penalties/penalty.routes").then((m) => m.PENALTY_ROUTES)
+                path: 'complaints',
+                loadChildren: () => import("./penalties/complaint.routes").then((m) => m.COMPLAINT_ROUTES)
+            },
+            {
+                path: 'sanctions',
+                loadChildren: () => import("./penalties/sanction.routes").then((m) => m.SANCTION_ROUTES)
             },
             {
                 path: 'notifications',

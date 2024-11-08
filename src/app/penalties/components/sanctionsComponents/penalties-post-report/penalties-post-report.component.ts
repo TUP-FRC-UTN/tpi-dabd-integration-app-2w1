@@ -6,7 +6,6 @@ import { PostReportDTO } from '../../../models/PostReportDTO';
 import { ReportReasonDto } from '../../../models/ReportReasonDTO';
 import { ReportService } from '../../../services/report.service';
 import { error } from 'jquery';
-import { routes } from '../sanctionRouting.routing';
 import { ModalComplaintsListComponent } from '../../complaintComponents/modals/penalties-list-complaints-modal/penalties-list-complaints-modal.component';
 import { RoutingService } from '../../../../common/services/routing.service';
 import Swal from 'sweetalert2';
@@ -93,7 +92,7 @@ export class NewReportComponent {
             timer: 1500,
             showConfirmButton: false
           });
-          this.routingService.redirect("main/penalties/sanctions/report-list", "Listado de Informes")
+          this.routingService.redirect("main/sanctions/report-list", "Listado de Informes")
         },
         error: (error) => {
           console.error('Error al enviar la denuncia', error);
@@ -108,7 +107,7 @@ export class NewReportComponent {
   }
 
   cancel(){
-    this.routingService.redirect("main/penalties/sanctions/report-list/", "Listado de Informes")
+    this.routingService.redirect("main/sanctions/report-list/", "Listado de Informes")
   }
 
   validateParams(): boolean {

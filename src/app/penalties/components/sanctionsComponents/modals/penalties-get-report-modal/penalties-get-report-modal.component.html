@@ -8,33 +8,48 @@
     <h5>Información del Informe</h5>
       <div class="row mb-3">
           <div class="col-md-6">
-              <p><strong>Motivo:</strong> {{ report?.reportReason.reportReason || 'N/A' }}</p>
-              <p><strong>Fecha:</strong> {{ report?.createdDate || 'N/A' }}</p>
+              <p><strong>Motivo</strong> {{ report?.reportReason.reportReason || 'N/A' }}</p>
+              <p><strong>Fecha</strong> {{ report?.createdDate | date:"dd/MM/yyyy" || 'N/A' }}</p>
           </div>
       
           <div class="col-md-6">
-              <p><strong>Descripcion:</strong> {{ report?.description || 'N/A' }}</p>
+              <p><strong>Descripción</strong> {{ report?.description || 'N/A' }}</p>
           </div>
       </div>
       <hr>
-      <h5>Denuncias</h5>
-        <div class="row mb-3">
-          @for(complaint of report?.complaints; track $index){
-            <div class="col-md-6">
-              <p><strong>Denuncia {{ $index + 1 || 'N/A' }}:</strong></p>
-              <p><strong>Tipo:</strong> {{ complaint?.complaintType || 'N/A' }}</p>
-              <p><strong>Descripción:</strong> {{ complaint?.description || 'N/A' }}</p>
-              <p><strong>Fecha:</strong> {{ report?.createdDate || 'N/A' }}</p>
-          </div>
-          }
-        </div>
 
+        <h5>Denuncias</h5>
+        <div class="overflow-auto" style="max-height: 300px;">
+        <table class="table table-bordered">
+
+            <thead>
+                <tr>
+                  <th>Descripción</th>
+                  <th>Tipo de Denuncia</th>
+                  <th>Estado</th>
+                  <th>Fecha</th>
+                </tr>
+            </thead>
+            <tbody>  
+              @for(complaint of report?.complaints; track $index){
+                <tr>
+                    <td>{{ complaint.description }}</td>
+                    <td>{{ complaint.complaintReason }}</td>
+                    <td>{{ complaint.complaintState }}</td>
+                    <td>{{ complaint.createdDate | date:"dd/MM/yyyy" }}</td>
+                </tr>
+              
+              }
+            
+            </tbody>
+        </table>
+      </div>
         <hr>
         <h5>Estado de la Multa</h5>
       <div class="row mb-3">
           <div class="col-md-6">
-              <p><strong>Estado:</strong> {{ report?.reportState || 'N/A' }}</p>
-              <p><strong>Razon</strong> {{ report?.stateReason || 'N/A' }}</p>
+              <p><strong>Estado</strong> {{ report?.reportState || 'N/A' }}</p>
+              <p><strong>Razón</strong> {{ report?.stateReason || 'N/A' }}</p>
           </div>
       </div>
 

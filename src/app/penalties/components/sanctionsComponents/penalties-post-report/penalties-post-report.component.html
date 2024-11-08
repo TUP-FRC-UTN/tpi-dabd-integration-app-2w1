@@ -19,12 +19,6 @@
                     </div>
                     }
                 </div>
-
-                <div class="input-box">
-                    <label for="dateInput" class="form-label">Fecha</label>
-                    <input type="date" id="dateInput" name="dateInput" class="form-control bg-body-secondary"
-                        [(ngModel)]="dateView" #dateField="ngModel" disabled>
-                </div>
             </div>
 
             <div class="input-box d-flex flex-column gap-2 mb-4">
@@ -60,10 +54,10 @@
             </div>
             <div class="submit-box d-flex justify-content-end">
                 <button type="button" class="btn btn-secondary me-3" (click)="cancel()">Cancelar</button>
-                <button type="submit" class="btn btn-success" [disabled]="formDenuncia.invalid">Crear</button>
+                <button type="submit" class="btn btn-success" [disabled]="formDenuncia.invalid">Registrar</button>
             </div>
         </form>
     </div>
 </div>
 
-<app-modal-complaints-list (selectedComplaints)="handleSelectedComplaints($event)"></app-modal-complaints-list>
+<app-modal-complaints-list (selectedComplaints)="handleSelectedComplaints($event)" [formType]="'add'"></app-modal-complaints-list>

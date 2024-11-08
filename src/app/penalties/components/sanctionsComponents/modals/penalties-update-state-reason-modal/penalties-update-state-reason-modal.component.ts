@@ -20,14 +20,27 @@ export class PenaltiesUpdateStateReasonModalComponent {
 
   constructor(public activeModal: NgbActiveModal, 
     public sanctionService: PenaltiesSanctionsServicesService) {}
+
+
   ngOnInit(): void {
     console.log(this.id, this.fineState)
   }
+
+
   close() {
     this.activeModal.close(); 
   }
 
-  //metodo para enviar
+  // Sends the updated fine state to the server
+  //
+  // Builds a `fineDto` object with:
+  // - id: Fine ID to update
+  // - fineState: New state to be set
+  // - stateReason: Reason entered by user for the update
+  // - userId: ID of the user making the change
+  //
+  // If successful, refreshes the fine list and closes the modal.
+  // Shows an alert based on the response.
   putFine(){
     const fineDto:any = {
       id: this.id,
@@ -35,21 +48,15 @@ export class PenaltiesUpdateStateReasonModalComponent {
       stateReason: this.reasonText,
       userId: this.userId
     };
-    // Confirmación antes de enviar el formulario
-    Swal.fire({
-      title: '¿Estás seguro?',
-      text: "¿Deseas confirmar la actualización de la multa?",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Confirmar',
-      cancelButtonText: 'Cancelar',
-      customClass: {
-        confirmButton: 'btn btn-success',
-        cancelButton: 'btn btn-danger'
-      },
-    }).then((result: any) => {
-      if (result.isConfirmed) {
-        // Envío de formulario solo después de la confirmación
+
+        // This method sends the 
+        // fine to the service.
+
+        // If the fine is sent correctly, 
+        // it will show a success message.
+        
+        // If the fine is not sent correctly, 
+        // it will show an error message.
         this.sanctionService.putStateFine(fineDto).subscribe( res => {
             Swal.fire({
               title: 'Multa actualizada!',
@@ -59,6 +66,7 @@ export class PenaltiesUpdateStateReasonModalComponent {
               showConfirmButton: false
               
             });
+            this.sanctionService.triggerRefresh();
             this.close();
           }, error => {
             console.error('Error al enviar la multa', error);
@@ -69,8 +77,7 @@ export class PenaltiesUpdateStateReasonModalComponent {
               confirmButtonText: 'Aceptar'
             });
           })
-        };
-      });
+
     
   }
 }

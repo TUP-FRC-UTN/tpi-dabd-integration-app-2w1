@@ -17,7 +17,7 @@ export class PenaltiesPostFineComponent implements OnInit {
 
 
   report:any
-
+  formattedDate: any;
 
   //tengo que llamar al microservicio de usuario para traer el plot usando el plot Id
   @Input() reportDto:ReportDTO={
@@ -58,6 +58,8 @@ export class PenaltiesPostFineComponent implements OnInit {
       (response) => {
         //console.log(response); 
         this.report = response
+        const createdDate = this.report?.createdDate;
+        this.formattedDate = new Date(createdDate).toISOString().split('T')[0];
       },
       (error) => {
         console.error('Error:', error);
@@ -90,19 +92,6 @@ export class PenaltiesPostFineComponent implements OnInit {
         createdUser: 1
       };
 
-      Swal.fire({
-        title: '¿Estás seguro?',
-        text: "¿Deseas confirmar el envío de la multa?",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Confirmar',
-        cancelButtonText: 'Cancelar',
-        customClass: {
-          confirmButton: 'btn btn-success',
-          cancelButton: 'btn btn-danger'
-        },
-      }).then((result: any) => {
-        if (result.isConfirmed) {
           // Envío de formulario solo después de la confirmación
           this.penaltiesService.postFine(fineData).subscribe( res => {
               Swal.fire({
@@ -112,7 +101,7 @@ export class PenaltiesPostFineComponent implements OnInit {
                 timer: 1500,
                 showConfirmButton: false
               });
-              this.routingService.redirect("main/penalties/sanctions/sanctions-list", "Listado de Infracciones")
+              this.routingService.redirect("main/sanctions/sanctions-list", "Listado de Infracciones")
             }, error => {
               console.error('Error al actualizar la multa', error);
               Swal.fire({
@@ -122,33 +111,40 @@ export class PenaltiesPostFineComponent implements OnInit {
                 confirmButtonText: 'Aceptar'
               });
             })
-          };
-        });
-    }
+          }
+
     else{
 
       const warningData = {
         reportId: 1,
         createdUser: 1
       };
-        //SWEET ALERT!!!
-      this.penaltiesService.postWarning(warningData).subscribe({
-        next: (response) => {
-          
-          console.log('Advertencia enviada correctamente', response);
-          this.router.navigate(['home/sanctions/sanctionsList']);
-        },
-        error: (error) => {
-          console.error('Error al enviar la Advertencia', error);
-        }
-      });
 
-    }
-      
-  }
+
+            // Envío de formulario solo después de la confirmación
+            this.penaltiesService.postWarning(warningData).subscribe( res => {
+                Swal.fire({
+                  title: '¡Advertencia enviada!',
+                  text: 'La advertencia ha sido enviada correctamente.',
+                  icon: 'success',
+                  timer: 1500,
+                  showConfirmButton: false
+                });
+                this.routingService.redirect("main/sanctions/sanctions-list", "Listado de Infracciones")
+              }, error => {
+                console.error('Error al enviar la advertencia', error);
+                Swal.fire({
+                  title: 'Error',
+                  text: 'No se pudo enviar la advertencia. Inténtalo de nuevo.',
+                  icon: 'error',
+                  confirmButtonText: 'Aceptar'
+                });
+              })
+            };     
+      }
 
   cancel(){
-    this.routingService.redirect("main/penalties/sanctions/report-list", "Listado de Informes")
+    this.routingService.redirect("main/sanctions/report-list", "Listado de Informes")
   }
 
 }

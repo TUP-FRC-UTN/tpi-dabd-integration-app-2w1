@@ -53,19 +53,7 @@ export class PenaltiesUpdateFineComponent implements OnInit {
       userId: 10
     };
     //Envio de formulario
-    Swal.fire({
-      title: '¿Estás seguro?',
-      text: "¿Deseas confirmar la actualización de la multa?",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Confirmar',
-      cancelButtonText: 'Cancelar',
-      customClass: {
-        confirmButton: 'btn btn-success',
-        cancelButton: 'btn btn-danger'
-      },
-    }).then((result: any) => {
-      if (result.isConfirmed) {
+
         // Envío de formulario solo después de la confirmación
         this.penaltiesService.updateFine(fineData).subscribe( res => {
             Swal.fire({
@@ -75,7 +63,7 @@ export class PenaltiesUpdateFineComponent implements OnInit {
               timer: 1500,
               showConfirmButton: false
             });
-            this.routingService.redirect("main/penalties/sanctions/sanctions-list", "Listado de Infracciones")
+            this.routingService.redirect("main/sanctions/sanctions-list", "Listado de Infracciones")
           }, error => {
             console.error('Error al actualizar la multa', error);
             Swal.fire({
@@ -86,11 +74,9 @@ export class PenaltiesUpdateFineComponent implements OnInit {
             });
           })
         };
-      });
-  }
 
   cancel(){
-    this.routingService.redirect("main/penalties/sanctions/sanctions-list", "Listado de Infracciones")
+    this.routingService.redirect("main/sanctions/sanctions-list", "Listado de Infracciones")
   }
   //Retorna una clase para poner el input en verde o rojo dependiendo si esta validado
   onValidate(controlName: string) {

@@ -1,6 +1,8 @@
 <div class="modal-content border border-2">
   <div class="modal-header">
-    <h1 class="modal-title fs-5" id="complaintModal">Multa</h1>
+    <h1 class="modal-title fs-5" id="complaintModal">Multa <i
+      class="bi bi-question-circle ms-2" data-bs-toggle="tooltip" data-bs-placement="right"
+      [title]="tooltipTitle"></i> </h1>
     <button type="button" class="btn-close" (click)="close()"></button>
   </div>
   <div class="modal-body">
@@ -8,19 +10,19 @@
     <h5>Información de la Multa</h5>
     <div class="row mb-3">
         <div class="col-md-6">
-            <p><strong>Motivo:</strong> {{ fine?.report.reportReason.reportReason || 'N/A' }}</p>
-            <p><strong>Fecha:</strong> {{ fine?.createdDate || 'N/A' }}</p>
+            <p><strong>Motivo</strong> {{ fine?.report.reportReason.reportReason || 'N/A' }}</p>
+            <p><strong>Fecha</strong> {{ fine?.createdDate | date:"dd/MM/yyyy" || 'N/A' }}</p>
         </div>
     
         <div class="col-md-6">
-            <p><strong>Descripcion:</strong> {{ fine?.report.description || 'N/A' }}</p>
+            <p><strong>Descripción</strong> {{ fine?.report.description || 'N/A' }}</p>
         </div>
     </div>
     <hr>
     <h5>Descargo</h5>
       <div class="row mb-3">
           <div class="col-md-6">
-              <p><strong>Motivo:</strong> {{ fine?.disclaimer || 'N/A' }}</p>
+              <p><strong>Motivo</strong> {{ fine?.disclaimer || 'N/A' }}</p>
           </div>
           <div class="col-md-6">
               <!--Si la multa esta apelada muestra la opcion de aceptar o rechazar el mismo-->
@@ -53,8 +55,8 @@
       <h5>Estado de la Multa</h5>
     <div class="row mb-3">
         <div class="col-md-6">
-            <p><strong>Estado:</strong> {{ fine?.fineState || 'N/A' }}</p>
-            <p><strong>Razon</strong> {{ fine?.stateReason || 'N/A' }}</p>
+            <p><strong>Estado</strong> {{ fine?.fineState || 'N/A' }}</p>
+            <p><strong>Razón</strong> {{ fine?.stateReason || 'N/A' }}</p>
         </div>
     </div>
     

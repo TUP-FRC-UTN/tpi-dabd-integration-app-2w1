@@ -1,26 +1,38 @@
-<div class="modal-content border border-2">
-    <div class="modal-header">
-      <h1 class="modal-title fs-5" id="complaintModal">MOTIVO DE CAMBIO DE ESTADO</h1>
-      <button type="button" class="btn-close" (click)="close()"></button>
-    </div>
-    <div class="modal-body">
-      <div class="row">
+<div class="modal-content">
+  <div class="modal-header">
+    <h5 class="modal-title">Confirmación</h5>
+  </div>
   
-        <!-- Input Descripcion -->
-        <div class="col mb-3">
-          <div class="row">
-            <label class="col-3 col-form-label">Descripcion</label>
-            <div class="col-9">
-              <textarea class="form-control" rows="3" style="resize: none;" [(ngModel)]="reasonText"></textarea>
-            </div>
-          </div>
-        </div>
-  
+  <div class="modal-body">
+    <p class="mb-4">¿Está seguro?</p>
+    
+    <div class="row align-items-center">
+      <label for="justification" class="col-3 form-label mb-0">Justificación</label>
+      <div class="col-9">
+        <textarea 
+          id="justification"
+          class="form-control"
+          rows="3"
+          [(ngModel)]="reasonText"
+        ></textarea>
       </div>
-  
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-success" (click)="putFine()">Confirmar</button>
-      <button type="button" class="btn btn-danger" (click)="close()">Cancelar</button>
     </div>
   </div>
+
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="btn btn-primary"
+      (click)="putFine()"
+    >
+      Guardar
+    </button>
+    <button
+      type="button"
+      class="btn btn-secondary"
+      (click)="close()"
+    >
+      Cancelar
+    </button>
+  </div>
+</div>

@@ -26,9 +26,20 @@ export class PenaltiesModalReportComponent implements OnInit{
     this.getReport()
     //alert(this.data.createdDate) 
   }
+
+
   close(){
     this.activeModal.close()
   }
+
+
+  // Fetches the report details using the provided ID.
+  
+  // This method calls `getById()` on the injected service with the specified ID
+  // and subscribes to handle the response. On success, it assigns the response to `report`
+  // and formats the date using the service's `formatDate()` method.
+  
+  // In case of an error, it logs an error message in the console.
   getReport(){
     this.service.getById(this.id)
     .subscribe(
