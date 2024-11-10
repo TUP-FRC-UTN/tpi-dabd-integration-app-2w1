@@ -30,18 +30,40 @@ export class PenaltiesFineDashboardComponent {
   lineChartType = ChartType.LineChart;
   columnChartType = ChartType.ColumnChart;
 
+  // pieChartOptions = {
+  //   backgroundColor: 'transparent',
+  //   colors: ['#8A2BE2', '#00BFFF', '#FF4500', '#32CD32'],
+  //   legend: {
+  //     position: 'right',
+  //     textStyle: { color: '#000000', fontSize: 17 },  // Cambiado a negro
+  //   },
+  //   pieSliceTextStyle: { color: '#000000' }, // Texto dentro de las porciones en negro
+  //   chartArea: { width: '80%', height: '80%' },
+  //   pieHole: 0.7,
+  //   height: '80%',
+  //   title: 'Distribución de Tipos de Multas'
+  // };
   pieChartOptions = {
     backgroundColor: 'transparent',
-    colors: ['#8A2BE2', '#00BFFF', '#FF4500', '#32CD32'],
+    
     legend: {
       position: 'right',
-      textStyle: { color: '#000000', fontSize: 17 },  // Cambiado a negro
+      textStyle: { color: '#6c757d', fontSize: 17 }
     },
-    pieSliceTextStyle: { color: '#000000' }, // Texto dentro de las porciones en negro
-    chartArea: { width: '80%', height: '80%' },
-    pieHole: 0.7,
+    chartArea: { width: '100%', height: '100%' },
+    pieHole: 0,
     height: '80%',
-    title: 'Distribución de Tipos de Multas'
+    slices: {
+      0: { color: '#8A2BE2' },  // MP siempre azul
+      1: { color: '#00BFFF' },  // STRIPE siempre violeta
+      2: { color: '#FF4500' },
+      3:{color:'#32CD32'},
+      4:{color:'#666666'}   // EFECTIVO siempre verde
+    },
+    pieSliceTextStyle: {
+      color: 'black',
+      fontSize: 16
+    }
   };
 
   lineChartOptions = {
