@@ -401,7 +401,7 @@
               </div>
               <div class="badge bg-success px-3 py-2">
                 Promedio de multas por período:
-                {{ averageFinesPerMonth | number : "1.1-1" }}%
+                {{ averageFinesPerMonth | number : "1.1-1" }}
               </div>
             </div>
             <google-chart
@@ -497,9 +497,21 @@
         (click)="makeBig(1)"
       >
         <div class="card-body">
-          <div class="text-center">
-            <h5 class="card-title text-secondary mb-1">Comparación de Tipos</h5>
-            <small class="text-secondary">Evolución de Multas</small>
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="back-arrow opacity-0">
+              <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="gray"
+                class="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
+                <path
+                  d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z" />
+              </svg>
+            </div>
+            <div>
+              <h5 class="card-title text-secondary mb-1">Comparación de Tipos</h5>
+              <small class="text-secondary">Evolución de Multas</small>
+            </div>
+            <div class="badge bg-warning px-3 py-2">
+              Total de Multas: {{ totalFines }}
+            </div>
           </div>
           <google-chart
             [type]="columnChartType"
@@ -538,11 +550,26 @@
           (click)="makeBig(3)"
         >
           <div class="card-body">
-            <div class="text-center">
-              <h5 class="card-title text-secondary mb-1">
-                Evolución de Multas
-              </h5>
-              <small class="text-secondary">Tendencia mensual</small>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div class="back-arrow opacity-0">
+                <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="gray"
+                  class="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
+                  <path
+                    d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z" />
+                </svg>
+              </div>
+              <div>
+                <h5 class="card-title text-secondary mb-1">
+                  Evolución de 
+                  Multas
+                </h5>
+                <small class="text-secondary">Tendencia mensual</small>
+
+              </div>
+              <div class="badge bg-success px-3 py-2">
+                Promedio de multas por período:
+                {{ averageFinesPerMonth | number : "1.1-1" }}
+              </div>
             </div>
             <google-chart
               [type]="lineChartType"

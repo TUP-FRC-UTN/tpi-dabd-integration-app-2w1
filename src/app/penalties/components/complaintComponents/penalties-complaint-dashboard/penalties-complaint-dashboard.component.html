@@ -371,7 +371,7 @@
               </h5>
               <small class="text-secondary">Evolución de Denuncias</small>
             </div>
-            <div class="badge bg-warning px-3 py-2">Tendencia mensual</div>
+            <div class="badge bg-warning px-3 py-2">Total de denuncias realizadas: {{totalComplaints}}</div>
           </div>
           <google-chart [type]="columnChartType" [data]="columnChartData" [options]="columnChartOptions" class="w-100">
           </google-chart>
@@ -422,7 +422,7 @@
                 </h5>
                 <small class="text-secondary">Tendencia mensual</small>
               </div>
-              <div class="badge bg-success px-3 py-2">+15.4%</div>
+              <div class="badge bg-success px-3 py-2">Promedio de Denuncias por período: {{ averageComplaintsPerMonth | number:'1.1-1' }}</div>
             </div>
             <google-chart [type]="lineChartType" [data]="lineChartData" [options]="lineChartOptions" class="w-100">
             </google-chart>
