@@ -99,20 +99,6 @@ private formatDateToString(date: Date): string {
 }
   
 
-  //Constructor
-  constructor(
-    private router: Router,
-    private _modal: NgbModal,
-    private complaintService: ComplaintService,
-    private routingService: RoutingService
-
-  ) {
-    (window as any).viewComplaint = (id: number) => this.viewComplaint(id);
-    (window as any).changeState = (state: string, id: number, userId: number) =>
-      this.changeState(state, id, userId);
-  }
-
-
   //Combo de filtrado de estado
   // onFilter(event: Event) {
   //   const selectedValue = (event.target as HTMLSelectElement).value;
