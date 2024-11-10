@@ -76,22 +76,22 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
     this.resetDates()
   }
 
-  // Función para convertir la fecha al formato `YYYY-MM-DD`
-  private formatDateToString(date: Date): string {
-    return date.toISOString().split('T')[0];
-  }
-
   resetDates() {
     const today = new Date();
-    today.setDate(today.getDate() + 1); 
-    this.filterDateEnd = this.formatDateToString(today);
-  
+    this.filterDateEnd = this.formatDateToString(today); // Fecha final con hora 00:00:00
+
     const previousMonthDate = new Date();
-    previousMonthDate.setMonth(previousMonthDate.getMonth() - 1);
-    previousMonthDate.setDate(1); 
-    previousMonthDate.setDate(previousMonthDate.getDate() + 1); 
-    this.filterDateStart = this.formatDateToString(previousMonthDate);
-  }
+    previousMonthDate.setMonth(previousMonthDate.getMonth() - 1); 
+    this.filterDateStart = this.formatDateToString(previousMonthDate); // Fecha de inicio con hora 00:00:00
+}
+
+// Función para convertir la fecha al formato `YYYY-MM-DD`
+private formatDateToString(date: Date): string {
+    // Crear una fecha ajustada a UTC-3 y establecer la hora a 00:00:00 para evitar horas residuales
+    const adjustedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0); 
+    return adjustedDate.toLocaleDateString('en-CA'); // Formato estándar `YYYY-MM-DD`
+}
+  
 
 
   //Combo de filtrado de estado
@@ -258,43 +258,38 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
   //based on the 2 dates.
 
   filterData() {
-    let filteredComplaints = [...this.report];  // Copy the data that 
-                                               // has not been filtered yet.
+    let filteredComplaints = [...this.report];  // Copiar los datos que no han sido filtrados aún.
   
-    // If there is a search term, 
-    // filter by it
+    // Filtrar por estado, si está definido
     if (this.selectedState) {
-      filteredComplaints = filteredComplaints.filter(
-        (c) => c.reportState === this.selectedState
-      );
+        filteredComplaints = filteredComplaints.filter(
+            (c) => c.reportState === this.selectedState
+        );
     }
   
-    // Filter by date if 
-    // there are defined dates.
-    const startDate = this.filterDateStart ? new Date(this.filterDateStart) : null;
-    const endDate = this.filterDateEnd ? new Date(this.filterDateEnd) : null;
+    // Convertir las fechas de inicio y fin
+    const startDate = this.filterDateStart ? new Date(this.filterDateStart + 'T00:00:00Z') : null;
+    let endDate = this.filterDateEnd ? new Date(this.filterDateEnd + 'T23:59:59Z') : null; // Asegurar que se incluya todo el último día
   
     filteredComplaints = filteredComplaints.filter((item) => {
-      const date = new Date(item.createdDate);
-      if (isNaN(date.getTime())) {
-        console.warn(`Fecha no válida: ${item.createdDate}`);
-        return false;
-      }
+        const date = new Date(item.createdDate);
+        if (isNaN(date.getTime())) {
+            console.warn(`Fecha no válida: ${item.createdDate}`);
+            return false;
+        }
 
-      // Checks if the date is 
-      // between the start and end date.
-      const afterStartDate = !startDate || date >= startDate;
-      const beforeEndDate = !endDate || date <= endDate;
+        // Verificar si la fecha está entre la fecha de inicio y fin
+        const afterStartDate = !startDate || date >= startDate;
+        const beforeEndDate = !endDate || date <= endDate;
   
-      return afterStartDate && beforeEndDate;
+        return afterStartDate && beforeEndDate;
     });
   
-    // Update the 
-    // table data.
+    // Actualizar los datos de la tabla
     this.reportfilter = filteredComplaints;
-    this.updateDataTable(); // Call the function 
-                           // to update the table.
-  }
+    this.updateDataTable(); // Llamar a la función para actualizar la tabla.
+}
+
   
   // Method to handle 
   // the State selection.

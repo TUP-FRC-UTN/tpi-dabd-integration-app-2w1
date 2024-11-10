@@ -72,23 +72,22 @@ export class PenaltiesListComplaintComponent implements OnInit {
   
   //Returns the date in this 
   //string format: `YYYY-MM-DD`.
-  private formatDateToString(date: Date): string {
-    return date.toISOString().split('T')[0];
-  }
-
-  
-  //Resets the date filters.
   resetDates() {
     const today = new Date();
-    today.setDate(today.getDate() + 1); 
-    this.filterDateEnd = this.formatDateToString(today);
-  
+    this.filterDateEnd = this.formatDateToString(today); // Fecha final con hora 00:00:00
+
     const previousMonthDate = new Date();
-    previousMonthDate.setMonth(previousMonthDate.getMonth() - 1);
-    previousMonthDate.setDate(1); 
-    previousMonthDate.setDate(previousMonthDate.getDate() + 1); 
-    this.filterDateStart = this.formatDateToString(previousMonthDate);
-  }
+    previousMonthDate.setMonth(previousMonthDate.getMonth() - 1); 
+    this.filterDateStart = this.formatDateToString(previousMonthDate); // Fecha de inicio con hora 00:00:00
+}
+
+// Función para convertir la fecha al formato `YYYY-MM-DD`
+private formatDateToString(date: Date): string {
+    // Crear una fecha ajustada a UTC-3 y establecer la hora a 00:00:00 para evitar horas residuales
+    const adjustedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0); 
+    return adjustedDate.toLocaleDateString('en-CA'); // Formato estándar `YYYY-MM-DD`
+}
+  
 
   //Constructor
   constructor(
@@ -283,7 +282,7 @@ export class PenaltiesListComplaintComponent implements OnInit {
     // Checks if the date is 
     // between the start and end date.
     const startDate = this.filterDateStart ? new Date(this.filterDateStart) : null;
-    const endDate = this.filterDateEnd ? new Date(this.filterDateEnd) : null;
+    let endDate = this.filterDateEnd ? new Date(this.filterDateEnd) : null;
   
     filteredComplaints = filteredComplaints.filter((item) => {
       const date = new Date(item.createdDate);

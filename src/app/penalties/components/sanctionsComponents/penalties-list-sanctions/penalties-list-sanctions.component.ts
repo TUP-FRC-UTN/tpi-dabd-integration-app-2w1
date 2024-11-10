@@ -80,20 +80,20 @@ export class PenaltiesSanctionsListComponent implements OnInit {
 
   resetDates() {
     const today = new Date();
-    today.setDate(today.getDate() + 1); 
-    this.filterDateEnd = this.formatDateToString(today);
-  
+    this.filterDateEnd = this.formatDateToString(today); // Fecha final con hora 00:00:00
+
     const previousMonthDate = new Date();
-    previousMonthDate.setMonth(previousMonthDate.getMonth() - 1);
-    previousMonthDate.setDate(1); 
-    previousMonthDate.setDate(previousMonthDate.getDate() + 1); 
-    this.filterDateStart = this.formatDateToString(previousMonthDate);
-  }
+    previousMonthDate.setMonth(previousMonthDate.getMonth() - 1); 
+    this.filterDateStart = this.formatDateToString(previousMonthDate); // Fecha de inicio con hora 00:00:00
+}
 
   // Función para convertir la fecha al formato `YYYY-MM-DD`
   private formatDateToString(date: Date): string {
-    return date.toISOString().split('T')[0];
+      // Crear una fecha ajustada a UTC-3 y establecer la hora a 00:00:00 para evitar horas residuales
+      const adjustedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0); 
+      return adjustedDate.toLocaleDateString('en-CA'); // Formato estándar `YYYY-MM-DD`
   }
+    
 
 
 
@@ -286,45 +286,47 @@ export class PenaltiesSanctionsListComponent implements OnInit {
   }
 
   // Método para filtrar la tabla en base a las 2 fechas y estado
-filterData() {
-  let filteredComplaints = [...this.sanctions];  // Copiar los datos de las sanciones que no han sido filtradas aún
-
-  // Filtrar por estado si se ha seleccionado alguno
-  if (this.selectedState) {
-    if (this.selectedState === 'Advertencia') {
-      // Filtrar por estado 'Advertencia' y por elementos con fineState == null
-      filteredComplaints = filteredComplaints.filter(
-        (c) => c.fineState === this.selectedState || c.fineState === null
-      );
-    } else {
-      // Filtrar por el estado seleccionado (no 'Advertencia')
-      filteredComplaints = filteredComplaints.filter(
-        (c) => c.fineState === this.selectedState
-      );
+  filterData() {
+    let filteredComplaints = [...this.sanctions];  // Copiar los datos de las sanciones que no han sido filtradas aún
+  
+    // Filtrar por estado si se ha seleccionado alguno
+    if (this.selectedState) {
+      if (this.selectedState === 'Advertencia') {
+        // Filtrar por estado 'Advertencia' y por elementos con fineState == null
+        filteredComplaints = filteredComplaints.filter(
+          (c) => c.fineState === this.selectedState || c.fineState === null
+        );
+      } else {
+        // Filtrar por el estado seleccionado (no 'Advertencia')
+        filteredComplaints = filteredComplaints.filter(
+          (c) => c.fineState === this.selectedState
+        );
+      }
     }
+  
+    // Filtrar por fecha si las fechas están definidas
+    const startDate = this.filterDateStart ? new Date(this.filterDateStart + 'T00:00:00Z') : null;  // Ajustar la fecha de inicio a las 00:00:00
+    const endDate = this.filterDateEnd ? new Date(this.filterDateEnd + 'T23:59:59Z') : null;  // Ajustar la fecha de fin a las 23:59:59
+    
+    filteredComplaints = filteredComplaints.filter((item) => {
+      const date = new Date(item.createdDate);
+      if (isNaN(date.getTime())) {
+        console.warn(`Fecha no válida: ${item.createdDate}`);
+        return false;
+      }
+  
+      // Verifica si la fecha está entre las fechas de inicio y fin
+      const afterStartDate = !startDate || date >= startDate;
+      const beforeEndDate = !endDate || date <= endDate;
+  
+      return afterStartDate && beforeEndDate;
+    });
+  
+    // Actualiza los datos filtrados en la tabla
+    this.sanctionsfilter = filteredComplaints;
+    this.updateDataTable(); // Llama a la función para actualizar la tabla
   }
-
-  // Filtrar por fecha si las fechas están definidas
-  const startDate = this.filterDateStart ? new Date(this.filterDateStart) : null;
-  const endDate = this.filterDateEnd ? new Date(this.filterDateEnd) : null;
-
-  filteredComplaints = filteredComplaints.filter((item) => {
-    const date = new Date(item.createdDate);
-    if (isNaN(date.getTime())) {
-      console.warn(`Fecha no válida: ${item.createdDate}`);
-      return false;
-    }
-
-    const afterStartDate = !startDate || date >= startDate;
-    const beforeEndDate = !endDate || date <= endDate;
-
-    return afterStartDate && beforeEndDate;
-  });
-
-  // Actualiza los datos filtrados en la tabla
-  this.sanctionsfilter = filteredComplaints;
-  this.updateDataTable(); // Llama a la función para actualizar la tabla
-}
+  
 
   
   // Método para manejar la selección del estado
