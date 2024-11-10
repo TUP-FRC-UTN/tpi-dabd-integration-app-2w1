@@ -71,21 +71,14 @@
           </div>
         </div>
 
-        <div class="clearfix mt-2">
+        <div class="clearfix mt-2 offset-9">
           <div class="float-end d-flex">
             <label *ngIf="newFine" class="me-2 mt-3">Importe</label>
             <div *ngIf="newFine" class="input-group mt-2 mb-3">
-              <input type="number" class="form-control text-end" placeholder="0.00" style="max-width: 220px"
-                formControlName="amount" [ngClass]="{
-                  'is-invalid': fineForm.get('amount')?.invalid && fineForm.get('amount')?.touched
-                }" />
-              <div *ngIf="fineForm.get('amount')?.invalid && fineForm.get('amount')?.touched" class="invalid-feedback">
-                <div *ngIf="fineForm.get('amount')?.errors?.['required']">
-                  El importe es requerido.
-                </div>
-                <div *ngIf="fineForm.get('amount')?.errors?.['min']">
-                  El importe debe ser mayor o igual a {{ report?.baseAmount }}.
-                </div>
+              <input type="number" class="form-control text-end"
+                formControlName="amount" [ngClass]="onValidate('amount')"/>
+              <div class="invalid-feedback">
+                {{ showError("amount") }}
               </div>
             </div>
           </div>
