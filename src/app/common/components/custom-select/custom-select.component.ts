@@ -30,10 +30,11 @@ export class CustomSelectComponent {
   selectControl: FormControl;
 
   constructor(private fb: FormBuilder) {
-    this.selectControl = this.fb.control([], [], );
+    this.selectControl = this.fb.control(this.selectedOptions, [], );
     this.reactiveForm = this.fb.group({
       selectControl: this.selectControl // Cambio el nombre para que coincida con el template
     });
+
 
     this.selectControl.valueChanges.subscribe(values => {
       this.selectedOptionsChange.emit(values);
@@ -83,6 +84,10 @@ export class CustomSelectComponent {
     };
 
     return errorMessages[errorKey]?.(errorValue) ?? 'Error no identificado en el campo.';
+  }
+
+  clearData(){
+    this.selectControl.setValue([]);
   }
 }
 
