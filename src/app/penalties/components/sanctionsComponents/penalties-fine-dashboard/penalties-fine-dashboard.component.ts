@@ -223,10 +223,9 @@ export class PenaltiesFineDashboardComponent {
       {}
     );
 
-    this.pieChartData = Object.entries(finesByType).map(([type, count]) => [
-      type,
-      count,
-    ]);
+    this.pieChartData = Object.keys(finesByType).length > 0
+        ? Object.entries(finesByType).map(([type, count]) => [type, count])
+        : [];
   }else{
     const filteredFines = this.state
     ? this.finesData.filter(fine => fine.fineState === this.state)
@@ -241,10 +240,9 @@ export class PenaltiesFineDashboardComponent {
     {}
   );
 
-  this.pieChartData = Object.entries(finesByType).map(([type, count]) => [
-    type,
-    count,
-  ]);
+  this.pieChartData = Object.keys(finesByType).length > 0
+        ? Object.entries(finesByType).map(([type, count]) => [type, count])
+        : [];
   }
   }
 
@@ -318,9 +316,9 @@ export class PenaltiesFineDashboardComponent {
       {}
     );
 
-    this.columnChartData = Object.entries(finesByState).map(
-      ([state, count]) => [state, count]
-    );
+    this.columnChartData = Object.keys(finesByState).length > 0
+        ? Object.entries(finesByState).map(([type, count]) => [type, count])
+        : [];
   }
   else{
     const filteredFines = this.reportReason
@@ -335,9 +333,9 @@ export class PenaltiesFineDashboardComponent {
     {}
   );
 
-  this.columnChartData = Object.entries(finesByState).map(
-    ([state, count]) => [state, count]
-  );
+  this.columnChartData = Object.keys(finesByState).length > 0
+        ? Object.entries(finesByState).map(([type, count]) => [type, count])
+        : [];
   }
   }
 

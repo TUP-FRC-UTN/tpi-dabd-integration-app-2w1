@@ -322,13 +322,19 @@
                 Total de Multas: {{ totalFines }}
               </div>
             </div>
-            <google-chart
+            @if(columnChartData.length > 0){
+              <google-chart
               [type]="columnChartType"
               [data]="columnChartData"
               [options]="columnChartOptions"
-              class="w-100 expanded-chart-content"
-            >
-            </google-chart>
+              class="w-100"
+            ></google-chart>
+            }
+            @else {
+              <div class="text-center text-secondary">
+                No se encontraron datos para los filtros seleccionados
+              </div>
+            }
           </div>
         </div>
       </div>
@@ -362,7 +368,8 @@
                 Total de Multas: {{ totalFines }}
               </div>
             </div>
-            <google-chart
+            @if(pieChartData.length > 0){
+              <google-chart
               [type]="pieChartType"
               [data]="pieChartData"
               [options]="pieChartOptions"
@@ -370,6 +377,12 @@
               style="height: 88%"
             >
             </google-chart>
+            }
+            @else {
+              <div class="text-center text-secondary">
+                No se encontraron datos para los filtros seleccionados
+              </div>
+            }
           </div>
         </div>
       </div>
@@ -513,12 +526,20 @@
               Total de Multas: {{ totalFines }}
             </div>
           </div>
-          <google-chart
+          @if(columnChartData.length > 0){
+            <google-chart
             [type]="columnChartType"
             [data]="columnChartData"
             [options]="columnChartOptions"
             class="w-100"
           ></google-chart>
+          }
+          @else {
+            <div class="text-center text-secondary">
+              No se encontraron datos para los filtros seleccionados
+            </div>
+          }
+          
         </div>
       </div>
     </div>
@@ -532,14 +553,21 @@
           <div class="card-body">
             <div class="text-center">
               <h5 class="card-title text-secondary mb-1">Razones de Multas</h5>
-              <small class="text-secondary"></small>
+              <small class="text-secondary">Porcentaje por razón</small>
             </div>
+            @if(pieChartData.length > 0){
             <google-chart
               [type]="pieChartType"
               [data]="pieChartData"
               [options]="pieChartOptions"
               class="w-100"
             ></google-chart>
+            }
+            @else {
+              <div class="text-center text-secondary">
+                No se encontraron datos para los filtros seleccionados
+              </div>
+            }
           </div>
         </div>
       </div>

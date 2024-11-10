@@ -196,9 +196,9 @@ export class PenaltiesComplaintDashboardComponent {
         },
         {}
       );
-      this.columnChartData = Object.entries(complaintsByState).map(
-        ([state, count]) => [state, count]
-      );
+      this.columnChartData = Object.keys(complaintsByState).length > 0
+        ? Object.entries(complaintsByState).map(([type, count]) => [type, count])
+        : [];
     } else {
       const filteredComplaints = this.complaintsData.filter((complaint) => {
         return complaint.complaintReason === this.reportReason; // Filtra por el campo 'reportReason'
@@ -213,9 +213,9 @@ export class PenaltiesComplaintDashboardComponent {
         {}
       );
 
-      this.columnChartData = Object.entries(complaintsByState).map(
-        ([state, count]) => [state, count]
-      );
+      this.columnChartData = Object.keys(complaintsByState).length > 0
+        ? Object.entries(complaintsByState).map(([type, count]) => [type, count])
+        : [];
     }
   }
 
@@ -302,9 +302,9 @@ export class PenaltiesComplaintDashboardComponent {
         },
         {}
       );
-      this.pieChartData = Object.entries(complaintsByType).map(
-        ([type, count]) => [type, count]
-      );
+      this.pieChartData = Object.keys(complaintsByType).length > 0
+        ? Object.entries(complaintsByType).map(([type, count]) => [type, count])
+        : [];
     } else {
       const filteredComplaints = this.complaintsData.filter((complaint) => {
         return complaint.complaintState === this.state; // Filtra por el campo 'state'
@@ -319,9 +319,9 @@ export class PenaltiesComplaintDashboardComponent {
         {}
       );
 
-      this.pieChartData = Object.entries(complaintsByType).map(
-        ([type, count]) => [type, count]
-      );
+      this.pieChartData = Object.keys(complaintsByType).length > 0
+        ? Object.entries(complaintsByType).map(([type, count]) => [type, count])
+        : [];
     }
   }
 

@@ -250,9 +250,19 @@
               </div>
               <div class="badge bg-warning px-3 py-2">Total de denuncias realizadas: {{totalComplaints}}</div>
             </div>
-            <google-chart [type]="columnChartType" [data]="columnChartData" [options]="columnChartOptions"
-              class="w-100 expanded-chart-content">
-            </google-chart>
+            @if(columnChartData.length > 0){
+              <google-chart
+              [type]="columnChartType"
+              [data]="columnChartData"
+              [options]="columnChartOptions"
+              class="w-100"
+            ></google-chart>
+            }
+            @else {
+              <div class="text-center text-secondary">
+                No se encontraron datos para los filtros seleccionados
+              </div>
+            }
           </div>
         </div>
       </div>
@@ -279,9 +289,19 @@
                 Total de Denuncias: {{totalComplaints}}
               </div>
             </div>
-            <google-chart [type]="pieChartType" [data]="pieChartData" [options]="pieChartOptions" class="w-100"
-              style="height: 88%">
-            </google-chart>
+            @if(pieChartData.length > 0){
+              <google-chart
+                [type]="pieChartType"
+                [data]="pieChartData"
+                [options]="pieChartOptions"
+                class="w-100"
+              ></google-chart>
+              }
+              @else {
+                <div class="text-center text-secondary">
+                  No se encontraron datos para los filtros seleccionados
+                </div>
+              }
           </div>
         </div>
       </div>
@@ -373,8 +393,19 @@
             </div>
             <div class="badge bg-warning px-3 py-2">Total de denuncias realizadas: {{totalComplaints}}</div>
           </div>
-          <google-chart [type]="columnChartType" [data]="columnChartData" [options]="columnChartOptions" class="w-100">
-          </google-chart>
+          @if(columnChartData.length > 0){
+            <google-chart
+            [type]="columnChartType"
+            [data]="columnChartData"
+            [options]="columnChartOptions"
+            class="w-100"
+          ></google-chart>
+          }
+          @else {
+            <div class="text-center text-secondary">
+              No se encontraron datos para los filtros seleccionados
+            </div>
+          }
         </div>
       </div>
     </div>
@@ -383,24 +414,23 @@
       <div class="mb-4">
         <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover-scale" (click)="makeBig(2)">
           <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-              <div class="back-arrow opacity-0">
-                <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="gray"
-                  class="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
-                  <path
-                    d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z" />
-                </svg>
-              </div>
-              <div class="row">
-                <h5 class="card-title text-center text-secondary mb-1">
-                  Promedios de Denuncias
-                </h5>
-                <small class="text-secondary text-center"></small>
-              </div>
-              <div class="badge bg-primary px-3 py-2"></div>
+            <div class="text-center">
+              <h5 class="card-title text-secondary mb-1">Razones de Denuncias</h5>
+              <small class="text-secondary">Porcentaje por razón</small>
             </div>
-            <google-chart [type]="pieChartType" [data]="pieChartData" [options]="pieChartOptions" class="w-100">
-            </google-chart>
+            @if(pieChartData.length > 0){
+              <google-chart
+                [type]="pieChartType"
+                [data]="pieChartData"
+                [options]="pieChartOptions"
+                class="w-100"
+              ></google-chart>
+              }
+              @else {
+                <div class="text-center text-secondary">
+                  No se encontraron datos para los filtros seleccionados
+                </div>
+              }
           </div>
         </div>
       </div>
