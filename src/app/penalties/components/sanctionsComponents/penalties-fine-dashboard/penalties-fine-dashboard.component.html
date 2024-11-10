@@ -201,7 +201,7 @@
       <div class="card border-0 shadow-lg rounded-4">
         <div class="card-body">
           <div class="row align-items-end">
-            <div class="col-md-6">
+            <div class="col-md-4">
               <label class="form-label text-secondary">Período Desde</label>
               <div class="input-group">
                 <input
@@ -213,7 +213,7 @@
                 />
               </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
               <label class="form-label text-secondary">Período Hasta</label>
               <div class="input-group">
                 <input
@@ -224,6 +224,21 @@
                   [min]="periodFrom"
                 />
               </div>
+            </div>
+            <div class="col-md-4">
+              <select
+                (change)="applyFilters()"
+                class="form-select"
+                [(ngModel)]="reportReason2"
+                aria-label="Default select example"
+              >
+                <option value="" selected>Razones...</option>
+                @for (item of reportsReasons; track $index) {
+                <option value="{{ item.reportReason }}">
+                  {{ item.reportReason }}
+                </option>
+                }
+              </select>
             </div>
             <!--
                 <div class="col-md-3">

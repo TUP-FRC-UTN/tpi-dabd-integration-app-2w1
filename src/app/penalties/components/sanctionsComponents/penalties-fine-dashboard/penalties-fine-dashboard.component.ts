@@ -277,15 +277,39 @@ export class PenaltiesFineDashboardComponent {
       lineChartData.push([monthLabel, finesByMonth[monthLabel] || 0]);
       currentDate.setMonth(currentDate.getMonth() + 1);
     }
-
     this.lineChartData = lineChartData;
     }
     else{
-      
+      const fromDate = new Date(this.periodFrom + '-01');
+      const toDate = new Date(this.periodTo + '-01');
+      toDate.setMonth(toDate.getMonth() + 1);
+    
+      const filteredFines = this.reportReason
+        ? this.finesData.filter(fine => fine.report.reportReason.reportReason === this.reportReason)
+        : this.finesData;
+    
+      const finesByMonth = filteredFines.reduce((acc: { [key: string]: number }, fine) => {
+        const fineDate = new Date(fine.createdDate);
+        const monthKey = fineDate.toLocaleString('default', { month: 'short', year: 'numeric' });
+        acc[monthKey] = (acc[monthKey] || 0) + 1;
+        return acc;
+      }, {});
+    
+      const lineChartData = [];
+      let currentDate = new Date(fromDate);
+    
+      while (currentDate < toDate) {
+        const monthLabel = currentDate.toLocaleString('default', { month: 'short', year: 'numeric' });
+        lineChartData.push([monthLabel, finesByMonth[monthLabel] || 0]);
+        currentDate.setMonth(currentDate.getMonth() + 1);
+      }
+    
+      this.lineChartData = lineChartData;
     }
   }
 
   private updateColumnChart() {
+    if(this.reportReason== ""){
     const finesByState = this.finesData.reduce(
       (acc: { [key: string]: number }, fine) => {
         acc[fine.fineState] = (acc[fine.fineState] || 0) + 1;
@@ -297,6 +321,24 @@ export class PenaltiesFineDashboardComponent {
     this.columnChartData = Object.entries(finesByState).map(
       ([state, count]) => [state, count]
     );
+  }
+  else{
+    const filteredFines = this.reportReason
+    ? this.finesData.filter(fine => fine.report.reportReason.reportReason === this.reportReason)
+    : this.finesData;
+
+  const finesByState = filteredFines.reduce(
+    (acc: { [key: string]: number }, fine) => {
+      acc[fine.fineState] = (acc[fine.fineState] || 0) + 1;
+      return acc;
+    },
+    {}
+  );
+
+  this.columnChartData = Object.entries(finesByState).map(
+    ([state, count]) => [state, count]
+  );
+  }
   }
 
   makeBig(nro: number) {
