@@ -62,7 +62,7 @@ export class PenaltiesFineDashboardComponent {
     },
     pieSliceTextStyle: {
       color: 'black',
-      fontSize: 16
+      fontSize: 14
     }
   };
 

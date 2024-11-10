@@ -2,8 +2,11 @@ import { Component, inject } from '@angular/core';
 import { ComplaintService } from '../../../services/complaintsService/complaints.service';
 import { ComplaintDto, EstadoDenuncia, TipoDenuncia } from '../../../models/complaint';
 import { ChartType, GoogleChartsModule } from 'angular-google-charts';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { State } from '@popperjs/core';
+import { ReportReason } from '../../../models/Dashboard-models';
+import { ReportReasonDto } from '../../../models/ReportReasonDTO';
 
 @Component({
   selector: 'app-penalties-complaint-dashboard',
@@ -18,6 +21,11 @@ export class PenaltiesComplaintDashboardComponent {
   status: number = 0;
   periodFrom: string = this.getDefaultFromDate();
   periodTo: string = this.getCurrentYearMonth();
+  stateFilter:string = ""
+  //filtros avanzados
+  states:any[] = []
+  reportsReasons:ReportReasonDto[] = []
+  //filtros avanzados
   complaintState: EstadoDenuncia = EstadoDenuncia.Aprobada;
   complaintType: TipoDenuncia = TipoDenuncia.Daño;
 
@@ -47,7 +55,7 @@ export class PenaltiesComplaintDashboardComponent {
     },
     pieSliceTextStyle: {
       color: 'black',
-      fontSize: 16
+      fontSize: 14
     }
   };
 
@@ -124,6 +132,26 @@ export class PenaltiesComplaintDashboardComponent {
 
   ngOnInit() {
     this.updateCharts();
+    this.getReporstReasons();
+    this.getStates();
+  }
+  getReporstReasons(){
+    this.sanctionsService.getAllReportReasons().subscribe(
+      (respuesta) => {
+        this.reportsReasons = respuesta
+      },
+      (error) => {
+        console.error('Error:', error);
+    });
+  }
+  getStates(){
+    this.sanctionsService.getState().subscribe(
+      (respuesta) => {
+        this.states = Object.entries(respuesta).map(([key, value]) => ({ key, value }));
+      },
+      (error) => {
+        console.error('Error:', error);
+    });
   }
 
   applyFilters() {
