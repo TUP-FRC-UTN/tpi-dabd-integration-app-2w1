@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { PutReportDTO } from '../../../models/PutReportDTO';
@@ -7,6 +7,8 @@ import { PenaltiesSanctionsServicesService } from '../../../services/sanctionsSe
 import { ModalComplaintsListComponent } from '../../complaintComponents/modals/penalties-list-complaints-modal/penalties-list-complaints-modal.component';
 import { RoutingService } from '../../../../common/services/routing.service';
 import Swal from 'sweetalert2';
+import { PlotService } from '../../../../users/users-servicies/plot.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-report-modify',
@@ -16,6 +18,10 @@ import Swal from 'sweetalert2';
   styleUrl: './sanctions-update-report.component.scss'
 })
 export class ReportModifyComponent implements OnInit {
+  url = 'https://my-json-server.typicode.com/405786MoroBenjamin/users-responses/plots';
+  private readonly plotService = inject(PlotService);
+  private readonly mockPlotService = inject(HttpClient);
+  
   reportId: number = 0;
   reportState = '';
   selectedDate = '';
@@ -25,6 +31,8 @@ export class ReportModifyComponent implements OnInit {
   description = '';
   selectedComplaints: any[] = [];
   private route: ActivatedRoute;
+  modalInstance: any;
+  formType = 'modify';
 
   constructor(private complaintService: ComplaintService,
      private reportService: PenaltiesSanctionsServicesService,
@@ -43,10 +51,21 @@ export class ReportModifyComponent implements OnInit {
         this.description = params['description'] || '';
         this.plotId = params['plotId'] || '';
         if (this.plotId) {
-          this.infractorPlaceholder = 'Lote ' + this.plotId;
+          this.plotService.getPlotById(this.plotId).subscribe(plot => {
+            this.infractorPlaceholder = `Bloque ${plot.block_number}, Lote ${plot.plot_number}`;
+          });
+        }
+        if (this.reportId) {
+          this.loadSelectedComplaints(this.reportId);
         }
         console.log(params);
       }
+    });
+  }
+
+  loadSelectedComplaints(reportId: number): void {
+    this.reportService.getById(reportId).subscribe(report => {
+      this.selectedComplaints = report.complaints || [];
     });
   }
 
@@ -70,18 +89,33 @@ export class ReportModifyComponent implements OnInit {
   }
 
   updateReport(): void {
-    const userId = 1;
+    Swal.fire({
+      title: '¿Está seguro?',
+      text: '¿Desea actualizar el informe?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Actualizar',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true, 
+      customClass: {
+        confirmButton: 'btn btn-success ms-2',
+        cancelButton: 'btn btn-secondary'
+      },
+      buttonsStyling: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const userId = 1;
 
-    const complaintsIds = this.selectedComplaints.length > 0
-      ? this.selectedComplaints.map(complaint => complaint.id)
-      : [];
+        const complaintsIds = this.selectedComplaints.length > 0
+          ? this.selectedComplaints.map(complaint => complaint.id)
+          : [];
 
-    const reportDTO: PutReportDTO = {
-      id: this.reportId,
-      userId: userId,
-      description: this.description,
-      complaintsIds: complaintsIds,
-    };
+        const reportDTO: PutReportDTO = {
+          id: this.reportId,
+          userId: userId,
+          description: this.description,
+          complaintsIds: complaintsIds,
+        };
 
         this.reportService.updateReport(reportDTO).subscribe(res => {
           Swal.fire({
@@ -102,6 +136,9 @@ export class ReportModifyComponent implements OnInit {
           });
         });
       }
+    });
+  }
+
   cancel(){
     this.routingService.redirect("main/sanctions/report-list", "Listado de Informes")
   }
@@ -109,8 +146,16 @@ export class ReportModifyComponent implements OnInit {
   openModal(): void {
     const modalElement = document.getElementById('complaintModal');
     if (modalElement) {
-      const modal = new (window as any).bootstrap.Modal(modalElement);
-      modal.show();
+      this.modalInstance = new (window as any).bootstrap.Modal(modalElement);
+      modalElement.addEventListener('shown.bs.modal', () => {
+        const modalComponent = (modalElement as any).componentInstance;
+        if (modalComponent) {
+          modalComponent.selectedComplaints = [...this.selectedComplaints];
+          modalComponent.updateCheckboxes();
+          modalComponent.reportId = this.reportId;
+        }
+      });
+      this.modalInstance.show();
     }
   }
 }

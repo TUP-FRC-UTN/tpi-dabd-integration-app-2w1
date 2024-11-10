@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { ReportDTO } from '../../../models/reportDTO';
+import { Component, inject, Input, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router,RouterLink } from '@angular/router';
+import { ReportDTO, plotOwner } from '../../../models/reportDTO';
 import { PenaltiesSanctionsServicesService } from '../../../services/sanctionsService/sanctions.service';
 import Swal from 'sweetalert2';
 import { RoutingService } from '../../../../common/services/routing.service';
-
+import { PlotService } from '../../../../users/users-servicies/plot.service';
 @Component({
   selector: 'app-penalties-post-fine',
   standalone: true,
@@ -15,6 +15,12 @@ import { RoutingService } from '../../../../common/services/routing.service';
   styleUrls: ['./penalties-post-fine.component.css']
 })
 export class PenaltiesPostFineComponent implements OnInit {
+  private readonly plotService = inject(PlotService);
+
+
+  report:any
+  formattedDate: any;
+  infractorPlaceholder: string = '';
   fineForm!: FormGroup;
   report: any;
   formattedDate: any;
@@ -64,6 +70,14 @@ export class PenaltiesPostFineComponent implements OnInit {
         this.report = response;
         const createdDate = this.report?.createdDate;
         this.formattedDate = new Date(createdDate).toISOString().split('T')[0];
+        this.plotService.getPlotById(this.report.plotId).subscribe(
+          (plot) => {
+            this.infractorPlaceholder = `Bloque ${plot.block_number}, Lote ${plot.plot_number}`;
+          },
+          (error) => {
+            console.error('Error al obtener los datos del plot:', error);
+          }
+        );
         
         // Update amount validator with the new baseAmount
         this.fineForm.get('amount')?.setValidators([

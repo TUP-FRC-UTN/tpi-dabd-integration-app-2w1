@@ -1,14 +1,15 @@
 import { Component, inject, Input, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ComplaintService } from '../../../../services/complaintsService/complaints.service';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PutStateComplaintDto } from '../../../../models/complaint';
+import { UserService } from '../../../../../users/users-servicies/user.service';
 
 @Component({
   selector: 'app-penalties-modal-consult-complaint',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, DatePipe],
   templateUrl: './penalties-get-complaint.component.html',
   styleUrl: './penalties-get-complaint.component.scss'
 })
@@ -18,7 +19,7 @@ export class PenaltiesModalConsultComplaintComponent implements OnInit {
   files: File[] = [];
   complaint: any;
   loggedUserId: number = 1;
-
+  private readonly userService = inject(UserService);
 
   //Constructor
   constructor(
@@ -58,6 +59,10 @@ export class PenaltiesModalConsultComplaintComponent implements OnInit {
           }
           this.complaintService.putStateComplaint(this.complaint.id, updatedComplaint).subscribe()
         }
+        this.userService.getUserById(this.complaint.userId).subscribe(
+          (response) => {
+            this.complaint.user = response.name + ' ' + response.lastname
+          });
       },
       (error) => {
         console.error('Error:', error);
