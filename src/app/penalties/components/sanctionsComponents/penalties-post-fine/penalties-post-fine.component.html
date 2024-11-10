@@ -1,26 +1,14 @@
 <section class="py-5">
   <div class="container p-3 border border-2 rounded shadow-lg">
-
-    <form #formPostFine="ngForm" (ngSubmit)="onSubmit()" novalidate>
+    <form [formGroup]="fineForm" (ngSubmit)="onSubmit()">
       <div class="container pe-5">
         <div class="row">
-
           <div class="col d-flex">
-            <!-- Input Infractor -->
-            
             <div class="col-lg-6 mb-3">
               <div class="row">
                 <div class="input-group">
                   <label class="col-2 col-form-label">Infractor</label>
-                  
-                  <!-- Input redondeado en la izquierda -->
-                  <input
-                    type="text"
-                    class="form-control rounded"
-                    [value]="report?.plotId"
-                    disabled
-                  />          
-                  <!-- Botón con espacio y bordes redondeados -->
+                  <input type="text" class="form-control rounded" [value]="report?.plotId" disabled />
                   <button type="button" class="btn btn-info rounded ms-3">
                     Ver más
                   </button>
@@ -47,32 +35,19 @@
           <div class="col d-flex">
             <div class="row ms-auto m-2">
               <div class="col">
-                <label for="reportReason" class="me-2"
-                  >Tipo de Infracción
-                </label>
+                <label for="reportReason" class="me-2">Tipo de Infracción</label>
               </div>
               <div class="col d-flex">
                 <div class="form-check">
-                  <input
-                    class="form-check-input"
-                    type="radio"
-                    name="flexRadioDefault"
-                    id="flexRadioDefault1"
-                    (change)="showAmountToPay('fine')"
-                  />
+                  <input class="form-check-input" type="radio" formControlName="infractionType" value="fine"
+                    id="flexRadioDefault1" (change)="showAmountToPay('fine')" />
                   <label class="form-check-label me-4" for="flexRadioDefault1">
                     Multa
                   </label>
                 </div>
                 <div class="form-check">
-                  <input
-                    class="form-check-input"
-                    type="radio"
-                    name="flexRadioDefault"
-                    id="flexCheckChecked2"
-                    checked
-                    (change)="showAmountToPay('warning')"
-                  />
+                  <input class="form-check-input" type="radio" formControlName="infractionType" value="warning"
+                    id="flexCheckChecked2" (change)="showAmountToPay('warning')" />
                   <label class="form-check-label" for="flexRadioDefault2">
                     Advertencia
                   </label>
@@ -83,18 +58,12 @@
         </div>
 
         <div class="row mt-4">
-          <!-- Input Descripcion -->
           <div class="col-lg-12 mb-3">
             <div class="row">
               <label class="col-2 col-lg-1 col-form-label">Descripción</label>
               <div class="col-10 col-lg-11">
-                <textarea
-                  class="form-control"
-                  rows="8"
-                  style="resize: none"
-                  [value]="report?.description"
-                  disabled
-                ></textarea>
+                <textarea class="form-control" rows="8" style="resize: none" [value]="report?.description"
+                  disabled></textarea>
               </div>
             </div>
           </div>
@@ -102,31 +71,18 @@
 
         <div class="clearfix mt-2">
           <div class="float-end d-flex">
-            <label *ngIf="newFine" for="" class="me-2 mt-3">Importe</label>
+            <label *ngIf="newFine" class="me-2 mt-3">Importe</label>
             <div *ngIf="newFine" class="input-group mt-2 mb-3">
-              <input
-                type="number"
-                class="form-control text-end"
-                placeholder="0.00"
-                style="max-width: 220px"
-                name="baseAmount"
-                [(ngModel)]="newAmount"
-                required
-                min="{{ report.baseAmount }}"
-                #baseAmount="ngModel"
-                [ngClass]="{
-                  'is-invalid': baseAmount.invalid && baseAmount.touched
-                }"
-              />
-              <div
-                *ngIf="baseAmount.invalid && baseAmount.touched"
-                class="invalid-feedback"
-              >
-                <div *ngIf="baseAmount.errors?.['required']">
+              <input type="number" class="form-control text-end" placeholder="0.00" style="max-width: 220px"
+                formControlName="amount" [ngClass]="{
+                  'is-invalid': fineForm.get('amount')?.invalid && fineForm.get('amount')?.touched
+                }" />
+              <div *ngIf="fineForm.get('amount')?.invalid && fineForm.get('amount')?.touched" class="invalid-feedback">
+                <div *ngIf="fineForm.get('amount')?.errors?.['required']">
                   El importe es requerido.
                 </div>
-                <div *ngIf="baseAmount.errors?.['minlength']">
-                  El importe debe ser mayor o igual a {{ report.baseAmount }}.
+                <div *ngIf="fineForm.get('amount')?.errors?.['min']">
+                  El importe debe ser mayor o igual a {{ report?.baseAmount }}.
                 </div>
               </div>
             </div>
@@ -135,18 +91,15 @@
 
         <div class="row">
           <div class="col d-flex justify-content-end gap-3">
-              <button type="button" class="btn btn-secondary me-3"
-                  (click)="cancel()">Cancelar</button>
-                <button 
-                  type="submit" 
-                  class="btn btn-success" 
-                  [disabled]="formPostFine.invalid || (newFine && newAmount === 0)">
-                Registrar
-              </button>
+            <button type="button" class="btn btn-secondary me-3" (click)="cancel()">
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-success"
+              [disabled]="fineForm.invalid || (newFine && fineForm.get('amount')?.value === 0)">
+              Registrar
+            </button>
           </div>
-      </div>
-
-        
+        </div>
       </div>
     </form>
   </div>
