@@ -214,7 +214,29 @@ export class PenaltiesComplaintDashboardComponent {
   this.lineChartData = lineChartData;
   }
   else{
-    
+    const fromDate = new Date(this.periodFrom + '-01');
+    const toDate = new Date(this.periodTo + '-01');
+    toDate.setMonth(toDate.getMonth() + 1);
+      const complaintsInRange = this.complaintsData.filter(complaint => {
+      const complaintDate = new Date(complaint.createdDate);
+      const isWithinDateRange = complaintDate >= fromDate && complaintDate < toDate;
+      const matchesReportReason = this.reportReason2 === "" || complaint.complaintReason === this.reportReason2;
+      return isWithinDateRange && matchesReportReason;
+    });
+      const complaintsByMonth = complaintsInRange.reduce((acc: any, complaint) => {
+      const month = new Date(complaint.createdDate).toLocaleString('default', { month: 'short', year: 'numeric' });
+      acc[month] = (acc[month] || 0) + 1;
+      return acc;
+    }, {});
+    const lineChartData = [];
+    let currentDate = new Date(fromDate);
+    while (currentDate < toDate) {
+      const monthLabel = currentDate.toLocaleString('default', { month: 'short', year: 'numeric' });
+      lineChartData.push([monthLabel, complaintsByMonth[monthLabel] || 0]);
+      currentDate.setMonth(currentDate.getMonth() + 1);
+    }
+  
+    this.lineChartData = lineChartData;
   }
 }
 
