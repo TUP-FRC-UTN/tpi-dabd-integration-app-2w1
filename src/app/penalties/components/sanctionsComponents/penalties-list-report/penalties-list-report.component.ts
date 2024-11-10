@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { PenaltiesSanctionsServicesService } from '../../../services/sanctionsService/sanctions.service';
 import { ReportDTO } from '../../../models/reportDTO';
 import { CommonModule } from '@angular/common';
@@ -17,13 +17,14 @@ import { RoutingService } from '../../../../common/services/routing.service';
 import moment from 'moment';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
 
 
 
 @Component({
   selector: 'app-penalties-sanctions-report-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, NgbModule],
+  imports: [CommonModule, RouterModule, FormsModule, NgbModule, CustomSelectComponent],
   templateUrl: './penalties-list-report.component.html',
   styleUrl: './penalties-list-report.component.scss'
 })
@@ -38,19 +39,24 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
   searchTerm: string = '';                        //Valor de la barra de busqueda
   filterDateStart: string='';
   filterDateEnd: string ='';
-  
+
   selectedState: string = '';
+  selectedStates: string[] = [];   //Valor select
+
+  options : {value: string, name: string}[] = []
+  @ViewChild(CustomSelectComponent) customSelect! : CustomSelectComponent;
 
   //Constructor
   constructor(
     private reportServices: PenaltiesSanctionsServicesService,
-     private _modal: NgbModal, 
+     private _modal: NgbModal,
      private router: Router,
      private routingService: RoutingService
 
     ) {
     (window as any).viewReport = (id: number) => this.viewReport(id);
     (window as any).editReport = (id: number) => this.editReport(id);
+    
   }
 
 
@@ -66,7 +72,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
     $('#reportsTable').on('click', 'a.dropdown-item', function(event) {
       const action = $(this).data('action');
       const id = $(this).data('id');
-  
+
       switch(action) {
         case 'newSaction':
           that.newSanction(id);
@@ -83,13 +89,13 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
 
   resetDates() {
     const today = new Date();
-    today.setDate(today.getDate() + 1); 
+    today.setDate(today.getDate() + 1);
     this.filterDateEnd = this.formatDateToString(today);
-  
+
     const previousMonthDate = new Date();
     previousMonthDate.setMonth(previousMonthDate.getMonth() - 1);
-    previousMonthDate.setDate(1); 
-    previousMonthDate.setDate(previousMonthDate.getDate() + 1); 
+    previousMonthDate.setDate(1);
+    previousMonthDate.setDate(previousMonthDate.getDate() + 1);
     this.filterDateStart = this.formatDateToString(previousMonthDate);
   }
 
@@ -109,7 +115,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
   // }
 
 
-  
+
   // Configures the DataTable display properties and loads data.
   updateDataTable() {
     // Clears existing DataTable if it is already initialized.
@@ -193,7 +199,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
         loadingRecords: "Cargando...",
         processing: "Procesando...",
       },
-      //This sets the buttons to export 
+      //This sets the buttons to export
       //the table data to Excel and PDF.
       buttons: [
         {
@@ -217,18 +223,18 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
       ]
     });
 
-    //These methods are used to export 
+    //These methods are used to export
     //the table data to Excel and PDF.
 
     //They are activated by
     //clicks in the buttons.
 
-    //Returns the table data exported 
+    //Returns the table data exported
     //to the desired format.
     $('#exportExcelBtn').on('click', function () {
       table.button('.buttons-excel').trigger();
     });
-    
+
     $('#exportPdfBtn').on('click', function () {
       table.button('.buttons-pdf').trigger();
     });
@@ -237,14 +243,14 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
   //Method to search in the table
   //based on the search term.
 
-  //Param 'event' is the event 
+  //Param 'event' is the event
   //that triggers the method.
 
   //Returns the table filtered.
   onSearch(event: any) {
     const searchValue = event.target.value;
 
-    
+
     //Checks if the search term has 3 or more characters.
     if (searchValue.length >= 3) {
       this.table.search(searchValue).draw();
@@ -258,22 +264,22 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
   //based on the 2 dates.
 
   filterData() {
-    let filteredComplaints = [...this.report];  // Copy the data that 
+    let filteredComplaints = [...this.report];  // Copy the data that
                                                // has not been filtered yet.
-  
-    // If there is a search term, 
+
+    // If there is a search term,
     // filter by it
-    if (this.selectedState) {
+    if (this.selectedStates.length > 0) {
       filteredComplaints = filteredComplaints.filter(
-        (c) => c.reportState === this.selectedState
+        (c) => this.selectedStates.includes(c.reportState)
       );
     }
-  
-    // Filter by date if 
+
+    // Filter by date if
     // there are defined dates.
     const startDate = this.filterDateStart ? new Date(this.filterDateStart) : null;
     const endDate = this.filterDateEnd ? new Date(this.filterDateEnd) : null;
-  
+
     filteredComplaints = filteredComplaints.filter((item) => {
       const date = new Date(item.createdDate);
       if (isNaN(date.getTime())) {
@@ -281,43 +287,42 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
         return false;
       }
 
-      // Checks if the date is 
+      // Checks if the date is
       // between the start and end date.
       const afterStartDate = !startDate || date >= startDate;
       const beforeEndDate = !endDate || date <= endDate;
-  
+
       return afterStartDate && beforeEndDate;
     });
-  
-    // Update the 
+
+    // Update the
     // table data.
     this.reportfilter = filteredComplaints;
-    this.updateDataTable(); // Call the function 
+    this.updateDataTable(); // Call the function
                            // to update the table.
   }
-  
-  // Method to handle 
+
+  // Method to handle
   // the State selection.
-  onFilter(event: Event) {
-    const selectedValue = (event.target as HTMLSelectElement).value;
-    this.selectedState = selectedValue; // Updates the 
-                                       // selected State value.
-    this.filterData(); // Applies 
-                      // the filters.
+
+  onFilter(data: any) {
+    this.selectedStates = data;
+    this.filterData();
   }
-  
-  // Method to handle the 
+
+
+  // Method to handle the
   // change of dates.
   filterDate() {
-    this.filterData(); // Applies the Date 
+    this.filterData(); // Applies the Date
                       // and State filters.
   }
 
-  //This method is used to return the 
+  //This method is used to return the
   //filters to their default values.
   eraseFilters(){
     this.refreshData();
-    this.selectedState = '';
+    this.selectedStates = [];
     this.searchTerm = '';
     this.resetDates();
   }
@@ -442,7 +447,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
   //                           <li><a class="dropdown-item" onclick="selectState('REJECTED', ${data.id}, ${data.userId})">Marcar como Rechazada</a></li>
   //                           <li><a class="dropdown-item" onclick="selectState('PENDING', ${data.id}, ${data.userId})">Marcar como Pendiente</a></li>
   //                           <li><hr class="dropdown-divider"></li>
-                            
+
   //                       </ul>
   //                   </div>
   //               </div>`,
@@ -517,7 +522,10 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
           value: data[key]
 
         }));
-        console.log(this.states)
+        this.options = this.states.map(opt => ({
+          value: opt.value,
+          name: opt.value
+        }))
       },
       error: (error) => {
         console.error('error: ', error);
@@ -584,7 +592,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
       [],
       ['Fecha de Creación', 'Estado', 'Descripción','Lote']
     ];
-  
+
     const excelData = this.reportfilter.map((report: ReportDTO) => {
       return [
         this.reportServices.formatDate(report.createdDate),
@@ -593,20 +601,20 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
         report.plotId,
       ];
     });
-  
+
     const worksheetData = [...encabezado, ...excelData];
     const worksheet = XLSX.utils.aoa_to_sheet(worksheetData)
-    
+
     worksheet['!cols'] = [
       { wch: 20 }, // Fecha de Creación
       { wch: 20 }, // Estado
       { wch: 50 }, // Descripción
       { wch: 20 }, // Lote Infractor
     ];
-  
+
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Informes');
-  
+
     XLSX.writeFile(workbook, `${this.reportServices.formatDate(this.filterDateStart)}-${this.reportServices.formatDate(this.filterDateEnd)}_Listado_Informes.xlsx`);
   }
 
