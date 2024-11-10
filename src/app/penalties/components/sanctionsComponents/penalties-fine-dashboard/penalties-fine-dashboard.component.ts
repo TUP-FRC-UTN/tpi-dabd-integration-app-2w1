@@ -136,7 +136,7 @@ export class PenaltiesFineDashboardComponent {
     this.getStates();
   }
   getStates() {
-    this.sanctionsService.getState().subscribe(
+    this.sanctionsService.getStateFines().subscribe(
       (respuesta) => {
         this.states = Object.entries(respuesta).map(([key, value]) => ({
           key,
