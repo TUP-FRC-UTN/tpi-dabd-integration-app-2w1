@@ -31,7 +31,9 @@ export class PenaltiesFineDashboardComponent {
   //Filtros avanzados
   states: any[] = [];
   reportsReasons: ReportReasonDto[] = [];
-
+  state = ''
+  reportReason = ''
+  reportReason2 = ''
   //propiedades para los kpi
   totalFines: number = 0;
   averageFinesPerMonth: number = 0;
@@ -212,6 +214,7 @@ export class PenaltiesFineDashboardComponent {
   }
 
   private updatePieChart() {
+    if(this.state == ""){
     const finesByType = this.finesData.reduce(
       (acc: { [key: string]: number }, fine) => {
         const type = fine.report.reportReason.reportReason;
@@ -225,9 +228,29 @@ export class PenaltiesFineDashboardComponent {
       type,
       count,
     ]);
+  }else{
+    const filteredFines = this.state
+    ? this.finesData.filter(fine => fine.fineState === this.state)
+    : this.finesData;
+
+  const finesByType = filteredFines.reduce(
+    (acc: { [key: string]: number }, fine) => {
+      const type = fine.report.reportReason.reportReason;
+      acc[type] = (acc[type] || 0) + 1;
+      return acc;
+    },
+    {}
+  );
+
+  this.pieChartData = Object.entries(finesByType).map(([type, count]) => [
+    type,
+    count,
+  ]);
+  }
   }
 
   private updateLineChart() {
+    if(this.reportReason2 == ""){
     const fromDate = new Date(this.periodFrom + '-01');
     const toDate = new Date(this.periodTo + '-01');
     toDate.setMonth(toDate.getMonth() + 1);
@@ -256,6 +279,10 @@ export class PenaltiesFineDashboardComponent {
     }
 
     this.lineChartData = lineChartData;
+    }
+    else{
+      
+    }
   }
 
   private updateColumnChart() {
