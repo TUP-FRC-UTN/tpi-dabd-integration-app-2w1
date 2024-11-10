@@ -25,6 +25,10 @@ export class PenaltiesComplaintDashboardComponent {
   //filtros avanzados
   states:any[] = []
   reportsReasons:ReportReasonDto[] = []
+  /////////////////////////
+  state = ''
+  reportReason = ''
+  reportReason2 = ''
   //filtros avanzados
   complaintState: EstadoDenuncia = EstadoDenuncia.Aprobada;
   complaintType: TipoDenuncia = TipoDenuncia.Daño;
@@ -83,7 +87,7 @@ export class PenaltiesComplaintDashboardComponent {
     },
     hAxis: {
       textStyle: { color: '#6c757d' },
-      title: 'Estado'
+      title: 'Periodo'
     },
     animation: {
       duration: 1000,
@@ -132,10 +136,10 @@ export class PenaltiesComplaintDashboardComponent {
 
   ngOnInit() {
     this.updateCharts();
-    this.getReporstReasons();
+    this.getReportReasons();
     this.getStates();
   }
-  getReporstReasons(){
+  getReportReasons(){
     this.sanctionsService.getAllReportReasons().subscribe(
       (respuesta) => {
         this.reportsReasons = respuesta
@@ -159,6 +163,8 @@ export class PenaltiesComplaintDashboardComponent {
   }
 
   private updateColumnChart() {
+    console.log(this.state)
+    if(this.reportReason == ""){
     const complaintsByState = this.complaintsData.reduce((acc: any, complaint) => {
       acc[complaint.complaintState] = (acc[complaint.complaintState] || 0) + 1;
       return acc;
@@ -168,8 +174,23 @@ export class PenaltiesComplaintDashboardComponent {
       count
     ]);
   }
+  else{
+    const filteredComplaints = this.complaintsData.filter(complaint => {
+      return complaint.complaintReason === this.reportReason; // Filtra por el campo 'reportReason'
+    });
+  
+    const complaintsByState = filteredComplaints.reduce((acc: any, complaint) => {
+      acc[complaint.complaintState] = (acc[complaint.complaintState] || 0) + 1;
+      return acc;
+    }, {});
+  
+    this.columnChartData = Object.entries(complaintsByState)
+      .map(([state, count]) => [state, count]);
+  }
+  }
 
   private updateLineChart() {
+    if(this.reportReason2 == ""){
     const fromDate = new Date(this.periodFrom + '-01'); 
   const toDate = new Date(this.periodTo + '-01');
   toDate.setMonth(toDate.getMonth() + 1); 
@@ -192,14 +213,35 @@ export class PenaltiesComplaintDashboardComponent {
 
   this.lineChartData = lineChartData;
   }
+  else{
+    
+  }
+}
 
   private updatePieChart() {
+    console.log(this.state)
+    if(this.state == ""){
+    console.log(this.state)
     const complaintsByType = this.complaintsData.reduce((acc: any, complaint) => {
       acc[complaint.complaintReason] = (acc[complaint.complaintReason] || 0) + 1;
       return acc;
     }, {});
     this.pieChartData = Object.entries(complaintsByType)
       .map(([type, count]) => [type, count]);
+  }
+  else{
+    const filteredComplaints = this.complaintsData.filter(complaint => {
+      return complaint.complaintState === this.state; // Filtra por el campo 'state'
+    });
+  
+    const complaintsByType = filteredComplaints.reduce((acc: any, complaint) => {
+      acc[complaint.complaintReason] = (acc[complaint.complaintReason] || 0) + 1;
+      return acc;
+    }, {});
+  
+    this.pieChartData = Object.entries(complaintsByType)
+      .map(([type, count]) => [type, count]);
+  }
   }
 
   updateCharts() {
