@@ -250,6 +250,7 @@ export class PenaltiesFineDashboardComponent {
   }
 
   private updateLineChart() {
+    console.log(this.reportReason2)
     if(this.reportReason2 == ""){
     const fromDate = new Date(this.periodFrom + '-01');
     const toDate = new Date(this.periodTo + '-01');
@@ -284,8 +285,8 @@ export class PenaltiesFineDashboardComponent {
       const toDate = new Date(this.periodTo + '-01');
       toDate.setMonth(toDate.getMonth() + 1);
     
-      const filteredFines = this.reportReason
-        ? this.finesData.filter(fine => fine.report.reportReason.reportReason === this.reportReason)
+      const filteredFines = this.reportReason2
+        ? this.finesData.filter(fine => fine.report.reportReason.reportReason == this.reportReason2)
         : this.finesData;
     
       const finesByMonth = filteredFines.reduce((acc: { [key: string]: number }, fine) => {
