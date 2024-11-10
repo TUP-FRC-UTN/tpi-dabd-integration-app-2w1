@@ -16,12 +16,12 @@
               <p><strong>Motivo</strong> {{ complaint?.complaintReason || 'N/A' }}</p>
             }
               
-              <p><strong>Fecha</strong> {{ complaint?.createdDate | date:"dd/MM/yyyy" || 'N/A' }}</p>
+              <p><strong>Fecha</strong> {{ complaint?.createdDate ? (complaint.createdDate | date:"dd/MM/yyyy") : 'N/A' }}</p>
           </div>
       
           <div class="col-md-6">
               <p><strong>Descripción</strong> {{ complaint?.description || 'N/A' }}</p>
-              <p><strong>Denunciante</strong> {{ complaint?.userId || 'N/A' }}</p>
+              <p><strong>Denunciante</strong> {{ complaint?.user || 'N/A' }}</p>
           </div>
       </div>
       <hr>
