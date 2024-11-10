@@ -140,10 +140,9 @@ export class PenaltiesFineDashboardComponent {
   getStates() {
     this.sanctionsService.getStateFines().subscribe(
       (respuesta) => {
-        this.states = Object.entries(respuesta).map(([key, value]) => ({
-          key,
-          value,
-        }));
+        this.states = Object.entries(respuesta)
+          .map(([key, value]) => ({ key, value }))
+          .filter(state => state.value !== 'Advertencia');
       },
       (error) => {
         console.error('Error:', error);
