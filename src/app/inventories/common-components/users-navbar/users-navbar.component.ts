@@ -10,7 +10,7 @@ import { SideButton } from '../../common-models/SideButton';
   templateUrl: './users-navbar.component.html',
   styleUrl: './users-navbar.component.css'
 })
-export class UsersNavbarComponent {
+export class MOCKUsersNavbarComponent {
   //Expande el side
   expand: boolean = false;
   pageTitle: string = "Página Principal"
