@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, input, OnInit } from '@angular/core';
+import { Component, input, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -42,21 +42,31 @@ import autoTable from 'jspdf-autotable';
 })
 export class PenaltiesListComplaintComponent implements OnInit {
   //Variables
-  Complaint: ComplaintDto[] = [];                 //Data Souce
-  filterComplaint: ComplaintDto[] = [];           //Data Source to show (filtered)
-  filterComplaintsecond: ComplaintDto[] = [];           //Second data source to show (filtered)
-  // filterDateStart: Date = new Date();             //Start Date value
-  // filterDateEnd: Date = new Date();               //End Date value
-  states: { key: string; value: string }[] = [];  //States array for the select
-  table: any;                                     //Base table
-  searchTerm: string = '';                        //Search bar value
+  Complaint: ComplaintDto[] = [];                 //Lista de datos
+  filterComplaint: ComplaintDto[] = [];           //Datos filtrados a mostrar
+  filterComplaintsecond: ComplaintDto[] = [];     //Datos filtrados a mostrar 2??
+  states: { key: string; value: string }[] = [];  //Lista de estados
+  table: any;                                     //tabla base
 
+  searchTerm: string = '';        //Valor de la barra de busqueda
+  filterDateStart: string = '';   //Valor fecha inicio
+  filterDateEnd: string = '';     //Valor fecha fin
+  selectedStates: string[] = [];   //Valor select
 
-  filterDateStart: string=''; //Start Date value
+  options : {value: string, name: string}[] = []
+  @ViewChild(CustomSelectComponent) customSelect! : CustomSelectComponent;
 
-  filterDateEnd: string =''; //End Date value
-  selectedState: string = '';
-  
+  //Constructor
+  constructor(
+    private router: Router,
+    private _modal: NgbModal,
+    private complaintService: ComplaintService,
+    private routingService: RoutingService
+  ) {
+    (window as any).viewComplaint = (id: number) => this.viewComplaint(id);
+    (window as any).changeState = (state: string, id: number, userId: number) =>
+      this.changeState(state, id, userId);
+  }
 
   //Init
   ngOnInit(): void {
@@ -129,22 +139,18 @@ private formatDateToString(date: Date): string {
     }
     $.fn.dataTable.ext.type.order['date-moment-pre'] = (d: string) => moment(d, 'DD/MM/YYYY').unix()
     let table = this.table = $('#complaintsTable').DataTable({
-      //These are the 
-      //table attributes.
       paging: true,
       searching: true,
       ordering: true,
       lengthChange: true,
       order: [0, 'desc'],
-      lengthMenu: [5,10, 25, 50],
+      lengthMenu: [5, 10, 25, 50],
       pageLength: 5,
       data: this.filterComplaint, //Fuente de datos
-
-      //Columnas de la tabla
       columns: [
         {
           data: 'createdDate',
-          render: (data) =>  moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY'),
+          render: (data) => moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY'),
           type: 'date-moment'
         },
         {
@@ -170,8 +176,8 @@ private formatDateToString(date: Date): string {
         {
           data: null,
           className: 'align-middle',
-          searchable: false, //This is false to indicate 
-          render: (data) =>  //that this column is not searchable.
+          searchable: false,
+          render: (data) =>
             `<div class="text-center">
                <div class="btn-group">
                  <div class="dropdown">
@@ -188,10 +194,10 @@ private formatDateToString(date: Date): string {
         },
       ],
       dom:
-        '<"mb-3"t>' +                           //Table
-        '<"d-flex justify-content-between"lp>', //Pagination
+        '<"mb-3"t>' +                           //Tabla
+        '<"d-flex justify-content-between"lp>', //Paginacion
       language: {
-        lengthMenu:`
+        lengthMenu: `
           <select class="form-select">
             <option value="5">5</option>
             <option value="10">10</option>
@@ -202,60 +208,15 @@ private formatDateToString(date: Date): string {
         loadingRecords: "Cargando...",
         processing: "Procesando...",
       },
-      //This sets the buttons to export 
-      //the table data to Excel and PDF.
-      buttons: [
-        {
-          extend: 'excel',
-          text: 'Excel',
-          className: 'btn btn-success export-excel-btn',
-          title: 'Listado de Denuncias',
-          exportOptions: {
-            columns: [0, 1, 2, 3], //This indicates the columns that will be exported to Excel.
-          },
-        },
-        {
-          extend: 'pdf',
-          text: 'PDF',
-          className: 'btn btn-danger export-pdf-btn',
-          title: 'Listado de denuncias',
-          exportOptions: {
-            columns: [0, 1, 2, 3], //This indicates the columns that will be exported to PDF.
-          },
-        }
-      ]
-    });
-
-
-    //These methods are used to export 
-    //the table data to Excel and PDF.
-
-    //They are activated by
-    //clicks in the buttons.
-
-    //Returns the table data exported 
-    //to the desired format.
-    $('#exportExcelBtn').on('click', function () {
-      table.button('.buttons-excel').trigger();
-    });
-
-    $('#exportPdfBtn').on('click', function () {
-      table.button('.buttons-pdf').trigger();
     });
   }
 
 
-  //Method to search in the table
-  //based on the search term.
-
-  //Param 'event' is the event 
-  //that triggers the method.
-
-  //Returns the table filtered.
+  //Metodo para filtrar con la barra de busqueda
   onSearch(event: any) {
     const searchValue = event.target.value;
 
-    //Checks if the search term has 3 or more characters.
+    //Dispara la busqueda despues del tercer caracter
     if (searchValue.length >= 3) {
       this.table.search(searchValue).draw();
     } else if (searchValue.length === 0) {
@@ -264,23 +225,18 @@ private formatDateToString(date: Date): string {
   }
 
 
-  // Method to filter the table
-  // based on the 2 dates.
-
-  // Returns true only if the complaint
-  // date is between the 2 dates.
+  //
   filterComplaintData() {
     let filteredComplaints = [...this.Complaint];  // Copiar los datos de las que no han sido filtradas aún
-  
-    // Filtrar por estado si se ha seleccionado alguno
-    if (this.selectedState) {
+
+    //Filtra por los estados
+    if (this.selectedStates.length > 0) {
       filteredComplaints = filteredComplaints.filter(
-        (c) => c.complaintState === this.selectedState
+        (c) => this.selectedStates.includes(c.complaintState)
       );
     }
 
-    // Checks if the date is 
-    // between the start and end date.
+    //Filtra por un rango de fechas
     const startDate = this.filterDateStart ? new Date(this.filterDateStart) : null;
     let endDate = this.filterDateEnd ? new Date(this.filterDateEnd) : null;
   
@@ -290,59 +246,42 @@ private formatDateToString(date: Date): string {
         console.warn(`Fecha no válida: ${item.createdDate}`);
         return false;
       }
-  
+
       const afterStartDate = !startDate || date >= startDate;
       const beforeEndDate = !endDate || date <= endDate;
-  
-      return afterStartDate && beforeEndDate; //Returns true only if both conditions are met.
+
+      return afterStartDate && beforeEndDate; //Retorna true solo si se cumplen ambas condiciones
     });
-  
-    // This methos updates 
-    // the table data
+
     this.filterComplaint = filteredComplaints;
-    this.updateDataTable(); // Calls the function to
-                            // update the table.
+    this.updateDataTable();
   }
 
 
-
-  //This method filters the table 
-  //by the complaint state.
-
-  //Param 'event' is the event 
-  //that triggers the method.
-
-  //Updates the table using the filters.
-  onFilter(event: Event) {
-    const selectedValue = (event.target as HTMLSelectElement).value;
-    this.selectedState = selectedValue; // Actualiza el valor del estado seleccionado
-    this.filterComplaintData(); // Aplica los filtros
+  //Actualiza los valores seleccionados del select y filtra
+  onFilter(data: any) {
+    this.selectedStates = data;
+    this.filterComplaintData();
   }
-  
-  
-  // Método para manejar el cambio de fechas
+
+
+  //Método para manejar el cambio de fechas
   filterDate() {
-    this.filterComplaintData(); // Aplica los filtros de fecha y estado
+    this.filterComplaintData();
   }
 
 
-  //This method is used to return the 
-  //filters to their default values.
-  eraseFilters(){
+  //Limpia los filtros
+  eraseFilters() {
     this.refreshData();
-    this.selectedState = '';
+    this.selectedStates = [];
     this.searchTerm = '';
     this.resetDates();
+    this.customSelect.clearData();
   }
 
-  
-  //This method is used to get
-  //styles based on the complaint state.
 
-  //Param 'estado' is the 
-  //complaint state.
-
-  //Returns the class for the state.
+  //Retorna los estilos basados en los estados
   getStatusClass(estado: string): string {
     switch (estado) {
       case 'Anexada':
@@ -359,16 +298,7 @@ private formatDateToString(date: Date): string {
   }
 
 
-  // Method to get the complaint 
-  // state and show the modal.
-
-  // Param 'option' is the new state that the complaint is
-  // being changed to (e.g., "ATTACHED", "REJECTED", "PENDING").
-  // Param 'idComplaint' is the complaint id.
-  // Param 'userId' is the user id 
-  // associated with the complaint.
-
-  //Returns the modal to change the state.
+  //Metodo para actualizar el estado de una denuncia
   changeState(option: string, idComplaint: number, userId: number) {
     const newState = option;
     this.openModal(idComplaint, userId, newState);
@@ -379,9 +309,7 @@ private formatDateToString(date: Date): string {
   ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-  //List queries.
-  //This method is used to 
-  //refresh the data in the table.
+  //Consulta los datos del listado con la api
   refreshData() {
     this.complaintService.getAllComplaints().subscribe((data) => {
       this.Complaint = data;
@@ -390,9 +318,6 @@ private formatDateToString(date: Date): string {
       this.filterDate()
     });
   }
-
-
-
 
   //Loads the 'states' array with 
   //the complaint states for the filter.
@@ -403,6 +328,10 @@ private formatDateToString(date: Date): string {
           key,
           value: data[key]
         }));
+        this.options = this.states.map(opt => ({
+          value: opt.value,
+          name: opt.value
+        }))
       },
       error: (error) => {
         console.error('error: ', error);
@@ -411,11 +340,7 @@ private formatDateToString(date: Date): string {
   }
 
 
-  //Method to redirect 
-  //to another route.
-
-  //Param 'path' is the 
-  //route to redirect to.
+  //
   redirect(path: string) {
     this.router.navigate([path]);
   }
@@ -516,7 +441,7 @@ private formatDateToString(date: Date): string {
       [],
       ['Fecha de Creación', 'Estado', 'Descripción', 'Cantidad de Archivos']
     ];
-  
+
     const excelData = this.filterComplaint.map((complaint: ComplaintDto) => {
       return [
         this.complaintService.formatDate(complaint.createdDate),
@@ -525,20 +450,20 @@ private formatDateToString(date: Date): string {
         complaint.fileQuantity,
       ];
     });
-  
+
     const worksheetData = [...encabezado, ...excelData];
     const worksheet = XLSX.utils.aoa_to_sheet(worksheetData)
-    
+
     worksheet['!cols'] = [
       { wch: 20 }, // Creation Date
       { wch: 20 }, // State
       { wch: 50 }, // Description
       { wch: 20 }, // File Amount
     ];
-  
+
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Denuncias');
-  
+
     XLSX.writeFile(workbook, `${this.complaintService.formatDate(this.filterDateStart)}-${this.complaintService.formatDate(this.filterDateEnd)}_Listado_Denuncias.xlsx`);
   }
 
