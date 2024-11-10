@@ -10,20 +10,14 @@
             
             <div class="col-lg-6 mb-3">
               <div class="row">
-                <div class="input-group">
-                  <label class="col-2 col-form-label">Infractor</label>
-                  
-                  <!-- Input redondeado en la izquierda -->
+                <label class="col-2 col-form-label">Infractor</label>
+                <div class="col-10">
                   <input
                     type="text"
                     class="form-control rounded"
-                    [value]="report?.plotId"
+                    [value]="infractorPlaceholder"
                     disabled
-                  />          
-                  <!-- Botón con espacio y bordes redondeados -->
-                  <button type="button" class="btn btn-info rounded ms-3">
-                    Ver más
-                  </button>
+                  />
                 </div>
               </div>
             </div>

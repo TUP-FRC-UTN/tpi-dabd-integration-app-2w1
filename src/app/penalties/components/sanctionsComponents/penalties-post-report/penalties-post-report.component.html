@@ -7,9 +7,7 @@
                     <select id="selectOption" class="form-select w-100" name="option" [(ngModel)]="selectedReasonId"
                         #optionField="ngModel" required>
                         <option value="" selected="true">Seleccione una opción</option>
-                        @for (reason of reportReasons; track $index) {
-                        <option [value]="reason.id">{{reason.reportReason}}</option>
-                        }
+                        <option *ngFor="let reason of reportReasons" [value]="reason.id">{{reason.reportReason}}</option>
                     </select>
                     @if (optionField.invalid && (optionField.dirty || optionField.touched)) {
                     <div class="text-danger">
@@ -42,14 +40,16 @@
 
             <div class="buttons-box d-flex justify-content-between">
                 <div class="actions-box">
-                    <label for="infractorInput" class="form-label">Infractor</label>
+                    <label for="plotSelect" class="form-label">Parcela</label>
                     <div class="d-flex align-items-center mb-3">
-                        <input type="text" id="infractorInput" class="form-control me-3" disabled
-                            placeholder="Infractor">
-                        <button class="btn btn-success" style="white-space: nowrap;" type="button">Ver más</button>
+                        <select id="plotSelect" class="form-select" [(ngModel)]="plot" name="plot" required>
+                            <option value="" selected="true" disabled>Seleccione un lote</option>
+                            <option *ngFor="let plot of plots" [value]="plot.id">{{ plot.name }}</option>
+                        </select>
                     </div>
                     <button type="button" class="btn btn-warning" (click)="openSelectComplaints()">Gestionar denuncias
                         <i class="bi bi-file-earmark-text"></i></button>
+                    <p>Denuncias seleccionadas: {{ selectedComplaintsCount }}</p>
                 </div>
             </div>
             <div class="submit-box d-flex justify-content-end">

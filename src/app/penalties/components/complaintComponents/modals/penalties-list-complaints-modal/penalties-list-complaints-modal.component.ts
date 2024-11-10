@@ -29,24 +29,30 @@ export class ModalComplaintsListComponent implements OnInit {
     this.complaintService.getAllComplaints().subscribe(res => {
       this.complaints = res.filter(complaint => {
         if (this.formType === 'modify') {
-          return complaint.complaintState === 'Nueva' ||
-            complaint.complaintState === 'Pendiente' ||
-            (complaint.reportId === Number(this.reportId) && complaint.complaintState === 'Anexada');
+          return (complaint.complaintState == 'Nueva' && complaint.reportId == null) ||
+            (complaint.complaintState == 'Pendiente' && complaint.reportId == null) ||
+            (complaint.reportId == Number(this.reportId) && complaint.complaintState == 'Anexada');
         } else {
-          return complaint.complaintState === 'Nueva' || complaint.complaintState === 'Pendiente';
+          return (complaint.complaintState == 'Nueva' && complaint.reportId == null) || (complaint.complaintState == 'Pendiente' && complaint.reportId == null);
         }
       })
         .map(complaint => ({
           ...complaint,
           selected: complaint.complaintState === 'Anexada'
         }));
+      this.updateCheckboxes(); 
       console.log('Denuncias:', this.complaints);
     }, error => {
       console.error('Error al obtener denuncias', error);
     });
   }
 
-  
+  updateCheckboxes(): void {
+    this.complaints.forEach(complaint => {
+      complaint.selected = complaint.complaintState === 'Anexada';
+    });
+  }
+
   // Emits the selected complaints 
   // to the parent component.
   attachSelectedComplaintsToList(): void {
