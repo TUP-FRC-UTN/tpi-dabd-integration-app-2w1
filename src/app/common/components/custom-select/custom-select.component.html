@@ -1,23 +1,33 @@
-<ng-select
-    [items]="options"
-    [multiple]="multiple"
-    bindLabel="name"
-    [closeOnSelect]="false"
-    bindValue="value"
-    [closeOnSelect]="!multiple"
-    [(ngModel)]="selectedOptions"
-    (ngModelChange)="send()">
-    @if(multiple){
+<form [formGroup]="reactiveForm">
+    <ng-select [formControl]="selectControl"
+               bindLabel="name"
+               bindValue="value"
+               [closeOnSelect]="!multiple"
+               [multiple]="multiple"
+               [items]="options"
+               [placeholder]="'Seleccione...'"
+               [ngClass]="onValidate('selectControl')"
+               class="form-select p-0">
+      @if(multiple){
         <ng-template ng-multi-label-tmp let-items="items">
-            @if(items.length == 1){
-                {{ items[0].name }}
-            }
-            @if(items.length>1){
-                {{ items.length }} seleccionados
-            }
-          </ng-template>
-        <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
-            <input class="form-check-input text-dark" id={{item.value}} type="checkbox" [ngModel]="item$.selected" /> {{ item.name }}
+          {{items.length === 1 ? items[0].name : items.length + ' seleccionados'}}
         </ng-template>
+        <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+          <div class="d-flex align-items-center">
+            <input class="form-check-input me-2" 
+                   [id]="'opt-' + item.value" 
+                   type="checkbox" 
+                   [checked]="item$.selected" />
+            <label [for]="'opt-' + item.value" class="form-check-label mb-0">
+              {{ item.name }}
+            </label>
+          </div>
+        </ng-template>
+      }
+    </ng-select>
+    @if(showError('selectControl')){
+      <div class="invalid-feedback d-block">
+        {{showError('selectControl')}}
+      </div>
     }
-</ng-select>
+  </form>
