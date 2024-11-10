@@ -1,20 +1,20 @@
 import { Routes } from "@angular/router";
 import { InventoryEmployeeProviderHomeComponent } from "./inventory-employee-provider-home/inventory-employee-provider-home.component";
-import { IepAttentionCallComponent } from "./components/iep-attention-call/iep-attention-call.component";
-import { IepChargesComponent } from "./components/iep-charges/iep-charges.component";
-import { IepDetailTableComponent } from "./components/iep-detail-table/iep-detail-table.component";
-import { IEPFormPostEmployeesComponent } from "./components/iep-form-post-employees/iep-form-post-employees.component";
-import { IepInventoryComponent } from "./components/iep-inventory/iep-inventory.component";
-import { IepListEmployeesComponent } from "./components/iep-list-employees/iep-list-employees.component";
-import { IepPerformancelistComponent } from "./components/iep-performancelist/iep-performancelist.component";
-import { IepProductComponent } from "./components/iep-product/iep-product.component";
-import { IepPutEmployeesComponent } from "./components/iep-put-employees/iep-put-employees.component";
-import { IepStockIncreaseComponent } from "./components/iep-stock-increase/iep-stock-increase.component";
-import { IepSupplierListComponent } from "./components/iep-supplier-list/iep-supplier-list.component";
-import { IepSupplierUpdateComponent } from "./components/iep-supplier-update/iep-supplier-update.component";
-import { IepSuppliersFormComponent } from "./components/iep-suppliers-form/iep-suppliers-form.component";
-import { IepTableComponent } from "./components/iep-table/iep-table.component";
-import { IepWarehouseMovementSearchComponent } from "./components/iep-warehouse-movement-search/iep-warehouse-movement-search.component";
+import { IepAttentionCallComponent } from "./iep-employees/components/iep-attention-call/iep-attention-call.component";
+import { IepChargesComponent } from "./iep-employees/components/iep-charges/iep-charges.component";
+import { IEPFormPostEmployeesComponent } from "./iep-employees/components/iep-form-post-employees/iep-form-post-employees.component";
+import { IepListEmployeesComponent } from "./iep-employees/components/iep-list-employees/iep-list-employees.component";
+import { IepPerformancelistComponent } from "./iep-employees/components/iep-performancelist/iep-performancelist.component";
+import { IepPutEmployeesComponent } from "./iep-employees/components/iep-put-employees/iep-put-employees.component";
+import { IepDetailTableComponent } from "./iep-inventory/components/iep-detail-table/iep-detail-table.component";
+import { IepInventoryComponent } from "./iep-inventory/components/iep-inventory/iep-inventory.component";
+import { IepProductComponent } from "./iep-inventory/components/iep-product/iep-product.component";
+import { IepStockIncreaseComponent } from "./iep-inventory/components/iep-stock-increase/iep-stock-increase.component";
+import { IepSupplierListComponent } from "./iep-inventory/components/iep-supplier-list/iep-supplier-list.component";
+import { IepSupplierUpdateComponent } from "./iep-inventory/components/iep-supplier-update/iep-supplier-update.component";
+import { IepSuppliersFormComponent } from "./iep-inventory/components/iep-suppliers-form/iep-suppliers-form.component";
+import { IepTableComponent } from "./iep-inventory/components/iep-table/iep-table.component";
+import { IepWarehouseMovementSearchComponent } from "./iep-inventory/components/iep-warehouse-movement-search/iep-warehouse-movement-search.component";
 
 export const INVENTORY_ROUTES: Routes = [
     { path: '', component: InventoryEmployeeProviderHomeComponent },
@@ -91,12 +91,9 @@ export const INVENTORY_ROUTES: Routes = [
         title: 'Gestión de Cargos'
     },
     {
-        
       path: 'empleados/modificar/:id',  // TOMAS H
       component:IepPutEmployeesComponent,
       title: 'Modificar empleado'
-        
-
     }
   
 ];

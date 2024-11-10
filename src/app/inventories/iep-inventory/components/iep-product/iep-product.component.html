@@ -1,0 +1,282 @@
+<section class="py-5">
+  <div class="container p-3 border border-2 rounded shadow-lg">
+    <div class="row">
+      <form class="custom-form" #myForm="ngForm" (ngSubmit)="onSubmit(myForm)">
+        <div class="row">
+          <div class="col-lg-6 mb-3">
+            <div class="row">
+              <label for="inputName" class="col-2 col-form-label text-end"
+                >Nombre</label
+              >
+              <div class="col-10">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="name"
+                  name="name"
+                  [(ngModel)]="dto.name"
+                  #name="ngModel"
+                  minlength="3"
+                  [ngClass]="{
+                    'is-invalid': name.invalid && name.touched,
+                    'is-valid': name.valid && name.touched
+                  }"
+                  required
+                />
+                <div class="error-container">
+                  @if(name.invalid && name.touched) {
+                  @if(name.errors?.['minlength']) {
+                  <div class="text-danger">
+                    El nombre del producto debe tener al menos 3 caracteres
+                  </div>
+                  } @else {
+                  <div class="text-danger">Este campo es requerido</div>
+                  } }
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6 mb-3">
+            <div class="row text-end">
+              <label class="col-2 col-form-label">Categoría</label>
+              <div class="col-10">
+                <ng-select
+                  class="text-start"
+                  id="Categoría"
+                  name="Categoría"
+                  [items]="categories"
+                  [(ngModel)]="dto.category_id"
+                  [clearable]="false"
+                  bindLabel="category"
+                  bindValue="id"
+                  required
+                >
+                </ng-select>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6 mb-3">
+            <div class="row text-end">
+              <label class="col-2 col-form-label">P. Unitario</label>
+              <div class="col-10">
+                <input
+                  type="number"
+                  class="form-control text-end"
+                  aria-label="Amount"
+                  #unit="ngModel"
+                  pattern="^(0|[1-9]\d*)$"
+                  [(ngModel)]="dto.unitPrice"
+                  name="unit"
+                  min="0"
+                  [ngClass]="{
+                    'is-invalid': unit.invalid && unit.touched,
+                    'is-valid': unit.valid && unit.touched
+                  }"
+                  required
+                />
+              </div>
+              <div class="error-container">
+                <div *ngIf="unit.invalid && unit.touched" class="text-danger">
+                  El precio unitario debe ser un número mayor o igual a 0.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!--           <div class="col-lg-6 mb-3">
+            <div class="row text-end">
+              <label class="col-2 col-form-label">Estado</label>
+              <div class="col-10">
+                <select
+                  (click)="(myForm.invalid)"
+                  [ngClass]="{
+                    'is-invalid': state.invalid && state.touched,
+                    'is-valid': state.valid && state.touched
+                  }"
+                  class="form-select"
+                  id=""
+                  name="state"
+                  #state="ngModel"
+                  [(ngModel)]="dto.state_id"
+                  [value]="0"
+                  required
+                >
+                  <option value="1">Disponible</option>
+                  <option value="2">En uso</option>
+                  <option value="3">En mantenimiento</option>
+                </select>
+              </div>
+              <div class="error-container">
+                @if(state.invalid && state.touched) {
+                <div class="text-danger">Este campo es requerido</div>
+                }
+              </div>
+            </div>
+          </div> -->
+
+          <div class="col-lg-6 mb-3">
+            <div class="row text-end">
+              <label class="col-2 col-form-label">Proveedor</label>
+              <div class="col-10">
+                <ng-select
+                  class="text-start"
+                  id="providers"
+                  name="providers"
+                  [items]="providers"
+                  [(ngModel)]="dto.supplier_id"
+                  [clearable]="false"
+                  bindLabel="name"
+                  bindValue="id"
+                  required
+                >
+                </ng-select>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6 mb-3">
+            <div class="row text-end">
+              <label class="col-2 col-form-label">Stock Inicial</label>
+              <div class="col-10">
+                <input
+                  type="number"
+                  name="stock"
+                  class="form-control text-end"
+                  [(ngModel)]="dto.amount"
+                  #stock="ngModel"
+                  id="inputStock"
+                  min="1"
+                  required
+                  [ngClass]="{
+                    'is-invalid': stock.invalid && stock.touched,
+                    'is-valid': stock.valid && stock.touched
+                  }"
+                />
+              </div>
+              <div class="error-container">
+                <div *ngIf="stock.invalid && stock.touched">
+                  <div *ngIf="stock.errors?.['min']" class="text-danger">
+                    La cantidad de stock debe ser mayor a 0
+                  </div>
+                  <div *ngIf="stock.errors?.['required']" class="text-danger">
+                    La cantidad debe ser un número mayor o igual a 0.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6 mb-3">
+            <div class="row text-end">
+              <label class="col-2 col-form-label">Stock Mín.</label>
+              <div class="col-10">
+                <input
+                  type="number"
+                  name="min"
+                  class="form-control text-end"
+                  [(ngModel)]="dto.minAmountWarning"
+                  #min="ngModel"
+                  id="inputMinStock"
+                  min="1"
+                  required
+                  [ngClass]="{
+                    'is-invalid': min.invalid && min.touched,
+                    'is-valid': min.valid && min.touched
+                  }"
+                />
+              </div>
+              <div class="error-container">
+                <div *ngIf="min.invalid && min.touched">
+                  <div *ngIf="min.errors?.['min']" class="text-danger">
+                    La cantidad de stock debe ser mayor a 0
+                  </div>
+                  <div *ngIf="min.errors?.['required']" class="text-danger">
+                    El Stock minimo debe ser un número mayor o igual a 0.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6"></div>
+          <div class="mb-4 form-check col-md-6 ml-2 text-end">
+            <input
+              type="checkbox"
+              class="btn-check"
+              name="reusable"
+              id="btn-check-outlined1"
+              autocomplete="off"
+              [(ngModel)]="dto.reusable"
+              (change)="logear()"
+            />
+            <label
+              class="btn btn-outline-primary"
+              name="reusable"
+              for="btn-check-outlined1"
+              >Reusable</label
+            >
+            <br />
+          </div>
+        </div>
+
+        <div class="col-lg-12 mb-3">
+          <div class="row">
+            <label class="col-2 col-lg-1 col-form-label">Descripción</label>
+            <div class="col-10 col-lg-11">
+              <textarea
+                class="form-control"
+                placeholder=""
+                id="floatingTextarea"
+                style="height: 150px"
+                name="descr"
+                #descr="ngModel"
+                [ngClass]="{
+                  'is-invalid': descr.invalid && descr.touched,
+                  'is-valid': descr.valid && descr.touched
+                }"
+                [(ngModel)]="dto.description"
+                minlength="5"
+                required
+              ></textarea>
+              <div class="error-container">
+                @if(descr.invalid && descr.touched) {
+                @if(descr.errors?.['minlength']) {
+                <div class="text-danger">
+                  La descripción del producto debe tener al menos 5 caracteres
+                </div>
+                }@else {
+                <div class="text-danger">Este campo es requerido</div>
+                } }
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3 mt-4 row justify-content-end">
+          <div class="col-auto">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              (click)="goTo('home/inventory')"
+              style="width: 100%"
+            >
+              Cancelar
+            </button>
+          </div>
+          <div class="col-auto">
+            <button
+              [disabled]="!myForm.valid"
+              type="submit"
+              class="btn btn-success"
+              style="width: 100%"
+            >
+              Registrar
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,241 @@
+<section class="py-5">
+  <div class="container p-3 border border-2 rounded shadow-lg">
+    <div class="row">
+      <!-- Sección para filtro global -->
+      <div class="col-md-8">
+        <!-- Campo de búsqueda con tamaño normal -->
+        <div class="row">
+          <div class="col-4">
+          <input type="text" class="form-control" placeholder="Buscar" [(ngModel)]="globalFilter"
+                (input)="applyFilters()" />
+
+          </div>
+
+                
+            <!-- Filtro de estado -->
+            <div class="col-4"> <!-- Ajuste de ancho y margen -->
+              <ng-select
+                  [items]="stateOptions"
+                  [(ngModel)]="selectedStatesList"
+                  bindLabel="label"
+                  bindValue="value"
+                  [multiple]="true"
+                  placeholder="Seleccionar Estado"
+                  (change)="applyFilters()"
+                  class="w-100"
+              >
+                  <ng-template ng-multi-label-tmp let-items="items">
+                      Seleccionar Estado
+                      <span *ngIf="items.length > 0">({{ items.length }})</span>
+                  </ng-template>
+  
+                  <!-- Template para las opciones del dropdown -->
+                  <ng-template ng-option-tmp let-item="item" let-item$="item$">
+                      <input type="checkbox" [checked]="item$.selected" />
+                      {{ item.label }}
+                  </ng-template>
+              </ng-select>
+          </div>
+
+             
+            <!-- Dropdown de Proveedor -->
+            <div class="col-4"> <!-- Ajuste de ancho -->
+              <ng-select
+                  [items]="providerTypeOptions"
+                  [(ngModel)]="selectedProviderTypesList"
+                  bindLabel="label"
+                  bindValue="value"
+                  [multiple]="true"
+                  placeholder="Tipo proveedor"
+                  (change)="applyFilters()"
+                  class="w-100"
+              >
+                  <ng-template ng-multi-label-tmp let-items="items">
+                      Seleccionar Proveedor
+                      <span *ngIf="items.length > 0">({{ items.length }})</span>
+                  </ng-template>
+  
+                  <!-- Template para las opciones del dropdown -->
+                  <ng-template ng-option-tmp let-item="item" let-item$="item$">
+                      <input type="checkbox" [checked]="item$.selected" />
+                      {{ item.label }}
+                  </ng-template>
+              </ng-select>
+          </div>
+
+
+        </div>
+          
+    </div>
+    <div class="col-4">
+
+      <div class="row">
+        <div class="col-6"></div> <!-- Espacio vacío para centrar los botones -->
+      
+        <div class="col-6 d-flex justify-content-end"> <!-- Usar d-flex para alinear los botones a la derecha -->
+          <!-- Botón para limpiar filtros -->
+          <button class="btn btn-secondary me-1 filterbutton" (click)="cleanFilters()"> <!-- Espacio a la derecha reducido -->
+            <i class="bi bi-trash"></i>
+          </button>
+      
+          <!-- Botón de exportación a Excel -->
+          <button class="btn btn-success me-1 filterbutton" (click)="exportToExcel()"> <!-- Espacio a la derecha reducido -->
+            <i class="fa-solid bi-file-earmark-excel"></i>
+          </button>
+      
+          <!-- Botón de exportación a PDF -->
+          <button class="btn btn-danger filterbutton" (click)="exportToPdf()">
+            <i class="fas bi-file-earmark-pdf"></i>
+          </button>
+        </div>
+      </div>
+
+      </div>
+
+    </div>
+
+      <!-- Botón para mostrar/ocultar filtros 
+      <button class="btn btn-primary me-2" (click)="toggleFilters()">
+        <i class="bi bi-funnel-fill"></i>
+      </button>
+      -->
+
+    
+
+    <!-- Sección de filtros por columnas -->
+      <!-- Fila 1 con 4 inputs -->
+      <!-- Fila 1 con 4 inputs alineados en una sola fila 
+      <div class="row">
+        <div class="col-md-4 mb-2"><input
+          type="text"
+          class="form-control"
+          placeholder="Cuit"
+          [(ngModel)]="columnFilters.cuit"
+          (input)="applyFilters()"
+        /></div>
+        <div class="col-md-4 mb-2"><input
+          type="text"
+          class="form-control"
+          placeholder="Nombre"
+          [(ngModel)]="columnFilters.name"
+          (input)="applyFilters()"
+        /></div>
+        <div class="col-md-4 mb-2"><input
+          type="text"
+          class="form-control"
+          placeholder="Dirección"
+          [(ngModel)]="columnFilters.address"
+          (input)="applyFilters()"
+        /></div>
+          
+            
+          
+          
+        </div>
+
+        -->
+      <!-- Fila 2 con 3 inputs 
+      <div class="row">
+        <div class="col-md-4 mb-2">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Descripción"
+            [(ngModel)]="columnFilters.description"
+            (input)="applyFilters()"
+          />
+        </div>
+        <div class="col-md-4 mb-2">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Teléfono"
+            [(ngModel)]="columnFilters.phoneNumber"
+            (input)="applyFilters()"
+          />
+        </div>
+        <div class="col-md-4 mb-2">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Email"
+            [(ngModel)]="columnFilters.email"
+            (input)="applyFilters()"
+          />
+        </div>
+      </div>
+        -->
+
+
+    <!-- Sección de Tabla -->
+
+    <div class="row mt-1">
+      <div class="col table-responsive">
+        <table 
+        class="table table-striped border border-4 rounded table-hover" id="suppliersTable">
+        <thead class="table-light border border-4">
+            <tr>
+              <th>Razon social</th>
+              <th>Tipo proveedor</th>
+              <th>Direccion</th>
+              <th>Obra Social</th>
+              <th>Descripcion</th>
+              <th>Telefono</th>
+              <th>Email</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let supplier of filteredSuppliers">
+              <td>{{ supplier.name }}</td>
+              <td>{{ supplier.supplierType | supplierType }}</td>
+              <td>{{ supplier.address }}</td>
+              <td>{{ supplier.cuit }}</td>
+              <td>{{ supplier.description }}</td>
+              <td>{{ supplier.phoneNumber }}</td>
+              <td>{{ supplier.email }}</td>
+              <td>
+                <!-- Aquí irían los botones de acciones como editar y eliminar -->
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <!-- Boton + Flotante 
+  HACER MODAL
+-->
+  <!-- Modal de confirmación de eliminación -->
+  <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteModalLabel">
+            Confirmar eliminación
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          ¿Está seguro que desea dar de baja al proveedor seleccionado?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" (click)="confirmDelete()" data-bs-dismiss="modal">
+            Eliminar
+          </button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="floating-btn btn btn-primary" routerLink="/home/create-supplier">
+    <span class="bi-plus-lg"></span>
+  </button>
+</section>

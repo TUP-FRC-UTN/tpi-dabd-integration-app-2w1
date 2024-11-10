@@ -1,0 +1,205 @@
+<section class="py-5">
+  <div class="container p-3 border border-2 rounded shadow-lg">
+    <!-- Filtros para Desempeño y Asistencias -->
+    <div class="row filtros mb-3">
+      <div class="col-1">
+        <button class="btn btn-secondary ms-2" (click)="volverInventario()">
+          <i class="bi bi-arrow-left"></i>
+        </button>
+      </div>
+      <div class="col-2">
+        <input
+          type="text"
+          id="searchTerm"
+          [(ngModel)]="empleadoName"
+          placeholder="Buscar"
+          class="form-control"
+          readonly
+        />
+      </div>
+      <!-- Filtros por fecha -->
+      <div class="col-2">
+        <input
+          type="date"
+          id="startDate"
+          class="form-control"
+          [(ngModel)]="startDate"
+          (change)="onStartDateChange()"
+        />
+      </div>
+      <div class="col-2">
+        <input
+          type="date"
+          id="endDate"
+          class="form-control"
+          [(ngModel)]="endDate"
+          (change)="onEndDateChange()"
+        />
+      </div>
+      <!-- Filtro de estado  -->
+      <div class="col-2">
+        <app-iep-attendances-ngselect
+          [(selectedProviders)]="estadosFiltrados"
+          [emptyValue]="true"
+          [multiple]="false"
+          (selectedProvidersChange)="loadAsistencias()"
+        ></app-iep-attendances-ngselect>
+      </div>
+
+      <!-- <div class="col-2">
+                <select class="form-select" id="" [(ngModel)]="estadoFiltrado" (ngModelChange)="loadAsistencias()">
+                    <option value="" selected>Estado</option>
+                    <option value="PRESENTE">PRESENTE</option>
+                    <option value="TARDE">TARDE</option>
+                    <option value="AUSENTE">AUSENTE</option>
+                    <option value="JUSTIFICADO">JUSTIFICADO</option>
+                </select>
+            </div> -->
+
+      <!-- Botones de exportación en Asistencias y Desempeño -->
+      <div class="col text-end">
+        <button
+          class="btn btn-secondary ms-2 filterbutton"
+          (click)="limpiarFiltro()"
+        >
+          <i class="bi bi-trash"></i>
+        </button>
+        <button
+          class="btn btn-success ms-2 filterbutton"
+          (click)="exportToExcel()"
+        >
+          <i class="fa-solid bi-file-earmark-excel"></i>
+        </button>
+        <button
+          class="btn btn-danger ms-2 filterbutton"
+          (click)="exportToPdf()"
+        >
+          <i class="fas bi-file-earmark-pdf"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabla de empleados con cabecera de columnas -->
+
+    <table
+      id="empleadosTable"
+      class="table table-striped table-hover border border-4 rounded"
+    >
+      <thead class="table-light border border-4">
+        <tr>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th scope="col" class="text-center">Acción</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <!-- Modal put Justificacion -->
+    <div
+      #modalConfirmDelete
+      class="modal"
+      id="modalPutJustificacion"
+      tabindex="-1"
+      role="dialog"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <!-- HEADER -->
+          <div class="modal-header">
+            <h5 class="modal-title">Confirmación</h5>
+          </div>
+
+          <!-- BODY -->
+          <div class="modal-body">
+            <p class="mb-4">¿Está seguro de justificar la falta?</p>
+
+            <div class="row align-items-center">
+              <label for="justification" class="col-3 form-label mb-0"
+                >Justificación:</label
+              >
+              <div class="col-9">
+                <textarea
+                  id="justification"
+                  class="form-control"
+                  rows="3"
+                  required
+                  maxlength="155"
+                  [(ngModel)]="justificationPutText"
+                  #justificationText="ngModel"
+                  [ngClass]="{
+                    'is-invalid':
+                      justificationText.invalid && justificationText.touched,
+                    'is-valid': justificationText.valid
+                  }"
+                ></textarea>
+              </div>
+            </div>
+            <div
+              *ngIf="justificationText.invalid && justificationText.touched"
+              class="invalid-feedback"
+            >
+              Este campo es obligatorio.
+            </div>
+          </div>
+
+          <!-- FOOTER -->
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              [disabled]="justificationText.invalid"
+              data-bs-dismiss="modal"
+              (click)="confirmarJustificacion()"
+            >
+              Guardar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal get Justificacion -->
+    <div
+      #modalConfirmDelete
+      class="modal"
+      id="modalGetJustificacion"
+      tabindex="-1"
+      role="dialog"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <!-- HEADER -->
+          <div class="modal-header">
+            <h5 class="modal-title">Justificacion</h5>
+          </div>
+
+          <!-- BODY -->
+          <div class="modal-body">
+            <p class="mb-4">{{ justificationGetText }}</p>
+          </div>
+
+          <!-- FOOTER -->
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
