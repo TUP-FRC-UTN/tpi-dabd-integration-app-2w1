@@ -189,7 +189,7 @@ private formatDateToString(date: Date): string {
                         ${data.reportState === 'Abierto' || data.reportState === 'Pendiente' ?
                           `<li><a class="dropdown-item" data-action="changeState" data-id="${data.id}" data-state="REJECTED"">Rechazar</a></li>` : ''}
                           ${data.reportState === 'Abierto' || data.reportState === 'Pendiente' ?
-                            `<li><a class="dropdown-item" data-action="changeState" data-id="${data.id}" data-state="CLOSED"">Cancelar</a></li>` : ''}
+                            `<li><a class="dropdown-item" data-action="changeState" data-id="${data.id}" data-state="CLOSED"">Cerrar</a></li>` : ''}
                  </ul>
                 </div>
               </div>
