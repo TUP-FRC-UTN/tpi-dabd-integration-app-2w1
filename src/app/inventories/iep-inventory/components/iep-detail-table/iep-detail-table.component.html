@@ -1,0 +1,614 @@
+<section class="py-5">
+  <div class="container p-3 border border-2 rounded shadow-lg">
+    <!-- Modal de Información -->
+    <div
+      class="modal fade"
+      id="infoModal"
+      tabindex="-1"
+      aria-labelledby="infoModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="infoModalLabel">
+              Información sobre la Página
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p>
+              En esta página, puedes gestionar el listado de productos
+              disponibles en el sistema. A continuación, se detallan las
+              funciones que puedes realizar:
+            </p>
+            <ul>
+              <li>
+                <strong>Filtrar productos:</strong> Utiliza las opciones de
+                filtrado para buscar productos específicos en la lista. Puedes
+                filtrar por diferentes criterios, como el nombre del proveedor,
+                el estado y el rango de precios.
+              </li>
+              <li>
+                <strong>Seleccionar productos:</strong> Marca los productos que
+                deseas eliminar utilizando las casillas de verificación situadas
+                a la derecha de cada fila.
+              </li>
+              <li>
+                <strong>Justificativo de eliminación:</strong> Antes de
+                confirmar la eliminación de productos, deberás proporcionar un
+                justificativo en el campo correspondiente.
+              </li>
+              <li>
+                <strong>Navegación entre páginas:</strong> Utiliza los botones
+                de navegación para desplazarte por las diferentes páginas de
+                productos si hay una gran cantidad de ellos.
+              </li>
+              <li>
+                <strong>Exportar datos:</strong> Puedes exportar la lista de
+                productos a formatos PDF y Excel utilizando los botones
+                correspondientes en la parte superior de la lista.
+              </li>
+            </ul>
+            <p>
+              Asegúrate de proporcionar un justificativo antes de confirmar la
+              eliminación de productos seleccionados. Esta acción no se puede
+              deshacer.
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Confirmación de Eliminación con Justificativo -->
+    <div
+      class="modal fade"
+      id="confirmDeleteModal"
+      tabindex="-1"
+      aria-labelledby="confirmDeleteModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="confirmDeleteModalLabel">
+              Confirmación de Eliminación
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p>¿Está seguro que desea eliminar los productos seleccionados?</p>
+            <div class="mb-3">
+              <label for="modalJustificativo" class="form-label"
+                >Justificativo</label
+              >
+              <textarea
+                id="modalJustificativo"
+                class="form-control"
+                [(ngModel)]="justificativo"
+                rows="3"
+                placeholder="Escribe el motivo por el cual se borran los productos seleccionados"
+              ></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-danger"
+              data-bs-dismiss="modal"
+              (click)="confirmDelete()"
+              [disabled]="justificativo.trim() === ''"
+            >
+              Eliminar
+            </button>
+            <button
+              type="button"
+              (click)="this.cleanDTO()"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección: Opciones de Búsqueda y Acciones -->
+    <div class="d-flex justify-content-between align-items-center">
+      <!-- Contenedor Izquierdo: Campo de Búsqueda y ComboBox -->
+      <div class="d-flex mb-3 align-items-center">
+        <!-- Botón Volver -->
+        <button class="btn btn-secondary me-2" (click)="volverInventario()">
+          <i class="bi bi-arrow-left"></i>
+        </button>
+
+        <div class="input-group">
+          <!-- Campo de Búsqueda -->
+          <input
+            type="text"
+            id="filterInput"
+            class="form-control"
+            placeholder="Buscar"
+            (input)="applyFilter($event)"
+            style="max-width: 200px"
+          />
+
+          <!-- Dropdown de Estado con el evento (change) para filtrar -->
+          <div
+            class="ms-2"
+            style="width: auto; min-width: 150px; max-width: 400px"
+          >
+            <ng-select
+              [items]="stateOptions"
+              [multiple]="true"
+              bindLabel="label"
+              bindValue="id"
+              [(ngModel)]="selectedStates"
+              (change)="applyAllFilters()"
+              [closeOnSelect]="false"
+              [clearable]="true"
+              placeholder="Seleccionar Estado"
+              class="custom-select"
+            >
+              <ng-template ng-multi-label-tmp let-items="items">
+                Seleccionar Estado
+                <span *ngIf="items.length > 0">({{ items.length }})</span>
+              </ng-template>
+
+              <!-- Template para las opciones del dropdown -->
+              <ng-template ng-option-tmp let-item="item" let-item$="item$">
+                <input type="checkbox" [checked]="item$.selected" />
+                {{ item.label }}
+              </ng-template>
+            </ng-select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contenedor Derecho: Selección y Botones de Exportación -->
+      <div class="d-flex align-items-center">
+        <input
+          type="checkbox"
+          id="selectAll"
+          (change)="toggleSelectAll($event)"
+          class="form-check-input me-2"
+        />
+        <label for="selectAll" class="me-3">Seleccionar Todo</label>
+
+        <!-- Botón para mostrar/ocultar filtros
+        <button class="btn btn-primary me-2" (click)="toggleFilters()">
+          <i class="bi bi-funnel-fill"></i>
+        </button> -->
+
+        <!-- Botón filtros avanzados -->
+        <button
+          class="btn btn-primary me-2"
+          data-bs-toggle="modal"
+          title="Filtros Avanzados"
+          data-bs-target="#filtrosAvanzados"
+        >
+          <i class="bi bi-funnel-fill"></i>
+        </button>
+
+        <!-- Botón para limpiar filtros -->
+        <button class="btn btn-secondary me-2" (click)="cleanColumnFilters()">
+          <i class="bi bi-trash"></i>
+        </button>
+
+        <!-- Botones que antes eran flotantes -->
+        <button
+          class="btn btn-danger me-2 filterbutton"
+          [disabled]="selectedIds.length === 0"
+          data-bs-toggle="modal"
+          data-bs-target="#confirmDeleteModal"
+        >
+          <i class="bi bi-x-circle-fill"></i>
+        </button>
+
+        <button
+          class="btn btn-primary me-2 filterbutton"
+          [disabled]="selectedIds.length === 0"
+          data-bs-toggle="modal"
+          data-bs-target="#warehouseModal"
+        >
+          <i class="bi bi-arrow-left-right"></i>
+        </button>
+
+        <button class="btn btn-success me-2 filterbutton" (click)="generateExcel()">
+          <i class="fa-solid bi-file-earmark-excel"></i>
+        </button>
+
+        <button class="btn btn-danger me-2 filterbutton" (click)="generatePDF()">
+          <i class="fas bi-file-earmark-pdf"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Sección de filtros por columna -->
+    <!-- <div *ngIf="filtersVisible" class="row mb-3"> -->
+    <!--       <div class="col-md-2">
+        <input type="text" placeholder="Fecha" (input)="applyColumnFilter($event, 'date')" class="form-control" />
+      </div> -->
+    <!-- <div class="col-md-4">
+        <input type="text" placeholder="Descripción" (input)="applyColumnFilter($event, 'product')"
+          class="form-control" />
+      </div>
+      <div class="col-md-4">
+        <input type="text" placeholder="Proveedor" (input)="applyColumnFilter($event, 'supplier')"
+          class="form-control" />
+      </div>
+      <div class="col-md-2">
+        <input type="number" placeholder="Precio Mín." (input)="applyPriceFilter('min', $event)"
+          class="form-control text-end" />
+      </div>
+
+      <div class="col-md-2">
+        <input type="number" placeholder="Precio Máx." (input)="applyPriceFilter('max', $event)"
+          class="form-control text-end" />
+      </div>
+    </div> -->
+
+    <!-- Advanced Filters Modal -->
+    <div
+      class="modal fade"
+      id="filtrosAvanzados"
+      tabindex="-1"
+      aria-labelledby="filtrosAvanzadosLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="filtrosAvanzadosLabel">
+              Filtros Avanzados
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <!-- Descripción -->
+            <!--         <div class="mb-3">
+          <label for="descripcion" class="form-label">Descripción</label>
+          <input 
+            type="text" 
+            class="form-control"
+            id="descripcion"
+            placeholder="Descripción" />
+        </div> -->
+            <!-- Proveedor -->
+            <!--         <div class="mb-3">
+          <label for="proveedor" class="form-label">Proveedor</label>
+          <input 
+            type="text" 
+            class="form-control"
+            id="proveedor"
+            placeholder="Proveedor" />
+        </div> -->
+            <div class="mb-3">
+              <div class="row">
+                <!-- Primer grupo: Precio Mínimo -->
+                <div class="mb-4">
+                  <div class="row align-items-center">
+                    <div class="col-3">
+                      <label for="precioMin" class="form-label text-end d-block">Precio Mínimo</label>
+                    </div>
+                    <div class="col-9">
+                      <div class="input-group">
+                        <input 
+                          type="number" 
+                          class="form-control text-end" 
+                          id="precioMin" 
+                          min="0"
+                          (input)="applyPriceFilter2($event, 'min')"
+                        />
+                      </div>
+                      <div class="error-container mt-1">
+                        @if (priceValidationError) {
+                          <div class="text-danger small">
+                            El precio mínimo no puede ser mayor que el precio máximo.
+                          </div>
+                        }
+                        @if (minPrice) {
+                          @if (minPrice < 0) {
+                            <div class="text-danger small">
+                              El precio no puede ser menor a 0.
+                            </div>
+                          }
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Segundo grupo: Precio Máximo -->
+                <div class="mb-4">
+                  <div class="row align-items-center">
+                    <div class="col-3">
+                      <label for="precioMax" class="form-label text-end d-block">Precio Máximo</label>
+                    </div>
+                    <div class="col-9">
+                      <div class="input-group">
+                        <input 
+                          type="number" 
+                          class="form-control text-end" 
+                          id="precioMax" 
+                          min="0"
+                          [(ngModel)]="maxPrice"
+                          name="precioMax"
+                          (input)="applyPriceFilter2($event, 'max')"
+                        />
+                      </div>
+                      <div class="error-container mt-1">
+                        @if (maxPrice) {
+                          @if (maxPrice < 0) {
+                            <div class="text-danger small">
+                              El precio no puede ser menor a 0.
+                            </div>
+                          }
+                        }
+                      </div>
+                      </div> 
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cerrar
+            </button>
+            <!--         <button type="button" class="btn btn-primary" (click)="applyAllFilters2()" data-bs-dismiss="modal">Aplicar</button>
+        <button type="button" class="btn btn-primary bi bi-trash" title="Limpiar Filtros" (click)="cleanColumnFilters()"></button> -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección: Tabla de Detalles de Productos -->
+    <div class="table-responsive mb-4 justify-content-between">
+      <table
+        id="productTable"
+        class="table table-striped border border-4 rounded table-hover"
+      >
+        <thead class="table-light border border-4">
+          <tr>
+            <th>Descripción</th>
+            <th>Nombre del Proveedor</th>
+            <th>Estado</th>
+            <th class="text-end">Precio</th>
+            <th class="text-center">Seleccionar</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let detail of details">
+            <td>{{ detail.description }}</td>
+            <td>{{ detail.supplierName }}</td>
+            <td>{{ detail.state }}</td>
+            <td class="text-end">{{ detail.price | currency : "USD" }}</td>
+            <td class="text-center">
+              <input
+                type="checkbox"
+                [checked]="selectedIds.includes(detail.id)"
+                (change)="toggleSelection(detail.id)"
+              />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal para registrar Movimiento de Inventario -->
+  <div
+    class="modal fade"
+    id="warehouseModal"
+    role="dialog"
+    aria-labelledby="warehouseModal"
+    style="width: 100%"
+    aria-hidden=""
+  >
+    <div class="modal-dialog" style="width: 100%">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">
+            Registro de Movimiento de Inventario
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+            (click)="cleanDTO()"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <div class="row" style="color: gray">
+            @if(selectedIds.length === 0) {
+            <p class="col-12">No hay ítems seleccionados</p>
+            }@else {
+            <label for="detailsSelected" class="col-form-label col-12"
+              >Ítems seleccionados: {{ selectedIds.length }}</label
+            >
+            }
+          </div>
+          <div class="mt-2">
+            <div class="row form">
+              <form
+                class="custom-form"
+                #myForm="ngForm"
+                (ngSubmit)="onSubmit(myForm)"
+              >
+                <div class="mb-3 row">
+                  <label for="movementType" class="col-form-label col-2"
+                    >Tipo</label
+                  >
+                  <div class="col-10">
+                    <select
+                      class="form-select"
+                      #movementType="ngModel"
+                      [(ngModel)]="dtoCreate.id_movement_type"
+                      id="movementType"
+                      style="border-radius: 0.25rem"
+                      name="movementType"
+                      [ngClass]="{
+                        'is-invalid':
+                          movementType.invalid && movementType.touched,
+                        'is-valid': movementType.valid && movementType.touched
+                      }"
+                      min="1"
+                      required
+                    >
+                      <option value="1">Devolución</option>
+                      <option value="2">Préstamo</option>
+                      <option value="3">A mantenimiento</option>
+                    </select>
+                    <div class="error-container">
+                      <div
+                        *ngIf="movementType.invalid && movementType.touched"
+                        class="error-message"
+                        style="color: red"
+                      >
+                        @if(movementType.invalid){
+                        @if(movementType.errors?.['min']){
+                        <p>Seleccione un Tipo de Movimiento</p>
+                        } @else {
+                        <p>El campo es requerido</p>
+                        } }
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mb-3 row">
+                  <label for="inputName" class="col-form-label col-2"
+                    >Empleado</label
+                  >
+                  <div class="col-10">
+                    <select
+                      class="form-select"
+                      id="employee"
+                      style="border-radius: 0.25rem"
+                      name="employee"
+                      #employee="ngModel"
+                      [(ngModel)]="dtoCreate.employee_id"
+                      (ngModelChange)="onChangeEmployee()"
+                      [ngClass]="{
+                        'is-invalid': employee.invalid && employee.touched,
+                        'is-valid': employee.valid && employee.touched
+                      }"
+                    >
+                      <option value="" selected></option>
+                      @for(e of employees; track $index) {
+                      <option value="{{ e.id }}">{{ e.fullName }}</option>
+                      }
+                    </select>
+                    <div class="error-container">
+                      <div
+                        *ngIf="employee.invalid && employee.touched"
+                        class="error-message"
+                        style="color: red"
+                      >
+                        @if(employee.invalid){
+                        <p>El campo es requerido</p>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+          
+                  <div class="mb-3 row">
+                    <label for="inputDate" class="col-form-label col-2"
+                      >Fecha</label
+                    >
+                    <div class="col-10">
+                      <input
+                        type="datetime-local"
+                        [value]="dtoCreate.date | date : 'yyyy-MM-ddTHH:mm'"
+                        #date="ngModel"
+                        [(ngModel)]="dtoCreate.date"
+                        required
+                        name="date"
+                        max="dtoCreate.reincorporationDate"
+                        class="form-control"
+                        id="date"
+                        [ngClass]="{
+                          'is-invalid': date.invalid && date.touched,
+                          'is-valid': date.valid && date.touched
+                        }"
+                      />
+                      <div class="error-container">
+                        <div
+                          *ngIf="date.invalid && date.touched"
+                          class="error-message"
+                        >
+                          @if(date.invalid && date.touched){
+                          @if(date.errors?.['required']){
+                          <p>El campo es requerido</p>
+                          } }
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+              
+
+                <div class="modal-footer">
+                  <div class=""></div>
+                  <div class="">
+                    <button
+                      type="submit"
+                      [disabled]="myForm.invalid"
+                      class="btn btn-primary"
+                      data-bs-dismiss=""
+                    >
+                      Registrar
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Boton + Flotante -->
+  <!-- <button class="floating-btn btn btn-danger" style="bottom: 90px;" data-bs-toggle="modal"
+    [disabled]="selectedIds.length === 0" data-bs-target="#confirmDeleteModal">
+    <span class="bi-x-circle-fill"></span>
+  </button>
+
+  <button class="floating-btn btn btn-primary" data-bs-toggle="modal" (click)="openModalWarehouse()"
+    [disabled]="selectedIds.length === 0">
+    <span class="bi-arrow-left-right"></span>
+  </button> -->
+</section>

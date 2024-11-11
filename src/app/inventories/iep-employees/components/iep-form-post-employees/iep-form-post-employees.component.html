@@ -1,0 +1,620 @@
+<section class="py-2">
+
+    <div class="container mt-5 col-md-8 ">
+        <form #form="ngForm" (ngSubmit)="onSubmit(form)" class="form-container border rounded border shadow p-4">
+
+            
+            <!-- Modal de Información -->
+                <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                    <div class=" modal-header">
+                        <h5 class="modal-title">Información sobre la Página</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                                <!-- Resto del contenido del modal -->
+                        <p>
+                            Bienvenido al formulario de registro de empleado. En esta página, puedes registrar nuevos
+                            empleados del sistema. A continuación, se
+                            detallan las secciones :
+                        </p>
+                        <ul>
+                            <li><strong>Datos personales:</strong>Se piden los datos afines para la individualizacion
+                                del empleado
+                            </li>
+                            <li><strong>Datos de contacto:</strong> Se piden los datos para tener un canal de
+                                comunicacion no personal con el empleado , el empleado debe contar con ambos
+                                contactos<em>E-mail y Telefono</em>,
+                            </li>
+                            <li><strong>Datos de domicilio:</strong> Se piden los datos para saber donde se encuentra
+                                viviendo el empleado ,se deben ingresar los datos sobre el domicilio Real
+                            </li>
+                            <li>
+                                <strong>Datos de contrato:</strong> Se piden los datos para constatar la modalidad de
+                                trabajo, puede ser
+                                <em>Tercerizado <button class="btn btn-success" >SI</button>   o no Tercerizado <button class="btn btn-danger">NO</button></em>      la fecha de inicio de contrato debe ser igual o
+                                posterior a la fecha actual
+                            </li>
+                            <li>
+                                <strong>Dias laborales y horarios:</strong> se deben seleccionar los dias habiles que el
+                                empleado debe asistir y los horarios que deberia cumplir
+                            </li>
+                            <li><strong>General</strong> :Se deben ingresar todos los datos validos respetando formatos
+                                , tipos y rangos </li>
+                        </ul>
+
+
+                    </div>
+                    
+                  
+                    </div>
+                </div>
+            </div>
+
+            <!-- empieza el formulario -->
+            <!-- empieza el formulario -->
+            <!-- empieza el formulario -->
+            <!-- empieza el formulario -->
+            <!-- empieza el formulario -->
+            <!-- empieza el formulario -->
+            <!-- empieza el formulario -->
+            <!-- empieza el formulario -->
+            <!-- empieza el formulario -->
+            <!-- empieza el formulario -->
+            <!-- Datos personales -->
+        
+
+                <p class="text-start mb-3 mt-3 ">Datos personales:</p>
+                <hr>
+                <div class="form-group row mb-3 ">
+                    <!-- nombre  -->
+
+                    <div class="col-md-6">
+                        <div class="row">
+                            <label for="nombre" class="col-form-label col-md-3 text-end">Nombre</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" id="nombre" name="nombre" [(ngModel)]="nombre"
+                                    #nombreModel="ngModel" required pattern="^[A-Za-zÀ-ÿ\s]+$" [ngClass]="{
+                    'is-invalid': nombreModel.invalid && nombreModel.touched, 
+                    'is-valid': nombreModel.valid && nombreModel.touched
+                }">
+                                <div *ngIf="nombreModel.invalid && nombreModel.touched" class="invalid-feedback">
+                                    "La entrada no es válida. Asegúrate de usar solo letras."
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- apellido  -->
+                    <div class="col-md-6">
+                        <div class="row">
+                            <label for="apellido" class="col-form-label col-md-3 text-end">Apellido</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" id="apellido" name="apellido" name="apellido"
+                                    [(ngModel)]="apellido" #apellidoModel="ngModel" required pattern="^[A-Za-zÀ-ÿ\s]+$"
+                                    [ngClass]="{
+                          'is-invalid': apellidoModel.invalid && apellidoModel.touched, 
+                          'is-valid': apellidoModel.valid && apellidoModel.touched
+                      }">
+                                <div *ngIf="apellidoModel.invalid && apellidoModel.touched" class="invalid-feedback">
+                                    "La entrada no es válida. Asegúrate de usar solo letras."
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="form-group row mb-5">
+
+
+                    <!-- tipo doc  -->
+
+                    <div class="col-md-6">
+                        <div class="row">
+                            <label for="documentType" class="col-form-label col-md-3 text-end">Tipo Doc</label>
+                            <div class="col-md-9">
+                                <select id="documentType" name="documentType" class="form-select"
+                                    [(ngModel)]="documentType">
+                                    <option disabled required value="">Seleccionar tipo de documento</option>
+                                    <option [ngValue]="documentTypeEnum.DNI">DNI</option>
+                                    <option [ngValue]="documentTypeEnum.PASSPORT">PASAPORTE</option>
+                                </select>
+                                <div *ngIf="dniModel.invalid && dniModel.touched" class="invalid-feedback">
+                                    "La entrada no es válida. Asegúrate de seleccionar un tipo."
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <!-- cuil  -->
+
+                    <div class="col-md-6">
+                        <div class="row">
+                            <label for="cuil" class="col-form-label col-md-3 text-end">CUIL</label>
+                            <div class="form-group col-md-9">
+                                <input type="text" class="form-control" id="cuil" name="cuil" [(ngModel)]="cuil"
+                                    #cuilModel="ngModel" required pattern="^([0-9]{2}-)?[0-9]{8}-[0-9]$" [ngClass]="{
+                    'is-invalid': (cuilModel.invalid && cuilModel.touched)||(!isValidCuil), 
+                    'is-valid': (cuilModel.valid && cuilModel.touched)||(isValidCuil)
+                }" (input)="cuilModel.valid ? validateCuil() : null">
+                                <div *ngIf="cuilModel.invalid && cuilModel.touched" class="invalid-feedback">
+                                    "La entrada no es válida. Asegúrate que cumpla con el formato estipulado."
+                                </div>
+                                <div *ngIf=" !isValidCuil" class="invalid-feedback">
+                                    "El CUIL ingresado ya existe en el sistema."
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- document-dni  -->
+
+                    <div class="col-md-6 mt-3">
+                        <div class="row">
+                            <label for="dni" class="col-form-label col-md-3 text-end">Documento</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" id="dni" name="dni" [(ngModel)]="dni"
+                                    #dniModel="ngModel" required [ngClass]="{
+                  'is-invalid': (dniModel.invalid && dniModel.touched)|| (!isValidDni), 
+                  'is-valid': dniModel.valid && dniModel.touched && isValidDni
+              }" (input)="validateDni()">
+                                <div *ngIf="dniModel.invalid && dniModel.touched" class="invalid-feedback">
+                                    "La entrada no es válida."
+                                </div>
+                                <div *ngIf="dniModel.touched&&!isValidDni" class="invalid-feedback">
+                                    "El DNI ingresado ya existe en el sistema"
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+                </div>
+       
+
+            <!-- contacto  -->
+          
+                <p class="text-start mb-3 mt-3">Datos de contacto:</p>
+                <hr>
+
+                <div class="form-group row mb-5 pb-2 ">
+                    <!-- tel  -->
+
+                    <div class="col-md-6">
+                        <div class="row">
+                            <label for="telefono" class="col-form-label col-md-3 text-end">Teléfono</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" id="telefono" name="telefono"
+                                    [(ngModel)]="telefono" #telefonoModel="ngModel" required
+                                    pattern='^(0?15)?[1-9]\d{8}$' [ngClass]="{
+                   'is-invalid': telefonoModel.invalid && telefonoModel.touched, 
+                   'is-valid': telefonoModel.valid && telefonoModel.touched
+               }">
+                                <div *ngIf="telefonoModel.invalid && telefonoModel.touched" class="invalid-feedback">
+                                    "La entrada no es válida. , Asegúrate de no estar agregando 0351 o +54"
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- mail  -->
+
+                    <div class="col-md-6">
+                        <div class="row">
+                            <label for="mail" class="col-form-label col-md-3 text-end">E-mail</label>
+                            <div class="col-md-9">
+                                <input type="email" class="form-control" id="mail" name="mail" [(ngModel)]="mail"
+                                    #mailModel="ngModel" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                                    [ngClass]="{
+                         'is-invalid': mailModel.invalid && mailModel.touched, 
+                         'is-valid': mailModel.valid && mailModel.touched
+                     }">
+                                <div *ngIf="mailModel.invalid && mailModel.touched" class="invalid-feedback">
+                                    "La entrada no es válida ,Asegúrate de usar el formato de e-mail"
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+          
+
+
+            <!-- Dirección -->
+
+           
+                <p class="text-start mb-3 mt-3 ">Datos de domicilio:</p>
+                <hr>
+                <div class="mb-5">
+                <div class="form-group row mb-3 ">
+
+                         <!-- provincia -->
+                    <div class="col-md-6 mb-3">
+                        <div class="row text-end">
+                          <label class="col-form-label col-md-3" for="provincia">Provincia</label>
+                          <div class="col-md-9">
+                            <ng-select
+                                class="text-start"
+                              id="provincia"
+                              name="provincia"                             
+                              [items]="provincias"
+                              [(ngModel)]="provinciaSelect"
+                              [clearable]="false"
+                              bindLabel="nombre"
+                              (change)="loadLocalidades()"
+                              required
+                              >
+                            </ng-select>
+                          </div>
+                        </div>
+                      </div>
+
+
+
+
+
+
+         <!-- localidad -->
+         <div class="col-md-6 mb-3">
+            <div class="row text-end">
+              <label class="col-form-label col-md-3" for="localidad">Localidad</label>
+              <div class="col-md-9 ">
+                <ng-select
+                class="text-start"
+                  id="localidad"
+                  name="localidad"                             
+                  [items]="localidades"
+                  [(ngModel)]="localidadSelect"
+                  [clearable]="false"
+                  bindLabel= "nombre"           
+                  required>
+                </ng-select>
+              </div>
+            </div>
+          </div>
+
+
+          </div>
+            
+
+
+
+
+
+
+
+
+                <div class="form-group row mb-3  ">
+
+                    <!-- calle  -->
+
+                    <div class="col-md-6">
+                        <div class="row text-end">
+                            <label for="calle" class="col-form-label col-md-3">Calle</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" id="calle" name="calle" [(ngModel)]="calle"
+                                    #calleModel="ngModel" required pattern="^[A-Za-z0-9\s]+$" [ngClass]="{
+                   'is-invalid': calleModel.invalid && calleModel.touched, 
+                   'is-valid': calleModel.valid && calleModel.touched
+               }">
+                                <div *ngIf="calleModel.invalid && calleModel.touched" class="invalid-feedback">
+                                    La entrada no es válida. Asegúrate de no usar caracteres especiales. <br>
+                                    <small>EJ: (+, -, /, "", |)</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- nro calle  -->
+
+                    <div class="col-md-6">
+                        <div class="row text-end">
+                            <label for="numeroCalle" class="col-form-label col-md-3">Número</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" id="numeroCalle" name="numeroCalle"
+                                    [(ngModel)]="numeroCalle" #numeroCalleModel="ngModel" required
+                                    pattern="^(0|[1-9]\d*)$" [ngClass]="{
+                   'is-invalid': numeroCalleModel.invalid && numeroCalleModel.touched, 
+                   'is-valid': numeroCalleModel.valid && numeroCalleModel.touched
+               }">
+
+                                <div *ngIf="numeroCalleModel.invalid && numeroCalleModel.touched"
+                                    class="invalid-feedback">
+                                    La entrada no es válida. Asegúrate de usar solo numeros enteros positivos
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group row mb-3  ">
+
+                    <!-- piso  -->
+
+                    <div class="col-md-6">
+                        <div class="row text-end">
+                            <label for="piso" class="col-form-label col-md-3">Piso</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" id="piso" name="piso" [(ngModel)]="piso"
+                                    #pisoModel="ngModel" required pattern="^-?[0-9]\d*$" [ngClass]="{
+                   'is-invalid': pisoModel.invalid && pisoModel.touched, 
+                   'is-valid': pisoModel.valid && pisoModel.touched
+               }">
+                                <div *ngIf="pisoModel.invalid && pisoModel.touched" class="invalid-feedback">
+                                    La entrada no es válida. Asegúrate de usar solo numeros enteros</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- depa  -->
+
+                    <div class="col-md-6">
+                        <div class="row text-end">
+                            <label for="dpto" class="col-form-label col-md-3">Departamento</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" id="dpto" name="dpto" [(ngModel)]="dpto"
+                                    #dptoModel="ngModel" pattern="^[a-zA-Z0-9]+$" [ngClass]="{
+                       'is-invalid': dptoModel.invalid && dptoModel.touched, 
+                       'is-valid': dptoModel.valid && dptoModel.touched
+                   }">
+
+                                <div *ngIf="dptoModel.invalid && dptoModel.touched" class="invalid-feedback">
+                                    La entrada no es válida. Asegúrate de usar no usar caracteres especiales
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="form-group row mb-3  ">
+                    <!-- cod postal  -->
+
+                    <div class="col-md-6">
+                        <div class="row text-end">
+                            <label for="codigo-postal" class="col-form-label col-md-3">Código P </label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" id="codigo-postal" name="codigo-postal"
+                                    [(ngModel)]="codigoPostal" #codigoPostaModel="ngModel" required
+                                    pattern="^(0|[1-9]\d*)$" [ngClass]="{
+                   'is-invalid': codigoPostaModel.invalid && codigoPostaModel.touched, 
+                   'is-valid': codigoPostaModel.valid && codigoPostaModel.touched
+               }">
+
+                                <div *ngIf="codigoPostaModel.invalid && codigoPostaModel.touched"
+                                    class="invalid-feedback">
+                                    La entrada no es válida. Asegúrate de usar solo numeros enteros positivos
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+
+      
+    
+                <p class="text-start mb-3 mt-3">Datos del contrato:</p>
+                <hr>
+
+                <div class="form-group row mb-5">
+                    <!-- Empleado tercerizado -->
+                    <div class="col-md-6 mb-3 ">
+                        <div class="row text-end">
+
+                            <label class="col-form-label col-md-3" for="tercerizado">Tercerizado</label>
+                            <div class="col-md-9 text-center">
+
+
+                                <button 
+                                type="button"
+                                style="width: 100%;"
+                                [ngClass]="terciorizedEmployee ? 'btn btn-success text-center' : 'btn btn-danger text-center'"  
+                                (click)="changeTerceorized()">
+                                {{ terciorizedEmployee ? 'SI' : 'NO' }}
+                            </button>
+                            </div>
+
+                        </div>
+                    </div>
+                    @if (!terciorizedEmployee) {
+                    <!-- Salario -->
+                    <div class="col-md-6 mb-3">
+                        <div class="row text-end">
+
+                            <label class="col-form-label col-md-3" for="salario">Salario</label>
+                            <div class="col-md-9">
+                                <input type="number" class="form-control text-end" id="salario" name="salario"
+                                    [(ngModel)]="salario" #salarioModel="ngModel" required pattern="^[1-9]\d*$"
+                                    [ngClass]="{
+                           'is-invalid': salarioModel.invalid && salarioModel.touched, 
+                           'is-valid': salarioModel.valid && salarioModel.touched
+                       }">
+
+                                <div *ngIf="salarioModel.invalid && salarioModel.touched" class="invalid-feedback">
+                                    La entrada no es válida. Asegúrate de introducir un número entero positivo.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    }
+                    @else {
+                    <!-- Proveedores de servicio tercerizado -->
+                    <div class="col-md-6 mb-3">
+                        <div class="row text-end">
+                          <label class="col-form-label col-md-3" for="proveedores">Proveedores</label>
+                          <div class="col-md-9 text-start">
+                            <ng-select
+                              id="proveedores"
+                              name="proveedores"
+                              [items]="suppliers"
+                              [(ngModel)]="selectedSupplier"
+                              [clearable]="false"
+                              bindLabel="name"
+                              required>
+                            </ng-select>
+                          </div>
+                        </div>
+                      </div>
+                    }
+                    <!-- Cargo -->
+
+
+                    <div class="col-md-6 mb-3">
+                        <div class="row text-end">
+                          <label class="col-form-label col-md-3" for="cargo">Cargo</label>
+                          <div class="col-md-9 ">
+                            <ng-select
+                            class="text-start"
+                              id="cargo"
+                              name="cargo"                             
+                              [items]="cargos"
+                              [(ngModel)]="cargoSelected"
+                              [clearable]="false"
+                              bindLabel= "charge"           
+                              required>
+                            </ng-select>
+                          </div>
+                        </div>
+                      </div>
+
+
+                    <!-- fecha inicio contrato -->
+                    <div class="col-md-6 ">
+                        <div class="row text-end">
+                            <label for="start-time-contract" class="col-form-label col-md-3">Inicio</label>
+                            <div class="col-md-9">
+                                <input type="date" id="startTimeContract" id="startTimeContract" class="form-control"
+                                    name="startTimeContract" [(ngModel)]="startTimeContract"
+                                    #startTimeContractModel="ngModel" required (ngModelChange)="validateDate()"
+                                    [ngClass]="{
+                            'is-invalid': (startTimeContractModel.invalid && startTimeContractModel.touched) || invalidDate, 
+                            'is-valid': (startTimeContractModel.valid && startTimeContractModel.touched )&& !invalidDate
+                        }">
+                                <div *ngIf="(startTimeContractModel.invalid && startTimeContractModel.touched )||(invalidDate && startTimeContractModel.touched)"
+                                    class="invalid-feedback">
+                                    Por favor, selecciona una fecha válida.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+          
+
+
+
+            <!-- dias laborales -->
+          
+
+                <p class="text-start mb-3 mt-3  ">Dias laborales</p>
+                <hr>
+
+
+                <div class="btn-group d-flex flex-wrap mb-5 mt-5" role="group" aria-label="Dias laborales">
+                    <input type="checkbox" class="btn-check" name="lunes" id="btn-check-outlined1" autocomplete="off" [(ngModel)]="lunes" (change)="cambio()">
+                    <label class="btn btn-outline-primary" name="lunes"for="btn-check-outlined1">Lunes</label><br>
+
+                    <input type="checkbox" class="btn-check" name="martes" id="btn-check-outlined2" autocomplete="off" [(ngModel)]="martes" (change)="cambio()">
+                    <label class="btn btn-outline-primary"name="martes" for="btn-check-outlined2">Martes</label><br>
+
+                    <input type="checkbox" class="btn-check" name="miercoles" id="btn-check-outlined3" autocomplete="off" [(ngModel)]="miercoles" (change)="cambio()">
+                    <label class="btn btn-outline-primary"name="miercoles" for="btn-check-outlined3">Miercoles</label><br>
+
+                    <input type="checkbox" class="btn-check" name="jueves" id="btn-check-outlined4" autocomplete="off" [(ngModel)]="jueves" (change)="cambio()">
+                    <label class="btn btn-outline-primary"name="jueves" for="btn-check-outlined4">Jueves</label><br>
+
+                    <input type="checkbox" class="btn-check" name="viernes" id="btn-check-outlined5" autocomplete="off" [(ngModel)]="viernes" (change)="cambio()">
+                    <label class="btn btn-outline-primary"name="viernes" for="btn-check-outlined5">Viernes</label><br>
+
+                    <input type="checkbox" class="btn-check" name="sabado" id="btn-check-outlined6" autocomplete="off" [(ngModel)]="sabado" (change)="cambio()">
+                    <label class="btn btn-outline-primary"name="sabado" for="btn-check-outlined6">Sabado</label><br>
+
+                    <input type="checkbox" class="btn-check" name="domingo" id="btn-check-outlined7" autocomplete="off" [(ngModel)]="domingo" (change)="cambio()">
+                    <label class="btn btn-outline-primary"name="domingo" for="btn-check-outlined7">Domingo</label><br>
+                  </div>
+
+
+
+
+
+
+               
+
+            <!-- Horarios -->
+                <p class="text-start mb-3 ">Horarios</p>
+                <hr>
+                <div class="form-group row mb-3 pt-3">
+                    <div class="col-md-6">
+                        <div class="row">
+                            <label for="hora-entrada" class="col-md-3"> <i class="fas fa-clock"></i> Entrada</label>
+                            <div class=" col-md-5">
+                                <input type="time" class="form-control" id="hora-entrada" name="hora-entrada"
+                                    [(ngModel)]="horaEntrada" #horaEntradaModel="ngModel" required [ngClass]="{
+                    'is-invalid': horaEntradaModel.invalid && horaEntradaModel.touched, 
+                    'is-valid': horaEntradaModel.valid && horaEntradaModel.touched
+                }">
+                                <div *ngIf="horaEntradaModel.invalid && horaEntradaModel.touched"
+                                    class="invalid-feedback">
+                                    Por favor, selecciona una hora válida.
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="row">
+
+
+                            <label for="hora-salida" class="col-md-4 text-end">
+                                <i class="fas fa-clock"></i> Salida:</label>
+
+
+                            <div class="col-md-5">
+                                <input type="time" class="form-control" id="hora-salida" name="hora-salida"
+                                    [(ngModel)]="horaSalida" #horaSalidaModel="ngModel" required [ngClass]="{
+                                'is-invalid': horaSalidaModel.invalid && horaSalidaModel.touched, 
+                                'is-valid': horaSalidaModel.valid && horaSalidaModel.touched
+                            }">
+                                <div *ngIf="horaSalidaModel.invalid && horaSalidaModel.touched"
+                                    class="invalid-feedback">
+                                    Por favor, selecciona una hora válida.
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                </div>
+           
+
+            <!-- Botones -->
+          
+            <div class="row mt-5">
+                <div class="col-md-10 text-end">
+                    <button  type="submit" link class="btn btn-secondary" (click)="goTo('home/employee-list')">Cancelar</button>
+
+                </div>
+                <div class="col-md-2  d-flex justify-content-end">
+                    <button [disabled]="!form.valid" type="submit" class="btn btn-success">Registrar</button>
+                </div>
+            </div>
+
+
+
+           
+        </form>
+    </div>
+
+</section>

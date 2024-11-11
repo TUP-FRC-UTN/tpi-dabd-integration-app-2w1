@@ -1,0 +1,54 @@
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-6">
+            <google-chart
+                [type]="chartTypeAsistencias" 
+                [data]="dataAsistencias" 
+                [columns]="columnNamesAsistencias"
+                [options]="chartOptionsAsistencias"
+                [width]="width"
+                [height]="height">
+            </google-chart>
+            <select [(ngModel)]="empleado" (ngModelChange)="loadAsistencias()">
+                <option value="" selected>Empleado</option>
+                @for (em of empleados; track $index) {
+                    <option [value]="em.fullName">{{em.fullName}}</option>
+                }
+            </select>
+            <input id="fechaInicio" type="date" [(ngModel)]="fechaInicio" (ngModelChange)="loadAsistencias()">
+            <input type="date" [(ngModel)]="fechaFin" (ngModelChange)="loadAsistencias()">
+            <button class="btn btn-primary ms-auto" (click)="limpiarFiltro()">
+                <i class="bi bi-trash"></i>
+            </button>
+            <select class="form-select">
+                <option value="">Seleccionar periodo</option>
+                <option value="1">Ultimo mes</option>
+                <option value="3">Ultimo 3 meses</option>
+                <option value="6">Ultimo 6 meses</option>
+                <option value="12">Ultimo año</option>
+            </select>
+        </div>
+        <div class="col-6">
+            <google-chart
+                [type]="chartTypeLlamados" 
+                [data]="dataLlamados" 
+                [columns]="columnNamesLlamados"
+                [options]="chartOptionsLlamados"
+                [width]="width"
+                [height]="height">
+            </google-chart>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <google-chart
+                [type]="chartTypeCargos" 
+                [data]="dataCargos" 
+                [columns]="columnNamesCargos"
+                [options]="chartOptionsCargos"
+                [width]="width"
+                [height]="height">
+            </google-chart>
+        </div>
+    </div>
+</div>

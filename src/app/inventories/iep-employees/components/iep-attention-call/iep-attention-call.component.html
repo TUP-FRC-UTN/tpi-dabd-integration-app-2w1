@@ -1,0 +1,71 @@
+<div class="container">
+  <form [formGroup]="wakeUpCallForm" (ngSubmit)="onSubmit()" class="wake-up-call-form needs-validation">
+    <!-- Fecha -->
+    <div class="mb-3 row">
+      <label for="fecha" class="col-sm-3 col-form-label text-start">Fecha <span class="text-danger"></span></label>
+      <div class="col-sm-9">
+        <div class="input-group has-validation">
+          <input 
+            id="fecha" 
+            formControlName="fecha" 
+            type="date" 
+            class="form-control"
+            [class.is-invalid]="wakeUpCallForm.get('fecha')?.invalid && (wakeUpCallForm.get('fecha')?.touched || formSubmitted)"
+            [class.is-valid]="wakeUpCallForm.get('fecha')?.valid && wakeUpCallForm.get('fecha')?.touched"
+          />
+          <div class="invalid-feedback">
+            <i class="bi bi-exclamation-circle"></i> La fecha es requerida y no debe ser futura
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Desempeño -->
+    <div class="mb-3 row">
+      <label class="col-sm-3 col-form-label text-start">Desempeño <span class="text-danger"></span></label>
+      <div class="col-sm-9">
+        <div class="btn-group w-100" role="group">
+          <input type="radio" class="btn-check" formControlName="desempeno" value="Leve" id="leve">
+          <label class="btn btn-outline-primary" for="leve">Leve</label>
+
+          <input type="radio" class="btn-check" formControlName="desempeno" value="Moderado" id="moderado">
+          <label class="btn btn-outline-primary" for="moderado">Moderado</label>
+
+          <input type="radio" class="btn-check" formControlName="desempeno" value="Severo" id="severo">
+          <label class="btn btn-outline-primary" for="severo">Severo</label>
+        </div>
+        <div class="invalid-feedback d-block" *ngIf="wakeUpCallForm.get('desempeno')?.invalid && (wakeUpCallForm.get('desempeno')?.touched || formSubmitted)">
+          <i class="bi bi-exclamation-circle"></i> Seleccione un nivel de desempeño
+        </div>
+      </div>
+    </div>
+
+    <!-- Observaciones -->
+    <div class="mb-3 row">
+      <label for="observaciones" class="col-sm-3 col-form-label text-start">Observaciones <span class="text-danger"></span></label>
+      <div class="col-sm-9">
+        <textarea 
+          id="observaciones" 
+          formControlName="observaciones" 
+          class="form-control" 
+          rows="4"
+          [class.is-invalid]="wakeUpCallForm.get('observaciones')?.invalid && (wakeUpCallForm.get('observaciones')?.touched || formSubmitted)"
+          [class.is-valid]="wakeUpCallForm.get('observaciones')?.valid && wakeUpCallForm.get('observaciones')?.touched"
+        ></textarea>
+        <div *ngIf="wakeUpCallForm.get('observaciones')?.errors?.['maxlength']" class="text-danger">
+          <i class="bi bi-exclamation-circle"></i> Máximo de 200 caracteres alcanzado
+        </div>
+        <div *ngIf="wakeUpCallForm.get('observaciones')?.hasError('required') && (wakeUpCallForm.get('observaciones')?.touched || formSubmitted)" class="invalid-feedback">
+          <i class="bi bi-exclamation-circle"></i> Las observaciones son requeridas
+        </div>
+      </div>
+    </div>
+
+    <!-- Botón de Envío -->
+    <div class="d-flex justify-content-end gap-2 mt-4">
+      <button type="submit" class="btn btn-primary" [disabled]="wakeUpCallForm.invalid">
+        Guardar
+      </button>
+    </div>
+  </form>
+</div>

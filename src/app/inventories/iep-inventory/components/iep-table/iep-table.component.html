@@ -1,0 +1,322 @@
+<section class="py-5">
+  <div class="container p-3 border border-2 rounded shadow-lg">
+    <!-- Sección de filtros y botones de exportación -->
+    <div
+      class="d-flex mb-2 justify-content-between align-items-center flex-nowrap"
+    >
+      <!-- Campo de Búsqueda -->
+      <div class="me-2" style="width: 300px">
+        <input
+          type="text"
+          id="filterInput"
+          class="form-control"
+          placeholder="Buscar"
+          [(ngModel)]="globalFilter"
+          name="globalFilter"
+          (input)="applyFilter()"
+        />
+      </div>
+
+      <!-- Campo Desde para seleccionar la fecha de inicio -->
+      <div class="me-2" style="width: 200px">
+        <input
+          type="date"
+          id="startDate"
+          class="form-control"
+          #startDateInput
+          [(ngModel)]="startDate"
+          name="startDate"
+          (ngModelChange)="applyAllFilters()"
+        />
+      </div>
+
+      <!-- Campo Hasta para seleccionar la fecha de fin -->
+      <div class="me-2" style="width: 200px">
+        <input
+          type="date"
+          id="endDate"
+          class="form-control"
+          #endDateInput
+          [(ngModel)]="endDate"
+          name="endDate"
+          (ngModelChange)="applyAllFilters()"
+        />
+      </div>
+
+      <!-- Period Section -->
+      <div  style="width: 350px;">
+        <ng-select
+          [items]="movementTypeOptions"
+          [(ngModel)]="selectedMovementTypes"
+          bindLabel="label"
+          bindValue="value"
+          [multiple]="true"
+          placeholder="Seleccionar Tipo"
+          (change)="applyAllFilters()"
+          class="w-100"
+        >
+        <ng-template ng-multi-label-tmp let-items="items">
+          Seleccionar Estado
+          <span *ngIf="items.length > 0">({{ items.length }})</span>
+        </ng-template>
+
+        <!-- Template para las opciones del dropdown -->
+        <ng-template ng-option-tmp let-item="item" let-item$="item$">
+          <input type="checkbox" [checked]="item$.selected" />
+          {{ item.label }}
+        </ng-template>
+        </ng-select>
+      </div>
+      
+
+      <!-- Botones de acción -->
+      <div class="d-flex align-items-center">
+        <div class="m-2">
+          <button
+            class="btn btn-primary filterbutton"
+            data-bs-toggle="modal"
+            title="Filtros Avanzados"
+            data-bs-target="#filtrosAvanzados"
+          >
+            <i class="bi bi-funnel-fill"></i>
+          </button>
+        </div>
+
+        <div class="me-2">
+          <button class="btn btn-secondary filterbutton" (click)="cleanColumnFilters()">
+            <i class="bi bi-trash"></i>
+          </button>
+        </div>
+
+        <button
+          class="btn btn-success me-2 filterbutton"
+          (click)="exportToExcel()"
+          title="Exportar a Excel"
+        >
+          <i class="fa-solid bi-file-earmark-excel"></i>
+        </button>
+        <button
+          class="btn btn-danger filterbutton"
+          (click)="exportToPdf()"
+          title="Exportar a PDF"
+        >
+          <i class="fas bi-file-earmark-pdf"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabla que muestra el historial de movimientos de productos -->
+    <div class="table-responsive mt-4">
+      <table
+        id="historialTable"
+        class="table table-striped border border-4 rounded table-hover"
+      >
+        <thead class="table-light border border-4">
+          <tr>
+            <th>Fecha</th>
+            <th>Producto</th>
+            <th>Tipo movimiento</th>
+            <th>Proveedor</th>
+            <th>Cantidad</th>
+            <th>Justificativo</th>
+            <th>Stock resultante</th>
+            <!-- Nueva columna para mostrar el stock después del movimiento -->
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Los datos se llenarán dinámicamente con DataTables -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Modal de Información que se despliega al hacer clic en el botón de información -->
+    <div
+      class="modal fade"
+      id="infoModal"
+      tabindex="-1"
+      aria-labelledby="infoModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="infoModalLabel">
+              Información sobre la Página
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p>
+              Esta página muestra el historial de movimientos de productos,
+              permitiéndote realizar las siguientes acciones:
+            </p>
+            <ul>
+              <li>
+                <strong>Filtrar el historial por fechas:</strong> Utiliza los
+                campos "Desde" y "Hasta" para especificar el rango de fechas que
+                deseas consultar. Los datos de movimientos se actualizarán
+                automáticamente según tus selecciones.
+              </li>
+              <li>
+                <strong>Exportar los datos a Excel o PDF:</strong> Haz clic en
+                los botones de "Exportar a Excel" o "Exportar a PDF" para
+                obtener un archivo con la información visualizada en la tabla.
+                Estos botones estarán habilitados solo si hay datos disponibles
+                para exportar.
+              </li>
+              <li>
+                <strong
+                  >Visualizar los detalles de cada movimiento de
+                  producto:</strong
+                >
+                La tabla te permite ver información específica sobre cada
+                movimiento, incluyendo la fecha, producto, tipo de movimiento,
+                proveedor, cantidad, justificativo y stock después del
+                movimiento.
+              </li>
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Advanced Filters Modal -->
+  <div
+    class="modal fade"
+    id="filtrosAvanzados"
+    tabindex="-1"
+    aria-labelledby="filtrosAvanzadosLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h5 class="modal-title" id="filtrosAvanzadosLabel">
+            Filtros Avanzados
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="modal-body">
+          <!-- Min Amount Section -->
+          <!--           <div class="mb-3">
+            <label for="montoMinimo" class="form-label">Producto</label>
+            <input type="text" placeholder="" (input)="applyColumnFilter($event, 'product')" class="form-control" />
+          </div> -->
+
+          <!--           <div class="mb-3">
+            <label for="montoMinimo" class="form-label">Proveedor</label>
+            <input type="text" placeholder="" (input)="applyColumnFilter($event, 'supplier')" class="form-control" />
+          </div> -->
+
+          <div class="mb-3">
+            <div class="row">
+              <!-- Primer grupo: Cantidad Mínima -->
+              <div class="mb-4">
+                <!-- Aumentamos el margin-bottom -->
+                <div class="row align-items-start">
+                  <div class="col-4">
+                    <label for="montoMinimo" class="form-label"
+                      >Cantidad Mínima</label
+                    >
+                  </div>
+                  <div class="col-8">
+                    <input
+                      type="number"
+                      id="montoMinimo"
+                      (input)="applyAmountFilter('min', $event)"
+                      class="form-control text-end"
+                    />
+                    <!-- Contenedor con altura fija para mensajes de error -->
+                    <div class="error-container" style="min-height: 40px">
+                      @if (minAmount) { @if (minAmount < 0) {
+                      <div class="text-danger mt-1 small">
+                        La cantidad mínima no puede ser menor a 0.
+                      </div>
+                      } @if (minAmount && maxAmount) { @if (minAmount >
+                      maxAmount) {
+                      <div class="text-danger mt-1 small">
+                        La cantidad mínima no puede ser mayor que la cantidad
+                        máxima.
+                      </div>
+                      } } }
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Segundo grupo: Cantidad Máxima -->
+              <div class="mb-0">
+                <div class="row align-items-start">
+                  <div class="col-4">
+                    <label for="montoMaximo" class="form-label"
+                      >Cantidad Máxima</label
+                    >
+                  </div>
+                  <div class="col-8">
+                    <input
+                      type="number"
+                      id="montoMaximo"
+                      (input)="applyAmountFilter('max', $event)"
+                      class="form-control text-end"
+                    />
+                    <!-- Contenedor con altura fija para mensajes de error -->
+                    <div class="error-container" style="min-height: 40px">
+                      @if (maxAmount) { @if (maxAmount < 0) {
+                      <div class="text-danger mt-1 small">
+                        La cantidad máxima no puede ser menor a 0.
+                      </div>
+                      } }
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!--           <div class="mb-3">
+            <label for="montoMinimo" class="form-label">Justificativo</label>
+            <input type="text" placeholder="" (input)="applyColumnFilter($event, 'description')" class="form-control" />
+          </div> -->
+
+          <!-- Modal Footer -->
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cerrar
+            </button>
+            <!--             <button type="button" class="btn btn-primary" [disabled]="isApplyButtonDisabled" (click)="applyAllFilters()"
+              data-bs-dismiss="modal">
+              Aplicar
+            </button> -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
