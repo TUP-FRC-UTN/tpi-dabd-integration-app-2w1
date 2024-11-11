@@ -1,70 +1,94 @@
 <div class="container p-3">
     <div class="post-complaint-section p-4 border shadow-lg p-3 mb-5 bg-white rounded">
-        <h2 class="text-center">NUEVO INFORME</h2>
-        <form #formDenuncia="ngForm" (ngSubmit)="onSubmit()" novalidate>
-            <div class="d-flex justify-content-between w-100 mb-4">
-                <div class="input-box w-50">
-                    <label for="selectOption" class="form-label">Motivo</label>
-                    <select id="selectOption" class="form-select w-100" name="option" [(ngModel)]="selectedReasonId"
-                        #optionField="ngModel" required>
-                        <option value="" selected="true">Seleccione una opción</option>
-                        @for (reason of reportReasons; track $index) {
-                        <option [value]="reason.id">{{reason.reportReason}}</option>
-                        }
-                    </select>
-                    @if (optionField.invalid && (optionField.dirty || optionField.touched)) {
-                    <div class="text-danger">
-                        @if (optionField.errors?.['required']) {
-                        <span>Por favor, ingrese una opción</span>
-                        }
+        <form [formGroup]="reactiveForm" (ngSubmit)="onSubmit()">
+            <div class="row">
+                <!-- Ejemplo select -->
+                <div class="col-lg-6 mb-3">
+                    <div class="row">
+                        <label class="col-2 col-form-label">Motivo</label>
+                        <div class="col-10">
+                            <app-custom-select [options]="options"
+                                [selectedOptions]="reactiveForm.get('reportReason')?.value"
+                                (selectedOptionsChange)="updateSelect($event)"
+                                [validations]="reactiveForm.get('reportReason')?.validator">
+                            </app-custom-select>
+                        </div>
                     </div>
-                    }
                 </div>
 
-                <div class="input-box">
-                    <label for="dateInput" class="form-label">Fecha</label>
-                    <input type="date" id="dateInput" name="dateInput" class="form-control bg-body-secondary"
-                        [(ngModel)]="dateView" #dateField="ngModel" disabled>
-                </div>
-            </div>
-
-            <div class="input-box d-flex flex-column gap-2 mb-4">
-                <label for="textareaMessage" class="form-label">Descripción</label>
-                <textarea class="form-control" name="textareaMessage" id="textareaMessage"
-                    [placeholder]="textareaPlaceholder" [(ngModel)]="description" #textArea="ngModel" required
-                    minlength="10" maxlength="500" rows="8" style="resize: none;"></textarea>
-                @if (textArea.invalid && (textArea.dirty || textArea.touched)) {
-                @if (textArea.errors?.['required']) {
-                <span class="text-danger">
-                    Por favor, ingrese un mensaje.
-                </span>
-                }
-                @if (textArea.errors?.['minlength']) {
-                <span class="text-danger">
-                    El mensaje debe tener al menos 10 caracteres.
-                </span>
-                }
-                }
-            </div>
-
-            <div class="buttons-box d-flex justify-content-between">
-                <div class="actions-box">
-                    <label for="infractorInput" class="form-label">Infractor</label>
-                    <div class="d-flex align-items-center mb-3">
-                        <input type="text" id="infractorInput" class="form-control me-3" disabled
-                            placeholder="Infractor">
-                        <button class="btn btn-success" style="white-space: nowrap;" type="button">Ver más</button>
+                <!-- Textarea descripcion -->
+                <div class="col-lg-12 mb-3">
+                    <div class="row">
+                        <label class="col-2 col-lg-1 col-form-label">Descripción</label>
+                        <div class="col-10 col-lg-11">
+                            <textarea class="form-control" rows="8" formControlName="descriptionControl"
+                                style="resize: none;" [ngClass]="onValidate('descriptionControl')"></textarea>
+                            <div class="invalid-feedback">{{showError('descriptionControl')}}</div>
+                        </div>
                     </div>
-                    <button type="button" class="btn btn-warning" (click)="openSelectComplaints()">Gestionar denuncias
-                        <i class="bi bi-file-earmark-text"></i></button>
                 </div>
+
+                <!-- Select Infractor -->
+                <div class="col-lg-6 mb-3">
+                    <div class="row">
+                        <label class="col-2 col-form-label">Parcela</label>
+                        <div class="col-10">
+                            <app-custom-select [options]="optionsplot"
+                                [selectedOptions]="reactiveForm.get('plotId')?.value"
+                                (selectedOptionsChange)="updateSelectplot($event)"
+                                [validations]="reactiveForm.get('plotId')?.validator">
+                            </app-custom-select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal adjuntar -->
+                <div class="col">
+                    <button type="button" class="btn btn-warning" (click)="openSelectComplaints()">
+                        <i class="bi bi-paperclip"></i>
+                        Adjuntar Denuncias
+                        <span class=" ms-1 badge text-bg-danger">{{ selectedComplaintsCount }}</span>
+                    </button>
+                </div>
+
             </div>
+
             <div class="submit-box d-flex justify-content-end">
-                <button type="button" class="btn btn-secondary me-3" [routerLink]="'/list'">Cancelar</button>
-                <button type="submit" class="btn btn-success" [disabled]="formDenuncia.invalid">Crear</button>
+                <button type="button" class="btn btn-secondary me-3" (click)="cancel()">Cancelar</button>
+                <button type="submit" class="btn btn-success" [disabled]="reactiveForm.invalid">Registrar</button>
             </div>
         </form>
     </div>
 </div>
 
-<app-modal-complaints-list (selectedComplaints)="handleSelectedComplaints($event)"></app-modal-complaints-list>
+<app-modal-complaints-list (selectedComplaints)="handleSelectedComplaints($event)"
+    [formType]="'add'"></app-modal-complaints-list>
+
+
+
+<!-- Modal de info -->
+<div class="modal fade" id="infoModal" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Informe</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <!-- body con tus inputs -->
+          <p>
+            En este apartado podrá realizar un informe y relacionarlo con las denuncias que desee.
+        </p>
+        <p>
+            Contará con un espacio para indicar a qué parcela desea relacionarlo.
+        </p>
+        <p>
+            Además, un botón "Adjuntar Denuncias" que le mostrará el listado de las denuncias habilitadas para ser anexadas.
+        </p> 
+          </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+        </div>
+      </div>
+    </div>
+  </div>

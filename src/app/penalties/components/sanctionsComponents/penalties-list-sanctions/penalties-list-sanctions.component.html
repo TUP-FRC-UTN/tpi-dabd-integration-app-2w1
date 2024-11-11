@@ -10,57 +10,48 @@
       </div>
     </div> -->
 
-    <!-- Fila de botones de filtro -->
     <div class="row mb-3">
 
       <!-- Barra de busqueda -->
-      <div class="col">
+      <div class="col-md-3">
         <input type="text" placeholder="Buscar" class="form-control" [(ngModel)]="searchTerm"
           (input)="onSearch($event)">
       </div>
 
-      <!-- Filtro de fechas -->
-      <div class="col d-flex gap-3">
-        <div class="col">
-          <input (change)="filterDate()" [(ngModel)]="filterDateStart" class="form-control" type="date">
-        </div>
-        <div class="col">
-          <input (change)="filterDate()" [(ngModel)]="filterDateEnd" class="form-control" type="date">
-        </div>
-      </div>
 
       <!-- Select de estado -->
-      <div class="col">
-        <select (change)="onFilter($event)" [(ngModel)]="selectedValue" class="form-select" id="estadoSelect">
-          <option value="">Seleccionar Estado</option>
-          @for (state of states; track $index) {
-          <option [value]="state.value">{{state.value}}</option>
-          }
-        </select>
+      <div class="col-md-2">
+        <app-custom-select [options]="options" [selectedOptions]="selectedStates"
+          (selectedOptionsChange)="onFilter($event)" [multiple]="true">
+        </app-custom-select>
       </div>
 
-      <!-- BOTON DE FILTRO PARA QUIENES LO NECESITEN -->
-      <!-- <div class="col-auto">
-        <button class="btn btn-primary bi-funnel-fill">Filtros</button>
-      </div> -->
+
+      <!-- Filtro de fechas -->
+      <div class="col-md-4 d-flex gap-3">
+        <input (change)="filterDate()" [(ngModel)]="filterDateStart" class="form-control" type="date">
+        <input (change)="filterDate()" [(ngModel)]="filterDateEnd" class="form-control" type="date">
+      </div>
+
 
       <!-- Botones de exportar -->
-      <div class="col-auto d-flex gap-1 text-end">
-        <button id="exportExcelBtn" class="btn btn-success bi-file-earmark-excel"></button>
-        <button id="exportPdfBtn" class="btn btn-danger bi-file-earmark-pdf"></button>
+      <div class="col-md-3 d-flex gap-2 justify-content-end">
+        <button class="btn btn-secondary bi-trash" (click)="eraseFilters()"></button>
+        <button id="exportExcelBtn" class="btn btn-success bi-file-earmark-excel" (click)="exportToExcel()"></button>
+        <button id="exportPdfBtn" class="btn btn-danger bi-file-earmark-pdf" (click)="exportToPDF()"></button>
       </div>
+
     </div>
 
-    <table id="sanctionsTable" class="table table-striped border border-3 rounded">
+    <table id="sanctionsTable" class="table table-striped table-hover border border-3 rounded">
       <thead>
-        <tr class="text-center">
+        <tr>
           <th scope="col">Fecha</th>
-          <th scope="col">Estado</th>
-          <th scope="col">Lote infractor</th>
-          <th scope="col">Monto</th>
+          <th scope="col" class="text-center">Estado</th>
+          <th scope="col" class="text-end">Lote</th>
+          <th scope="col" class="text-end">Monto</th>
           <th scope="col">Mensaje</th>
-          <th scope="col">Acciones</th>
-          <!-- <th scope="col">Seleccionar</th> -->
+          <th scope="col" class="text-center">Acciones</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -75,12 +66,19 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Título de tu modal</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Listado de Sanciones</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <!-- body con tus inputs -->
-        Ejemplo modal
+        <p>
+          En este listado podrá buscar datos de su interés relacionados con las sanciones que posea.
+        </p>
+        <p>
+          Contará con la posibilidad de ver más detalles sobre las multas aplicadas.
+        </p>
+        <p>
+          Además, si se encuentra dentro de los 7 días hábiles desde que recibió la multa, podrá realizar un descargo.
+        </p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>

@@ -1,0 +1,503 @@
+<div class="container mt-5">
+  <!-- Filtors -->
+  <div class="row mb-4">
+    @if (status == 0) {
+    <div class="col-12">
+      <div class="card border-0 shadow-lg rounded-4">
+        <div class="card-body">
+          <div class="row align-items-end">
+            <div class="col-md-6">
+              <label class="form-label text-secondary">Período Desde</label>
+              <div class="input-group">
+                <input type="month" (ngModelChange)="applyFilters()" class="form-control border-0 bg-light"
+                  [(ngModel)]="periodFrom" [max]="periodTo" />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-secondary">Período Hasta</label>
+              <div class="input-group">
+                <input type="month" (ngModelChange)="applyFilters()" class="form-control border-0 bg-light"
+                  [(ngModel)]="periodTo" [min]="periodFrom" />
+              </div>
+            </div>
+
+            <!-- <div class="col-md-6">
+                <select class="form-select" aria-label="Default select example">
+                  <option selected>Tipos</option>
+                  <option value="1">Jhon doe</option>
+                  <option value="2">Pepe sans</option>
+                  <option value="3">Mclovin</option>
+                </select>
+              </div>-->
+          </div>
+        </div>
+      </div>
+    </div>
+    } @if (status == 1) {
+    <div class="col-12">
+      <div class="card border-0 shadow-lg rounded-4">
+        <div class="card-body">
+          <div class="row align-items-end">
+            <div class="col-md-4">
+              <label class="form-label text-secondary">Período Desde</label>
+              <div class="input-group">
+                <input (ngModelChange)="applyFilters()" type="month" class="form-control border-0 bg-light"
+                  [(ngModel)]="periodFrom" [max]="periodTo" />
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label text-secondary">Período Hasta</label>
+              <div class="input-group">
+                <input (ngModelChange)="applyFilters()" type="month" class="form-control border-0 bg-light"
+                  [(ngModel)]="periodTo" [min]="periodFrom" />
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <select (change)="applyFilters()" class="form-select" [(ngModel)]="reportReason"
+                aria-label="Default select example">
+                <option value="" selected>Razones...</option>
+                @for (item of reportsReasons; track $index) {
+                <option value="{{ item.reportReason }}">
+                  {{ item.reportReason }}
+                </option>
+                }
+              </select>
+            </div>
+            <!--
+              <div class="col-md-3">
+                <div class="filter-group">
+                  <div class="btn-group w-100" role="group">
+                    <input
+                      type="radio"
+                      class="btn-check"
+                      name="paymentStatus"
+                      id="approved"
+                      value="Aprobado"
+                    />
+                    <label class="btn btn-outline-primary" for="approved">
+                      <i class="bi bi-check-circle me-1"></i>Ingresos
+                    </label>
+  
+                    <input
+                      type="radio"
+                      class="btn-check"
+                      name="paymentStatus"
+                      id="rejected"
+                      s
+                      value="Rechazado"
+                    />
+                    <label class="btn btn-outline-primary" for="rejected">
+                      <i class="bi bi-x-circle me-1"></i>Morosos
+                    </label>
+                  </div>
+                </div>
+              </div>-->
+          </div>
+        </div>
+      </div>
+    </div>
+    } @if (status == 2) {
+    <div class="col-12">
+      <div class="card border-0 shadow-lg rounded-4">
+        <div class="card-body">
+          <div class="row align-items-end">
+            <div class="col-md-4">
+              <label class="form-label text-secondary">Período Desde</label>
+              <div class="input-group">
+                <input (ngModelChange)="applyFilters()" type="month" class="form-control border-0 bg-light"
+                  [(ngModel)]="periodFrom" [max]="periodTo" />
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label text-secondary">Período Hasta</label>
+              <div class="input-group">
+                <input (ngModelChange)="applyFilters()" type="month" class="form-control border-0 bg-light"
+                  [(ngModel)]="periodTo" [min]="periodFrom" />
+              </div>
+            </div>
+            <div class="col-md-4">
+              <select (change)="applyFilters()" class="form-select" aria-label="Default select example"
+                [(ngModel)]="state">
+                <option value="" selected>Estados...</option>
+                @for (item of states; track $index) {
+                <option value="{{ item.value }}">{{ item.value }}</option>
+                }
+              </select>
+            </div>
+            <!--
+           
+  
+              <div class="col-md-3">
+                <div class="filter-group">
+                  <div class="btn-group w-100" role="group">
+                    <input
+                      type="radio"
+                      class="btn-check"
+                      name="paymentStatus"
+                      id="approved"
+                      value="Aprobado"
+                    />
+                    <label class="btn btn-outline-primary" for="approved">
+                      <i class="bi bi-check-circle me-1"></i>Aprobados
+                    </label>
+  
+                    <input
+                      type="radio"
+                      class="btn-check"
+                      name="paymentStatus"
+                      id="rejected"
+                      value="Rechazado"
+                    />
+                    <label class="btn btn-outline-primary" for="rejected">
+                      <i class="bi bi-x-circle me-1"></i>Rechazados
+                    </label>
+                  </div>
+                </div>
+              </div>-->
+          </div>
+        </div>
+      </div>
+    </div>
+    } @if (status == 3) {
+    <div class="col-12">
+      <div class="card border-0 shadow-lg rounded-4">
+        <div class="card-body">
+          <div class="row align-items-end">
+            <div class="col-md-4">
+              <label class="form-label text-secondary">Período Desde</label>
+              <div class="input-group">
+                <input (ngModelChange)="applyFilters()" type="month" class="form-control border-0 bg-light"
+                  [(ngModel)]="periodFrom" [max]="periodTo" />
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label text-secondary">Período Hasta</label>
+              <div class="input-group">
+                <input (ngModelChange)="applyFilters()" type="month" class="form-control border-0 bg-light"
+                  [(ngModel)]="periodTo" [min]="periodFrom" />
+              </div>
+            </div>
+            <div class="col-md-4">
+              <select (change)="applyFilters()" class="form-select" [(ngModel)]="reportReason2"
+                aria-label="Default select example">
+                <option value="" selected>Razones...</option>
+                @for (item of reportsReasons; track $index) {
+                <option value="{{ item.reportReason }}">
+                  {{ item.reportReason }}
+                </option>
+                }
+              </select>
+            </div>
+            <!--
+              <div class="col-md-3">
+                <div class="filter-group">
+                  <div class="btn-group w-100" role="group">
+                    <input
+                      type="radio"
+                      class="btn-check"
+                      name="paymentStatus"
+                      id="approved"
+                      value="Aprobado"
+                    />
+                    <label class="btn btn-outline-primary" for="approved">
+                      <i class="bi bi-check-circle me-1"></i>Ingresos
+                    </label>
+  
+                    <input
+                      type="radio"
+                      class="btn-check"
+                      name="paymentStatus"
+                      id="rejected"
+                      value="Rechazado"
+                    />
+                    <label class="btn btn-outline-primary" for="rejected">
+                      <i class="bi bi-x-circle me-1"></i>Deudas
+                    </label>
+                  </div>
+                </div>
+              </div>-->
+          </div>
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+
+  <!-- ---------------------------------------------------------------------------------------- -->
+
+  <!-- Grilla del dashboard -->
+  <div class="row position-relative min-vh-75" [ngClass]="{ 'overflow-hidden': status !== 0 }">
+    <!-- Contenedor para cuando un grafico es grande -->
+    <div class="container d-flex gap-3" *ngIf="status !== 0">
+      <!-- Grafico de columnas -->
+      <div class="col-12" *ngIf="status === 1">
+        <div class="card border-0 shadow rounded-4 h-100 w-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div class="back-arrow" (click)="makeBig(0)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="gray"
+                  class="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
+                  <path
+                    d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z" />
+                </svg>
+              </div>
+              <div>
+                <h5 class="card-title text-secondary mb-1">
+                  Comparación de Tipos
+                </h5>
+                <small class="text-secondary">tipos por periodo</small>
+              </div>
+              <div class="badge bg-warning px-3 py-2">Total de denuncias realizadas: {{totalComplaints}}</div>
+            </div>
+            @if(columnChartData.length > 0){
+              <google-chart
+              [type]="columnChartType"
+              [data]="columnChartData"
+              [options]="columnChartOptions"
+              class="w-100"
+            ></google-chart>
+            }
+            @else {
+              <div class="text-center text-secondary">
+                No se encontraron datos para los filtros seleccionados
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Grafico de pie -->
+      <div class="col-12" *ngIf="status === 2">
+        <div class="card border-0 shadow rounded-4 h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div class="back-arrow" (click)="makeBig(0)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="gray"
+                  class="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
+                  <path
+                    d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z" />
+                </svg>
+              </div>
+              <div>
+                <h5 class="card-title text-secondary mb-1 text-start">
+                  Tipos de Denuncias
+                </h5>
+                <small class="text-secondary"></small>
+              </div>
+              <div class="badge bg-primary px-3 py-2">
+                Total de Denuncias: {{totalComplaints}}
+              </div>
+            </div>
+            @if(pieChartData.length > 0){
+              <google-chart
+                [type]="pieChartType"
+                [data]="pieChartData"
+                [options]="pieChartOptions"
+                class="w-100"
+              ></google-chart>
+              }
+              @else {
+                <div class="text-center text-secondary">
+                  No se encontraron datos para los filtros seleccionados
+                </div>
+              }
+          </div>
+        </div>
+      </div>
+
+      <!-- Grafico de lineas -->
+      <div class="col-12" *ngIf="status === 3">
+        <div class="card border-0 shadow rounded-4 h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div class="back-arrow" (click)="makeBig(0)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="gray"
+                  class="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
+                  <path
+                    d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z" />
+                </svg>
+              </div>
+              <div>
+                <h5 class="card-title text-secondary mb-1">
+                  Evolución de Denuncias
+                </h5>
+                <small class="text-secondary">Tendencia mensual</small>
+              </div>
+              <div class="badge bg-success px-3 py-2">Promedio de Denuncias por período: {{ averageComplaintsPerMonth | number:'1.1-1' }}</div>
+            </div>
+            <google-chart [type]="lineChartType" [data]="lineChartData" [options]="lineChartOptions" class="w-100"
+              style="height: 88%">
+            </google-chart>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- --------------------------------------------------------------------------------------------------- -->
+    <!--KPIS -->
+    <div class="col-md-2" *ngIf="status === 0">
+
+      <!-- KPI Total de Denuncias Realizadas -->
+      <div class="row">
+        <div class="col">
+          <div class="card border-0 shadow-lg rounded-4 mb-4 hover-scale" (click)="makeBig(1)"
+            style="background-color: #d8ffedde;">
+            <div class="card-body position-relative">
+              <i class="bi bi-flag-fill position-absolute top-50 end-0 translate-middle-y me-4"
+                style="font-size: 2.5rem; color: #198754; opacity: 0.8;"></i>
+              <div class="pe-5">
+                <h6 class="text-secondary mb-2">Total de Denuncias Realizadas</h6>
+                <h3 class="mb-0">{{ totalComplaints }}</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI Promedio de Denuncias por Mes -->
+      <div class="row">
+        <div class="col">
+          <div class="card border-0 shadow-lg rounded-4 mb-4 hover-scale" (click)="makeBig(3)"
+            style="background-color: #e7f1ff;">
+            <div class="card-body position-relative">
+              <i class="bi bi-calendar-day position-absolute top-50 end-0 translate-middle-y me-4"
+                style="font-size: 2.5rem; color: #004085; opacity: 0.8;"></i>
+              <div class="pe-5">
+                <h6 class="text-secondary mb-2">Promedio de Denuncias por Período</h6>
+                <h3 class="mb-0">{{ averageComplaintsPerMonth | number:'1.1-1' }}</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Vista principal de todos los charts -->
+    <div class="col-5 col-lg-5 mb-4" *ngIf="status === 0">
+      <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover-scale" (click)="makeBig(1)">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="back-arrow opacity-0">
+              <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="gray"
+                class="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
+                <path
+                  d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z" />
+              </svg>
+            </div>
+            <div>
+              <h5 class="card-title text-secondary mb-1">
+                Comparación de Tipos
+              </h5>
+              <small class="text-secondary">Evolución de Denuncias</small>
+            </div>
+            <div class="badge bg-warning px-3 py-2">Total de denuncias realizadas: {{totalComplaints}}</div>
+          </div>
+          @if(columnChartData.length > 0){
+            <google-chart
+            [type]="columnChartType"
+            [data]="columnChartData"
+            [options]="columnChartOptions"
+            class="w-100"
+          ></google-chart>
+          }
+          @else {
+            <div class="text-center text-secondary">
+              No se encontraron datos para los filtros seleccionados
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="col-5 col-lg-5" *ngIf="status === 0">
+      <div class="mb-4">
+        <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover-scale" (click)="makeBig(2)">
+          <div class="card-body">
+            <div class="text-center">
+              <h5 class="card-title text-secondary mb-1">Razones de Denuncias</h5>
+              <small class="text-secondary">Porcentaje por razón</small>
+            </div>
+            @if(pieChartData.length > 0){
+              <google-chart
+                [type]="pieChartType"
+                [data]="pieChartData"
+                [options]="pieChartOptions"
+                class="w-100"
+              ></google-chart>
+              }
+              @else {
+                <div class="text-center text-secondary">
+                  No se encontraron datos para los filtros seleccionados
+                </div>
+              }
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover-scale" (click)="makeBig(3)">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div class="back-arrow opacity-0">
+                <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="gray"
+                  class="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
+                  <path
+                    d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z" />
+                </svg>
+              </div>
+              <div>
+                <h5 class="card-title text-secondary mb-1">
+                  Evolución de Denuncias
+                </h5>
+                <small class="text-secondary">Tendencia mensual</small>
+              </div>
+              <div class="badge bg-success px-3 py-2">Promedio de Denuncias por período: {{ averageComplaintsPerMonth | number:'1.1-1' }}</div>
+            </div>
+            <google-chart [type]="lineChartType" [data]="lineChartData" [options]="lineChartOptions" class="w-100">
+            </google-chart>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de info -->
+<div class="modal fade" id="infoModal" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Estadísticas de Denuncias</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <h5>Descripción</h5>
+        <p>
+          En este dashboard podrá ver un resumen detallado de las estadísticas relacionadas con las denuncias. Podrá aplicar filtros según el período, comparar diferentes tipos de denuncias, observar el promedio de denuncias por motivo, y visualizar la evolución de estas a lo largo del tiempo a través de un gráfico de líneas. Además, en la sección izquierda encontrará datos relevantes basados en el período de su interés.
+        </p>
+        <h5>Filtros</h5>
+        <p>
+          En la sección de arriba, se observará los filtros que podrá aplicar. Entre ellos, tenemos
+          la posibilidad de seleccionar el período.
+        </p>
+        <h5>Comparación de Tipos</h5>
+        <p>
+          Usted podrá conocer la cantidad de denuncias por estado y elegir la razón. 
+        </p>
+        <h5>Promedio de Denuncias</h5>
+        <p>
+          Además, cuántas hay por cada motivo, con la posibilidad de elegir un estado específico para ver.
+        </p>
+        <h5>Evolución de Denuncias</h5>
+        <p>
+          También contará con un gráfico de líneas para conocer cuántas denuncias hubo por período, con la posibilidad de filtrar por motivo.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div>
+

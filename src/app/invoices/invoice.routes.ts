@@ -8,8 +8,8 @@ export const INVOICE_ROUTES: Routes = [
     { path: '', component: InvoiceHomeComponent },
     { path: '', component: ExpenseGenerationViewComponent },
     { path: 'expense-generation-admin-view', component: ExpenseGenerationAdminViewComponent },
-    {path: 'expense-generation-user-view', component: ExpenseGenerationUserViewComponent},
+    { path: 'expense-generation-user-view', component: ExpenseGenerationUserViewComponent },
     // {path: 'expense-generation-accountant-view', component: ExpenseGenerationAccountantViewComponent},
-    { path: '**', redirectTo: '' }
-   
+
+    { path: 'dashboard', component: InvoiceHomeComponent }, // Cambiar por el componente correspondiente
 ];

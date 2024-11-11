@@ -9,23 +9,32 @@
                     <div class="row">
                         <label class="col-2 col-form-label">Motivo</label>
                         <div class="col-10">
-                            <select class="form-select" formControlName="typeControl"
-                                [ngClass]="onValidate('typeControl')">
-                                <option value="" disabled selected>Seleccione una opción</option>
-                                @for (type of complaintTypes; track $index) {
-                                <option [value]="type.key">{{type.value}}</option>
-                                }
-                            </select>
-                            <div class="invalid-feedback">{{showError('typeControl')}}</div>
+                            <app-custom-select [options]="options"
+                                [selectedOptions]="reactiveForm.get('complaintReason')?.value"
+                                (selectedOptionsChange)="updateSelect($event)"
+                                [validations]="reactiveForm.get('complaintReason')?.validator">
+                            </app-custom-select>
                         </div>
                     </div>
                 </div>
 
+                @if(reactiveForm.value.complaintReason == "Otro"){
+                <div class="col-lg-6 mb-3">
+                    <div class="row">
+                        <label class="col-2 col-form-label">Detalle</label>
+                        <div class="col-10">
+                            <input type="text" name="otroMotivo" class="form-control" formControlName="anotherReason"
+                                [ngClass]="onValidate('anotherReason')">
+                            <div class="invalid-feedback">{{showError('anotherReason')}}</div>
+                        </div>
+                    </div>
+                </div>
+                }
 
                 <!-- Ejemplo text area -->
                 <div class="col-lg-12 mb-3">
                     <div class="row">
-                        <label class="col-2 col-lg-1 col-form-label">Descripcion</label>
+                        <label class="col-2 col-lg-1 col-form-label">Descripción</label>
                         <div class="col-10 col-lg-11">
                             <textarea class="form-control" rows="8" formControlName="descriptionControl"
                                 style="resize: none;" [ngClass]="onValidate('descriptionControl')"></textarea>
@@ -63,10 +72,10 @@
             <!-- Botones de Enviar / Cancelar -->
             <div class="row">
                 <div class="col d-flex justify-content-end gap-3">
-                    <button type="button" class="btn btn-secondary">Cancelar
+                    <button type="button" class="btn btn-secondary" (click)="cancel()">Cancelar
                     </button>
                     <button type="submit" class="btn btn-success" disabled
-                        [disabled]="reactiveForm.invalid">Enviar</button>
+                        [disabled]="reactiveForm.invalid">Registrar</button>
                 </div>
             </div>
         </form>
@@ -84,197 +93,10 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                Aqui la explicacion de la pagina
+                Aquí se puede realizar el alta de una denuncia con sus datos correspondientes. La misma puede contener
+                imágenes como prueba. Al hacer click en enviar, se registrará la nueva denuncia en el sistema. Al tocar
+                cancelar, podrás volver a la lista de denuncias.
             </div>
         </div>
     </div>
 </div>
-
-
-<!-- Formulario -->
-<!-- <form [formGroup]="reactiveForm" (ngSubmit)="onSubmit()">
-    <div class="row"> -->
-
-<!-- Ejemplo input text -->
-<!-- <div class="col-lg-6 mb-3">
-            <div class="row">
-                <label class="col-2 col-form-label">Text</label>
-                <div class="col-10">
-                    <input type="text" class="form-control" formControlName="text" [ngClass]="onValidate('text')">
-                    <div class="invalid-feedback">{{showError('text')}}</div>
-                </div>
-            </div>
-        </div> -->
-
-
-<!-- Ejemplo input number -->
-<!-- <div class="col-lg-6 mb-3">
-            <div class="row">
-                <label class="col-2 col-form-label">Number</label>
-                <div class="col-10">
-                    <input type="number" class="form-control" formControlName="number" [ngClass]="onValidate('number')">
-                    <div class="invalid-feedback">{{showError('number')}}</div>
-                </div>
-            </div>
-        </div> -->
-
-
-<!-- Ejemplo input email -->
-<!-- <div class="col-lg-6 mb-3">
-            <div class="row">
-                <label class="col-2 col-form-label">Email</label>
-                <div class="col-10">
-                    <input type="email" class="form-control" formControlName="email" [ngClass]="onValidate('email')">
-                    <div class="invalid-feedback">{{showError('email')}}</div>
-                </div>
-            </div>
-        </div> -->
-
-
-<!-- Ejemplo input password -->
-<!-- <div class="col-lg-6 mb-3">
-            <div class="row">
-                <label class="col-2 col-form-label">Password</label>
-                <div class="col-10">
-                    <input type="password" class="form-control" formControlName="password"
-                        [ngClass]="onValidate('password')">
-                    <div class="invalid-feedback">{{showError('password')}}</div>
-                </div>
-            </div>
-        </div> -->
-
-
-<!-- Ejemplo select -->
-<!-- <div class="col-lg-6 mb-3">
-            <div class="row">
-                <label class="col-2 col-form-label">Select</label>
-                <div class="col-10">
-                    <select id="selectOption" class="form-select" formControlName="select"
-                        [ngClass]="onValidate('select')">
-                        <option value="" disabled selected>Seleccione una opción</option>
-                        @for (type of complaintTypes; track $index) {
-                        <option [value]="type.key">{{type.value}}</option>
-                        }
-                    </select>
-                    <div class="invalid-feedback">{{showError('select')}}</div>
-                </div>
-            </div>
-        </div> -->
-
-
-<!-- Ejemplo input date -->
-<!-- <div class="col-lg-6 mb-3">
-            <div class="row">
-                <label class="col-2 col-form-label">DateTime</label>
-                <div class="col-10">
-                    <input type="date" class="form-control" formControlName="date" [ngClass]="onValidate('date')">
-                    <div class="invalid-feedback">{{showError('date')}}</div>
-                </div>
-            </div>
-        </div> -->
-
-
-<!-- Ejemplo radio buttons -->
-<!-- <div class="col-lg-6 mb-3">
-            <div class="row">
-                <label class="col-2 col-form-label">Radios</label>
-                <div class="col-10">
-                    <div [ngClass]="onValidate('radio')">
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="radio" value="1" id="radio1"
-                                formControlName="radio">
-                            <label class="form-check-label" for="radio1">Choice 1</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="radio" value="2" id="radio2"
-                                formControlName="radio">
-                            <label class="form-check-label" for="radio2">Choice 2</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="radio" value="3" id="radio3"
-                                formControlName="radio">
-                            <label class="form-check-label" for="radio3">Choice 3</label>
-                        </div>
-                    </div>
-                    <div class="invalid-feedback">{{showError('radio')}}</div>
-                </div>
-            </div>
-        </div> -->
-
-
-<!-- Ejemplo input file -->
-<!-- <div class="col-lg-6 mb-3">
-            <div class="row">
-                <label class="col-2 col-form-label">File</label>
-                <div class="col-10">
-                    <input type="file" class="form-control" multiple accept="image/*" formControlName="file"
-                        [ngClass]="onValidate('file')" (change)="onFileChange($event)">
-                    <div class="invalid-feedback">{{showError('file')}}</div>
-                    <div class="list-group mt-3">
-                        @for (file of files; track $index) {
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <div class="d-flex align-items-center">
-                                <i class="bi-file-earmark-text me-3 text-primary fs-5"></i>
-                                <span>{{file.name.length > 40 ? file.name.slice(0, 40)+'...' :
-                                    file.name}}</span>
-                            </div>
-                            <span>{{ (file.size / (1024 * 1024)).toFixed(2) }} MB</span>
-                        </div>
-                        }
-                    </div>
-                </div>
-            </div>
-        </div> -->
-<!-- Pueden limitar los tipos de archivos que necesiten Ej: accept=".png, .jpg, .jpeg" -->
-
-
-<!-- Ejemplo input range -->
-<!-- <div class="col-lg-6 mb-3">
-            <div class="row">
-                <label class="col-2 col-form-label">Range</label>
-                <div class="col-10">
-                    <input type="range" class="form-range" id="range" min="1" max="100" value="1"
-                        formControlName="range" [ngClass]="onValidate('range')">
-                    <div class="invalid-feedback">{{showError('range')}}</div>
-                </div>
-            </div>
-        </div> -->
-
-
-<!-- Ejemplo input dissabled -->
-<!-- <div class="col-lg-6 mb-3">
-            <div class="row">
-                <label class="col-2 col-form-label">Disabled</label>
-                <div class="col-10">
-                    <input type="text" class="form-control" name="disabled" id="disabled" formControlName="disabled"
-                        [ngClass]="onValidate('disabled')">
-                    <div class="invalid-feedback">{{showError('disabled')}}</div>
-                </div>
-            </div>
-        </div> -->
-
-
-<!-- Ejemplo text area -->
-<!-- <div class="col-lg-12 mb-3">
-            <div class="row">
-                <label class="col-2 col-lg-1 col-form-label">Textarea</label>
-                <div class="col-10 col-lg-11">
-                    <textarea class="form-control" name="textarea" id="textarea" minlength="10" maxlength="500" rows="8"
-                        formControlName="textarea" style="resize: none;" [ngClass]="onValidate('textarea')"></textarea>
-                    <div class="invalid-feedback">{{showError('textarea')}}</div>
-                </div>
-            </div>
-        </div> -->
-
-<!-- </div> -->
-
-<!-- Botones de Enviar / Cancelar -->
-<!-- <div class="row">
-        <div class="col d-flex justify-content-end gap-3">
-            <button type="button" class="btn btn-secondary">Cancelar
-            </button>
-            <button type="submit" class="btn btn-success" disabled [disabled]="reactiveForm.invalid">Enviar</button>
-        </div>
-    </div> -->
-
-<!-- </form> -->
