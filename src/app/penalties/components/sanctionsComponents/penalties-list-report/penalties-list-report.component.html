@@ -17,17 +17,16 @@
 
       <!-- Select de estado -->
       <div class="col-md-2">
-        <select [(ngModel)]="selectedState" (change)="onFilter($event)" class="form-select" id="estadoSelect">
-          <option value="" selected>Seleccionar Estado</option>
-          <option *ngFor="let state of states" [value]="state.value">{{ state.value }}</option>
-        </select>
+        <app-custom-select [options]="options" [selectedOptions]="selectedStates"
+          (selectedOptionsChange)="onFilter($event)" [multiple]="true">
+        </app-custom-select>
       </div>
 
       
       <!-- Filtro de fechas -->
       <div class="col-md-4 d-flex gap-3">
         <input (change)="filterDate()" [(ngModel)]="filterDateStart" class="form-control" type="date">
-        <input (change)="filterDate()" [(ngModel)]="filterDateEnd" class="form-control ms-2" type="date">
+        <input (change)="filterDate()" [(ngModel)]="filterDateEnd" class="form-control" type="date">
       </div>
 
 

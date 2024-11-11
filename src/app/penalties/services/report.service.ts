@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { ReportReasonDto } from '../models/ReportReasonDTO';
 
 @Injectable({
@@ -19,6 +19,19 @@ export class ReportService {
 
   getAllReportReasons() : Observable<any>{
     return this.http.get<ReportReasonDto[]>(this.reportReasonUrl + "/all");
+  }
+
+  putStateReport(data:any){
+    return this.http.put(this.reportUrl + '/state', data);
+  }
+
+  //Metodo para hacer refresh desde dos modales adentro de una lista
+  private refreshSubject2 = new Subject<void>();
+
+  refreshTable$ = this.refreshSubject2.asObservable();
+
+  triggerRefresh() {
+    this.refreshSubject2.next();
   }
   
 }

@@ -31,3 +31,30 @@ export interface ReportReason {
     lastUpdatedDate: number[]; // [año, mes, día, hora, minuto]
     lastUpdatedUser: number;
 }
+
+// Interfaces para los KPIs
+export interface ColumnChartKPIs {
+    totalPeriod: number;
+    monthlyAverage: number;
+    bestMonth: {
+      month: string;
+      value: number;
+    };
+  }
+  
+export interface PieChartKPIs {
+    topMethod: {
+      name: string;
+      percentage: number;
+    };
+    totalTransactions: number;
+    averagePerMethod: {
+      [key: string]: number;
+    };
+  }
+  
+export interface TopExpenseKPIs {
+    highestAmount: number;
+    averageTop5: number;
+    totalTop5: number;
+  }

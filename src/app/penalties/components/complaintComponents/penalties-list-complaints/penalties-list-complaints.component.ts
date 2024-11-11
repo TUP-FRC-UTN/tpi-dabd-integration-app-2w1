@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, input, OnInit } from '@angular/core';
+import { Component, input, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -11,16 +11,6 @@ import 'datatables.net-bs5'; // DataTables con Bootstrap 5
 import 'datatables.net-buttons-bs5'; // Botones con estilos de Bootstrap 5
 import 'datatables.net-buttons/js/buttons.html5';
 import 'datatables.net-buttons/js/buttons.print';
-
-//Si los estilos fallan (sobretodo en la paginacion) usen estos comandos
-// npm uninstall datatables.net
-// npm uninstall datatables.net-dt
-// npm uninstall datatables.net-buttons-dt
-
-// npm cache clean --force
-
-// npm install datatables.net-bs5
-// npm install datatables.net-buttons-bs5
 
 //Imports propios de multas
 import { PenaltiesModalConsultComplaintComponent } from '../modals/penalties-get-complaint-modal/penalties-get-complaint.component';
@@ -42,26 +32,36 @@ import autoTable from 'jspdf-autotable';
 })
 export class PenaltiesListComplaintComponent implements OnInit {
   //Variables
-  Complaint: ComplaintDto[] = [];                 //Data Souce
-  filterComplaint: ComplaintDto[] = [];           //Data Source to show (filtered)
-  filterComplaintsecond: ComplaintDto[] = [];           //Second data source to show (filtered)
-  // filterDateStart: Date = new Date();             //Start Date value
-  // filterDateEnd: Date = new Date();               //End Date value
-  states: { key: string; value: string }[] = [];  //States array for the select
-  table: any;                                     //Base table
-  searchTerm: string = '';                        //Search bar value
+  Complaint: ComplaintDto[] = [];                 //Lista de datos
+  filterComplaint: ComplaintDto[] = [];           //Datos filtrados a mostrar
+  filterComplaintsecond: ComplaintDto[] = [];     //Datos filtrados a mostrar 2??
+  states: { key: string; value: string }[] = [];  //Lista de estados
+  table: any;                                     //tabla base
 
+  searchTerm: string = '';        //Valor de la barra de busqueda
+  filterDateStart: string = '';   //Valor fecha inicio
+  filterDateEnd: string = '';     //Valor fecha fin
+  selectedStates: string[] = [];   //Valor select
 
-  filterDateStart: string=''; //Start Date value
+  options : {value: string, name: string}[] = []
+  @ViewChild(CustomSelectComponent) customSelect! : CustomSelectComponent;
 
-  filterDateEnd: string =''; //End Date value
-  selectedState: string = '';
-  
+  //Constructor
+  constructor(
+    private _modal: NgbModal,
+    private complaintService: ComplaintService,
+    private routingService: RoutingService
+  ) {
+    (window as any).viewComplaint = (id: number) => this.viewComplaint(id);
+    (window as any).changeState = (state: string, id: number, userId: number) =>
+      this.changeState(state, id, userId);
+  }
+
 
   //Init
   ngOnInit(): void {
     this.refreshData();
-    this.getTypes()
+    this.getStates()
     this.resetDates()
   }
 
@@ -72,80 +72,42 @@ export class PenaltiesListComplaintComponent implements OnInit {
   
   //Returns the date in this 
   //string format: `YYYY-MM-DD`.
-  private formatDateToString(date: Date): string {
-    return date.toISOString().split('T')[0];
-  }
-
-  
-  //Resets the date filters.
   resetDates() {
     const today = new Date();
-    today.setDate(today.getDate() + 1); 
-    this.filterDateEnd = this.formatDateToString(today);
-  
+    this.filterDateEnd = this.formatDateToString(today); // Fecha final con hora 00:00:00
+
     const previousMonthDate = new Date();
-    previousMonthDate.setMonth(previousMonthDate.getMonth() - 1);
-    previousMonthDate.setDate(1); 
-    previousMonthDate.setDate(previousMonthDate.getDate() + 1); 
-    this.filterDateStart = this.formatDateToString(previousMonthDate);
-  }
+    previousMonthDate.setMonth(previousMonthDate.getMonth() - 1); 
+    this.filterDateStart = this.formatDateToString(previousMonthDate); // Fecha de inicio con hora 00:00:00
+}
 
-  //Constructor
-  constructor(
-    private router: Router,
-    private _modal: NgbModal,
-    private complaintService: ComplaintService,
-    private routingService: RoutingService
+// Función para convertir la fecha al formato `YYYY-MM-DD`
+private formatDateToString(date: Date): string {
+    // Crear una fecha ajustada a UTC-3 y establecer la hora a 00:00:00 para evitar horas residuales
+    const adjustedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0); 
+    return adjustedDate.toLocaleDateString('en-CA'); // Formato estándar `YYYY-MM-DD`
+}
+  
 
-  ) {
-    (window as any).viewComplaint = (id: number) => this.viewComplaint(id);
-    (window as any).changeState = (state: string, id: number, userId: number) =>
-      this.changeState(state, id, userId);
-  }
-
-
-  //Combo de filtrado de estado
-  // onFilter(event: Event) {
-  //   const selectedValue = (event.target as HTMLSelectElement).value;
-
-  //   this.filterComplaint = this.Complaint.filter(
-  //     (c) => c.complaintState == selectedValue
-  //   );
-  //   if (selectedValue == '') {
-  //     this.filterComplaint = this.Complaint;
-  //   }
-
-  //   this.updateDataTable();
-  // }
-
-  //This method is used to 
-  //update the table.
-
-  //If the table is already created, it 
-  //is destroyed and created again.
+  //Crea la tabla con sus configuraciones 
   updateDataTable() {
-    //TODO: Revisar si es necesario UTILIZAR ESTA CONFIGURACION
     if ($.fn.dataTable.isDataTable('#complaintsTable')) {
       $('#complaintsTable').DataTable().clear().destroy();
     }
     $.fn.dataTable.ext.type.order['date-moment-pre'] = (d: string) => moment(d, 'DD/MM/YYYY').unix()
     let table = this.table = $('#complaintsTable').DataTable({
-      //These are the 
-      //table attributes.
       paging: true,
       searching: true,
       ordering: true,
       lengthChange: true,
       order: [0, 'desc'],
-      lengthMenu: [5,10, 25, 50],
+      lengthMenu: [5, 10, 25, 50],
       pageLength: 5,
       data: this.filterComplaint, //Fuente de datos
-
-      //Columnas de la tabla
       columns: [
         {
           data: 'createdDate',
-          render: (data) =>  moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY'),
+          render: (data) => moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY'),
           type: 'date-moment'
         },
         {
@@ -171,8 +133,8 @@ export class PenaltiesListComplaintComponent implements OnInit {
         {
           data: null,
           className: 'align-middle',
-          searchable: false, //This is false to indicate 
-          render: (data) =>  //that this column is not searchable.
+          searchable: false,
+          render: (data) =>
             `<div class="text-center">
                <div class="btn-group">
                  <div class="dropdown">
@@ -189,10 +151,10 @@ export class PenaltiesListComplaintComponent implements OnInit {
         },
       ],
       dom:
-        '<"mb-3"t>' +                           //Table
-        '<"d-flex justify-content-between"lp>', //Pagination
+        '<"mb-3"t>' +                           //Tabla
+        '<"d-flex justify-content-between"lp>', //Paginacion
       language: {
-        lengthMenu:`
+        lengthMenu: `
           <select class="form-select">
             <option value="5">5</option>
             <option value="10">10</option>
@@ -203,60 +165,15 @@ export class PenaltiesListComplaintComponent implements OnInit {
         loadingRecords: "Cargando...",
         processing: "Procesando...",
       },
-      //This sets the buttons to export 
-      //the table data to Excel and PDF.
-      buttons: [
-        {
-          extend: 'excel',
-          text: 'Excel',
-          className: 'btn btn-success export-excel-btn',
-          title: 'Listado de Denuncias',
-          exportOptions: {
-            columns: [0, 1, 2, 3], //This indicates the columns that will be exported to Excel.
-          },
-        },
-        {
-          extend: 'pdf',
-          text: 'PDF',
-          className: 'btn btn-danger export-pdf-btn',
-          title: 'Listado de denuncias',
-          exportOptions: {
-            columns: [0, 1, 2, 3], //This indicates the columns that will be exported to PDF.
-          },
-        }
-      ]
-    });
-
-
-    //These methods are used to export 
-    //the table data to Excel and PDF.
-
-    //They are activated by
-    //clicks in the buttons.
-
-    //Returns the table data exported 
-    //to the desired format.
-    $('#exportExcelBtn').on('click', function () {
-      table.button('.buttons-excel').trigger();
-    });
-
-    $('#exportPdfBtn').on('click', function () {
-      table.button('.buttons-pdf').trigger();
     });
   }
 
 
-  //Method to search in the table
-  //based on the search term.
-
-  //Param 'event' is the event 
-  //that triggers the method.
-
-  //Returns the table filtered.
+  //Metodo para filtrar con la barra de busqueda
   onSearch(event: any) {
     const searchValue = event.target.value;
 
-    //Checks if the search term has 3 or more characters.
+    //Dispara la busqueda despues del tercer caracter
     if (searchValue.length >= 3) {
       this.table.search(searchValue).draw();
     } else if (searchValue.length === 0) {
@@ -265,25 +182,20 @@ export class PenaltiesListComplaintComponent implements OnInit {
   }
 
 
-  // Method to filter the table
-  // based on the 2 dates.
-
-  // Returns true only if the complaint
-  // date is between the 2 dates.
+  //
   filterComplaintData() {
     let filteredComplaints = [...this.Complaint];  // Copiar los datos de las que no han sido filtradas aún
-  
-    // Filtrar por estado si se ha seleccionado alguno
-    if (this.selectedState) {
+
+    //Filtra por los estados
+    if (this.selectedStates.length > 0) {
       filteredComplaints = filteredComplaints.filter(
-        (c) => c.complaintState === this.selectedState
+        (c) => this.selectedStates.includes(c.complaintState)
       );
     }
 
-    // Checks if the date is 
-    // between the start and end date.
-    const startDate = this.filterDateStart ? new Date(this.filterDateStart) : null;
-    const endDate = this.filterDateEnd ? new Date(this.filterDateEnd) : null;
+    //Filtra por un rango de fechas
+    const startDate = this.filterDateStart ? new Date(this.filterDateStart + 'T00:00:00') : null;
+    let endDate = this.filterDateEnd ? new Date(this.filterDateEnd + 'T23:59:59') : null;
   
     filteredComplaints = filteredComplaints.filter((item) => {
       const date = new Date(item.createdDate);
@@ -291,59 +203,42 @@ export class PenaltiesListComplaintComponent implements OnInit {
         console.warn(`Fecha no válida: ${item.createdDate}`);
         return false;
       }
-  
+
       const afterStartDate = !startDate || date >= startDate;
       const beforeEndDate = !endDate || date <= endDate;
-  
-      return afterStartDate && beforeEndDate; //Returns true only if both conditions are met.
+
+      return afterStartDate && beforeEndDate; //Retorna true solo si se cumplen ambas condiciones
     });
-  
-    // This methos updates 
-    // the table data
+
     this.filterComplaint = filteredComplaints;
-    this.updateDataTable(); // Calls the function to
-                            // update the table.
+    this.updateDataTable();
   }
 
 
-
-  //This method filters the table 
-  //by the complaint state.
-
-  //Param 'event' is the event 
-  //that triggers the method.
-
-  //Updates the table using the filters.
-  onFilter(event: Event) {
-    const selectedValue = (event.target as HTMLSelectElement).value;
-    this.selectedState = selectedValue; // Actualiza el valor del estado seleccionado
-    this.filterComplaintData(); // Aplica los filtros
+  //Actualiza los valores seleccionados del select y filtra
+  onFilter(data: any) {
+    this.selectedStates = data;
+    this.filterComplaintData();
   }
-  
-  
-  // Método para manejar el cambio de fechas
+
+
+  //Método para manejar el cambio de fechas
   filterDate() {
-    this.filterComplaintData(); // Aplica los filtros de fecha y estado
+    this.filterComplaintData();
   }
 
 
-  //This method is used to return the 
-  //filters to their default values.
-  eraseFilters(){
+  //Limpia los filtros
+  eraseFilters() {
     this.refreshData();
-    this.selectedState = '';
+    this.selectedStates = [];
     this.searchTerm = '';
     this.resetDates();
+    this.customSelect.clearData();
   }
 
-  
-  //This method is used to get
-  //styles based on the complaint state.
 
-  //Param 'estado' is the 
-  //complaint state.
-
-  //Returns the class for the state.
+  //Retorna los estilos basados en los estados
   getStatusClass(estado: string): string {
     switch (estado) {
       case 'Anexada':
@@ -360,16 +255,7 @@ export class PenaltiesListComplaintComponent implements OnInit {
   }
 
 
-  // Method to get the complaint 
-  // state and show the modal.
-
-  // Param 'option' is the new state that the complaint is
-  // being changed to (e.g., "ATTACHED", "REJECTED", "PENDING").
-  // Param 'idComplaint' is the complaint id.
-  // Param 'userId' is the user id 
-  // associated with the complaint.
-
-  //Returns the modal to change the state.
+  //Metodo para actualizar el estado de una denuncia
   changeState(option: string, idComplaint: number, userId: number) {
     const newState = option;
     this.openModal(idComplaint, userId, newState);
@@ -380,9 +266,7 @@ export class PenaltiesListComplaintComponent implements OnInit {
   ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-  //List queries.
-  //This method is used to 
-  //refresh the data in the table.
+  //Consulta los datos del listado con la api
   refreshData() {
     this.complaintService.getAllComplaints().subscribe((data) => {
       this.Complaint = data;
@@ -393,17 +277,18 @@ export class PenaltiesListComplaintComponent implements OnInit {
   }
 
 
-
-
-  //Loads the 'states' array with 
-  //the complaint states for the filter.
-  getTypes(): void {
+  //Trae los estados desde la api
+  getStates(): void {
     this.complaintService.getState().subscribe({
       next: (data) => {
         this.states = Object.keys(data).map(key => ({
           key,
           value: data[key]
         }));
+        this.options = this.states.map(opt => ({
+          value: opt.value,
+          name: opt.value
+        }))
       },
       error: (error) => {
         console.error('error: ', error);
@@ -412,26 +297,7 @@ export class PenaltiesListComplaintComponent implements OnInit {
   }
 
 
-  //Method to redirect 
-  //to another route.
-
-  //Param 'path' is the 
-  //route to redirect to.
-  redirect(path: string) {
-    this.router.navigate([path]);
-  }
-
-
-  //Opens the modal to change 
-  //the complaint state.
-
-  //Param 'idComplaint' is the id of the complaint
-  //that's going to be visualized in the modal.
-  //Param 'userId' is the user id 
-  //which the complaint belongs to.
-  //Param 'complaintState' is the 
-  //current state of the complaint.
-
+  //Abre el modal para cambiar el estado de la denuncia
   openModal(idComplaint: number, userId: number, complaintState: string) {
     const modal = this._modal.open(PenaltiesModalStateReasonComponent, {
       size: 'md',
@@ -449,11 +315,8 @@ export class PenaltiesListComplaintComponent implements OnInit {
       });
   }
 
-  //Opens the modal to 
-  //get the complaint by id.
 
-  //Param 'i' is the 
-  //complaint id.
+  //Abre el modal con todos los datos de la denuncia
   viewComplaint(i: number) {
     const modal = this._modal.open(PenaltiesModalConsultComplaintComponent, {
       size: 'xl',
@@ -463,18 +326,18 @@ export class PenaltiesListComplaintComponent implements OnInit {
     modal.result
       .then((result) => { this.refreshData() })
       .catch((error) => {
-        console.log('Modal dismissed with error:', error);
+        console.log('Modal se cerro con un error: ', error);
       });
   }
 
+
+  //Redirige a la pagina para dar de alta una denuncia
   postRedirect() {
     this.routingService.redirect("main/complaints/post-complaint", "Registrar Denuncia")
   }
 
-  /////////////////////////////////////////////////////////////////////
-  // This method is used to export the complaint list to PDF.
 
-  // Returns the complaint list in PDF format.
+  //Exporta la tabla a PDF
   exportToPDF(): void {
     const doc = new jsPDF();
     const pageTitle = 'Listado de Denuncias';
@@ -506,10 +369,8 @@ export class PenaltiesListComplaintComponent implements OnInit {
     doc.save(`${formattedDesde}-${formattedHasta}_Listado_Denuncias.pdf`);
   }
 
-  /////////////////////////////////////////////////////////////////////
-  // This method is used to export the complaint list to Excel.
 
-  // Returns the complaint list in Excel format.
+  //Exporta la tabla a Excel
   exportToExcel(): void {
     const encabezado = [
       ['Listado de Denuncias'],
@@ -517,7 +378,7 @@ export class PenaltiesListComplaintComponent implements OnInit {
       [],
       ['Fecha de Creación', 'Estado', 'Descripción', 'Cantidad de Archivos']
     ];
-  
+
     const excelData = this.filterComplaint.map((complaint: ComplaintDto) => {
       return [
         this.complaintService.formatDate(complaint.createdDate),
@@ -526,20 +387,20 @@ export class PenaltiesListComplaintComponent implements OnInit {
         complaint.fileQuantity,
       ];
     });
-  
+
     const worksheetData = [...encabezado, ...excelData];
     const worksheet = XLSX.utils.aoa_to_sheet(worksheetData)
-    
+
     worksheet['!cols'] = [
-      { wch: 20 }, // Creation Date
-      { wch: 20 }, // State
-      { wch: 50 }, // Description
-      { wch: 20 }, // File Amount
+      { wch: 20 }, //Fecha 
+      { wch: 20 }, //Estado
+      { wch: 50 }, //Descripcion
+      { wch: 20 }, //Cantidad de archivos adjuntos
     ];
-  
+
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Denuncias');
-  
+
     XLSX.writeFile(workbook, `${this.complaintService.formatDate(this.filterDateStart)}-${this.complaintService.formatDate(this.filterDateEnd)}_Listado_Denuncias.xlsx`);
   }
 

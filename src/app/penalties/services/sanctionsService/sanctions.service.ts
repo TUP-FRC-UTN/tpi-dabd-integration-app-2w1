@@ -6,6 +6,7 @@ import { SanctionsDTO } from '../../models/SanctionsDTO';
 import { PutReportDTO } from '../../models/PutReportDTO';
 import { Subject } from 'rxjs';
 import { Fine } from '../../models/Dashboard-models';
+import { ReportReasonDto } from '../../models/ReportReasonDTO';
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +15,8 @@ export class PenaltiesSanctionsServicesService {
 
   private readonly http: HttpClient = inject(HttpClient);
   private readonly url = 'http://localhost:8042/api/';
+  private readonly reportReasonUrl = 'http://localhost:8042/api/report-reason';
+
 
   constructor() { }
 
@@ -97,4 +100,8 @@ export class PenaltiesSanctionsServicesService {
     return this.http.get<Fine[]>(this.url + "sanction/allFines")
   } 
 
+    // Obtiene todos los tipos de razones
+    getAllReportReasons(): Observable<any> {
+      return this.http.get<ReportReasonDto[]>(this.reportReasonUrl + "/all");
+    }
 }
