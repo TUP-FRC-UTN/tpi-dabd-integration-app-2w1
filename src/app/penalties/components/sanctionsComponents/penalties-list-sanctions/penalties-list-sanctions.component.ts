@@ -318,7 +318,7 @@ export class PenaltiesSanctionsListComponent implements OnInit {
     this.selectedStates = [];
     this.searchTerm = '';
     this.resetDates();
-    this.customSelect.clearData();
+    this.customSelect.setData(this.selectedStates);
   }
 
 
