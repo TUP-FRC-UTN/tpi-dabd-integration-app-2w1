@@ -60,7 +60,7 @@ export class PenaltiesUpdateStateReasonReportModalComponent implements OnInit {
         // it will show an error message.
         this.reportService.putStateReport(reportDto).subscribe( res => {
             Swal.fire({
-              title: 'Informe actualizada!',
+              title: 'Informe actualizado!',
               text: 'El estado del informe fue actualizado con éxito',
               icon: 'success',
               timer: 1500,

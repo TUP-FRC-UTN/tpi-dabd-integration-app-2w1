@@ -89,8 +89,8 @@ export class CustomSelectComponent {
 
 
   //Limpia la/las opciones seleccionadas
-  clearData(){
-    this.selectControl.setValue([]);
+  setData(value: any[]){
+    this.selectControl.setValue(value);
   }
 
 
