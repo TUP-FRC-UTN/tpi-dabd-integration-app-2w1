@@ -12,16 +12,6 @@ import 'datatables.net-buttons-bs5'; // Botones con estilos de Bootstrap 5
 import 'datatables.net-buttons/js/buttons.html5';
 import 'datatables.net-buttons/js/buttons.print';
 
-//Si los estilos fallan (sobretodo en la paginacion) usen estos comandos
-// npm uninstall datatables.net
-// npm uninstall datatables.net-dt
-// npm uninstall datatables.net-buttons-dt
-
-// npm cache clean --force
-
-// npm install datatables.net-bs5
-// npm install datatables.net-buttons-bs5
-
 //Imports propios de multas
 import { PenaltiesModalConsultComplaintComponent } from '../modals/penalties-get-complaint-modal/penalties-get-complaint.component';
 import { PenaltiesModalStateReasonComponent } from '../modals/penalties-update-stateReason-modal/penalties-update-stateReason-modal.component';
@@ -58,7 +48,6 @@ export class PenaltiesListComplaintComponent implements OnInit {
 
   //Constructor
   constructor(
-    private router: Router,
     private _modal: NgbModal,
     private complaintService: ComplaintService,
     private routingService: RoutingService
@@ -68,10 +57,11 @@ export class PenaltiesListComplaintComponent implements OnInit {
       this.changeState(state, id, userId);
   }
 
+
   //Init
   ngOnInit(): void {
     this.refreshData();
-    this.getTypes()
+    this.getStates()
     this.resetDates()
   }
 
@@ -96,27 +86,8 @@ export class PenaltiesListComplaintComponent implements OnInit {
   }
 
 
-  //Combo de filtrado de estado
-  // onFilter(event: Event) {
-  //   const selectedValue = (event.target as HTMLSelectElement).value;
-
-  //   this.filterComplaint = this.Complaint.filter(
-  //     (c) => c.complaintState == selectedValue
-  //   );
-  //   if (selectedValue == '') {
-  //     this.filterComplaint = this.Complaint;
-  //   }
-
-  //   this.updateDataTable();
-  // }
-
-  //This method is used to 
-  //update the table.
-
-  //If the table is already created, it 
-  //is destroyed and created again.
+  //Crea la tabla con sus configuraciones 
   updateDataTable() {
-    //TODO: Revisar si es necesario UTILIZAR ESTA CONFIGURACION
     if ($.fn.dataTable.isDataTable('#complaintsTable')) {
       $('#complaintsTable').DataTable().clear().destroy();
     }
@@ -301,9 +272,9 @@ export class PenaltiesListComplaintComponent implements OnInit {
     });
   }
 
-  //Loads the 'states' array with 
-  //the complaint states for the filter.
-  getTypes(): void {
+
+  //Trae los estados desde la api
+  getStates(): void {
     this.complaintService.getState().subscribe({
       next: (data) => {
         this.states = Object.keys(data).map(key => ({
@@ -322,22 +293,7 @@ export class PenaltiesListComplaintComponent implements OnInit {
   }
 
 
-  //
-  redirect(path: string) {
-    this.router.navigate([path]);
-  }
-
-
-  //Opens the modal to change 
-  //the complaint state.
-
-  //Param 'idComplaint' is the id of the complaint
-  //that's going to be visualized in the modal.
-  //Param 'userId' is the user id 
-  //which the complaint belongs to.
-  //Param 'complaintState' is the 
-  //current state of the complaint.
-
+  //Abre el modal para cambiar el estado de la denuncia
   openModal(idComplaint: number, userId: number, complaintState: string) {
     const modal = this._modal.open(PenaltiesModalStateReasonComponent, {
       size: 'md',
@@ -355,11 +311,8 @@ export class PenaltiesListComplaintComponent implements OnInit {
       });
   }
 
-  //Opens the modal to 
-  //get the complaint by id.
 
-  //Param 'i' is the 
-  //complaint id.
+  //Abre el modal con todos los datos de la denuncia
   viewComplaint(i: number) {
     const modal = this._modal.open(PenaltiesModalConsultComplaintComponent, {
       size: 'xl',
@@ -369,18 +322,18 @@ export class PenaltiesListComplaintComponent implements OnInit {
     modal.result
       .then((result) => { this.refreshData() })
       .catch((error) => {
-        console.log('Modal dismissed with error:', error);
+        console.log('Modal se cerro con un error: ', error);
       });
   }
 
+
+  //Redirige a la pagina para dar de alta una denuncia
   postRedirect() {
     this.routingService.redirect("main/complaints/post-complaint", "Registrar Denuncia")
   }
 
-  /////////////////////////////////////////////////////////////////////
-  // This method is used to export the complaint list to PDF.
 
-  // Returns the complaint list in PDF format.
+  //Exporta la tabla a PDF
   exportToPDF(): void {
     const doc = new jsPDF();
     const pageTitle = 'Listado de Denuncias';
@@ -412,10 +365,8 @@ export class PenaltiesListComplaintComponent implements OnInit {
     doc.save(`${formattedDesde}-${formattedHasta}_Listado_Denuncias.pdf`);
   }
 
-  /////////////////////////////////////////////////////////////////////
-  // This method is used to export the complaint list to Excel.
 
-  // Returns the complaint list in Excel format.
+  //Exporta la tabla a Excel
   exportToExcel(): void {
     const encabezado = [
       ['Listado de Denuncias'],
@@ -437,10 +388,10 @@ export class PenaltiesListComplaintComponent implements OnInit {
     const worksheet = XLSX.utils.aoa_to_sheet(worksheetData)
 
     worksheet['!cols'] = [
-      { wch: 20 }, // Creation Date
-      { wch: 20 }, // State
-      { wch: 50 }, // Description
-      { wch: 20 }, // File Amount
+      { wch: 20 }, //Fecha 
+      { wch: 20 }, //Estado
+      { wch: 50 }, //Descripcion
+      { wch: 20 }, //Cantidad de archivos adjuntos
     ];
 
     const workbook = XLSX.utils.book_new();

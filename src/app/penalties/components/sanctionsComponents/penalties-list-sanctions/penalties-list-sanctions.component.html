@@ -21,13 +21,13 @@
 
       <!-- Select de estado -->
       <div class="col-md-2">
-        <select [(ngModel)]="selectedState" (change)="onFilter($event)" class="form-select" id="estadoSelect">
-          <option value="" selected>Seleccionar Estado</option>
-          <option *ngFor="let state of states" [value]="state.value">{{ state.value }}</option>
-        </select>
+       
+        <app-custom-select [options]="options" [selectedOptions]="selectedStates"
+          (selectedOptionsChange)="onFilter($event)" [multiple]="true">
+        </app-custom-select>
       </div>
 
-      
+
       <!-- Filtro de fechas -->
       <div class="col-md-4 d-flex gap-3">
         <input (change)="filterDate()" [(ngModel)]="filterDateStart" class="form-control" type="date">
@@ -37,11 +37,11 @@
 
       <!-- Botones de exportar -->
       <div class="col-md-3 d-flex gap-2 justify-content-end">
-        <button class="btn btn-secondary bi-trash"(click)="eraseFilters()"></button>
-        <button id="exportExcelBtn" class="btn btn-success bi-file-earmark-excel"(click)="exportToExcel()"></button>
-        <button id="exportPdfBtn" class="btn btn-danger bi-file-earmark-pdf"(click)="exportToPDF()"></button>
+        <button class="btn btn-secondary bi-trash" (click)="eraseFilters()"></button>
+        <button id="exportExcelBtn" class="btn btn-success bi-file-earmark-excel" (click)="exportToExcel()"></button>
+        <button id="exportPdfBtn" class="btn btn-danger bi-file-earmark-pdf" (click)="exportToPDF()"></button>
       </div>
-      
+
     </div>
 
     <table id="sanctionsTable" class="table table-striped table-hover border border-3 rounded">
