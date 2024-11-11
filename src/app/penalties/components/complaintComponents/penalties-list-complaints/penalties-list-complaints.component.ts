@@ -65,26 +65,29 @@ export class PenaltiesListComplaintComponent implements OnInit {
     this.resetDates()
   }
 
+  // This method is used to convert
+  //a date to a formatted string.
 
-  //Convierte la fecha a formato iso (YYYY-MM-DD) para los inputs
-  private formatDateToString(date: Date): string {
-    return date.toISOString().split('T')[0];
-  }
-
-
-  //Reinicia los valores de las fechas al default (start: hoy, end: hace 30 dias)
+  //Param 'date' is the date to convert.
+  
+  //Returns the date in this 
+  //string format: `YYYY-MM-DD`.
   resetDates() {
     const today = new Date();
-    today.setDate(today.getDate() + 1);
-    this.filterDateEnd = this.formatDateToString(today);
+    this.filterDateEnd = this.formatDateToString(today); // Fecha final con hora 00:00:00
 
     const previousMonthDate = new Date();
-    previousMonthDate.setMonth(previousMonthDate.getMonth() - 1);
-    previousMonthDate.setDate(1);
-    previousMonthDate.setDate(previousMonthDate.getDate() + 1);
-    this.filterDateStart = this.formatDateToString(previousMonthDate);
-  }
+    previousMonthDate.setMonth(previousMonthDate.getMonth() - 1); 
+    this.filterDateStart = this.formatDateToString(previousMonthDate); // Fecha de inicio con hora 00:00:00
+}
 
+// Función para convertir la fecha al formato `YYYY-MM-DD`
+private formatDateToString(date: Date): string {
+    // Crear una fecha ajustada a UTC-3 y establecer la hora a 00:00:00 para evitar horas residuales
+    const adjustedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0); 
+    return adjustedDate.toLocaleDateString('en-CA'); // Formato estándar `YYYY-MM-DD`
+}
+  
 
   //Crea la tabla con sus configuraciones 
   updateDataTable() {
@@ -192,7 +195,8 @@ export class PenaltiesListComplaintComponent implements OnInit {
 
     //Filtra por un rango de fechas
     const startDate = this.filterDateStart ? new Date(this.filterDateStart) : null;
-    const endDate = this.filterDateEnd ? new Date(this.filterDateEnd) : null;
+    let endDate = this.filterDateEnd ? new Date(this.filterDateEnd) : null;
+  
     filteredComplaints = filteredComplaints.filter((item) => {
       const date = new Date(item.createdDate);
       if (isNaN(date.getTime())) {
