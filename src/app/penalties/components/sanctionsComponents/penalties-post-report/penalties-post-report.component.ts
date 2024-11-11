@@ -1,5 +1,5 @@
 import { Component, inject, OnDestroy } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink, Router, Routes, RouterModule } from '@angular/router';
 // import { MockapiService } from '../../../services/mock/mockapi.service';
 import { PostReportDTO } from '../../../models/PostReportDTO';
@@ -14,11 +14,12 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { PlotModel } from '../../../../users/users-models/plot/Plot';
 import { CommonModule } from '@angular/common';
+import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
 
 @Component({
   selector: 'app-new-report',
   standalone: true,
-  imports: [FormsModule, RouterLink, ModalComplaintsListComponent, RouterModule, CommonModule],
+  imports: [FormsModule, RouterLink, ModalComplaintsListComponent, RouterModule, CommonModule,ReactiveFormsModule,CustomSelectComponent],
   templateUrl: './penalties-post-report.component.html',
   styleUrl: './penalties-post-report.component.scss'
 })
@@ -41,11 +42,30 @@ export class NewReportComponent {
   selectedComplaints: any[] = [];
   selectedComplaintsCount = 0;
 
+  reactiveForm: FormGroup;
+  otroSelected: boolean = false;
+  options: { name: string, value: any }[] = []
+  optionsplot: { name: string, value: any }[] = []
+
   constructor(private reportService: ReportService,
      private router: Router,
-     private routingService: RoutingService
+     private routingService: RoutingService, 
+     private formBuilder : FormBuilder
     ) {
     this.dateView = this.setTodayDate();
+
+    this.reactiveForm = this.formBuilder.group({  //Usen las validaciones que necesiten, todo lo de aca esta puesto a modo de ejemplo
+      reportReason: new FormControl([], [Validators.required]),
+      descriptionControl: new FormControl('', [Validators.required, Validators.minLength(10), Validators.maxLength(800)]),
+      plotId: new FormControl([], [Validators.required])
+    });
+  }
+
+  updateSelect(data : any){
+    this.reactiveForm.get('reportReason')?.setValue(data)
+  }
+  updateSelectplot(data : any){
+    this.reactiveForm.get('plotId')?.setValue(data)
   }
 
   setTodayDate(): string {
@@ -64,25 +84,24 @@ export class NewReportComponent {
   getReportReasons(): void {
     this.reportService.getAllReportReasons().subscribe(
       (reasons: ReportReasonDto[]) => {
-        reasons.forEach((reason) => this.reportReasons.push(reason))
-        console.log("Reports: " + this.reportReasons)
+        reasons.forEach((reason) => this.reportReasons.push({ reportReason: reason.reportReason, id: reason.id, baseAmount: reason.baseAmount}))
+        this.options = this.reportReasons.map(opt => ({ name: opt.reportReason, value: opt.id }))
       },
       (error) => {
         console.error('Error al cargar report reasons: ', error);
       }
     );
+    
 
   }
 
   getPlots(): void {
-    this.plotService.getAllPlots().subscribe(
-    //this.mockGetPlots().subscribe(
+    //el mock se usa para no pegarle a usuarios
+    //this.plotService.getAllPlots().subscribe(
+    this.mockGetPlots().subscribe(
       (plots: any[]) => {
-        this.plots = plots.map(plot => ({
-          id: plot.id,
-          name: `Bloque ${plot.block_number}, Lote ${plot.plot_number}`
-        }));
-        console.log("Mapped Plots: ", this.plots);
+        plots.forEach((plot) => this.plots.push({ name:`Bloque ${plot.block_number}, Lote ${plot.plot_number}` , value: plot.id }))
+        this.optionsplot = this.plots.map(opt => ({ name: opt.name, value: opt.value }))
       },
       (error) => {
         console.error('Error al cargar plots: ', error);
@@ -118,12 +137,12 @@ export class NewReportComponent {
       return;
     }
 
-    if (this.validateParams()) {
-      this.selectedReasonId == "" ? this.selectedReasonId = "" : this.selectedReasonId;
-      const reportDTO: PostReportDTO = {
-        reportReasonId: Number(this.selectedReasonId),
-        plotId: Number(plotId),
-        description: this.description,
+    if (this.reactiveForm.valid) {
+      let formData = this.reactiveForm.value;
+      let reportDTO = {
+        reportReasonId:  formData.reportReason,
+        plotId:  formData.plotId,
+        description: formData.descriptionControl,
         complaints: complaintsIds,
         userId: userId,
       };
@@ -152,28 +171,57 @@ export class NewReportComponent {
     this.routingService.redirect("main/sanctions/report-list/", "Listado de Informes")
   }
 
-  validateParams(): boolean {
-    if (this.selectedReasonId == "0" || this.selectedReasonId == null) {
-      return false
-    }
-    if (Number(this.plot) == 0 || this.plot == null) {
-      return false;
-    }
-    if (this.description == null || this.description == '') {
-      return false
-    }
-    if (this.reportReasons == null || this.reportReasons[0] == null) {
-      return false;
-    }
-    return true;
-  }
-
   openSelectComplaints(): void {
     const modalElement = document.getElementById('complaintModal');
     if (modalElement) {
       const modal = new (window as any).bootstrap.Modal(modalElement);
       modal.show();
     }
+  }
+
+
+  //
+  onValidate(controlName: string) {
+    const control = this.reactiveForm.get(controlName);
+    return {
+      'is-invalid': control?.invalid && (control?.dirty || control?.touched),
+      'is-valid': control?.valid
+    }
+  }
+
+  show(){
+    console.log("Formulario:", this.reactiveForm.value)
+  }
+
+
+  //
+  showError(controlName: string): string {
+    const control = this.reactiveForm.get(controlName);
+    
+    if (control?.errors && control.invalid && (control.dirty || control.touched)) {
+      const errorKey = Object.keys(control.errors)[0];
+      return this.getErrorMessage(errorKey, control.errors[errorKey]);
+    }
+    return '';
+  }
+
+  private getErrorMessage(errorKey: string, errorValue: any): string {
+    const errorMessages: { [key: string]: (error: any) => string } = {
+      required: () => 'Este campo no puede estar vacío.',
+      email: () => 'Formato de correo electrónico inválido.',
+      minlength: (error) => `El valor ingresado es demasiado corto. Mínimo ${error.requiredLength} caracteres.`,
+      maxlength: (error) => `El valor ingresado es demasiado largo. Máximo ${error.requiredLength} caracteres.`,
+      pattern: () => 'El formato ingresado no es válido.',
+      min: (error) => `El valor es menor que el mínimo permitido (${error.min}).`,
+      max: (error) => `El valor es mayor que el máximo permitido (${error.max}).`,
+      requiredTrue: () => 'Debe aceptar el campo requerido para continuar.',
+      date: () => 'La fecha ingresada es inválida.',
+      url: () => 'El formato de URL ingresado no es válido.',
+      number: () => 'Este campo solo acepta números.',
+      customError: () => 'Error personalizado: verifique el dato ingresado.'
+    };
+
+    return errorMessages[errorKey]?.(errorValue) ?? 'Error no identificado en el campo.';
   }
 
 }
