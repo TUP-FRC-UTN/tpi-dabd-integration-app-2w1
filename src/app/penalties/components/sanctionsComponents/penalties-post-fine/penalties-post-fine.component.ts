@@ -208,6 +208,7 @@ export class PenaltiesPostFineComponent implements OnInit {
     return '';
   }
 
+  
   //Devuelve el mensaje de error
   private getErrorMessage(errorKey: string, errorValue: any): string {
     const errorMessages: { [key: string]: (error: any) => string } = {

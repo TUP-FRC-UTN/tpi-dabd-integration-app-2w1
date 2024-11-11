@@ -49,6 +49,7 @@ export class PenaltiesSanctionsListComponent implements OnInit {
   options: { name: string, value: any }[] = []
   @ViewChild(CustomSelectComponent) customSelect!: CustomSelectComponent;
 
+  
   //Init
   ngOnInit(): void {
     //Metodo para recargar la datatable desde dentro de un modal en el modal
@@ -80,35 +81,33 @@ export class PenaltiesSanctionsListComponent implements OnInit {
     this.resetDates()
   }
 
+
+  //Reinicia las fechas a la actual y la de hace 30 dias
   resetDates() {
     const today = new Date();
     this.filterDateEnd = this.formatDateToString(today); // Fecha final con hora 00:00:00
 
     const previousMonthDate = new Date();
-    previousMonthDate.setMonth(previousMonthDate.getMonth() - 1); 
+    previousMonthDate.setMonth(previousMonthDate.getMonth() - 1);
     this.filterDateStart = this.formatDateToString(previousMonthDate); // Fecha de inicio con hora 00:00:00
-}
+  }
+
 
   // Función para convertir la fecha al formato `YYYY-MM-DD`
   private formatDateToString(date: Date): string {
-      // Crear una fecha ajustada a UTC-3 y establecer la hora a 00:00:00 para evitar horas residuales
-      const adjustedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0); 
-      return adjustedDate.toLocaleDateString('en-CA'); // Formato estándar `YYYY-MM-DD`
+    // Crear una fecha ajustada a UTC-3 y establecer la hora a 00:00:00 para evitar horas residuales
+    const adjustedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0);
+    return adjustedDate.toLocaleDateString('en-CA'); // Formato estándar `YYYY-MM-DD`
   }
-    
 
 
   //Constructor
   constructor(
-    private router: Router,
     private _modal: NgbModal,
     private sanctionService: PenaltiesSanctionsServicesService,
     private routingService: RoutingService
   ) {
-    //Esto es importante para llamar los funciones dentro del data table con onClick
     (window as any).viewFine = (id: number) => this.viewFine(id);
-    // (window as any).selectState = (state: string, id: number, userId: number) =>
-    //   this.selectState(state, id, userId);
   }
 
 
@@ -210,31 +209,11 @@ export class PenaltiesSanctionsListComponent implements OnInit {
         loadingRecords: "Cargando...",
         processing: "Procesando..."
       },
-      // Uso de botones para exportar
-      buttons: [
-        {
-          extend: 'excel',
-          text: 'Excel',
-          className: 'btn btn-success export-excel-btn',
-          title: 'Listado de Multas y Advertencias',
-          exportOptions: {
-            columns: [0, 1, 2, 3, 4] // Columnas a exportar
-          }
-        },
-        {
-          extend: 'pdf',
-          text: 'PDF',
-          className: 'btn btn-danger export-pdf-btn',
-          title: 'Listado de Multas y Advertencias',
-          exportOptions: {
-            columns: [0, 1, 2, 3, 4] // Columnas a exportar
-          }
-        }
-      ]
     });
   }
-  ///////////////////////////////////////////////////////////////////////////////////////
 
+
+  //
   viewFine(i: number) {
     const modal = this._modal.open(PenaltiesModalFineComponent, {
       size: 'xl',
@@ -247,6 +226,9 @@ export class PenaltiesSanctionsListComponent implements OnInit {
         console.log('Modal dismissed with error:', error);
       });
   }
+
+
+  //Abre el modal de vermas por id de multa
   openModal(fineId: number) {
     const modal = this._modal.open(PenaltiesModalFineComponent, {
       size: 'md',
@@ -262,6 +244,7 @@ export class PenaltiesSanctionsListComponent implements OnInit {
       });
   }
 
+
   //Metodo para manejar la busqueda
   onSearch(event: any) {
     const searchValue = event.target.value;
@@ -273,6 +256,7 @@ export class PenaltiesSanctionsListComponent implements OnInit {
       this.table.search('').draw();
     }
   }
+
 
   // Método para filtrar la tabla en base a las 2 fechas y estado
   filterData() {
@@ -291,29 +275,29 @@ export class PenaltiesSanctionsListComponent implements OnInit {
         );
       }
     }
-  
+
     // Filtrar por fecha si las fechas están definidas
     const startDate = this.filterDateStart ? new Date(this.filterDateStart + 'T00:00:00') : null;  // Ajustar la fecha de inicio a las 00:00:00
     const endDate = this.filterDateEnd ? new Date(this.filterDateEnd + 'T23:59:59') : null;  // Ajustar la fecha de fin a las 23:59:59
-    
+
     filteredComplaints = filteredComplaints.filter((item) => {
       const date = new Date(item.createdDate);
       if (isNaN(date.getTime())) {
         console.warn(`Fecha no válida: ${item.createdDate}`);
         return false;
       }
-  
+
       // Verifica si la fecha está entre las fechas de inicio y fin
       const afterStartDate = !startDate || date >= startDate;
       const beforeEndDate = !endDate || date <= endDate;
-  
+
       return afterStartDate && beforeEndDate;
     });
     // Actualiza los datos filtrados en la tabla
     this.sanctionsfilter = filteredComplaints;
     this.updateDataTable(); // Llama a la función para actualizar la tabla
   }
-  
+
 
   // Método para manejar la selección del estado
   onFilter(data: any) {
@@ -327,6 +311,8 @@ export class PenaltiesSanctionsListComponent implements OnInit {
     this.filterData(); // Aplica los filtros de fecha y estado
   }
 
+
+  //Limpia los filtros
   eraseFilters() {
     this.refreshData();
     this.selectedStates = [];
@@ -464,7 +450,7 @@ export class PenaltiesSanctionsListComponent implements OnInit {
     doc.save(`${formattedDesde}-${formattedHasta}_Listado_Sanciones.pdf`);
   }
 
-  
+
   //Exportar a Excel
   exportToExcel(): void {
     const encabezado = [

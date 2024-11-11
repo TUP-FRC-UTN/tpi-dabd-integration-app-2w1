@@ -13,12 +13,15 @@ import { RoutingService } from '../../../../common/services/routing.service';
   styleUrl: './penalties-update-fine.component.scss'
 })
 export class PenaltiesUpdateFineComponent implements OnInit {
+  //Variables
   userId: number;
   fineIdFromList: number;
   fine: any;
   reactiveForm: FormGroup;
+
+
+  //Constructor
   constructor(private penaltiesService: PenaltiesSanctionsServicesService,
-    private router: Router,
     private route: ActivatedRoute,
     formBuilder: FormBuilder,
     private routingService: RoutingService
@@ -29,6 +32,9 @@ export class PenaltiesUpdateFineComponent implements OnInit {
       amountControl: new FormControl('', [Validators.required, Validators.min(0)])
     })
   }
+
+
+  //Init
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
       this.fineIdFromList = + params.get('fineId')!;
@@ -37,7 +43,7 @@ export class PenaltiesUpdateFineComponent implements OnInit {
   }
 
 
-  //
+  //Consulta los datos de la multa desde la api
   getFine(fineId: number) {
     this.penaltiesService.getFineById(fineId).subscribe(
       (response) => {
@@ -52,7 +58,7 @@ export class PenaltiesUpdateFineComponent implements OnInit {
   }
 
 
-  //
+  //Envia un update con los datos de la multa
   onSubmit() {
     const fineData = {
       id: this.fineIdFromList,
@@ -82,7 +88,7 @@ export class PenaltiesUpdateFineComponent implements OnInit {
     })
   };
 
-  //
+  //Cancela el update de la multa
   cancel() {
     this.routingService.redirect("main/sanctions/sanctions-list", "Listado de Infracciones")
   }
@@ -96,42 +102,37 @@ export class PenaltiesUpdateFineComponent implements OnInit {
       'is-valid': control?.valid
     }
   }
-  //Retorna el primer error encontrado para el input dentro de los posibles
-  showError(controlName: string) {
+
+
+  //Controla que se tenga que enviar un mensaje de error, lo busca y retorna
+  showError(controlName: string): string {
     const control = this.reactiveForm.get(controlName);
-    //Si encuentra un error retorna un mensaje describiendolo
-    if (control && control.errors) {
-      const errorKey = Object.keys(control!.errors!)[0];
-      switch (errorKey) {
-        case 'required':
-          return 'Este campo no puede estar vacío.';
-        case 'email':
-          return 'Formato de correo electrónico inválido.';
-        case 'minlength':
-          return `El valor ingresado es demasiado corto. Mínimo ${control.errors['minlength'].requiredLength} caracteres.`;
-        case 'maxlength':
-          return `El valor ingresado es demasiado largo. Máximo ${control.errors['maxlength'].requiredLength} caracteres.`;
-        case 'pattern':
-          return 'El formato ingresado no es válido.';
-        case 'min':
-          return `El valor es menor que el mínimo permitido (${control.errors['min'].min}).`;
-        case 'max':
-          return `El valor es mayor que el máximo permitido (${control.errors['max'].max}).`;
-        case 'requiredTrue':
-          return 'Debe aceptar el campo requerido para continuar.';
-        case 'date':
-          return 'La fecha ingresada es inválida.';
-        case 'url':
-          return 'El formato de URL ingresado no es válido.';
-        case 'number':
-          return 'Este campo solo acepta números.';
-        case 'customError':
-          return 'Error personalizado: verifique el dato ingresado.';
-        default:
-          return 'Error no identificado en el campo.';
-      }
+
+    if (control?.errors && control.invalid && (control.dirty || control.touched)) {
+      const errorKey = Object.keys(control.errors)[0];
+      return this.getErrorMessage(errorKey, control.errors[errorKey]);
     }
-    //Si no se cumplen ninguno de los anteriores retorna vacio
     return '';
+  }
+
+  
+  //Devuelve el mensaje de error
+  private getErrorMessage(errorKey: string, errorValue: any): string {
+    const errorMessages: { [key: string]: (error: any) => string } = {
+      required: () => 'Este campo no puede estar vacío.',
+      email: () => 'Formato de correo electrónico inválido.',
+      minlength: (error) => `El valor ingresado es demasiado corto. Mínimo ${error.requiredLength} caracteres.`,
+      maxlength: (error) => `El valor ingresado es demasiado largo. Máximo ${error.requiredLength} caracteres.`,
+      pattern: () => 'El formato ingresado no es válido.',
+      min: (error) => `El valor es menor que el mínimo permitido (${error.min}).`,
+      max: (error) => `El valor es mayor que el máximo permitido (${error.max}).`,
+      requiredTrue: () => 'Debe aceptar el campo requerido para continuar.',
+      date: () => 'La fecha ingresada es inválida.',
+      url: () => 'El formato de URL ingresado no es válido.',
+      number: () => 'Este campo solo acepta números.',
+      customError: () => 'Error personalizado: verifique el dato ingresado.'
+    };
+
+    return errorMessages[errorKey]?.(errorValue) ?? 'Error no identificado en el campo.';
   }
 }
