@@ -1,0 +1,451 @@
+<section class="py-5">
+  <div class="container p-3 border border-2 rounded shadow-lg">
+    <!-- Modal de Información -->
+    <div
+      class="modal fade"
+      id="infoModal"
+      tabindex="-1"
+      aria-labelledby="infoModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="infoModalLabel">
+              Información sobre la Página
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+            <div class="modal-body">
+              <p>
+                En esta página, puedes gestionar el listado de empleados del
+                sistema. A continuación, se detallan las secciones y
+                funcionalidades disponibles:
+              </p>
+              <ul>
+                <li>
+                  <strong>Botones de navegación:</strong> Cambia entre las
+                  secciones <em>Información</em>, <em>Asistencias</em> y
+                  <em>Desempeño</em> para acceder a diferentes datos
+                  relacionados con los empleados.
+                </li>
+                <li>
+                  <strong>Filtros de fecha:</strong> En la sección de
+                  <em>Desempeño</em>, puedes seleccionar un rango de fechas para
+                  filtrar el rendimiento de los empleados.
+                </li>
+                <li>
+                  <strong>Tabla de empleados:</strong> Muestra una lista de
+                  empleados con columnas para <em>Apellido y Nombre</em>,
+                  <em>Documento</em>, <em>Posición</em>, <em>Salario</em>, y
+                  <em>Acciones</em>.
+                </li>
+                <li>
+                  <strong>Detalles del empleado:</strong> Haz clic en un
+                  empleado para ver más información en un modal emergente.
+                </li>
+                <li>
+                  <strong>Registrar observaciones:</strong> En la sección de
+                  <em>Desempeño</em>, puedes añadir observaciones sobre el
+                  rendimiento de los empleados.
+                </li>
+                <li>
+                  <strong>Exportar datos:</strong> Descarga la lista de
+                  empleados en formatos PDF y Excel desde los botones
+                  disponibles en la parte superior de la lista.
+                </li>
+              </ul>
+              <p>
+                Asegúrate de utilizar correctamente las funcionalidades para
+                gestionar eficazmente la información y el rendimiento de los
+                empleados.
+              </p>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col"></div>
+    </div>
+
+    <div
+      class="row filtros"
+      *ngIf="ventana === 'Informacion'"
+      style="align-items: center"
+    >
+      <!-- Campo de búsqueda y selector de cargos -->
+      <div class="col-md-3">
+        <input
+          type="text"
+          id="inputFiltroNombre"
+          class="form-control m-2"
+          placeholder="Buscar"
+          (input)="onSearchFilterChange($event)"
+        />
+      </div>
+      <!--             <div class="col-md-3">
+          <select class="form-select m-2" id="comboFiltroCargo" (change)="onPositionFilterChange($event)">
+              <option value="">Todos los cargos</option>
+          </select>
+      </div> -->
+
+      <div class="col-md-3">
+        <div class="w-100 m-2">
+          <ng-select
+            [items]="stateOptions"
+            [multiple]="true"
+            bindLabel="label"
+            bindValue="id"
+            [(ngModel)]="selectedState"
+            (change)="onStateChange($event)"
+            [closeOnSelect]="false"
+            placeholder="Seleccionar Estado"
+            [clearable]="true"
+            [ngClass]="'custom-select'"
+          >
+            <!-- Template para el texto del placeholder con contador -->
+            <ng-template ng-multi-label-tmp let-items="items">
+              Estado
+              <span *ngIf="items.length > 0">({{ items.length }})</span>
+            </ng-template>
+
+            <!-- Template para las opciones con checkbox -->
+            <ng-template ng-option-tmp let-item="item" let-item$="item$">
+              <input type="checkbox" [checked]="item$.selected" />
+              {{ item.label }}
+            </ng-template>
+          </ng-select>
+        </div>
+      </div>
+
+      <div class="col"></div>
+
+      <!-- Botones de exportación alineados a la derecha del selector -->
+      <div class="col-md-2 d-flex align-items-center justify-content-end">
+        <!-- Botón para mostrar/ocultar filtros -->
+        <button
+          class="btn btn-primary me-2 filterbutton"
+          data-bs-toggle="modal"
+          title="Filtros Avanzados"
+          data-bs-target="#filtrosAvanzados"
+        >
+          <i class="bi bi-funnel-fill"></i>
+        </button>
+        <button class="btn btn-secondary me-2 filterbutton" (click)="cleanColumnFilters()">
+          <i class="bi bi-trash"></i>
+        </button>
+        <button class="btn btn-success me-2 filterbutton" (click)="exportToExcel()">
+          <i class="fa-solid bi-file-earmark-excel"></i>
+        </button>
+        <button class="btn btn-danger filterbutton" (click)="exportToPdf()">
+          <i class="fas bi-file-earmark-pdf"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Botones de exportación alineados a la derecha del selector -->
+    <!-- Botón para mostrar/ocultar filtros -->
+    <!--     <div class="col-md-2 d-flex align-items-center justify-content-end">
+      <button
+        class="btn btn-primary me-2"
+        data-bs-toggle="modal"
+        title="Filtros Avanzados"
+        data-bs-target="#filtrosAvanzados"
+      >
+        <i class="bi bi-funnel-fill"></i>
+      </button>
+      <button class="btn btn-secondary me-2" (click)="cleanColumnFilters()">
+        <i class="bi bi-trash"></i>
+      </button>
+      <button class="btn btn-success me-2" (click)="exportToExcel()">
+        <i class="fa-solid bi-file-earmark-excel"></i>
+      </button>
+      <button class="btn btn-danger" (click)="exportToPdf()">
+        <i class="fas bi-file-earmark-pdf"></i>
+      </button>
+    </div> -->
+
+    <!-- Tabla de empleados con cabecera de columnas -->
+    <table
+      id="empleadosTable"
+      class="table table-striped border border-4 rounded table-hover"
+    >
+      <thead class="table-light border border-4">
+        <tr>
+          <th>Apellido y Nombre</th>
+          <th>Documento</th>
+          <th>Posición</th>
+          <th>Salario</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <!-- Modal personalizado para mostrar detalles de un empleado seleccionado -->
+    <div class="modal-overlay" [class.show]="showModal" (click)="closeModal()">
+      <div class="modal-container" (click)="$event.stopPropagation()">
+        <!-- Encabezado del modal -->
+        <div class="modal-header">
+          <h5>Detalles del Empleado</h5>
+          <button class="close-button" (click)="closeModal()">×</button>
+        </div>
+        <!-- Cuerpo del modal con el contenido dinámico del empleado -->
+        <div class="modal-body" [innerHTML]="modalContent"></div>
+        <!-- Pie del modal con botón para cerrar -->
+        <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="closeModal()">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Opciones de acción según la ventana seleccionada -->
+    <div class="opciones">
+      <!-- Opciones cuando la ventana es "Desempeño" -->
+      @if (ventana == "Desempeño") {
+      <div class="row">
+        <div class="col-2">
+          <div class="row">
+            <button
+              class="btn btn-primary"
+              (click)="navigateToWakeUpCallForm()"
+            >
+              Registrar observacion
+            </button>
+          </div>
+        </div>
+      </div>
+      }
+    </div>
+
+    <!-- Modal de confirmación de eliminación -->
+    <div
+      class="modal fade"
+      id="deleteModal"
+      tabindex="-1"
+      aria-labelledby="deleteModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="deleteModalLabel">
+              Confirmar eliminación
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            ¿Está seguro de que desea eliminar este empleado?
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-danger"
+              data-bs-dismiss="modal"
+              (click)="confirmDelete()"
+            >
+              Eliminar
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button
+    class="floating-btn btn btn-primary"
+    (click)="goTo('home/employee-post')"
+  >
+    <span class="bi-plus-lg"></span>
+  </button>
+
+  <div
+    class="modal fade"
+    id="filtrosAvanzados"
+    tabindex="-1"
+    aria-labelledby="filtrosAvanzadosLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h5 class="modal-title" id="filtrosAvanzadosLabel">
+            Filtros Avanzados
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="modal-body">
+          <!-- Filtro por nombre -->
+          <!--                     <div class="mb-3">
+                        <label for="Nombre" class="form-label">Apellido, Nombre</label>
+                        <input type="text" placeholder="" (input)="applyColumnFilter($event, 'apellidoNombre')"
+                            [(ngModel)]="apellidoNombre" name="apellidoNombre" class="form-control" />
+                    </div> -->
+
+          <!-- Filtro por nombre -->
+          <!--                     <div class="mb-3">
+                        <label for="Nombre" class="form-label">Documento</label>
+                        <input type="text" placeholder="" (input)="applyColumnFilter($event, 'documento')"
+                            [(ngModel)]="documento" name="documento" class="form-control text-end" />
+                    </div> -->
+
+          <!-- Dropdown de Posición -->
+          <!--           <div class="mb-3 row align-items-start">
+            <label
+              for="dropdownReusable"
+              class="col-4 col-form-label text-start"
+            >
+              Seleccionar Posición
+            </label>
+            <div class="col-8">
+              <button
+                class="btn btn-secondary dropdown-toggle w-100 text-start"
+                type="button"
+                id="dropdownCargo"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Posición @if (selectedPositions.length>0) { ({{
+                  selectedPositions.length
+                }}) }
+              </button>
+              <ul class="dropdown-menu w-100" aria-labelledby="dropdownCargo">
+                <li *ngFor="let position of uniquePositions">
+                  <label class="dropdown-item">
+                    <input
+                      type="checkbox"
+                      class="form-check-input me-2"
+                      [value]="position"
+                      [checked]="selectedPositions.includes(position)"
+                      (change)="onPositionFilterChange()"
+                    />
+                    {{ position }}
+                  </label>
+                </li>
+              </ul>
+            </div>
+          </div>
+ -->
+          <!-- Selector de posicion -->
+          <!-- Selector de posiciones -->
+          <!--           <div class="mb-3">
+            <label for="dropdownReusable" class="form-label"
+              >Reutilizables</label
+            >
+            <ng-select
+              [items]="uniquePositions"
+              bindLabel="position"
+              [(ngModel)]="selectedPositions"
+              placeholder="Selecciona las posiciones"
+              [multiple]="true"
+              [closeOnSelect]="false"
+              (change)="onPositionFilterChange()"
+              [clearable]="true"
+            >
+            </ng-select>
+          </div> -->
+
+          <!--                     <div class="mb-3 btn btn-secondary dropdown-toggle w-100 text-star">
+                        <ng-select [items]="uniquePositions" bindLabel="name" bindValue="id"
+                            placeholder="Selecciona países" [multiple]="true" [(ngModel)]="selecteduniquePositions">
+                        </ng-select>
+                    </div> -->
+
+          <!-- Input Salario Mínimo -->
+          <div class="mb-3 row align-items-start">
+            <label for="salarioMin" class="col-4 col-form-label text-start">
+              Salario mínimo
+            </label>
+            <div class="col-8">
+              <input
+                type="number"
+                id="salarioMin"
+                placeholder=""
+                (input)="applyAmountFilter('min', $event)"
+                min="0"
+                [(ngModel)]="salarioMin"
+                name="salarioMin"
+                class="form-control text-end"
+              />
+              <div class="mt-1">
+                @if (errorMessage) {
+                <div class="text-danger small">
+                  {{ errorMessage }}
+                </div>
+                }@else {
+                <div class="text-danger small">
+                  {{ errorMessage }}
+                </div>
+                } @if (salarioMin) {
+                <div *ngIf="salarioMin < 0" class="text-danger small">
+                  El salario mínimo no puede ser negativo
+                </div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Input Salario Máximo -->
+          <div class="mb-3 row align-items-start">
+            <label for="salarioMax" class="col-4 col-form-label text-start">
+              Salario máximo
+            </label>
+            <div class="col-8">
+              <input
+                type="number"
+                id="salarioMax"
+                placeholder=""
+                (input)="applyAmountFilter('max', $event)"
+                min="0"
+                [(ngModel)]="salarioMax"
+                name="salarioMax"
+                class="form-control text-end"
+              />
+              <div class="mt-1">
+                @if (salarioMax) {
+                <div *ngIf="salarioMax < 0" class="text-danger small">
+                  El salario máximo no puede ser negativo
+                </div>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

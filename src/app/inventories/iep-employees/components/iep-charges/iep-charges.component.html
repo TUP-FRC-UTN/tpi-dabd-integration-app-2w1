@@ -1,0 +1,429 @@
+<div class="py-5">
+  <div class="container p-3 border border-2 rounded shadow-lg">
+    <div class="">
+      <!-- Fila de opciones (Filtro, Exportar, Nuevo) -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <!-- Filtro de búsqueda a la izquierda -->
+        <div class="col-md-6  ">
+          <div class="row">
+            <div class="col-md-6">
+              <input
+              type="text"
+              class="form-control col-3"
+              placeholder="Buscar"
+              [(ngModel)]="searchTerm"
+              (input)="filterData($event)"
+            />
+            </div>
+
+               <!-- Contenedor flex para alinear el ng-select a la derecha -->
+               <div style="flex-grow: 1; max-width: 300px" class="me-2 col-md-6">
+                <ng-select
+                  [items]="stateOptions"
+                  [multiple]="true"
+                  bindLabel="label"
+                  bindValue="id"
+                  [(ngModel)]="filters.reutilizableSeleccionado"
+                  (change)="stateFilter()"
+                  [closeOnSelect]="true"
+                  placeholder="Seleccionar Estado"
+                  [clearable]="true"
+                >
+                  <ng-template ng-multi-label-tmp let-items="items">
+                    Seleccionar Estado
+                    <span *ngIf="items.length > 0">({{ items.length }})</span>
+                  </ng-template>
+  
+                  <!-- Template para las opciones del dropdown -->
+                  <ng-template ng-option-tmp let-item="item" let-item$="item$">
+                    <input type="checkbox" [checked]="item$.selected" />
+                    {{ item.label }}
+                  </ng-template>
+                </ng-select>
+              </div>
+          </div>
+          <div class="input-group">
+         
+
+         
+          </div>
+        </div>
+
+        <!-- Botones a la derecha -->
+        <div>
+          <button class="btn btn-secondary me-2 filterbutton" (click)="resetFilters()">
+            <i class="bi bi-trash"></i>
+          </button>
+          <button class="btn btn-success me-2 filterbutton" (click)="exportToExcel()">
+            <i class="fa-solid bi-file-earmark-excel"></i>
+          </button>
+          <button class="btn btn-danger me-2 filterbutton" (click)="exportToPdf()">
+            <i class="fas bi-file-earmark-pdf"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Tabla de cargos -->
+      <table
+        id="cargosTable"
+        class="table table-striped border border-4 rounded table-hover"
+      >
+      <thead class="table-light border border-4">
+          <tr>
+            <th>Cargo</th>
+            <th>Descripción</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal para Crear Cargo -->
+  <div class="modal fade" id="createChargeModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Nuevo Cargo</h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+            (click)="reset()"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="cargoForm" (ngSubmit)="onSubmitCreate()">
+            <div class="mb-3 row">
+              <label for="charge" class="col-sm-3 col-form-label text-end"
+                >Cargo</label
+              >
+              <div class="col-sm-9">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="charge"
+                  formControlName="charge"
+                  [ngClass]="{
+                    'is-valid':
+                      cargoForm.get('charge')?.valid &&
+                      cargoForm.get('charge')?.touched,
+                    'is-invalid':
+                      cargoForm.get('charge')?.invalid &&
+                      cargoForm.get('charge')?.touched
+                  }"
+                />
+                <div
+                  *ngIf="
+                    cargoForm.get('charge')?.invalid &&
+                    cargoForm.get('charge')?.touched
+                  "
+                  class="invalid-feedback"
+                >
+                  <small>El cargo es requerido</small>
+                </div>
+              </div>
+            </div>
+            <div class="mb-3 row">
+              <label for="description" class="col-sm-3 col-form-label text-end"
+                >Descripción</label
+              >
+              <div class="col-sm-9">
+                <textarea
+                  class="form-control"
+                  id="description"
+                  formControlName="description"
+                  rows="3"
+                  [ngClass]="{
+                    'is-valid':
+                      cargoForm.get('description')?.valid &&
+                      cargoForm.get('description')?.touched,
+                    'is-invalid':
+                      cargoForm.get('description')?.invalid &&
+                      cargoForm.get('description')?.touched
+                  }"
+                ></textarea>
+                <div
+                  *ngIf="
+                    cargoForm.get('description')?.invalid &&
+                    cargoForm.get('description')?.touched
+                  "
+                  class="invalid-feedback"
+                >
+                  <small>La descripción es requerida</small>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+                (click)="reset()"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                class="btn btn-success"
+                [disabled]="cargoForm.invalid"
+              >
+                Registrar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmación -->
+  <div class="modal fade" id="confirmUpdateModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Confirmar cambios</h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <p>
+            ¿Deseas actualizar el cargo "{{ cargoForm.get("charge")?.value }}"?
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="confirmUpdate()"
+          >
+            Confirmar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tu modal original de edición actualizado -->
+  <div class="modal fade" id="editChargeModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Modificar Cargo</h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+            (click)="reset()"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="cargoForm" (ngSubmit)="onSubmitEdit()" novalidate>
+            <!-- Grupo de formulario para Cargo -->
+            <div class="mb-3 row align-items-center">
+              <label for="editCharge" class="col-sm-3 col-form-label text-end"
+                >Cargo</label
+              >
+              <div class="col-sm-9">
+                <input
+                  type="text"
+                  class="form-control text-start"
+                  [ngClass]="{
+                    'is-valid':
+                      cargoForm.get('charge')?.valid &&
+                      cargoForm.get('charge')?.touched,
+                    'is-invalid':
+                      cargoForm.get('charge')?.invalid &&
+                      cargoForm.get('charge')?.touched
+                  }"
+                  id="editCharge"
+                  formControlName="charge"
+                />
+                <div
+                  *ngIf="
+                    cargoForm.get('charge')?.invalid &&
+                    cargoForm.get('charge')?.touched
+                  "
+                  class="invalid-feedback"
+                >
+                  <small>El cargo es requerido</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Grupo de formulario para Descripción -->
+            <div class="mb-3 row align-items-center">
+              <label
+                for="editDescription"
+                class="col-sm-3 col-form-label text-end"
+                >Descripción</label
+              >
+              <div class="col-sm-9">
+                <textarea
+                  class="form-control text-start"
+                  [ngClass]="{
+                    'is-valid':
+                      cargoForm.get('description')?.valid &&
+                      cargoForm.get('description')?.touched,
+                    'is-invalid':
+                      cargoForm.get('description')?.invalid &&
+                      cargoForm.get('description')?.touched
+                  }"
+                  id="editDescription"
+                  formControlName="description"
+                  rows="3"
+                >
+                </textarea>
+                <div
+                  *ngIf="
+                    cargoForm.get('description')?.invalid &&
+                    cargoForm.get('description')?.touched
+                  "
+                  class="invalid-feedback"
+                >
+                  <small>La descripción es requerida</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+                (click)="reset()"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="cargoForm.invalid"
+              >
+                Actualizar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para Confirmar Eliminación -->
+  <div
+    class="modal fade"
+    id="eliminarCargoModal"
+    tabindex="-1"
+    aria-labelledby="eliminarCargoModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="eliminarCargoModalLabel">
+            Confirmar Eliminación
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <p>
+            ¿Estás seguro de que deseas eliminar el cargo
+            <strong>{{ cargoSeleccionado?.charge }}</strong
+            >?
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-danger"
+            (click)="confirmarEliminacion()"
+          >
+            Eliminar
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmación -->
+  <div
+    class="modal fade"
+    id="confirmUpdateModal"
+    tabindex="-1"
+    aria-labelledby="confirmUpdateModalLabel"
+    aria-hidden="true"
+    data-bs-backdrop="static"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmUpdateModalLabel">
+            Confirmar cambios
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <p>
+            ¿Deseas actualizar el cargo "{{ cargoForm.get("charge")?.value }}"?
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="confirmUpdate()"
+          >
+            Confirmar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botón Flotante -->
+  <button
+    class="floating-btn btn btn-primary"
+    data-bs-target="#createChargeModal"
+    data-bs-toggle="modal"
+  >
+    <span class="bi-plus-lg"></span>
+  </button>
+</div>

@@ -1,0 +1,198 @@
+<section class="py-5">
+  <div class="container p-3 border border-2 rounded shadow-lg">
+    <!-- Fila de búsqueda, selectores de período y botones a la derecha -->
+    <div class="row mb-3">
+      <div class="col-md-12">
+        <div class="row w-100 align-items-center">
+          
+          <!-- Campo de búsqueda a la izquierda -->
+          <div class="col-md-3 d-flex align-items-center">
+            <button class="btn btn-secondary me-2" (click)="volverInventario()">
+              <i class="bi bi-arrow-left"></i>
+            </button>
+            <input type="text" id="searchTerm" [(ngModel)]="searchTerm" placeholder="Buscar" class="form-control" readonly>
+          </div>
+
+          <!-- Selector de Período en el centro -->
+          <div class="col-md-4 d-flex align-items-center">
+            <!-- <label class="form-label me-2 mb-0">Período</label> -->
+            <div class="ms-2" style="flex-grow: 1; max-width: 300px;">
+              <ng-select
+                [items]="periodOptions"
+                [multiple]="true" 
+                [closeOnSelect]="false"
+                bindLabel="label"
+                bindValue="id"
+                [(ngModel)]="selectedPeriod"
+                (change)="onPeriodChange($event)"
+                placeholder="Seleccionar Período"
+                [clearable]="true">
+                <ng-template ng-multi-label-tmp let-items="items">
+                  Seleccionar Período
+                  <span *ngIf="items.length > 0">({{ items.length }})</span>
+                </ng-template>
+                <ng-template ng-option-tmp let-item="item" let-item$="item$">
+                  <input type="checkbox" [checked]="item$.selected"/> {{item.label}}
+                </ng-template>
+              </ng-select>
+            </div>
+          </div>
+
+          <!-- Botones a la derecha -->
+          <div class="col-md-5 d-flex justify-content-end align-items-center">
+            <button class="btn btn-primary me-2 filterbutton" (click)="openFilterModal()">
+              <i class="bi bi-funnel-fill"></i> 
+            </button>
+            <button class="btn btn-secondary me-2 filterbutton" (click)="resetFilters()">
+              <i class="bi bi-trash"></i>
+            </button>
+            <button class="btn btn-success me-2 filterbutton" (click)="exportToExcel()">
+              <i class="fa-solid bi-file-earmark-excel"></i>
+            </button>
+            <button class="btn btn-danger me-2 filterbutton" (click)="exportToPdf()">
+              <i class="fas bi-file-earmark-pdf"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Filtros Avanzados -->
+    <div class="modal fade" id="filterModal" tabindex="-1" data-bs-backdrop="static">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Filtros Avanzados</h5>
+            <button type="button" class="btn-close" (click)="closeFilterModal()"></button>
+          </div>
+          <div class="modal-body">
+            <!-- Tipo de Desempeño -->
+            <div class="mb-3">
+              <label class="form-label">Tipo de Desempeño</label>
+              <div class="ms-2" style="flex-grow: 1; max-width: 300px;">
+                <ng-select
+                  [items]="performanceTypeOptions"
+                  [multiple]="true"
+                  bindLabel="label"
+                  bindValue="id"
+                  [(ngModel)]="selectedPerformanceType"
+                  (change)="onPerformanceTypeChange($event)"
+                  [closeOnSelect]="true"
+                  placeholder="Seleccionar Desempeño"
+                  [clearable]="true">
+                  <ng-template ng-multi-label-tmp let-items="items">
+                    Seleccionar Desempeño
+                    <span *ngIf="items.length > 0">({{ items.length }})</span>
+                  </ng-template>
+                  <ng-template ng-option-tmp let-item="item" let-item$="item$">
+                    <input type="checkbox" [checked]="item$.selected"/> {{item.label}}
+                  </ng-template>
+                </ng-select>
+              </div>
+            </div>
+
+            <!-- Observaciones -->
+            <div class="mb-3">
+              <label class="form-label">Cantidad de Observaciones</label>
+              <input 
+                type="number" 
+                [(ngModel)]="selectedObservationCount"
+                (input)="filterData()"
+                class="form-control" 
+                placeholder="Número de observaciones">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Move the table section here -->
+    <table 
+    class="table table-striped border border-4 rounded table-hover">
+      <thead class="table-light border border-4">
+        <tr>
+          <th>Período</th>
+          <th>Empleado</th>
+          <th>Observaciones</th>
+          <th>Desempeño</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <!-- Floating button -->
+    <button class="floating-btn btn btn-primary" data-bs-target="#newCall" data-bs-toggle="modal">
+      <span class="bi-plus-lg"></span>
+    </button>
+
+    <!-- Modal del Formulario -->
+    <div class="modal fade" id="newCall" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Llamado de Atención</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <app-iep-attention-call [employeeId]="selectedEmployeeId"
+            (closeModal)="closeNewCallModal()"></app-iep-attention-call>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Detalles -->
+    <div class="modal fade" id="viewDetail" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Detalles de Llamados de Atención</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Tipo</th>
+                    <th>Observación</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let detail of paginatedDetails">
+                    <td>{{ detail.dateReal[2] }}/{{ detail.dateReal[1] }}/{{ detail.dateReal[0] }}</td>
+                    <td>
+                      <span class="tag" [ngClass]="detail.wackeUpTypeEnum.toLowerCase()">
+                        {{ detail.wackeUpTypeEnum }}
+                      </span>
+                    </td>
+                    <td>
+                      <ng-container *ngFor="let line of formatObservation(detail.observation)">
+                        {{ line }}<br />
+                      </ng-container>
+                    </td>
+                    
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div *ngIf="selectedEmployeeDetails.length === 0" class="text-center p-3">
+              No hay llamados de atención para mostrar en este período.
+            </div>                      <!-- Contenedor de la paginación debajo de la tabla -->
+                        <!-- Contenedor de la paginación debajo de la tabla -->
+            <div class="d-flex justify-content-between align-items-center mt-3">
+              <!-- Información de la página actual alineada a la izquierda -->
+              <span>Página {{ currentPage }} de {{ totalPages }}</span>
+              <!-- Botones de paginación alineados a la derecha -->
+              <div>
+                <button class="btn btn-secondary me-2" (click)="prevPage()" [disabled]="currentPage === 1">Anterior</button>
+                <button class="btn btn-secondary" (click)="nextPage()" [disabled]="currentPage >= totalPages">Siguiente</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
