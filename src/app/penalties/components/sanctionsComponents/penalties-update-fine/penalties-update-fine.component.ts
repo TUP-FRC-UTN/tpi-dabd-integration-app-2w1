@@ -13,20 +13,20 @@ import { RoutingService } from '../../../../common/services/routing.service';
   styleUrl: './penalties-update-fine.component.scss'
 })
 export class PenaltiesUpdateFineComponent implements OnInit {
-  userId:number;
+  userId: number;
   fineIdFromList: number;
   fine: any;
-  reactiveForm:FormGroup;
+  reactiveForm: FormGroup;
   constructor(private penaltiesService: PenaltiesSanctionsServicesService,
     private router: Router,
-     private route: ActivatedRoute,
-      formBuilder:FormBuilder,
-      private routingService: RoutingService
-    ){
+    private route: ActivatedRoute,
+    formBuilder: FormBuilder,
+    private routingService: RoutingService
+  ) {
     this.userId = 1;
     this.fineIdFromList = 0; //Esto deberia venir del listado
     this.reactiveForm = formBuilder.group({
-      amountControl: new FormControl('', [Validators.required, Validators.min(1.00)])
+      amountControl: new FormControl('', [Validators.required, Validators.min(0)])
     })
   }
   ngOnInit(): void {
@@ -35,49 +35,59 @@ export class PenaltiesUpdateFineComponent implements OnInit {
       this.getFine(this.fineIdFromList);
     });
   }
-  getFine(fineId:number){
-    this.penaltiesService.getFineById(this.fineIdFromList)
-    .subscribe(
+
+
+  //
+  getFine(fineId: number) {
+    this.penaltiesService.getFineById(fineId).subscribe(
       (response) => {
-        console.log(response); 
+        console.log(response);
         this.fine = response
+        this.reactiveForm.get('amountControl')?.setValue(this.fine.amount)
       },
       (error) => {
         console.error('Error:', error);
-      });
+      }
+    );
   }
-  onSubmit(){
+
+
+  //
+  onSubmit() {
     const fineData = {
-      id:this.fineIdFromList,
+      id: this.fineIdFromList,
       amount: this.reactiveForm.value.amountControl,
       userId: 10
     };
     //Envio de formulario
 
-        // Envío de formulario solo después de la confirmación
-        this.penaltiesService.updateFine(fineData).subscribe( res => {
-            Swal.fire({
-              title: '¡Multa actualizada!',
-              text: 'La multa  ha sido actualizada correctamente.',
-              icon: 'success',
-              timer: 1500,
-              showConfirmButton: false
-            });
-            this.routingService.redirect("main/sanctions/sanctions-list", "Listado de Infracciones")
-          }, error => {
-            console.error('Error al actualizar la multa', error);
-            Swal.fire({
-              title: 'Error',
-              text: 'No se pudo actualizar la multa. Inténtalo de nuevo.',
-              icon: 'error',
-              confirmButtonText: 'Aceptar'
-            });
-          })
-        };
+    // Envío de formulario solo después de la confirmación
+    this.penaltiesService.updateFine(fineData).subscribe(res => {
+      Swal.fire({
+        title: '¡Multa actualizada!',
+        text: 'La multa  ha sido actualizada correctamente.',
+        icon: 'success',
+        timer: 1500,
+        showConfirmButton: false
+      });
+      this.routingService.redirect("main/sanctions/sanctions-list", "Listado de Infracciones")
+    }, error => {
+      console.error('Error al actualizar la multa', error);
+      Swal.fire({
+        title: 'Error',
+        text: 'No se pudo actualizar la multa. Inténtalo de nuevo.',
+        icon: 'error',
+        confirmButtonText: 'Aceptar'
+      });
+    })
+  };
 
-  cancel(){
+  //
+  cancel() {
     this.routingService.redirect("main/sanctions/sanctions-list", "Listado de Infracciones")
   }
+
+
   //Retorna una clase para poner el input en verde o rojo dependiendo si esta validado
   onValidate(controlName: string) {
     const control = this.reactiveForm.get(controlName);

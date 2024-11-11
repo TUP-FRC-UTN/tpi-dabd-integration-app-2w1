@@ -29,20 +29,21 @@ export class CustomSelectComponent {
   reactiveForm: FormGroup;
   selectControl: FormControl;
 
+
+  //Constructor
   constructor(private fb: FormBuilder) {
     this.selectControl = this.fb.control(this.selectedOptions, [], );
     this.reactiveForm = this.fb.group({
-      selectControl: this.selectControl // Cambio el nombre para que coincida con el template
+      selectControl: this.selectControl
     });
 
-
+    //Emite los items seleccionados cuando estos cambian dentro del componente
     this.selectControl.valueChanges.subscribe(values => {
       this.selectedOptionsChange.emit(values);
-      //Quiero actualizar el estado de las validaciones
     })
   }
 
-  //
+  //Devuelve los valores necesarios para mostrar los inputs en verde o rojo segun la validacion
   onValidate(controlName: string) {
     this.selectControl.setValidators(this.validations!)
     if(this.validations){
@@ -55,7 +56,7 @@ export class CustomSelectComponent {
     return '';
   }
 
-  //
+  //Controla que se tenga que enviar un mensaje de error, lo busca y retorna
   showError(controlName: string): string {
     const control = this.reactiveForm.get(controlName);
 
@@ -66,7 +67,7 @@ export class CustomSelectComponent {
     return '';
   }
 
-  //
+  //Devuelve el mensaje de error
   private getErrorMessage(errorKey: string, errorValue: any): string {
     const errorMessages: { [key: string]: (error: any) => string } = {
       required: () => 'Este campo no puede estar vacío.',
@@ -86,8 +87,16 @@ export class CustomSelectComponent {
     return errorMessages[errorKey]?.(errorValue) ?? 'Error no identificado en el campo.';
   }
 
+
+  //Limpia la/las opciones seleccionadas
   clearData(){
     this.selectControl.setValue([]);
+  }
+
+
+  //Alterna la seleccion sel item al tocar sobre la label (Por problemas en la seleccion multiple)
+  toggleSelection(item: any): void {
+    item.selected = !item.selected;
   }
 }
 

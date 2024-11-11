@@ -232,16 +232,6 @@ export class PenaltiesSanctionsListComponent implements OnInit {
         }
       ]
     });
-
-    // Triggers para los botones de exportación
-    $('#exportExcelBtn').on('click', function () {
-      table.button('.buttons-excel').trigger();
-    });
-
-    $('#exportPdfBtn').on('click', function () {
-      table.button('.buttons-pdf').trigger();
-    });
-
   }
   ///////////////////////////////////////////////////////////////////////////////////////
 

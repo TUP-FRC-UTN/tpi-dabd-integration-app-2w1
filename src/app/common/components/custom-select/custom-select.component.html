@@ -10,14 +10,13 @@
             <div class="d-flex align-items-center">
                 <input class="form-check-input me-2" [id]="'opt-' + item.value" type="checkbox"
                     [checked]="item$.selected" />
-                <label [for]="'opt-' + item.value" class="form-check-label mb-0">
+                <label [for]="'opt-' + item.value" class="form-check-label mb-0" (click)="toggleSelection(item$)">
                     {{ item.name }}
                 </label>
             </div>
         </ng-template>
         }
     </ng-select>
-    <div class="invalid-feedback d-block">
-        {{showError('selectControl')}}
-    </div>
+    <!-- Mensaje de error -->
+    <div class="invalid-feedback">{{showError('selectControl')}}</div>
 </form>
