@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { PenaltiesSanctionsServicesService } from '../../../services/sanctionsService/sanctions.service';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -22,30 +22,32 @@ import moment from 'moment';
 import jsPDF from 'jspdf';
 import { SanctionsDTO } from '../../../models/SanctionsDTO';
 import autoTable from 'jspdf-autotable';
+import { CustomSelectComponent } from "../../../../common/components/custom-select/custom-select.component";
 
 
 @Component({
   selector: 'app-penalties-sanctions-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, NgbModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule, NgbModule, RouterModule, CustomSelectComponent],
   templateUrl: './penalties-list-sanctions.component.html',
   styleUrl: './penalties-list-sanctions.component.scss'
 })
 export class PenaltiesSanctionsListComponent implements OnInit {
   //Variables
   sanctionsfilter: any[] = [];                    //
-  sanctions: SanctionsDTO[] = [];                          //
+  sanctions: SanctionsDTO[] = [];                 //
   sanctionState: String = '';                     //
   selectedValue: string = '';                     //
-  // filterDateStart: Date = new Date();             //
-  // filterDateEnd: Date = new Date();               //
   states: { key: string; value: string }[] = [];  //
   table: any;                                     //Tabla base
   searchTerm: string = '';                        //Valor de la barra de busqueda
-  filterDateStart: string='';
-  filterDateEnd: string ='';
-  
-  selectedState: string = '';
+  filterDateStart: string = '';
+  filterDateEnd: string = '';
+
+  selectedStates: string[] = [];
+
+  options: { name: string, value: any }[] = []
+  @ViewChild(CustomSelectComponent) customSelect!: CustomSelectComponent;
 
   //Init
   ngOnInit(): void {
@@ -54,16 +56,16 @@ export class PenaltiesSanctionsListComponent implements OnInit {
       this.refreshData();
     });
 
-    this.getTypes()
+    this.getStates()
     this.refreshData()
     //Esto es para acceder al metodo desde afuera del datatable
     const that = this; // para referenciar metodos afuera de la datatable
-    $('#sanctionsTable').on('click', 'a.dropdown-item', function(event) {
+    $('#sanctionsTable').on('click', 'a.dropdown-item', function (event) {
       const action = $(this).data('action');
       const id = $(this).data('id');
       const state = $(this).data('state');
-  
-      switch(action) {
+
+      switch (action) {
         case 'newDisclaimer':
           that.newDisclaimer(id);
           break;
@@ -96,7 +98,6 @@ export class PenaltiesSanctionsListComponent implements OnInit {
     
 
 
-
   //Constructor
   constructor(
     private router: Router,
@@ -109,8 +110,6 @@ export class PenaltiesSanctionsListComponent implements OnInit {
     // (window as any).selectState = (state: string, id: number, userId: number) =>
     //   this.selectState(state, id, userId);
   }
-
-
 
 
   ///////////////////////////////////////////////////////////////////////////////////////
@@ -127,7 +126,7 @@ export class PenaltiesSanctionsListComponent implements OnInit {
       ordering: true,
       lengthChange: true,
       order: [0, 'desc'],
-      lengthMenu: [5,10, 25, 50],
+      lengthMenu: [5, 10, 25, 50],
       pageLength: 5,
       data: this.sanctionsfilter, // Fuente de datos
       // Columnas de la tabla
@@ -135,7 +134,7 @@ export class PenaltiesSanctionsListComponent implements OnInit {
         {
           data: 'createdDate',
           className: 'align-middle',
-           render: (data) =>  moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY'),
+          render: (data) => moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY'),
           type: 'date-moment'
         },
         {
@@ -200,7 +199,7 @@ export class PenaltiesSanctionsListComponent implements OnInit {
       ],
       dom: '<"mb-3"t>' + '<"d-flex justify-content-between"lp>', // Tabla y paginación
       language: {
-        lengthMenu:`
+        lengthMenu: `
           <select class="form-select">
             <option value="5">5</option>
             <option value="10">10</option>
@@ -233,27 +232,27 @@ export class PenaltiesSanctionsListComponent implements OnInit {
         }
       ]
     });
-    
+
     // Triggers para los botones de exportación
     $('#exportExcelBtn').on('click', function () {
       table.button('.buttons-excel').trigger();
     });
-    
+
     $('#exportPdfBtn').on('click', function () {
       table.button('.buttons-pdf').trigger();
     });
-    
+
   }
   ///////////////////////////////////////////////////////////////////////////////////////
 
-  viewFine(i:number){
+  viewFine(i: number) {
     const modal = this._modal.open(PenaltiesModalFineComponent, {
       size: 'xl',
       keyboard: false,
     });
     modal.componentInstance.fineId = i;
     modal.result
-      .then((result:any) => { })
+      .then((result: any) => { })
       .catch((error: any) => {
         console.log('Modal dismissed with error:', error);
       });
@@ -268,7 +267,7 @@ export class PenaltiesSanctionsListComponent implements OnInit {
       .then((result: any) => {
         this.refreshData();
       })
-      .catch((error:any) => {
+      .catch((error: any) => {
         console.log("Error con modal: " + error);
       });
   }
@@ -321,37 +320,34 @@ export class PenaltiesSanctionsListComponent implements OnInit {
   
       return afterStartDate && beforeEndDate;
     });
-  
     // Actualiza los datos filtrados en la tabla
     this.sanctionsfilter = filteredComplaints;
     this.updateDataTable(); // Llama a la función para actualizar la tabla
   }
   
 
-  
   // Método para manejar la selección del estado
-  onFilter(event: Event) {
-    const selectedValue = (event.target as HTMLSelectElement).value;
-    this.selectedState = selectedValue; // Actualiza el valor del estado seleccionado
-    this.filterData(); // Aplica los filtros
+  onFilter(data: any) {
+    this.selectedStates = data;
+    this.filterData();
   }
- 
-  
+
+
   // Método para manejar el cambio de fechas
   filterDate() {
     this.filterData(); // Aplica los filtros de fecha y estado
   }
 
-  eraseFilters(){
+  eraseFilters() {
     this.refreshData();
-    this.selectedState = '';
+    this.selectedStates = [];
     this.searchTerm = '';
     this.resetDates();
+    this.customSelect.clearData();
   }
 
 
-
-  //ToDo: Esto esta desactualizado o son los de los informes (arreglar mas tarde)
+  //Retorna el formato para el class
   getStatusClass(estado: string): string {
     switch (estado) {
       case 'Pendiente':
@@ -371,6 +367,8 @@ export class PenaltiesSanctionsListComponent implements OnInit {
     }
   }
 
+
+  //Actualiza todos los datos de la tabla consultando con la api
   refreshData() {
     this.sanctionService.getAllSactions().subscribe((data) => {
       this.sanctions = data;
@@ -381,25 +379,26 @@ export class PenaltiesSanctionsListComponent implements OnInit {
   }
 
 
-
-  redirect(path: string) {
-    this.router.navigate([path]);
-  }
-
+  //Redirige a la pagina para dar de alta un descargo
   newDisclaimer(id: number) {
     this.routingService.redirect(`main/sanctions/post-disclaimer/${id}`, "Registrar Descargo")
   }
 
-  changeState(id: number, state:string) {
+
+  //Abre el modal para actualizar el estado
+  changeState(id: number, state: string) {
     this.openModalStateReason(id, state);
   }
 
+
+  //Redirige a la pagina para actualizar/modificar la multa
   updateFine(id: number) {
     this.routingService.redirect(`main/sanctions/put-fine/${id}`, "Actualizar Multa")
   }
 
-  
-  openModalStateReason(id: number, state:string) {
+
+  //Abre el modal para actualizar el estado de la multa
+  openModalStateReason(id: number, state: string) {
     const modal = this._modal.open(PenaltiesUpdateStateReasonModalComponent, {
       size: 'md',
       keyboard: false,
@@ -407,17 +406,19 @@ export class PenaltiesSanctionsListComponent implements OnInit {
     modal.componentInstance.id = id;
     modal.componentInstance.fineState = state;
     modal.result
-      .then((result:any) => {
-        if(result.stateUpdated){
+      .then((result: any) => {
+        if (result.stateUpdated) {
           this.refreshData();
         }
       })
-      .catch((error:any) => {
+      .catch((error: any) => {
         console.log("Error con modal: " + error);
       });
   }
-  
-  getTypes(): void {
+
+
+  //Consulta de la api los estados para cargar el select del filtro
+  getStates(): void {
     this.sanctionService.getStateFines().subscribe({
       next: (data) => {
         this.states = Object.keys(data).map(key => ({
@@ -425,7 +426,11 @@ export class PenaltiesSanctionsListComponent implements OnInit {
           value: data[key]
 
         }));
-        console.log(this.states)
+        this.options = this.states.map(opt => ({
+          name: opt.value,
+          value: opt.value
+        }))
+
       },
       error: (error) => {
         console.error('error: ', error);
@@ -434,79 +439,79 @@ export class PenaltiesSanctionsListComponent implements OnInit {
   }
 
 
-  ///////////////////////////////////////////////////////////////////
-    //Metodos Para Exportar A pdf y Excel
-    exportToPDF(): void {
-      const doc = new jsPDF();
-      const pageTitle = 'Listado de Sanciones';
-      doc.setFontSize(18);
-      doc.text(pageTitle, 15, 10);
-      doc.setFontSize(12);
-  
-      const formattedDesde = this.sanctionService.formatDate(this.filterDateStart);
-      const formattedHasta = this.sanctionService.formatDate(this.filterDateEnd);
-      doc.text(`Fechas: Desde ${formattedDesde} hasta ${formattedHasta}`, 15, 20);
-  
-      const filteredData = this.sanctionsfilter.map((sanction: SanctionsDTO) => {
-        return [
-          this.sanctionService.formatDate(sanction.createdDate),
-          sanction.fineState,
-          sanction.description,
-          sanction.plotId,
-          sanction.amount != null 
-            ? '$' + new Intl.NumberFormat('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(sanction.amount) 
-            : '',
-          
-        ];
-      });
-  
-      autoTable(doc, {
-        head: [['Fecha de Creación', 'Estado', 'Descripción','Lote', 'Monto a pagar']],
-        body: filteredData,
-        startY: 30,
-        theme: 'grid',
-        margin: { top: 30, bottom: 20 },
-      });
-  
-      doc.save(`${formattedDesde}-${formattedHasta}_Listado_Sanciones.pdf`);
-    }
-  
-    //Exportar a Excel
-    exportToExcel(): void {
-      const encabezado = [
-        ['Listado de Sanciones'],
-        [`Fechas: Desde ${this.sanctionService.formatDate(this.filterDateStart)} hasta ${this.sanctionService.formatDate(this.filterDateEnd)}`],
-        [],
-        ['Fecha de Creación', 'Estado', 'Descripción','Lote', 'Monto a pagar']
-      ];
-    
-      const excelData = this.sanctionsfilter.map((sanction: SanctionsDTO) => {
-        return [
-          this.sanctionService.formatDate(sanction.createdDate),
-          sanction.fineState,
-          sanction.description,
-          sanction.plotId,
-          sanction.amount != null 
-          ? '$' + new Intl.NumberFormat('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(sanction.amount) 
+  //Exporta a PDF
+  exportToPDF(): void {
+    const doc = new jsPDF();
+    const pageTitle = 'Listado de Sanciones';
+    doc.setFontSize(18);
+    doc.text(pageTitle, 15, 10);
+    doc.setFontSize(12);
+
+    const formattedDesde = this.sanctionService.formatDate(this.filterDateStart);
+    const formattedHasta = this.sanctionService.formatDate(this.filterDateEnd);
+    doc.text(`Fechas: Desde ${formattedDesde} hasta ${formattedHasta}`, 15, 20);
+
+    const filteredData = this.sanctionsfilter.map((sanction: SanctionsDTO) => {
+      return [
+        this.sanctionService.formatDate(sanction.createdDate),
+        sanction.fineState,
+        sanction.description,
+        sanction.plotId,
+        sanction.amount != null
+          ? '$' + new Intl.NumberFormat('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(sanction.amount)
           : '',
-        ];
-      });
-    
-      const worksheetData = [...encabezado, ...excelData];
-      const worksheet = XLSX.utils.aoa_to_sheet(worksheetData)
-      
-      worksheet['!cols'] = [
-        { wch: 20 }, // Fecha de Creación
-        { wch: 20 }, // Estado
-        { wch: 50 }, // Descripción
-        { wch: 20 }, // Lote Infractor
-        { wch: 20 }, // Monto a pagar
+
       ];
-    
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Sanciones');
-    
-      XLSX.writeFile(workbook, `${this.sanctionService.formatDate(this.filterDateStart)}-${this.sanctionService.formatDate(this.filterDateEnd)}_Listado_Sanciones.xlsx`);
-    }
+    });
+
+    autoTable(doc, {
+      head: [['Fecha de Creación', 'Estado', 'Descripción', 'Lote', 'Monto a pagar']],
+      body: filteredData,
+      startY: 30,
+      theme: 'grid',
+      margin: { top: 30, bottom: 20 },
+    });
+
+    doc.save(`${formattedDesde}-${formattedHasta}_Listado_Sanciones.pdf`);
+  }
+
+  
+  //Exportar a Excel
+  exportToExcel(): void {
+    const encabezado = [
+      ['Listado de Sanciones'],
+      [`Fechas: Desde ${this.sanctionService.formatDate(this.filterDateStart)} hasta ${this.sanctionService.formatDate(this.filterDateEnd)}`],
+      [],
+      ['Fecha de Creación', 'Estado', 'Descripción', 'Lote', 'Monto a pagar']
+    ];
+
+    const excelData = this.sanctionsfilter.map((sanction: SanctionsDTO) => {
+      return [
+        this.sanctionService.formatDate(sanction.createdDate),
+        sanction.fineState,
+        sanction.description,
+        sanction.plotId,
+        sanction.amount != null
+          ? '$' + new Intl.NumberFormat('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(sanction.amount)
+          : '',
+      ];
+    });
+
+    const worksheetData = [...encabezado, ...excelData];
+    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData)
+
+    worksheet['!cols'] = [
+      { wch: 20 }, // Fecha de Creación
+      { wch: 20 }, // Estado
+      { wch: 50 }, // Descripción
+      { wch: 20 }, // Lote Infractor
+      { wch: 20 }, // Monto a pagar
+    ];
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sanciones');
+
+    XLSX.writeFile(workbook, `${this.sanctionService.formatDate(this.filterDateStart)}-${this.sanctionService.formatDate(this.filterDateEnd)}_Listado_Sanciones.xlsx`);
+  }
 
 }

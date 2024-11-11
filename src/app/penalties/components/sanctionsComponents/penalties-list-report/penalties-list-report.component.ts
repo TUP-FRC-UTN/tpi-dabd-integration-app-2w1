@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { PenaltiesSanctionsServicesService } from '../../../services/sanctionsService/sanctions.service';
 import { ReportDTO } from '../../../models/reportDTO';
 import { CommonModule } from '@angular/common';
@@ -17,13 +17,14 @@ import { RoutingService } from '../../../../common/services/routing.service';
 import moment from 'moment';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
 
 
 
 @Component({
   selector: 'app-penalties-sanctions-report-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, NgbModule],
+  imports: [CommonModule, RouterModule, FormsModule, NgbModule, CustomSelectComponent],
   templateUrl: './penalties-list-report.component.html',
   styleUrl: './penalties-list-report.component.scss'
 })
@@ -38,19 +39,24 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
   searchTerm: string = '';                        //Valor de la barra de busqueda
   filterDateStart: string='';
   filterDateEnd: string ='';
-  
+
   selectedState: string = '';
+  selectedStates: string[] = [];   //Valor select
+
+  options : {value: string, name: string}[] = []
+  @ViewChild(CustomSelectComponent) customSelect! : CustomSelectComponent;
 
   //Constructor
   constructor(
     private reportServices: PenaltiesSanctionsServicesService,
-     private _modal: NgbModal, 
+     private _modal: NgbModal,
      private router: Router,
      private routingService: RoutingService
 
     ) {
     (window as any).viewReport = (id: number) => this.viewReport(id);
     (window as any).editReport = (id: number) => this.editReport(id);
+    
   }
 
 
@@ -66,7 +72,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
     $('#reportsTable').on('click', 'a.dropdown-item', function(event) {
       const action = $(this).data('action');
       const id = $(this).data('id');
-  
+
       switch(action) {
         case 'newSaction':
           that.newSanction(id);
@@ -91,7 +97,6 @@ private formatDateToString(date: Date): string {
     const adjustedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0); 
     return adjustedDate.toLocaleDateString('en-CA'); // Formato estándar `YYYY-MM-DD`
 }
-  
 
 
   //Combo de filtrado de estado
@@ -109,7 +114,7 @@ private formatDateToString(date: Date): string {
   // }
 
 
-  
+
   // Configures the DataTable display properties and loads data.
   updateDataTable() {
     // Clears existing DataTable if it is already initialized.
@@ -193,7 +198,7 @@ private formatDateToString(date: Date): string {
         loadingRecords: "Cargando...",
         processing: "Procesando...",
       },
-      //This sets the buttons to export 
+      //This sets the buttons to export
       //the table data to Excel and PDF.
       buttons: [
         {
@@ -217,18 +222,18 @@ private formatDateToString(date: Date): string {
       ]
     });
 
-    //These methods are used to export 
+    //These methods are used to export
     //the table data to Excel and PDF.
 
     //They are activated by
     //clicks in the buttons.
 
-    //Returns the table data exported 
+    //Returns the table data exported
     //to the desired format.
     $('#exportExcelBtn').on('click', function () {
       table.button('.buttons-excel').trigger();
     });
-    
+
     $('#exportPdfBtn').on('click', function () {
       table.button('.buttons-pdf').trigger();
     });
@@ -237,14 +242,14 @@ private formatDateToString(date: Date): string {
   //Method to search in the table
   //based on the search term.
 
-  //Param 'event' is the event 
+  //Param 'event' is the event
   //that triggers the method.
 
   //Returns the table filtered.
   onSearch(event: any) {
     const searchValue = event.target.value;
 
-    
+
     //Checks if the search term has 3 or more characters.
     if (searchValue.length >= 3) {
       this.table.search(searchValue).draw();
@@ -270,7 +275,6 @@ private formatDateToString(date: Date): string {
     // Convertir las fechas de inicio y fin
     const startDate = this.filterDateStart ? new Date(this.filterDateStart + 'T00:00:00Z') : null;
     let endDate = this.filterDateEnd ? new Date(this.filterDateEnd + 'T23:59:59Z') : null; // Asegurar que se incluya todo el último día
-  
     filteredComplaints = filteredComplaints.filter((item) => {
         const date = new Date(item.createdDate);
         if (isNaN(date.getTime())) {
@@ -293,26 +297,25 @@ private formatDateToString(date: Date): string {
   
   // Method to handle 
   // the State selection.
-  onFilter(event: Event) {
-    const selectedValue = (event.target as HTMLSelectElement).value;
-    this.selectedState = selectedValue; // Updates the 
-                                       // selected State value.
-    this.filterData(); // Applies 
-                      // the filters.
+
+  onFilter(data: any) {
+    this.selectedStates = data;
+    this.filterData();
   }
-  
-  // Method to handle the 
+
+
+  // Method to handle the
   // change of dates.
   filterDate() {
-    this.filterData(); // Applies the Date 
+    this.filterData(); // Applies the Date
                       // and State filters.
   }
 
-  //This method is used to return the 
+  //This method is used to return the
   //filters to their default values.
   eraseFilters(){
     this.refreshData();
-    this.selectedState = '';
+    this.selectedStates = [];
     this.searchTerm = '';
     this.resetDates();
   }
@@ -437,7 +440,7 @@ private formatDateToString(date: Date): string {
   //                           <li><a class="dropdown-item" onclick="selectState('REJECTED', ${data.id}, ${data.userId})">Marcar como Rechazada</a></li>
   //                           <li><a class="dropdown-item" onclick="selectState('PENDING', ${data.id}, ${data.userId})">Marcar como Pendiente</a></li>
   //                           <li><hr class="dropdown-divider"></li>
-                            
+
   //                       </ul>
   //                   </div>
   //               </div>`,
@@ -512,7 +515,10 @@ private formatDateToString(date: Date): string {
           value: data[key]
 
         }));
-        console.log(this.states)
+        this.options = this.states.map(opt => ({
+          value: opt.value,
+          name: opt.value
+        }))
       },
       error: (error) => {
         console.error('error: ', error);
@@ -579,7 +585,7 @@ private formatDateToString(date: Date): string {
       [],
       ['Fecha de Creación', 'Estado', 'Descripción','Lote']
     ];
-  
+
     const excelData = this.reportfilter.map((report: ReportDTO) => {
       return [
         this.reportServices.formatDate(report.createdDate),
@@ -588,20 +594,20 @@ private formatDateToString(date: Date): string {
         report.plotId,
       ];
     });
-  
+
     const worksheetData = [...encabezado, ...excelData];
     const worksheet = XLSX.utils.aoa_to_sheet(worksheetData)
-    
+
     worksheet['!cols'] = [
       { wch: 20 }, // Fecha de Creación
       { wch: 20 }, // Estado
       { wch: 50 }, // Descripción
       { wch: 20 }, // Lote Infractor
     ];
-  
+
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Informes');
-  
+
     XLSX.writeFile(workbook, `${this.reportServices.formatDate(this.filterDateStart)}-${this.reportServices.formatDate(this.filterDateEnd)}_Listado_Informes.xlsx`);
   }
 
