@@ -43,7 +43,7 @@ export class PenaltiesSanctionsListComponent implements OnInit {
   searchTerm: string = '';                        //Valor de la barra de busqueda
   filterDateStart: string = '';
   filterDateEnd: string = '';
-
+  selectedState: string = '';
   selectedStates: string[] = [];
 
   options: { name: string, value: any }[] = []
@@ -304,8 +304,8 @@ export class PenaltiesSanctionsListComponent implements OnInit {
     }
   
     // Filtrar por fecha si las fechas están definidas
-    const startDate = this.filterDateStart ? new Date(this.filterDateStart + 'T00:00:00Z') : null;  // Ajustar la fecha de inicio a las 00:00:00
-    const endDate = this.filterDateEnd ? new Date(this.filterDateEnd + 'T23:59:59Z') : null;  // Ajustar la fecha de fin a las 23:59:59
+    const startDate = this.filterDateStart ? new Date(this.filterDateStart + 'T00:00:00') : null;  // Ajustar la fecha de inicio a las 00:00:00
+    const endDate = this.filterDateEnd ? new Date(this.filterDateEnd + 'T23:59:59') : null;  // Ajustar la fecha de fin a las 23:59:59
     
     filteredComplaints = filteredComplaints.filter((item) => {
       const date = new Date(item.createdDate);

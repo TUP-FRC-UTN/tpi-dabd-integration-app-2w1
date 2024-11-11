@@ -194,8 +194,8 @@ private formatDateToString(date: Date): string {
     }
 
     //Filtra por un rango de fechas
-    const startDate = this.filterDateStart ? new Date(this.filterDateStart) : null;
-    let endDate = this.filterDateEnd ? new Date(this.filterDateEnd) : null;
+    const startDate = this.filterDateStart ? new Date(this.filterDateStart + 'T00:00:00') : null;
+    let endDate = this.filterDateEnd ? new Date(this.filterDateEnd + 'T23:59:59') : null;
   
     filteredComplaints = filteredComplaints.filter((item) => {
       const date = new Date(item.createdDate);

@@ -273,8 +273,8 @@ private formatDateToString(date: Date): string {
     }
   
     // Convertir las fechas de inicio y fin
-    const startDate = this.filterDateStart ? new Date(this.filterDateStart + 'T00:00:00Z') : null;
-    let endDate = this.filterDateEnd ? new Date(this.filterDateEnd + 'T23:59:59Z') : null; // Asegurar que se incluya todo el último día
+    const startDate = this.filterDateStart ? new Date(this.filterDateStart + 'T00:00:00') : null;
+    let endDate = this.filterDateEnd ? new Date(this.filterDateEnd + 'T23:59:59') : null; // Asegurar que se incluya todo el último día
     filteredComplaints = filteredComplaints.filter((item) => {
         const date = new Date(item.createdDate);
         if (isNaN(date.getTime())) {
