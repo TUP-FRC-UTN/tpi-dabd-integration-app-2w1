@@ -18,6 +18,8 @@ import moment from 'moment';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
+import { PenaltiesUpdateStateReasonModalComponent } from '../modals/penalties-update-state-reason-modal/penalties-update-state-reason-modal.component';
+import { PenaltiesUpdateStateReasonReportModalComponent } from '../modals/penalties-update-state-reason-report-modal/penalties-update-state-reason-report-modal.component';
 
 
 
@@ -62,6 +64,9 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
 
   //Init
   ngOnInit(): void {
+    this.reportServices.refreshTable$.subscribe(() => {
+      this.refreshData();
+    });
     this.refreshData()
 
     this.getTypes()
@@ -72,10 +77,14 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
     $('#reportsTable').on('click', 'a.dropdown-item', function(event) {
       const action = $(this).data('action');
       const id = $(this).data('id');
+      const state = $(this).data('state');
 
       switch(action) {
         case 'newSaction':
           that.newSanction(id);
+          break;
+        case 'changeState':
+            that.changeState(id, state);
           break;
       }
     })
@@ -177,7 +186,11 @@ private formatDateToString(date: Date): string {
                       `<li><hr class="dropdown-divider"></li> <li><a class="dropdown-item" onclick="editReport(${data.id})">Editar</a></li>` : ''}
                       ${data.reportState === 'Abierto' || data.reportState === 'Pendiente' ?
                         `<li><a class="dropdown-item" data-action="newSaction" data-id="${data.id}"">Sancionar</a></li>` : ''}
-                  </ul>
+                        ${data.reportState === 'Abierto' || data.reportState === 'Pendiente' ?
+                          `<li><a class="dropdown-item" data-action="changeState" data-id="${data.id}" data-state="REJECTED"">Rechazar</a></li>` : ''}
+                          ${data.reportState === 'Abierto' || data.reportState === 'Pendiente' ?
+                            `<li><a class="dropdown-item" data-action="changeState" data-id="${data.id}" data-state="CLOSED"">Cancelar</a></li>` : ''}
+                 </ul>
                 </div>
               </div>
             </div>`
@@ -266,9 +279,9 @@ private formatDateToString(date: Date): string {
     let filteredComplaints = [...this.report];  // Copiar los datos que no han sido filtrados aún.
   
     // Filtrar por estado, si está definido
-    if (this.selectedState) {
+    if (this.selectedStates.length > 0) {
         filteredComplaints = filteredComplaints.filter(
-            (c) => c.reportState === this.selectedState
+          (c) => this.selectedStates.includes(c.reportState)
         );
     }
   
@@ -609,6 +622,29 @@ private formatDateToString(date: Date): string {
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Informes');
 
     XLSX.writeFile(workbook, `${this.reportServices.formatDate(this.filterDateStart)}-${this.reportServices.formatDate(this.filterDateEnd)}_Listado_Informes.xlsx`);
+  }
+
+  //Abre el modal para actualizar el estado
+  changeState(id: number, state: string) {
+    this.openModalStateReason(id, state);
+  }
+
+
+  //Abre el modal para actualizar el estado de la multa
+  openModalStateReason(id: number, state: string) {
+    const modal = this._modal.open(PenaltiesUpdateStateReasonReportModalComponent, {
+      size: 'md',
+      keyboard: false,
+    });
+    modal.componentInstance.id = id;
+    modal.componentInstance.reportState = state;
+    modal.result
+      .then((result: any) => {
+          this.refreshData();
+      })
+      .catch((error: any) => {
+        console.log("Error con modal: " + error);
+      });
   }
 
 

@@ -287,18 +287,17 @@ export class PenaltiesSanctionsListComponent implements OnInit {
   // Método para filtrar la tabla en base a las 2 fechas y estado
   filterData() {
     let filteredComplaints = [...this.sanctions];  // Copiar los datos de las sanciones que no han sido filtradas aún
-  
     // Filtrar por estado si se ha seleccionado alguno
-    if (this.selectedState) {
-      if (this.selectedState === 'Advertencia') {
+    if (this.selectedStates.length > 0) {
+      if (this.selectedStates.includes('Advertencia')) {
         // Filtrar por estado 'Advertencia' y por elementos con fineState == null
         filteredComplaints = filteredComplaints.filter(
-          (c) => c.fineState === this.selectedState || c.fineState === null
+          (c) => c.fineState === null || this.selectedStates.includes(c.fineState)
         );
       } else {
         // Filtrar por el estado seleccionado (no 'Advertencia')
         filteredComplaints = filteredComplaints.filter(
-          (c) => c.fineState === this.selectedState
+          (c) => this.selectedStates.includes(c.fineState!) //FixMe
         );
       }
     }

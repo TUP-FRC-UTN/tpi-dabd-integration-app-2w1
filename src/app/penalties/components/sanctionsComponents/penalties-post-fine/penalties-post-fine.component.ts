@@ -7,6 +7,7 @@ import { PenaltiesSanctionsServicesService } from '../../../services/sanctionsSe
 import Swal from 'sweetalert2';
 import { RoutingService } from '../../../../common/services/routing.service';
 import { PlotService } from '../../../../users/users-servicies/plot.service';
+import { ReportService } from '../../../services/report.service';
 @Component({
   selector: 'app-penalties-post-fine',
   standalone: true,
@@ -40,7 +41,8 @@ export class PenaltiesPostFineComponent implements OnInit {
     private router: Router,
     private penaltiesService: PenaltiesSanctionsServicesService,
     private route: ActivatedRoute,
-    private routingService: RoutingService
+    private routingService: RoutingService,
+    private reportService: ReportService
   ) {
     
   }
@@ -127,6 +129,17 @@ export class PenaltiesPostFineComponent implements OnInit {
               timer: 1500,
               showConfirmButton: false
             });
+            const reportDto:any = {
+              id: this.report.id,
+              reportState: "ENDED",
+              stateReason: "Multa generada, se finaliza el proceso",
+              userId: this.report.userId
+            };
+            this.reportService.putStateReport(reportDto).subscribe( res => {
+              
+            }, error => {
+              console.error('Error al actualizar el estado', error);
+            })
             this.routingService.redirect("main/sanctions/sanctions-list", "Listado de Infracciones");
           },
           error => {

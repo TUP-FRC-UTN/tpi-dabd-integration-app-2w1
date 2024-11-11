@@ -1,0 +1,39 @@
+<div class="modal-content">
+  <div class="modal-header">
+    <h5 class="modal-title">Confirmación</h5>
+  </div>
+  
+  <div class="modal-body">
+    <p class="mb-4">¿Está seguro?</p>
+    
+    <div class="row align-items-center">
+      <label for="justification" class="col-3 form-label mb-0">Justificación</label>
+      <div class="col-9">
+        <textarea 
+          id="justification"
+          class="form-control"
+          rows="3"
+          [(ngModel)]="reasonText"
+        ></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="btn btn-primary"
+      (click)="putReport()"
+    >
+      Guardar
+    </button>
+    <button
+      type="button"
+      class="btn btn-secondary"
+      (click)="close()"
+    >
+      Cancelar
+    </button>
+  </div>
+</div>
+
