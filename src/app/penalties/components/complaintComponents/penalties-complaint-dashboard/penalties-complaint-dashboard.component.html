@@ -10,7 +10,7 @@
               <label class="form-label text-secondary">Período Desde</label>
               <div class="input-group">
                 <input type="month" (ngModelChange)="applyFilters()" class="form-control border-0 bg-light"
-                  [(ngModel)]="periodFrom" [max]="getCurrentYearMonth()" />
+                  [(ngModel)]="periodFrom" [max]="periodTo" />
               </div>
             </div>
             <div class="col-md-6">
@@ -42,7 +42,7 @@
               <label class="form-label text-secondary">Período Desde</label>
               <div class="input-group">
                 <input (ngModelChange)="applyFilters()" type="month" class="form-control border-0 bg-light"
-                  [(ngModel)]="periodFrom" [max]="getCurrentYearMonth()" />
+                  [(ngModel)]="periodFrom" [max]="periodTo" />
               </div>
             </div>
             <div class="col-md-4">
@@ -106,7 +106,7 @@
               <label class="form-label text-secondary">Período Desde</label>
               <div class="input-group">
                 <input (ngModelChange)="applyFilters()" type="month" class="form-control border-0 bg-light"
-                  [(ngModel)]="periodFrom" [max]="getCurrentYearMonth()" />
+                  [(ngModel)]="periodFrom" [max]="periodTo" />
               </div>
             </div>
             <div class="col-md-4">
@@ -168,7 +168,7 @@
               <label class="form-label text-secondary">Período Desde</label>
               <div class="input-group">
                 <input (ngModelChange)="applyFilters()" type="month" class="form-control border-0 bg-light"
-                  [(ngModel)]="periodFrom" [max]="getCurrentYearMonth()" />
+                  [(ngModel)]="periodFrom" [max]="periodTo" />
               </div>
             </div>
             <div class="col-md-4">

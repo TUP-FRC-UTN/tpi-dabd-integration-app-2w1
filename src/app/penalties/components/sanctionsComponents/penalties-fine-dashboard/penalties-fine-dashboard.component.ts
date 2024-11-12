@@ -11,6 +11,8 @@ import {
 } from '../../../models/Dashboard-models';
 import { textShadow } from 'html2canvas/dist/types/css/property-descriptors/text-shadow';
 import { ReportReasonDto } from '../../../models/ReportReasonDTO';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { PenaltiesModalFineComponent } from '../modals/penalties-get-fine-modal/penalties-get-fine-modal.component';
 
 @Component({
   selector: 'app-penalties-fine-dashboard',
@@ -27,6 +29,8 @@ export class PenaltiesFineDashboardComponent {
   status: number = 0;
   periodFrom: string = this.getDefaultFromDate();
   periodTo: string = this.getCurrentYearMonth();
+  constructor(
+    private _modal: NgbModal) {}
 
   //Filtros avanzados
   states: any[] = [];
@@ -51,19 +55,7 @@ export class PenaltiesFineDashboardComponent {
   lineChartType = ChartType.LineChart;
   columnChartType = ChartType.ColumnChart;
 
-  // pieChartOptions = {
-  //   backgroundColor: 'transparent',
-  //   colors: ['#8A2BE2', '#00BFFF', '#FF4500', '#32CD32'],
-  //   legend: {
-  //     position: 'right',
-  //     textStyle: { color: '#000000', fontSize: 17 },  // Cambiado a negro
-  //   },
-  //   pieSliceTextStyle: { color: '#000000' }, // Texto dentro de las porciones en negro
-  //   chartArea: { width: '80%', height: '80%' },
-  //   pieHole: 0.7,
-  //   height: '80%',
-  //   title: 'Distribución de Tipos de Multas'
-  // };
+  
   pieChartOptions = {
     backgroundColor: 'transparent',
 
@@ -168,6 +160,10 @@ export class PenaltiesFineDashboardComponent {
   private convertArrayDateToDate(dateArray: number[]): Date {
     // Asumiendo que dateArray tiene el formato [año, mes, día]
     return new Date(dateArray[0], dateArray[1] - 1, dateArray[2]);
+  }
+
+  get currentYearMonth(): string {
+    return this.getCurrentYearMonth();
   }
 
   private getCurrentYearMonth(): string {
@@ -341,7 +337,25 @@ export class PenaltiesFineDashboardComponent {
   }
 
   makeBig(nro: number) {
-    this.status = nro;
+    if (nro === 5 && this.highestFine) {
+      this.openFineModal(this.highestFine.id);
+    } else {
+      this.status = nro;
+    }
+  }
+  
+  private openFineModal(fineId: number) {
+    const modal = this._modal.open(PenaltiesModalFineComponent, {
+      size: 'md',
+      keyboard: false,
+    });
+    modal.componentInstance.fineId = fineId;
+    modal.result
+      .then((result: any) => {
+      })
+      .catch((error: any) => {
+        console.log("Error con modal: " + error);
+      });
   }
 
   private calculateKPIs() {
