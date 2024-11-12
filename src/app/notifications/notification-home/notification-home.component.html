@@ -1,1 +1,80 @@
-<p>notification-home works!</p>
+  <!-- Fila superior: Filtros -->
+  <div class="container">
+      <div class="row sticky-section border-0 rounded-2 p-3 shadow mb-4" style="flex: 0 0 10%; justify-content: center; align-items: center;" [formGroup]="filterForm">
+        <div class="col-3">
+          <label for="startDate" style="font-size: 1.1em;">Periodo Desde</label>
+          <input id="startDate" type="date" class="form-control form-control-sm" formControlName="startDate" style="font-size:.9em;">
+        </div>
+        <div class="col-3">
+          <label for="endDate" style="font-size: 1.1em;">Periodo Hasta</label>
+          <input id="endDate" type="date" class="form-control form-control-sm" formControlName="endDate" style="font-size:.9em; ">
+        </div>
+        <div class="col-6  justify-content-center align-items-center mt-3" style="gap: 10px;">
+          <label style="font-size: 1.3em; margin-right: 10px;">Estado de Lectura:</label>
+          <div class="form-check form-check-inline mt-1">
+            <input class="form-check-input" type="radio" name="readStatus" checked value="Todas" formControlName="readStatus">
+            <label class="form-check-label" style="font-size: 1em;">Todas</label>
+          </div>
+          <div class="form-check form-check-inline mt-1">
+            <input class="form-check-input" type="radio" name="readStatus" value="Leídas" formControlName="readStatus">
+            <label class="form-check-label" style="font-size: 1em;">Leídas</label>
+          </div>
+          <div class="form-check form-check-inline mt-1">
+            <input class="form-check-input" type="radio" name="readStatus" value="No Leídas" formControlName="readStatus">
+            <label class="form-check-label" style="font-size: 1em;">No Leídas</label>
+          </div>
+        </div>
+      </div> 
+    
+      <div class="card shadow-lg " style="width: 100%; height: 90vh; padding: 50px;  box-sizing: border-box;">
+        <div class="row g-3" style="flex: 1; height: 100%;">
+        <div class="col-md-6" style="height: 100%; padding: 0 10px;">
+          <div class="card shadow-sm h-100">
+            <div class="card-body  d-flex flex-column">
+              <h6 class="card-title text-center" style="font-size: 1.2em; margin-bottom: 8px;">Notificaciones Enviadas por Día</h6>
+              <google-chart
+                [type]="columnChartType"
+                [data]="columnChartData"
+                [options]="columnChartOptions"
+                class="w-10"
+                style=>
+              </google-chart>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-6 d-flex flex-column gap-2" style="height: 100%; padding: 0 10px;">
+          <div class="card shadow-sm flex-grow-1">
+            <div class="card-body p-2 d-flex flex-column">
+              <h6 class="card-title text-center" style="font-size: 1.2em; margin-bottom: 5px;">Notificaciones Enviadas por Tipo</h6>
+              <google-chart
+                [type]="column2ChartType"
+                [data]="columnChartData2"
+                [options]="columnChartOptions2"
+                class="w-100"
+                style="height: 100%;">
+              </google-chart>
+            </div>
+          </div>
+          <div class="card shadow-sm flex-grow-1">
+            <div class="card-body p-2 d-flex flex-column">
+              <h4 class="card-title text-center ">Total de Notificaciones Enviadas: {{allNotificationsCounter}}</h4>
+            
+            </div>
+          </div>
+          <div class="card shadow-sm ">
+            <div class="card-body p-2 d-flex flex-column">
+              <h6 class="card-title text-center mb-3" style="font-size: 1.2em; margin-bottom: 5px;">Leídas y No Leídas</h6>
+              
+              <google-chart
+                [type]="c3ChartType"
+                [data]="columnChartData5"
+                [options]="columnChartOptions5"
+                class="w-100"
+                style="height: 100%;">
+              </google-chart>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>

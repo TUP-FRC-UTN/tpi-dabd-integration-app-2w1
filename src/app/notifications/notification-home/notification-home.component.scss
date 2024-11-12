@@ -1,0 +1,62 @@
+.min-vh-75 {
+    min-height: 75vh;
+}
+.hover-scale{
+    transition: all 0.3s ease;
+}
+.hover-scale:hover{
+    transform: scale(1.01);
+    cursor: pointer;
+}
+
+.back-arrow:hover {
+    transform: scale(1.1);
+    cursor: pointer;
+}
+
+.date-input {
+    max-width: 160px;
+}
+
+button:hover, .date-input:hover {
+    transform: translateY(-2px);
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+google-chart {
+    height: 100%;
+}
+
+.chart-title {
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.row {
+    margin-right: 0;
+    margin-left: 0;
+}
+
+.col-md-6 {
+    padding: 0 10px; /* Ajustar espaciado para que no provoque scroll */
+}
+
+google-chart {
+    width: 100%; 
+    height: calc(100% - 20px);
+    margin: 0 auto;
+    padding: 0; 
+    transition: all 0.4s ease;
+    height: 100%;
+}
+
+
+.sticky-section {
+    position: sticky;
+    top: 70px;
+    z-index: 1;
+    background-color: white; 
+  }
+
