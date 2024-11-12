@@ -110,7 +110,7 @@ export class PenaltiesFineDashboardComponent {
       easing: 'out',
       startup: true,
     },
-    title: 'Evolución de Multas por Mes',
+    title: 'Cantidad de Multas por Mes',
   };
 
   columnChartOptions = {
