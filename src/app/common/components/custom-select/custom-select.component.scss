@@ -5,7 +5,8 @@
     ::ng-deep {
       .ng-select {
         .ng-select-container {
-          min-height: 38px;
+          max-height: 1px;
+          padding: 0;
           
           &:hover {
             box-shadow: 0 0 0 0.2rem rgba(0,123,255,.15);

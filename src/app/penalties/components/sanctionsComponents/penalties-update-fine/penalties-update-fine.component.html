@@ -1,135 +1,97 @@
 <section class="py-5">
-    <div class="container p-3 border border-2 rounded shadow-lg">
-      <!-- Datos de la multa -->
-      <div class="row mb-3">
-        <h4>Datos de la multa</h4>
-  
-        <!-- Select Motivo -->
-        <div class="col-lg-6 mb-3">
-          <div class="row">
-            <label class="col-2 col-form-label">Motivo</label>
-            <div class="col-10">
-              <select class="form-select" disabled>
-                <option value="" selected>
-                  {{ fine?.report.reportReason.reportReason }}
-                </option>
-              </select>
-            </div>
-          </div>
-        </div>
-  
-        <!-- Input fecha -->
-        <div class="col-lg-6 mb-3">
-          <div class="row">
-            <label class="col-2 col-form-label">Fecha</label>
-            <div class="col-10">
-              <input
-                type="datetime-local"
-                class="form-control"
-                [value]="fine?.createdDate"
-                disabled
-              />
-            </div>
-          </div>
-        </div>
-  
-        <!-- Input Descripcion -->
-        <div class="col-lg-12 mb-3">
-          <div class="row">
-            <label class="col-2 col-lg-1 col-form-label">Descripcion</label>
-            <div class="col-10 col-lg-11">
-              <textarea
-                class="form-control"
-                rows="8"
-                style="resize: none"
-                [value]="fine?.report.description"
-                disabled
-              ></textarea>
-            </div>
+  <div class="container p-3 border border-2 rounded shadow-lg">
+    <!-- Datos de la multa -->
+    <div class="row mb-3">
+
+      <!-- Select Motivo -->
+      <div class="col-lg-6 mb-3">
+        <div class="row">
+          <label class="col-2 col-form-label">Motivo</label>
+          <div class="col-10">
+            <select class="form-select" disabled>
+              <option value="" selected>
+                {{ fine?.report.reportReason.reportReason }}
+              </option>
+            </select>
           </div>
         </div>
       </div>
-  
-      
-        <form (ngSubmit)="onSubmit()" [formGroup]="reactiveForm">
+
+      <!-- Input fecha -->
+      <div class="col-lg-6 mb-3">
+        <div class="row">
+          <label class="col-2 col-form-label">Fecha</label>
+          <div class="col-10">
+            <input type="datetime-local" class="form-control" [value]="fine?.createdDate" disabled />
+          </div>
+        </div>
+      </div>
+
+      <!-- Input Descripcion -->
+      <div class="col-lg-12 mb-3">
+        <div class="row">
+          <label class="col-2 col-lg-1 col-form-label">Descripcion</label>
+          <div class="col-10 col-lg-11">
+            <textarea class="form-control" rows="8" style="resize: none" [value]="fine?.report.description"
+              disabled></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    
+    <form (ngSubmit)="onSubmit()" [formGroup]="reactiveForm">
+      <div class="row flex-row-reverse">
+
+        <!-- Importe -->
+        <div class="col-lg-6 mb-3">
           <div class="row">
-            
-            <div class="row col-3 offset-9 justify-content-end">
-              <div class="clearfix mt-2">
-                <div class="float-end d-flex">
-                  <label for="" class="me-2 mt-3">Importe:</label>
-                  <div class="input-group mt-2 mb-3">
-                    <span class="input-group-text" id="basic-addon1">$</span>
-                    <input
-                      type="number"
-                      class="form-control text-end"
-                      name="amount"
-                      [value]="fine?.amount"
-                      formControlName="amountControl"
-                      [ngClass]="onValidate('amountControl')"
-                      required
-                    />
-                    <div class="invalid-feedback">
-                      {{ showError("amountControl") }}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          
-          <div class="buttons-box d-flex justify-content-end">
-            <div class="submit-box">
-              <button
-                type="button"
-                class="btn btn-secondary me-3"
-                (click)="cancel()"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                class="btn btn-success"
-                [disabled]="reactiveForm.invalid"
-              >
-                Guardar
-              </button>
+            <label class="col-2 col-form-label">Importe $</label>
+            <div class="col-10">
+              <input type="number" class="form-control text-end" formControlName="amountControl"
+                [ngClass]="onValidate('amountControl')" />
+              <div class="text-danger">{{ showError("amountControl") }}</div>
             </div>
           </div>
         </div>
-        </form>
-    </div>
-  </section>
-  
-  <!-- Modal de info -->
-  <div class="modal fade" id="infoModal" role="dialog">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">
-            Actualizar Precio Multa
-          </h5>
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="modal"
-          ></button>
+
+        <div class="buttons-box d-flex justify-content-end">
+          <div class="submit-box">
+            <button type="button" class="btn btn-secondary me-3" (click)="cancel()">Cancelar</button>
+            <button type="submit" class="btn btn-success" [disabled]="reactiveForm.invalid">Guardar</button>
+          </div>
         </div>
-        <div class="modal-body">
-          <!-- body con tus inputs -->
-          <p>
-            En este apartado podrá modificar el valor relacionado con la multa
-            seleccionada.
-          </p>
-          <p>
-            Recuerde que cambiar el precio no es una decisión menor; asegúrese de
-            estar seguro antes de realizar el cambio.
-          </p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
-            Aceptar
-          </button>
-        </div>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- Modal de info -->
+<div class="modal fade" id="infoModal" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">
+          Actualizar Precio Multa
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <!-- body con tus inputs -->
+        <p>
+          En este apartado podrá modificar el valor relacionado con la multa
+          seleccionada.
+        </p>
+        <p>
+          Recuerde que cambiar el precio no es una decisión menor; asegúrese de
+          estar seguro antes de realizar el cambio.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+          Aceptar
+        </button>
       </div>
     </div>
   </div>
+</div>

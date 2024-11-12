@@ -21,7 +21,6 @@
 
       <!-- Select de estado -->
       <div class="col-md-2">
-       
         <app-custom-select [options]="options" [selectedOptions]="selectedStates"
           (selectedOptionsChange)="onFilter($event)" [multiple]="true">
         </app-custom-select>
@@ -30,8 +29,8 @@
 
       <!-- Filtro de fechas -->
       <div class="col-md-4 d-flex gap-3">
-        <input (change)="filterDate()" [(ngModel)]="filterDateStart" class="form-control" type="date">
-        <input (change)="filterDate()" [(ngModel)]="filterDateEnd" class="form-control ms-2" type="date">
+        <input (change)="filterDate()" [(ngModel)]="filterDateStart" class="form-control" type="date" [max]="today">
+        <input (change)="filterDate()" [(ngModel)]="filterDateEnd" class="form-control" type="date" [max]="today" [min]="filterDateStart">
       </div>
 
 

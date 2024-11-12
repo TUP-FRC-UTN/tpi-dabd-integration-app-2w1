@@ -40,6 +40,12 @@ export class PenaltiesFineDashboardComponent {
   finesByState: { [key: string]: number } = {};
   highestFine: Fine | null = null;
   finesByReason: { [key: string]: number } = {};
+  lowestFine: Fine | null = null;
+  finesByStatePercentage: { state: string; percentage: number }[] = [];
+  stateWithHighestPercentage: { state: string; percentage: number } = { state: '', percentage: 0 };
+  stateWithLowestPercentage: { state: string; percentage: number } = { state: '', percentage: 0 };
+  paidFinesCount: any;
+  pendingFinesCount: any;
 
   // Datos para gráficos
   pieChartData: any[] = [];
@@ -48,7 +54,7 @@ export class PenaltiesFineDashboardComponent {
 
   // Tipos de gráficos
   pieChartType = ChartType.PieChart;
-  lineChartType = ChartType.LineChart;
+  lineChartType = ChartType.ColumnChart;
   columnChartType = ChartType.ColumnChart;
 
   // pieChartOptions = {
@@ -75,21 +81,22 @@ export class PenaltiesFineDashboardComponent {
     pieHole: 0,
     height: '80%',
     slices: {
-      0: { color: '#8A2BE2' }, // MP siempre azul
-      1: { color: '#00BFFF' }, // STRIPE siempre violeta
-      2: { color: '#FF4500' },
-      3: { color: '#32CD32' },
-      4: { color: '#666666' }, // EFECTIVO siempre verde
+      0: { color: '#FCAE7C' }, // MP siempre azul
+      1: { color: '#D1BDFF' }, // STRIPE siempre violeta
+      2: { color: '#F9FFB5' },
+      3: { color: '#D6F6FF' },
+      4: { color: '#E2CBF7' }, // EFECTIVO siempre verde
+      5: { color: '#B3F5BC' },
     },
     pieSliceTextStyle: {
       color: 'black',
-      fontSize: 14,
+      fontSize: 12,
     },
   };
 
   lineChartOptions = {
     backgroundColor: 'transparent',
-    colors: ['#24f73f'],
+    colors: ['#D1BDFF'],
     legend: { position: 'none' },
     chartArea: { width: '90%', height: '80%' },
     vAxis: {
@@ -105,12 +112,12 @@ export class PenaltiesFineDashboardComponent {
       easing: 'out',
       startup: true,
     },
-    title: 'Evolución de Multas por Mes',
+    title: 'Cantidad de Multas por Mes',
   };
 
   columnChartOptions = {
     backgroundColor: 'transparent',
-    colors: ['#24473f', '#FF4500', '#32CD32', '#8A2BE2'],
+    colors: ['#FCAE7C', '#F9FFB5', '#E2CBF7', '#B3F5BC'],
     legend: { position: 'none' },
     chartArea: { width: '80%', height: '75%' },
     vAxis: {
@@ -126,7 +133,7 @@ export class PenaltiesFineDashboardComponent {
       easing: 'out',
       startup: true,
     },
-    height: 600,
+    height: 500,
     width: '100%',
     bar: { groupWidth: '70%' },
     title: 'Cantidad de Multas por Estado',
@@ -368,6 +375,11 @@ export class PenaltiesFineDashboardComponent {
       acc[fine.fineState] = (acc[fine.fineState] || 0) + 1;
       return acc;
     }, {});
+
+    // Calcular el total de multas en estado "Pagada" y "Pendiente de Pago"
+    this.paidFinesCount = this.finesData.filter(fine => fine.fineState === 'Pagada').length;
+    this.pendingFinesCount = this.finesData.filter(fine => fine.fineState === 'Pendiente de pago').length;
+
   
     // Distribución de multas por razón
     this.finesByReason = this.finesData.reduce((acc: { [key: string]: number }, fine) => {
@@ -375,6 +387,30 @@ export class PenaltiesFineDashboardComponent {
       acc[reason] = (acc[reason] || 0) + 1;
       return acc;
     }, {});
+
+    // Calcular porcentaje de denuncias por estado
+this.finesByStatePercentage = Object.entries(this.finesByState).map(([state, count]) => {
+  const percentage = (count / this.totalFines) * 100;
+  return { state, percentage };
+});
+
+// Encontrar el estado con el mayor porcentaje
+this.stateWithHighestPercentage = this.finesByStatePercentage.reduce((max, current) => {
+  return current.percentage > max.percentage ? current : max;
+}, { state: '', percentage: 0 });
+
+// Encontrar el estado con el menor porcentaje
+this.stateWithLowestPercentage = this.finesByStatePercentage.reduce((min, current) => {
+  return current.percentage < min.percentage ? current : min;
+}, { state: '', percentage: Infinity });
+
+// Multa de menor monto
+this.lowestFine = this.finesData.reduce((min: Fine | null, fine: Fine) => {
+  return fine.amount < (min?.amount || Infinity) ? fine : min;
+  }, null as Fine | null);
+
+
+    
   }
   
 }

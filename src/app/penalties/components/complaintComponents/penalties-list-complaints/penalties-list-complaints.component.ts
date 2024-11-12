@@ -41,10 +41,11 @@ export class PenaltiesListComplaintComponent implements OnInit {
   searchTerm: string = '';        //Valor de la barra de busqueda
   filterDateStart: string = '';   //Valor fecha inicio
   filterDateEnd: string = '';     //Valor fecha fin
-  selectedStates: string[] = [];   //Valor select
+  minDateEnd: string = '';        //Valor mínimo para la fecha fin
+  selectedStates: string[] = [];  //Valor select
 
-  options : {value: string, name: string}[] = []
-  @ViewChild(CustomSelectComponent) customSelect! : CustomSelectComponent;
+  options: { value: string, name: string }[] = []
+  @ViewChild(CustomSelectComponent) customSelect!: CustomSelectComponent;
 
   //Constructor
   constructor(
@@ -61,33 +62,29 @@ export class PenaltiesListComplaintComponent implements OnInit {
   //Init
   ngOnInit(): void {
     this.refreshData();
-    this.getStates()
-    this.resetDates()
+    this.getStates();
+    this.eraseFilters();
   }
 
-  // This method is used to convert
-  //a date to a formatted string.
-
-  //Param 'date' is the date to convert.
-  
-  //Returns the date in this 
-  //string format: `YYYY-MM-DD`.
+  //Setea el valor default de las fechas
   resetDates() {
     const today = new Date();
     this.filterDateEnd = this.formatDateToString(today); // Fecha final con hora 00:00:00
 
     const previousMonthDate = new Date();
-    previousMonthDate.setMonth(previousMonthDate.getMonth() - 1); 
+    previousMonthDate.setMonth(previousMonthDate.getMonth() - 1);
     this.filterDateStart = this.formatDateToString(previousMonthDate); // Fecha de inicio con hora 00:00:00
-}
+  }
+  get maxDate(): string {
+    return this.formatDateToString(new Date());
+  }
+  //Función para convertir la fecha al formato `YYYY-MM-DD`
+  formatDateToString(date: Date): string {
+    // Crea una fecha ajustada a UTC-3 y establece la hora a 00:00:00 para evitar horas residuales
+    const adjustedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0);
+    return adjustedDate.toLocaleDateString('en-CA'); // Formato `YYYY-MM-DD`
+  }
 
-// Función para convertir la fecha al formato `YYYY-MM-DD`
-private formatDateToString(date: Date): string {
-    // Crear una fecha ajustada a UTC-3 y establecer la hora a 00:00:00 para evitar horas residuales
-    const adjustedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0); 
-    return adjustedDate.toLocaleDateString('en-CA'); // Formato estándar `YYYY-MM-DD`
-}
-  
 
   //Crea la tabla con sus configuraciones 
   updateDataTable() {
@@ -194,9 +191,9 @@ private formatDateToString(date: Date): string {
     }
 
     //Filtra por un rango de fechas
-    const startDate = this.filterDateStart ? new Date(this.filterDateStart) : null;
-    let endDate = this.filterDateEnd ? new Date(this.filterDateEnd) : null;
-  
+    const startDate = this.filterDateStart ? new Date(this.filterDateStart + 'T00:00:00') : null;
+    let endDate = this.filterDateEnd ? new Date(this.filterDateEnd + 'T23:59:59') : null;
+
     filteredComplaints = filteredComplaints.filter((item) => {
       const date = new Date(item.createdDate);
       if (isNaN(date.getTime())) {
@@ -224,6 +221,20 @@ private formatDateToString(date: Date): string {
 
   //Método para manejar el cambio de fechas
   filterDate() {
+    const today = new Date();
+    const startDate = new Date(this.filterDateStart);
+    const endDate = new Date(this.filterDateEnd);
+
+    if (startDate > today) {
+      this.filterDateStart = this.formatDateToString(today);
+    }
+
+    if (endDate > today) {
+      this.filterDateEnd = this.formatDateToString(today);
+    }
+
+    this.minDateEnd = this.filterDateStart; // Establecer el valor mínimo para la fecha fin
+
     this.filterComplaintData();
   }
 
@@ -234,7 +245,7 @@ private formatDateToString(date: Date): string {
     this.selectedStates = [];
     this.searchTerm = '';
     this.resetDates();
-    this.customSelect.clearData();
+    this.customSelect.setData(this.selectedStates);
   }
 
 

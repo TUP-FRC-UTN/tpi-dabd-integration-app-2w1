@@ -18,6 +18,8 @@ import moment from 'moment';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
+import { PenaltiesUpdateStateReasonModalComponent } from '../modals/penalties-update-state-reason-modal/penalties-update-state-reason-modal.component';
+import { PenaltiesUpdateStateReasonReportModalComponent } from '../modals/penalties-update-state-reason-report-modal/penalties-update-state-reason-report-modal.component';
 
 
 
@@ -37,31 +39,34 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
   states: { key: string; value: string }[] = [];  //
   table: any;                                     //Tabla base
   searchTerm: string = '';                        //Valor de la barra de busqueda
-  filterDateStart: string='';
-  filterDateEnd: string ='';
+  filterDateStart: string = '';
+  filterDateEnd: string = '';
 
   selectedState: string = '';
   selectedStates: string[] = [];   //Valor select
 
-  options : {value: string, name: string}[] = []
-  @ViewChild(CustomSelectComponent) customSelect! : CustomSelectComponent;
+  options: { value: string, name: string }[] = []
+  @ViewChild(CustomSelectComponent) customSelect!: CustomSelectComponent;
 
   //Constructor
   constructor(
     private reportServices: PenaltiesSanctionsServicesService,
-     private _modal: NgbModal,
-     private router: Router,
-     private routingService: RoutingService
+    private _modal: NgbModal,
+    private router: Router,
+    private routingService: RoutingService
 
-    ) {
+  ) {
     (window as any).viewReport = (id: number) => this.viewReport(id);
     (window as any).editReport = (id: number) => this.editReport(id);
-    
+
   }
 
 
   //Init
   ngOnInit(): void {
+    this.reportServices.refreshTable$.subscribe(() => {
+      this.refreshData();
+    });
     this.refreshData()
 
     this.getTypes()
@@ -69,13 +74,17 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
     const that = this; // para referenciar metodos afuera de la datatable
 
     // Sets up event listeners for the DataTable.
-    $('#reportsTable').on('click', 'a.dropdown-item', function(event) {
+    $('#reportsTable').on('click', 'a.dropdown-item', function (event) {
       const action = $(this).data('action');
       const id = $(this).data('id');
+      const state = $(this).data('state');
 
-      switch(action) {
+      switch (action) {
         case 'newSaction':
           that.newSanction(id);
+          break;
+        case 'changeState':
+          that.changeState(id, state);
           break;
       }
     })
@@ -87,32 +96,16 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
     this.filterDateEnd = this.formatDateToString(today); // Fecha final con hora 00:00:00
 
     const previousMonthDate = new Date();
-    previousMonthDate.setMonth(previousMonthDate.getMonth() - 1); 
+    previousMonthDate.setMonth(previousMonthDate.getMonth() - 1);
     this.filterDateStart = this.formatDateToString(previousMonthDate); // Fecha de inicio con hora 00:00:00
-}
+  }
 
-// Función para convertir la fecha al formato `YYYY-MM-DD`
-private formatDateToString(date: Date): string {
+  // Función para convertir la fecha al formato `YYYY-MM-DD`
+  private formatDateToString(date: Date): string {
     // Crear una fecha ajustada a UTC-3 y establecer la hora a 00:00:00 para evitar horas residuales
-    const adjustedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0); 
+    const adjustedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0);
     return adjustedDate.toLocaleDateString('en-CA'); // Formato estándar `YYYY-MM-DD`
-}
-
-
-  //Combo de filtrado de estado
-  // onFilter(event: Event) {
-  //   const selectedValue = (event.target as HTMLSelectElement).value;
-
-  //   this.reportfilter = this.report.filter(
-  //     (c) => c.reportState == selectedValue
-  //   );
-  //   if (selectedValue == '') {
-  //     this.reportfilter = this.report;
-  //   }
-
-  //   this.updateDataTable();
-  // }
-
+  }
 
 
   // Configures the DataTable display properties and loads data.
@@ -130,7 +123,7 @@ private formatDateToString(date: Date): string {
       ordering: true,
       lengthChange: true,
       order: [0, 'desc'],
-      lengthMenu: [5,10, 25, 50],
+      lengthMenu: [5, 10, 25, 50],
       pageLength: 5,
       data: this.reportfilter, // Fuente de datos
       // Columnas de la tabla
@@ -139,13 +132,13 @@ private formatDateToString(date: Date): string {
         {
           data: 'createdDate',
           className: 'align-middle',
-           render: (data) =>  moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY'),
+          render: (data) => moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY'),
           type: 'date-moment'
         },
         {
           data: 'reportState',
           className: 'align-middle',
-          render: (data) =>`
+          render: (data) => `
             <div class="text-center">
               <div class="badge ${this.getStatusClass(data)} border rounded-pill">${data}</div>
             </div>`
@@ -174,10 +167,14 @@ private formatDateToString(date: Date): string {
                   <ul class="dropdown-menu">
                     <li><a class="dropdown-item" onclick="viewReport(${data.id})">Ver más</a></li>
                     ${data.reportState === 'Abierto' || data.reportState === 'Nuevo' || data.reportState === 'Pendiente' ?
-                      `<li><hr class="dropdown-divider"></li> <li><a class="dropdown-item" onclick="editReport(${data.id})">Editar</a></li>` : ''}
+              `<li><hr class="dropdown-divider"></li> <li><a class="dropdown-item" onclick="editReport(${data.id})">Editar</a></li>` : ''}
                       ${data.reportState === 'Abierto' || data.reportState === 'Pendiente' ?
-                        `<li><a class="dropdown-item" data-action="newSaction" data-id="${data.id}"">Sancionar</a></li>` : ''}
-                  </ul>
+              `<li><a class="dropdown-item" data-action="newSaction" data-id="${data.id}"">Sancionar</a></li>` : ''}
+                        ${data.reportState === 'Abierto' || data.reportState === 'Pendiente' ?
+              `<li><a class="dropdown-item" data-action="changeState" data-id="${data.id}" data-state="REJECTED"">Rechazar</a></li>` : ''}
+                          ${data.reportState === 'Abierto' || data.reportState === 'Pendiente' ?
+              `<li><a class="dropdown-item" data-action="changeState" data-id="${data.id}" data-state="CLOSED"">Cerrar</a></li>` : ''}
+                 </ul>
                 </div>
               </div>
             </div>`
@@ -187,7 +184,7 @@ private formatDateToString(date: Date): string {
         '<"mb-3"t>' +                           // Table
         '<"d-flex justify-content-between"lp>', // Pagination
       language: {
-        lengthMenu:`
+        lengthMenu: `
           <select class="form-select">
             <option value="5">5</option>
             <option value="10">10</option>
@@ -222,35 +219,13 @@ private formatDateToString(date: Date): string {
       ]
     });
 
-    //These methods are used to export
-    //the table data to Excel and PDF.
-
-    //They are activated by
-    //clicks in the buttons.
-
-    //Returns the table data exported
-    //to the desired format.
-    $('#exportExcelBtn').on('click', function () {
-      table.button('.buttons-excel').trigger();
-    });
-
-    $('#exportPdfBtn').on('click', function () {
-      table.button('.buttons-pdf').trigger();
-    });
   }
 
-  //Method to search in the table
-  //based on the search term.
 
-  //Param 'event' is the event
-  //that triggers the method.
-
-  //Returns the table filtered.
+  //
   onSearch(event: any) {
     const searchValue = event.target.value;
 
-
-    //Checks if the search term has 3 or more characters.
     if (searchValue.length >= 3) {
       this.table.search(searchValue).draw();
     } else if (searchValue.length === 0) {
@@ -259,65 +234,60 @@ private formatDateToString(date: Date): string {
   }
 
 
-  //Method to filter the table
-  //based on the 2 dates.
-
+  //
   filterData() {
     let filteredComplaints = [...this.report];  // Copiar los datos que no han sido filtrados aún.
-  
-    // Filtrar por estado, si está definido
-    if (this.selectedState) {
-        filteredComplaints = filteredComplaints.filter(
-            (c) => c.reportState === this.selectedState
-        );
-    }
-  
-    // Convertir las fechas de inicio y fin
-    const startDate = this.filterDateStart ? new Date(this.filterDateStart + 'T00:00:00Z') : null;
-    let endDate = this.filterDateEnd ? new Date(this.filterDateEnd + 'T23:59:59Z') : null; // Asegurar que se incluya todo el último día
-    filteredComplaints = filteredComplaints.filter((item) => {
-        const date = new Date(item.createdDate);
-        if (isNaN(date.getTime())) {
-            console.warn(`Fecha no válida: ${item.createdDate}`);
-            return false;
-        }
 
-        // Verificar si la fecha está entre la fecha de inicio y fin
-        const afterStartDate = !startDate || date >= startDate;
-        const beforeEndDate = !endDate || date <= endDate;
-  
-        return afterStartDate && beforeEndDate;
+    // Filtrar por estado, si está definido
+    if (this.selectedStates.length > 0) {
+      filteredComplaints = filteredComplaints.filter(
+        (c) => this.selectedStates.includes(c.reportState)
+      );
+    }
+
+    // Convertir las fechas de inicio y fin
+    const startDate = this.filterDateStart ? new Date(this.filterDateStart + 'T00:00:00') : null;
+    let endDate = this.filterDateEnd ? new Date(this.filterDateEnd + 'T23:59:59') : null; // Asegurar que se incluya todo el último día
+    filteredComplaints = filteredComplaints.filter((item) => {
+      const date = new Date(item.createdDate);
+      if (isNaN(date.getTime())) {
+        console.warn(`Fecha no válida: ${item.createdDate}`);
+        return false;
+      }
+
+      // Verificar si la fecha está entre la fecha de inicio y fin
+      const afterStartDate = !startDate || date >= startDate;
+      const beforeEndDate = !endDate || date <= endDate;
+
+      return afterStartDate && beforeEndDate;
     });
-  
+
     // Actualizar los datos de la tabla
     this.reportfilter = filteredComplaints;
     this.updateDataTable(); // Llamar a la función para actualizar la tabla.
-}
+  }
 
-  
-  // Method to handle 
-  // the State selection.
 
+  //
   onFilter(data: any) {
     this.selectedStates = data;
     this.filterData();
   }
 
 
-  // Method to handle the
-  // change of dates.
+  //
   filterDate() {
-    this.filterData(); // Applies the Date
-                      // and State filters.
+    this.filterData();
   }
 
-  //This method is used to return the
-  //filters to their default values.
-  eraseFilters(){
+
+  //
+  eraseFilters() {
     this.refreshData();
     this.selectedStates = [];
     this.searchTerm = '';
     this.resetDates();
+    this.customSelect.setData(this.selectedStates);
   }
 
 
@@ -335,11 +305,15 @@ private formatDateToString(date: Date): string {
     )
   }
 
+
+  //Redirige a el alta de una infraccion (Multa/Advert)
   newSanction(id: number) {
     this.routingService.redirect(`main/sanctions/post-fine/${id}`, "Registrar Multa")
   }
 
-  postRedirect(){
+  
+  //Redirige a el alta de un informe
+  postRedirect() {
     this.routingService.redirect("main/sanctions/post-report", "Registrar Informe")
   }
 
@@ -395,7 +369,7 @@ private formatDateToString(date: Date): string {
   showReport(id: number) {
     const selectedReport = this.report.find(report => report.id === id);
 
-    if(selectedReport) {
+    if (selectedReport) {
       this.router.navigate(['/home/sanctions/postFine'], {
         queryParams: {
           id: selectedReport.id,
@@ -410,101 +384,101 @@ private formatDateToString(date: Date): string {
   }
 
   CreateDataTable() {
-  //   if ($.fn.dataTable.isDataTable('#reportsTables')) {//creo que es por la funcion
-  //     $('#reportsTables').DataTable().clear().destroy();
-  //   }
+    //   if ($.fn.dataTable.isDataTable('#reportsTables')) {//creo que es por la funcion
+    //     $('#reportsTables').DataTable().clear().destroy();
+    //   }
 
-  //   let table = $('#reportsTables').DataTable({
-  //     data: this.reportfilter,
-  //     columns: [
-  //       {
-  //         data: 'createdDate',
-  //         render: (data) => this.reportServices.formatDate(data),
-  //       },
-  //       {
-  //         data: 'reportState',
-  //         render: (data) => `<div class="d-flex justify-content-center"><div class="${this.getStatusClass(data)} btn w-75 text-center border rounded-pill" >${data}</div></div>`
-  //       },
-  //       { data: 'plotId', render: (data) => ` <div class="text-start">Nro: ${data}</div>` },
-  //       { data: 'description' },
-  //       {
-  //         data: null,
-  //         render: (data) => `
-  //              <div class="btn-group gap-2">
-  //                   <div class="dropdown">
-  //                       <button type="button" class="btn btn-light border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
-  //                       <ul class="dropdown-menu">
-  //                           <li><a class="dropdown-item" onclick="viewComplaint(${data.id})">Ver más</a> </li>
-  //                           <li><hr class="dropdown-divider"></li>
-  //                           <li><a class="dropdown-item" onclick="selectState('ATTACHED', ${data.id}, ${data.userId})">Marcar como Anexada</a></li>
-  //                           <li><a class="dropdown-item" onclick="selectState('REJECTED', ${data.id}, ${data.userId})">Marcar como Rechazada</a></li>
-  //                           <li><a class="dropdown-item" onclick="selectState('PENDING', ${data.id}, ${data.userId})">Marcar como Pendiente</a></li>
-  //                           <li><hr class="dropdown-divider"></li>
+    //   let table = $('#reportsTables').DataTable({
+    //     data: this.reportfilter,
+    //     columns: [
+    //       {
+    //         data: 'createdDate',
+    //         render: (data) => this.reportServices.formatDate(data),
+    //       },
+    //       {
+    //         data: 'reportState',
+    //         render: (data) => `<div class="d-flex justify-content-center"><div class="${this.getStatusClass(data)} btn w-75 text-center border rounded-pill" >${data}</div></div>`
+    //       },
+    //       { data: 'plotId', render: (data) => ` <div class="text-start">Nro: ${data}</div>` },
+    //       { data: 'description' },
+    //       {
+    //         data: null,
+    //         render: (data) => `
+    //              <div class="btn-group gap-2">
+    //                   <div class="dropdown">
+    //                       <button type="button" class="btn btn-light border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
+    //                       <ul class="dropdown-menu">
+    //                           <li><a class="dropdown-item" onclick="viewComplaint(${data.id})">Ver más</a> </li>
+    //                           <li><hr class="dropdown-divider"></li>
+    //                           <li><a class="dropdown-item" onclick="selectState('ATTACHED', ${data.id}, ${data.userId})">Marcar como Anexada</a></li>
+    //                           <li><a class="dropdown-item" onclick="selectState('REJECTED', ${data.id}, ${data.userId})">Marcar como Rechazada</a></li>
+    //                           <li><a class="dropdown-item" onclick="selectState('PENDING', ${data.id}, ${data.userId})">Marcar como Pendiente</a></li>
+    //                           <li><hr class="dropdown-divider"></li>
 
-  //                       </ul>
-  //                   </div>
-  //               </div>`,
-  //       }
-  //     ],
-  //     paging: true,
-  //     pageLength: 10,
-  //     lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
-  //     dom: 't<"d-flex justify-content-between"<lf>"d-flex justify-content-between"p>',
-  //     searching: false,
-  //     language: {
-  //       lengthMenu: '<select class="form-select">' +
-  //         '<option value="5">5</option>' +
-  //         '<option value="10">10</option>' +
-  //         '<option value="25">25</option>' +
-  //         '<option value="50">50</option>' +
-  //         '<option value="-1">All</option>' +
-  //         '</select>'
-  //     },
-  //     buttons: [
-  //       {
-  //         extend: 'excel',
-  //         text: 'Excel',
-  //         className: 'btn btn-success export-excel-btn',
-  //         title: 'Listado de Denuncias',
-  //         exportOptions: {
-  //           columns: [0, 1, 2, 3],
-  //         },
-  //       },
-  //       {
-  //         extend: 'pdf',
-  //         text: 'PDF',
-  //         className: 'btn btn-danger export-pdf-btn',
-  //         title: 'Listado de denuncias',
-  //         exportOptions: {
-  //           columns: [0, 1, 2, 3],
-  //         },
-  //       },
-  //     ],
-  //   });
+    //                       </ul>
+    //                   </div>
+    //               </div>`,
+    //       }
+    //     ],
+    //     paging: true,
+    //     pageLength: 10,
+    //     lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+    //     dom: 't<"d-flex justify-content-between"<lf>"d-flex justify-content-between"p>',
+    //     searching: false,
+    //     language: {
+    //       lengthMenu: '<select class="form-select">' +
+    //         '<option value="5">5</option>' +
+    //         '<option value="10">10</option>' +
+    //         '<option value="25">25</option>' +
+    //         '<option value="50">50</option>' +
+    //         '<option value="-1">All</option>' +
+    //         '</select>'
+    //     },
+    //     buttons: [
+    //       {
+    //         extend: 'excel',
+    //         text: 'Excel',
+    //         className: 'btn btn-success export-excel-btn',
+    //         title: 'Listado de Denuncias',
+    //         exportOptions: {
+    //           columns: [0, 1, 2, 3],
+    //         },
+    //       },
+    //       {
+    //         extend: 'pdf',
+    //         text: 'PDF',
+    //         className: 'btn btn-danger export-pdf-btn',
+    //         title: 'Listado de denuncias',
+    //         exportOptions: {
+    //           columns: [0, 1, 2, 3],
+    //         },
+    //       },
+    //     ],
+    //   });
 
-  //   $('#exportExcelBtn').on('click', function () {
-  //     table.button('.buttons-excel').trigger();
-  //   });
+    //   $('#exportExcelBtn').on('click', function () {
+    //     table.button('.buttons-excel').trigger();
+    //   });
 
-  //   $('#exportPdfBtn').on('click', function () {
-  //     table.button('.buttons-pdf').trigger();
-  //   });
-  // }
+    //   $('#exportPdfBtn').on('click', function () {
+    //     table.button('.buttons-pdf').trigger();
+    //   });
+    // }
 
   }
 
   viewReport(i: number) {
-     const modal = this._modal.open(PenaltiesModalReportComponent, {
-       size: 'xl',
-       keyboard: false,
-     });
-     modal.componentInstance.id = i;
-     modal.result
-       .then((result) => { })
-       .catch((error) => {
-         console.log('Modal dismissed with error:', error);
-       });
-      }
+    const modal = this._modal.open(PenaltiesModalReportComponent, {
+      size: 'xl',
+      keyboard: false,
+    });
+    modal.componentInstance.id = i;
+    modal.result
+      .then((result) => { })
+      .catch((error) => {
+        console.log('Modal dismissed with error:', error);
+      });
+  }
 
 
   getTypes(): void {
@@ -567,7 +541,7 @@ private formatDateToString(date: Date): string {
     });
 
     autoTable(doc, {
-      head: [['Fecha de Creación', 'Estado', 'Descripción','Lote']],
+      head: [['Fecha de Creación', 'Estado', 'Descripción', 'Lote']],
       body: filteredData,
       startY: 30,
       theme: 'grid',
@@ -583,7 +557,7 @@ private formatDateToString(date: Date): string {
       ['Listado de Informes'],
       [`Fechas: Desde ${this.reportServices.formatDate(this.filterDateStart)} hasta ${this.reportServices.formatDate(this.filterDateEnd)}`],
       [],
-      ['Fecha de Creación', 'Estado', 'Descripción','Lote']
+      ['Fecha de Creación', 'Estado', 'Descripción', 'Lote']
     ];
 
     const excelData = this.reportfilter.map((report: ReportDTO) => {
@@ -609,6 +583,29 @@ private formatDateToString(date: Date): string {
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Informes');
 
     XLSX.writeFile(workbook, `${this.reportServices.formatDate(this.filterDateStart)}-${this.reportServices.formatDate(this.filterDateEnd)}_Listado_Informes.xlsx`);
+  }
+
+  //Abre el modal para actualizar el estado
+  changeState(id: number, state: string) {
+    this.openModalStateReason(id, state);
+  }
+
+
+  //Abre el modal para actualizar el estado de la multa
+  openModalStateReason(id: number, state: string) {
+    const modal = this._modal.open(PenaltiesUpdateStateReasonReportModalComponent, {
+      size: 'md',
+      keyboard: false,
+    });
+    modal.componentInstance.id = id;
+    modal.componentInstance.reportState = state;
+    modal.result
+      .then((result: any) => {
+        this.refreshData();
+      })
+      .catch((error: any) => {
+        console.log("Error con modal: " + error);
+      });
   }
 
 
