@@ -346,7 +346,42 @@
       </div>
 
       <!-- Grafico de lineas -->
-      <div class="col-12" *ngIf="status === 3">
+      <div class="col-2" *ngIf="status === 3">
+        <!-- KPI Multas Pagadas -->
+        <div class="row">
+          <div class="col">
+            <div class="card border-0 shadow-lg rounded-4 mb-4 hover-scale" (click)="makeBig(4)"
+              style="background-color: #d1f7e3;">
+              <div class="card-body position-relative">
+                <i class="bi bi-check-circle position-absolute top-50 end-0 translate-middle-y me-4"
+                  style="font-size: 2.5rem; color: #28a745; opacity: 0.8;"></i>
+                <div class="pe-5">
+                  <h6 class="text-secondary mb-2">Multas Pagadas</h6>
+                  <h3 class="mb-0">{{ paidFinesCount }}</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <!-- KPI Multas Pendientes de Pago -->
+        <div class="row">
+          <div class="col">
+            <div class="card border-0 shadow-lg rounded-4 mb-4 hover-scale" (click)="makeBig(4)"
+              style="background-color: #fff3cd;">
+              <div class="card-body position-relative">
+                <i class="bi bi-clock position-absolute top-50 end-0 translate-middle-y me-4"
+                  style="font-size: 2.5rem; color: #ffc107; opacity: 0.8;"></i>
+                <div class="pe-5">
+                  <h6 class="text-secondary mb-2">Multas Pendientes de Pago</h6>
+                  <h3 class="mb-0">{{ pendingFinesCount }}</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-10" *ngIf="status === 3">
         <div class="card border-0 shadow rounded-4 h-100">
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-4">

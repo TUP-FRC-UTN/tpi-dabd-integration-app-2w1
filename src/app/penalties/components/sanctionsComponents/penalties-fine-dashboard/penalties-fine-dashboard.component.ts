@@ -44,6 +44,8 @@ export class PenaltiesFineDashboardComponent {
   finesByStatePercentage: { state: string; percentage: number }[] = [];
   stateWithHighestPercentage: { state: string; percentage: number } = { state: '', percentage: 0 };
   stateWithLowestPercentage: { state: string; percentage: number } = { state: '', percentage: 0 };
+  paidFinesCount: any;
+  pendingFinesCount: any;
 
   // Datos para gráficos
   pieChartData: any[] = [];
@@ -94,7 +96,7 @@ export class PenaltiesFineDashboardComponent {
 
   lineChartOptions = {
     backgroundColor: 'transparent',
-    colors: ['#E2CBF7'],
+    colors: ['#D1BDFF'],
     legend: { position: 'none' },
     chartArea: { width: '90%', height: '80%' },
     vAxis: {
@@ -373,6 +375,11 @@ export class PenaltiesFineDashboardComponent {
       acc[fine.fineState] = (acc[fine.fineState] || 0) + 1;
       return acc;
     }, {});
+
+    // Calcular el total de multas en estado "Pagada" y "Pendiente de Pago"
+    this.paidFinesCount = this.finesData.filter(fine => fine.fineState === 'Pagada').length;
+    this.pendingFinesCount = this.finesData.filter(fine => fine.fineState === 'Pendiente de pago').length;
+
   
     // Distribución de multas por razón
     this.finesByReason = this.finesData.reduce((acc: { [key: string]: number }, fine) => {
@@ -401,6 +408,8 @@ this.stateWithLowestPercentage = this.finesByStatePercentage.reduce((min, curren
 this.lowestFine = this.finesData.reduce((min: Fine | null, fine: Fine) => {
   return fine.amount < (min?.amount || Infinity) ? fine : min;
   }, null as Fine | null);
+
+
     
   }
   

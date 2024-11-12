@@ -94,7 +94,7 @@ export class PenaltiesComplaintDashboardComponent {
   // };
   lineChartOptions = {
     backgroundColor: 'transparent',
-    colors: ['#E2CBF7'],
+    colors: ['#D1BDFF'],
     legend: { position: 'none' },
     chartArea: { width: '90%', height: '80%' },
     vAxis: {
