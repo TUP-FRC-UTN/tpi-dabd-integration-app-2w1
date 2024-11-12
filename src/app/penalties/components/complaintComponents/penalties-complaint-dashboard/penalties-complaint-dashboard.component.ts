@@ -31,12 +31,15 @@ export class PenaltiesComplaintDashboardComponent {
   reportsReasons: ReportReasonDto[] = [];
 
   //propiedades para los kpi
-  totalComplaints: number =0;
-  averageComplaintsPerMonth: number=0;
+  totalComplaints: number = 0;
+  averageComplaintsPerMonth: number = 0;
   complaintWithMostFiles?: ComplaintDto | null;
   complaintsByState?: { [key: string]: number };
   complaintsByReason?: { [key: string]: number };
   complaintsByUser?: { [key: number]: number };
+  complaintsByStatePercentage: { state: string; percentage: number }[] = [];
+  stateWithHighestPercentage: { state: string; percentage: number } = { state: '', percentage: 0 };
+  stateWithLowestPercentage: { state: string; percentage: number } = { state: '', percentage: 0 };
   /////////////////////////
   state = '';
   reportReason = '';
@@ -50,7 +53,7 @@ export class PenaltiesComplaintDashboardComponent {
   columnChartData: any[] = [];
 
   pieChartType = ChartType.PieChart;
-  lineChartType = ChartType.LineChart;
+  lineChartType = ChartType.ColumnChart;
   columnChartType = ChartType.ColumnChart;
   pieChartOptions = {
     backgroundColor: 'transparent',
@@ -91,7 +94,7 @@ export class PenaltiesComplaintDashboardComponent {
   // };
   lineChartOptions = {
     backgroundColor: 'transparent',
-    colors: ['#24f73f'],
+    colors: ['#D1BDFF'],
     legend: { position: 'none' },
     chartArea: { width: '90%', height: '80%' },
     vAxis: {
@@ -107,7 +110,7 @@ export class PenaltiesComplaintDashboardComponent {
       easing: 'out',
       startup: true,
     },
-    title: 'Evolución de Denuncias por Mes',
+    title: 'Cantidad de Denuncias por Mes',
   };
 
   columnChartOptions = {
@@ -354,46 +357,65 @@ export class PenaltiesComplaintDashboardComponent {
   }
 
   private calculateKPIs() {
-     // Total de denuncias realizadas
-  this.totalComplaints = this.complaintsData.length;
+    // Total de denuncias realizadas
+    this.totalComplaints = this.complaintsData.length;
 
-  // Calcular denuncias por mes para obtener el promedio
-  const complaintsByMonth: { [key: string]: number } = {};
-  this.complaintsData.forEach(complaint => {
-    const complaintDate = new Date(complaint.createdDate);
-    const monthKey = complaintDate.toLocaleString('default', { month: 'short', year: 'numeric' });
-    complaintsByMonth[monthKey] = (complaintsByMonth[monthKey] || 0) + 1;
-  });
-  this.averageComplaintsPerMonth = this.totalComplaints / Object.keys(complaintsByMonth).length;
+    // Calcular denuncias por mes para obtener el promedio
+    const complaintsByMonth: { [key: string]: number } = {};
+    this.complaintsData.forEach(complaint => {
+      const complaintDate = new Date(complaint.createdDate);
+      const monthKey = complaintDate.toLocaleString('default', { month: 'short', year: 'numeric' });
+      complaintsByMonth[monthKey] = (complaintsByMonth[monthKey] || 0) + 1;
+    });
+    this.averageComplaintsPerMonth = this.totalComplaints / Object.keys(complaintsByMonth).length;
 
-  // Denuncia con mayor cantidad de archivos adjuntos
-  this.complaintWithMostFiles = this.complaintsData.reduce((max: ComplaintDto | null, complaint: ComplaintDto) => {
-    return complaint.fileQuantity > (max?.fileQuantity || 0) ? complaint : max;
-  }, null as ComplaintDto | null);
+    // Denuncia con mayor cantidad de archivos adjuntos
+    this.complaintWithMostFiles = this.complaintsData.reduce((max: ComplaintDto | null, complaint: ComplaintDto) => {
+      return complaint.fileQuantity > (max?.fileQuantity || 0) ? complaint : max;
+    }, null as ComplaintDto | null);
 
-  // Distribución de denuncias por estado
-  this.complaintsByState = this.complaintsData.reduce((acc: { [key: string]: number }, complaint) => {
-    acc[complaint.complaintState] = (acc[complaint.complaintState] || 0) + 1;
-    return acc;
-  }, {});
+    // Distribución de denuncias por estado
+    this.complaintsByState = this.complaintsData.reduce((acc: { [key: string]: number }, complaint) => {
+      acc[complaint.complaintState] = (acc[complaint.complaintState] || 0) + 1;
+      return acc;
+    }, {});
 
-  // Distribución de denuncias por razón
-  this.complaintsByReason = this.complaintsData.reduce((acc: { [key: string]: number }, complaint) => {
-    const reason = complaint.complaintReason || complaint.anotherReason;
-    acc[reason] = (acc[reason] || 0) + 1;
-    return acc;
-  }, {});
+    // Distribución de denuncias por razón
+    this.complaintsByReason = this.complaintsData.reduce((acc: { [key: string]: number }, complaint) => {
+      const reason = complaint.complaintReason || complaint.anotherReason;
+      acc[reason] = (acc[reason] || 0) + 1;
+      return acc;
+    }, {});
 
-  // Distribución de denuncias por usuario
-  this.complaintsByUser = this.complaintsData.reduce((acc: { [key: number]: number }, complaint) => {
-    acc[complaint.userId] = (acc[complaint.userId] || 0) + 1;
-    return acc;
-  }, {});
+    // Distribución de denuncias por usuario
+    this.complaintsByUser = this.complaintsData.reduce((acc: { [key: number]: number }, complaint) => {
+      acc[complaint.userId] = (acc[complaint.userId] || 0) + 1;
+      return acc;
+    }, {});
+
+
+    // Calcular porcentaje de denuncias por estado
+    this.complaintsByStatePercentage = Object.entries(this.complaintsByState).map(([state, count]) => {
+      const percentage = (count / this.totalComplaints) * 100;
+      return { state, percentage };
+    });
+
+    // Encontrar el estado con el mayor porcentaje
+    this.stateWithHighestPercentage = this.complaintsByStatePercentage.reduce((max, current) => {
+      return current.percentage > max.percentage ? current : max;
+    }, { state: '', percentage: 0 });
+
+    // Encontrar el estado con el menor porcentaje
+    this.stateWithLowestPercentage = this.complaintsByStatePercentage.reduce((min, current) => {
+      return current.percentage < min.percentage ? current : min;
+    }, { state: '', percentage: Infinity });
+
+  }
+  // getMostFrequentUser(): number {
+  //   if (!this.complaintsByUser) return 0;
+  //   return Object.entries(this.complaintsByUser)
+  //     .reduce((a, b) => a[1] > b[1] ? a : b)[0] as unknown as number;
+  // }
 }
-// getMostFrequentUser(): number {
-//   if (!this.complaintsByUser) return 0;
-//   return Object.entries(this.complaintsByUser)
-//     .reduce((a, b) => a[1] > b[1] ? a : b)[0] as unknown as number;
-// }
-  
-}
+
+
