@@ -345,7 +345,7 @@ export class PenaltiesFineDashboardComponent {
   makeBig(nro: number) {
     if (nro === 5 && this.highestFine) {
       this.openFineModal(this.highestFine.id);
-    } else if (this.lowestFine) {
+    } else if (nro === 7 && this.lowestFine) {
       this.openFineModal(this.lowestFine.id);
     }
     else {
