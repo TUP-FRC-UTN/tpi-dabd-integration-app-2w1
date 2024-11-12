@@ -9,26 +9,15 @@
             <div class="col-md-6">
               <label class="form-label text-secondary">Período Desde</label>
               <div class="input-group">
-                <input
-                  type="month"
-                  (ngModelChange)="applyFilters()"
-                  class="form-control border-0 bg-light"
-                  [(ngModel)]="periodFrom"
-                  [max]="periodTo"
-                />
+                <input type="month" (ngModelChange)="applyFilters()" class="form-control border-0 bg-light"
+                  [(ngModel)]="periodFrom" [max]="periodTo" />
               </div>
             </div>
             <div class="col-md-6">
               <label class="form-label text-secondary">Período Hasta</label>
               <div class="input-group">
-                <input
-                  type="month"
-                  (ngModelChange)="applyFilters()"
-                  class="form-control border-0 bg-light"
-                  [(ngModel)]="periodTo"
-                  [min]="periodFrom"
-                  [max]="periodTo"
-                />
+                <input type="month" (ngModelChange)="applyFilters()" class="form-control border-0 bg-light"
+                  [(ngModel)]="periodTo" [min]="periodFrom" [max]="periodTo" />
               </div>
             </div>
 
@@ -52,36 +41,21 @@
             <div class="col-md-4">
               <label class="form-label text-secondary">Período Desde</label>
               <div class="input-group">
-                <input
-                  (ngModelChange)="applyFilters()"
-                  type="month"
-                  class="form-control border-0 bg-light"
-                  [(ngModel)]="periodFrom"
-                  [max]="periodTo"
-                />
+                <input (ngModelChange)="applyFilters()" type="month" class="form-control border-0 bg-light"
+                  [(ngModel)]="periodFrom" [max]="periodTo" />
               </div>
             </div>
             <div class="col-md-4">
               <label class="form-label text-secondary">Período Hasta</label>
               <div class="input-group">
-                <input
-                  (ngModelChange)="applyFilters()"
-                  type="month"
-                  class="form-control border-0 bg-light"
-                  [(ngModel)]="periodTo"
-                  [min]="periodFrom"
-                  [max]="periodTo"
-                />
+                <input (ngModelChange)="applyFilters()" type="month" class="form-control border-0 bg-light"
+                  [(ngModel)]="periodTo" [min]="periodFrom" [max]="periodTo" />
               </div>
             </div>
 
             <div class="col-md-4">
-              <select
-                (change)="applyFilters()"
-                [(ngModel)]="reportReason"
-                class="form-select"
-                aria-label="Default select example"
-              >
+              <select (change)="applyFilters()" [(ngModel)]="reportReason" class="form-select"
+                aria-label="Default select example">
                 <option selected value="">Razones...</option>
                 @for (item of reportsReasons; track $index) {
                 <option value="{{ item.reportReason }}">
@@ -131,36 +105,21 @@
             <div class="col-md-4">
               <label class="form-label text-secondary">Período Desde</label>
               <div class="input-group">
-                <input
-                  (ngModelChange)="applyFilters()"
-                  type="month"
-                  class="form-control border-0 bg-light"
-                  [(ngModel)]="periodFrom"
-                  [max]="periodTo"
-                />
+                <input (ngModelChange)="applyFilters()" type="month" class="form-control border-0 bg-light"
+                  [(ngModel)]="periodFrom" [max]="periodTo" />
               </div>
             </div>
             <div class="col-md-4">
               <label class="form-label text-secondary">Período Hasta</label>
               <div class="input-group">
-                <input
-                  (ngModelChange)="applyFilters()"
-                  type="month"
-                  class="form-control border-0 bg-light"
-                  [(ngModel)]="periodTo"
-                  [min]="periodFrom"
-                  [max]="periodTo"
-                />
+                <input (ngModelChange)="applyFilters()" type="month" class="form-control border-0 bg-light"
+                  [(ngModel)]="periodTo" [min]="periodFrom" [max]="periodTo" />
               </div>
             </div>
 
             <div class="col-md-4">
-              <select
-                (change)="applyFilters()"
-                [(ngModel)]="state"
-                class="form-select"
-                aria-label="Default select example"
-              >
+              <select (change)="applyFilters()" [(ngModel)]="state" class="form-select"
+                aria-label="Default select example">
                 <option selected value="">Estados...</option>
                 @for (item of states; track $index) {
                 <option value="{{ item.value }}">{{ item.value }}</option>
@@ -207,35 +166,20 @@
             <div class="col-md-4">
               <label class="form-label text-secondary">Período Desde</label>
               <div class="input-group">
-                <input
-                  (ngModelChange)="applyFilters()"
-                  type="month"
-                  class="form-control border-0 bg-light"
-                  [(ngModel)]="periodFrom"
-                  [max]="periodTo"
-                />
+                <input (ngModelChange)="applyFilters()" type="month" class="form-control border-0 bg-light"
+                  [(ngModel)]="periodFrom" [max]="periodTo" />
               </div>
             </div>
             <div class="col-md-4">
               <label class="form-label text-secondary">Período Hasta</label>
               <div class="input-group">
-                <input
-                  (ngModelChange)="applyFilters()"
-                  type="month"
-                  class="form-control border-0 bg-light"
-                  [(ngModel)]="periodTo"
-                  [min]="periodFrom"
-                  [max]="periodTo"
-                />
+                <input (ngModelChange)="applyFilters()" type="month" class="form-control border-0 bg-light"
+                  [(ngModel)]="periodTo" [min]="periodFrom" [max]="periodTo" />
               </div>
             </div>
             <div class="col-md-4">
-              <select
-                (change)="applyFilters()"
-                class="form-select"
-                [(ngModel)]="reportReason2"
-                aria-label="Default select example"
-              >
+              <select (change)="applyFilters()" class="form-select" [(ngModel)]="reportReason2"
+                aria-label="Default select example">
                 <option value="" selected>Razones...</option>
                 @for (item of reportsReasons; track $index) {
                 <option value="{{ item.reportReason }}">
@@ -291,10 +235,7 @@
   <!-- ---------------------------------------------------------------------------------------- -->
 
   <!-- Grilla del dashboard -->
-  <div
-    class="row position-relative min-vh-75"
-    [ngClass]="{ 'overflow-hidden': status !== 0 }"
-  >
+  <div class="row position-relative min-vh-75" [ngClass]="{ 'overflow-hidden': status !== 0 }">
     <!-- Contenedor para cuando un grafico es grande -->
     <div class="container d-flex gap-3" *ngIf="status !== 0">
       <div class="col-2" *ngIf="status === 1">
@@ -308,14 +249,15 @@
                   style="font-size: 2.5rem; color: #FCAE7C; opacity: 0.8;"></i>
                 <div class="pe-5">
                   <h6 class="text-secondary mb-2">Estado con Mayor Porcentaje</h6>
-                  <h3 class="mb-0">{{ stateWithHighestPercentage.state }} {{ stateWithHighestPercentage.percentage | number:'1.1-1' }}%</h3>
+                  <h3 class="mb-0">{{ stateWithHighestPercentage.state }} {{ stateWithHighestPercentage.percentage |
+                    number:'1.1-1' }}%</h3>
                 </div>
               </div>
             </div>
           </div>
         </div>
-         <!-- KPI Estado con mayor porcentaje de Denuncias -->
-         <div class="row">
+        <!-- KPI Estado con mayor porcentaje de Denuncias -->
+        <div class="row">
           <div class="col">
             <div class="card border-0 shadow-lg rounded-4 mb-4 hover-scale" (click)="makeBig(4)"
               style="background-color: #E2CBF7;">
@@ -324,30 +266,24 @@
                   style="font-size: 2.5rem; color: #b976f7; opacity: 0.8;"></i>
                 <div class="pe-5">
                   <h6 class="text-secondary mb-2">Estado con Menor Porcentaje</h6>
-                  <h3 class="mb-0">{{ stateWithLowestPercentage.state }} {{ stateWithLowestPercentage.percentage | number:'1.1-1' }}%</h3>
+                  <h3 class="mb-0">{{ stateWithLowestPercentage.state }} {{ stateWithLowestPercentage.percentage |
+                    number:'1.1-1' }}%</h3>
                 </div>
               </div>
             </div>
           </div>
         </div>
-              </div>
+      </div>
       <!-- Grafico de columnas -->
       <div class="col-12" *ngIf="status === 1">
         <div class="card border-0 shadow rounded-4 h-100 w-100">
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-4">
               <div class="back-arrow" (click)="makeBig(0)">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="35"
-                  height="35"
-                  fill="gray"
-                  class="bi bi-arrow-left-circle-fill"
-                  viewBox="0 0 16 16"
-                >
+                <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="gray"
+                  class="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
                   <path
-                    d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z"
-                  />
+                    d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z" />
                 </svg>
               </div>
               <div>
@@ -361,17 +297,13 @@
               </div>
             </div>
             @if(columnChartData.length > 0){
-              <google-chart
-              [type]="columnChartType"
-              [data]="columnChartData"
-              [options]="columnChartOptions"
-              class="w-100"
-            ></google-chart>
+            <google-chart [type]="columnChartType" [data]="columnChartData" [options]="columnChartOptions"
+              class="w-100"></google-chart>
             }
             @else {
-              <div class="text-center text-secondary">
-                No se encontraron datos para los filtros seleccionados
-              </div>
+            <div class="text-center text-secondary">
+              No se encontraron datos para los filtros seleccionados
+            </div>
             }
           </div>
         </div>
@@ -383,17 +315,10 @@
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-4">
               <div class="back-arrow" (click)="makeBig(0)">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="35"
-                  height="35"
-                  fill="gray"
-                  class="bi bi-arrow-left-circle-fill"
-                  viewBox="0 0 16 16"
-                >
+                <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="gray"
+                  class="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
                   <path
-                    d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z"
-                  />
+                    d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z" />
                 </svg>
               </div>
               <div>
@@ -407,19 +332,14 @@
               </div>
             </div>
             @if(pieChartData.length > 0){
-              <google-chart
-              [type]="pieChartType"
-              [data]="pieChartData"
-              [options]="pieChartOptions"
-              class="w-100"
-              style="height: 88%"
-            >
+            <google-chart [type]="pieChartType" [data]="pieChartData" [options]="pieChartOptions" class="w-100"
+              style="height: 88%">
             </google-chart>
             }
             @else {
-              <div class="text-center text-secondary">
-                No se encontraron datos para los filtros seleccionados
-              </div>
+            <div class="text-center text-secondary">
+              No se encontraron datos para los filtros seleccionados
+            </div>
             }
           </div>
         </div>
@@ -431,22 +351,15 @@
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-4">
               <div class="back-arrow" (click)="makeBig(0)">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="35"
-                  height="35"
-                  fill="gray"
-                  class="bi bi-arrow-left-circle-fill"
-                  viewBox="0 0 16 16"
-                >
+                <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="gray"
+                  class="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
                   <path
-                    d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z"
-                  />
+                    d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z" />
                 </svg>
               </div>
               <div>
                 <h5 class="card-title text-secondary mb-1">
-                  Evolución de Multas
+                  Cantidad de Multas
                 </h5>
                 <small class="text-secondary"></small>
               </div>
@@ -455,13 +368,8 @@
                 {{ averageFinesPerMonth | number : "1.1-1" }}
               </div>
             </div>
-            <google-chart
-              [type]="lineChartType"
-              [data]="lineChartData"
-              [options]="lineChartOptions"
-              class="w-100"
-              style="height: 88%"
-            >
+            <google-chart [type]="lineChartType" [data]="lineChartData" [options]="lineChartOptions" class="w-100"
+              style="height: 88%">
             </google-chart>
           </div>
         </div>
@@ -473,16 +381,11 @@
       <!-- KPI Total de Multas Realizadas -->
       <div class="row">
         <div class="col">
-          <div
-            class="card border-0 shadow-lg rounded-4 mb-4 hover-scale"
-            (click)="makeBig(1)"
-            style="background-color: #d8ffedde"
-          >
+          <div class="card border-0 shadow-lg rounded-4 mb-4 hover-scale" (click)="makeBig(1)"
+            style="background-color: #d8ffedde">
             <div class="card-body position-relative">
-              <i
-                class="bi bi-exclamation-triangle position-absolute top-50 end-0 translate-middle-y me-4"
-                style="font-size: 2.5rem; color: #198754; opacity: 0.8"
-              ></i>
+              <i class="bi bi-exclamation-triangle position-absolute top-50 end-0 translate-middle-y me-4"
+                style="font-size: 2.5rem; color: #198754; opacity: 0.8"></i>
               <div class="pe-5">
                 <h6 class="text-secondary mb-2">Total de Multas Realizadas</h6>
                 <h3 class="mb-0">{{ totalFines }}</h3>
@@ -495,16 +398,11 @@
       <!-- KPI Promedio de Multas por Mes -->
       <div class="row">
         <div class="col">
-          <div
-            class="card border-0 shadow-lg rounded-4 mb-4 hover-scale"
-            (click)="makeBig(3)"
-            style="background-color: #e7f1ff"
-          >
+          <div class="card border-0 shadow-lg rounded-4 mb-4 hover-scale" (click)="makeBig(3)"
+            style="background-color: #e7f1ff">
             <div class="card-body position-relative">
-              <i
-                class="bi bi-calendar-day position-absolute top-50 end-0 translate-middle-y me-4"
-                style="font-size: 2.5rem; color: #004085; opacity: 0.8"
-              ></i>
+              <i class="bi bi-calendar-day position-absolute top-50 end-0 translate-middle-y me-4"
+                style="font-size: 2.5rem; color: #004085; opacity: 0.8"></i>
               <div class="pe-5">
                 <h6 class="text-secondary mb-2">
                   Promedio de Multas por Período
@@ -521,16 +419,11 @@
       <!-- KPI Multa de Mayor Monto -->
       <div class="row">
         <div class="col">
-          <div
-            class="card border-0 shadow-lg rounded-4 mb-4 hover-scale"
-            (click)="makeBig(2)"
-            style="background-color: #fff3cd"
-          >
+          <div class="card border-0 shadow-lg rounded-4 mb-4 hover-scale" (click)="makeBig(2)"
+            style="background-color: #fff3cd">
             <div class="card-body position-relative">
-              <i
-                class="bi bi-cash-stack position-absolute top-50 end-0 translate-middle-y me-4"
-                style="font-size: 2.5rem; color: #856404; opacity: 0.8"
-              ></i>
+              <i class="bi bi-cash-stack position-absolute top-50 end-0 translate-middle-y me-4"
+                style="font-size: 2.5rem; color: #856404; opacity: 0.8"></i>
               <div class="pe-5">
                 <h6 class="text-secondary mb-2">Multa de Mayor Monto</h6>
                 <h3 class="mb-0">{{ highestFine?.amount | currency }}</h3>
@@ -543,15 +436,11 @@
       <!-- KPI Multa de Menor Monto -->
       <div class="row">
         <div class="col">
-          <div
-            class="card border-0 shadow-lg rounded-4 mb-4 hover-scale"
-            (click)="makeBig(2)"
+          <div class="card border-0 shadow-lg rounded-4 mb-4 hover-scale" (click)="makeBig(2)"
             style="background-color: #fff3cd">
             <div class="card-body position-relative">
-              <i
-                class="bi bi-cash-stack position-absolute top-50 end-0 translate-middle-y me-4"
-                style="font-size: 2.5rem; color: #856404; opacity: 0.8"
-              ></i>
+              <i class="bi bi-cash-stack position-absolute top-50 end-0 translate-middle-y me-4"
+                style="font-size: 2.5rem; color: #856404; opacity: 0.8"></i>
               <div class="pe-5">
                 <h6 class="text-secondary mb-2">Multa de Menor Monto</h6>
                 <h3 class="mb-0">{{ lowestFine?.amount | currency }}</h3>
@@ -561,15 +450,12 @@
         </div>
       </div>
 
-      
+
     </div>
 
     <!-- Gráficos -->
     <div class="col-5 col-lg-5 mb-4" *ngIf="status === 0">
-      <div
-        class="card border-0 shadow-lg rounded-4 h-100 transition-all hover-scale"
-        (click)="makeBig(1)"
-      >
+      <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover-scale" (click)="makeBig(1)">
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center mb-4">
             <div class="back-arrow opacity-0">
@@ -588,56 +474,42 @@
             </div>
           </div>
           @if(columnChartData.length > 0){
-            <google-chart
-            [type]="columnChartType"
-            [data]="columnChartData"
-            [options]="columnChartOptions"
-            class="w-100"
-          ></google-chart>
+          <google-chart [type]="columnChartType" [data]="columnChartData" [options]="columnChartOptions"
+            class="w-100"></google-chart>
           }
           @else {
-            <div class="text-center text-secondary">
-              No se encontraron datos para los filtros seleccionados
-            </div>
+          <div class="text-center text-secondary">
+            No se encontraron datos para los filtros seleccionados
+          </div>
           }
-          
+
         </div>
       </div>
     </div>
 
     <div class="col-5 col-lg-5" *ngIf="status === 0">
       <div class="mb-5">
-        <div
-          class="card border-0 shadow-lg rounded-4 h-100 transition-all hover-scale"
-          (click)="makeBig(2)"
-        >
+        <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover-scale" (click)="makeBig(2)">
           <div class="card-body">
             <div class="text-center">
               <h5 class="card-title text-secondary mb-1">Razones de Multas</h5>
               <small class="text-secondary">Porcentaje por razón</small>
             </div>
             @if(pieChartData.length > 0){
-            <google-chart
-              [type]="pieChartType"
-              [data]="pieChartData"
-              [options]="pieChartOptions"
-              class="w-100"
-            ></google-chart>
+            <google-chart [type]="pieChartType" [data]="pieChartData" [options]="pieChartOptions"
+              class="w-100"></google-chart>
             }
             @else {
-              <div class="text-center text-secondary">
-                No se encontraron datos para los filtros seleccionados
-              </div>
+            <div class="text-center text-secondary">
+              No se encontraron datos para los filtros seleccionados
+            </div>
             }
           </div>
         </div>
       </div>
 
       <div>
-        <div
-          class="card border-0 shadow-lg rounded-4 h-100 transition-all hover-scale"
-          (click)="makeBig(3)"
-        >
+        <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover-scale" (click)="makeBig(3)">
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-4">
               <div class="back-arrow opacity-0">
@@ -649,8 +521,7 @@
               </div>
               <div>
                 <h5 class="card-title text-secondary mb-1">
-                  Evolución de 
-                  Multas
+                  Cantidad de Multas
                 </h5>
                 <small class="text-secondary"></small>
 
@@ -660,12 +531,8 @@
                 {{ averageFinesPerMonth | number : "1.1-1" }}
               </div>
             </div>
-            <google-chart
-              [type]="lineChartType"
-              [data]="lineChartData"
-              [options]="lineChartOptions"
-              class="w-100"
-            ></google-chart>
+            <google-chart [type]="lineChartType" [data]="lineChartData" [options]="lineChartOptions"
+              class="w-100"></google-chart>
           </div>
         </div>
       </div>
@@ -681,11 +548,7 @@
         <h5 class="modal-title" id="exampleModalLabel">
           Estadísticas de Multas
         </h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-        ></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
         <h5>Descripción</h5>
@@ -693,8 +556,8 @@
           En este dashboard podrá ver un resumen detallado de las estadísticas
           relacionadas con las multas. Podrá aplicar filtros según el período,
           comparar diferentes tipos de multas, observar el promedio de multas
-          por motivo, y visualizar la evolución de estas a lo largo del tiempo a
-          través de un gráfico de líneas. Además, en la sección izquierda
+          por motivo, y visualizar la cantidad de estas a lo largo del tiempo a
+          través de un gráfico de columnas. Además, en la sección izquierda
           encontrará datos relevantes basados en el período de su interés.
         </p>
         <h5>Filtros</h5>
@@ -712,7 +575,7 @@
           Además, cuántas hay por cada motivo, con la posibilidad de elegir un
           estado específico para ver.
         </p>
-        <h5>Evolución de Multas</h5>
+        <h5>Cantidad de Multas</h5>
         <p>
           También contará con un gráfico de líneas para conocer cuántas multas
           hubo por período, con la posibilidad de filtrar por motivo.
