@@ -16,8 +16,14 @@
             <div class="col-md-6">
               <label class="form-label text-secondary">Período Hasta</label>
               <div class="input-group">
-                <input type="month" (ngModelChange)="applyFilters()" class="form-control border-0 bg-light"
-                  [(ngModel)]="periodTo" [min]="periodFrom" [max]="periodTo" />
+                <input
+                  type="month"
+                  (ngModelChange)="applyFilters()"
+                  class="form-control border-0 bg-light"
+                  [(ngModel)]="periodTo"
+                  [min]="periodFrom"
+                  [max]="currentYearMonth"
+                />
               </div>
             </div>
 
@@ -48,8 +54,14 @@
             <div class="col-md-4">
               <label class="form-label text-secondary">Período Hasta</label>
               <div class="input-group">
-                <input (ngModelChange)="applyFilters()" type="month" class="form-control border-0 bg-light"
-                  [(ngModel)]="periodTo" [min]="periodFrom" [max]="periodTo" />
+                <input
+                  (ngModelChange)="applyFilters()"
+                  type="month"
+                  class="form-control border-0 bg-light"
+                  [(ngModel)]="periodTo"
+                  [min]="periodFrom"
+                  [max]="currentYearMonth"
+                />
               </div>
             </div>
 
@@ -112,8 +124,14 @@
             <div class="col-md-4">
               <label class="form-label text-secondary">Período Hasta</label>
               <div class="input-group">
-                <input (ngModelChange)="applyFilters()" type="month" class="form-control border-0 bg-light"
-                  [(ngModel)]="periodTo" [min]="periodFrom" [max]="periodTo" />
+                <input
+                  (ngModelChange)="applyFilters()"
+                  type="month"
+                  class="form-control border-0 bg-light"
+                  [(ngModel)]="periodTo"
+                  [min]="periodFrom"
+                  [max]="currentYearMonth"
+                />
               </div>
             </div>
 
@@ -173,8 +191,14 @@
             <div class="col-md-4">
               <label class="form-label text-secondary">Período Hasta</label>
               <div class="input-group">
-                <input (ngModelChange)="applyFilters()" type="month" class="form-control border-0 bg-light"
-                  [(ngModel)]="periodTo" [min]="periodFrom" [max]="periodTo" />
+                <input
+                  (ngModelChange)="applyFilters()"
+                  type="month"
+                  class="form-control border-0 bg-light"
+                  [(ngModel)]="periodTo"
+                  [min]="periodFrom"
+                  [max]="currentYearMonth"
+                />
               </div>
             </div>
             <div class="col-md-4">
@@ -454,8 +478,11 @@
       <!-- KPI Multa de Mayor Monto -->
       <div class="row">
         <div class="col">
-          <div class="card border-0 shadow-lg rounded-4 mb-4 hover-scale" (click)="makeBig(2)"
-            style="background-color: #fff3cd">
+          <div
+            class="card border-0 shadow-lg rounded-4 mb-4 hover-scale"
+            (click)="makeBig(5)"
+            style="background-color: #fff3cd"
+          >
             <div class="card-body position-relative">
               <i class="bi bi-cash-stack position-absolute top-50 end-0 translate-middle-y me-4"
                 style="font-size: 2.5rem; color: #856404; opacity: 0.8"></i>
