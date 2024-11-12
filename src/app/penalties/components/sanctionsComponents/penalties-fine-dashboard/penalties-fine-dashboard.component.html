@@ -297,6 +297,40 @@
   >
     <!-- Contenedor para cuando un grafico es grande -->
     <div class="container d-flex gap-3" *ngIf="status !== 0">
+      <div class="col-2" *ngIf="status === 1">
+        <!-- KPI Estado con mayor porcentaje de Denuncias -->
+        <div class="row">
+          <div class="col">
+            <div class="card border-0 shadow-lg rounded-4 mb-4 hover-scale" (click)="makeBig(4)"
+              style="background-color: #ffe7e7;">
+              <div class="card-body position-relative">
+                <i class="bi bi-percent position-absolute top-50 end-0 translate-middle-y me-4"
+                  style="font-size: 2.5rem; color: #FCAE7C; opacity: 0.8;"></i>
+                <div class="pe-5">
+                  <h6 class="text-secondary mb-2">Estado con Mayor Porcentaje</h6>
+                  <h3 class="mb-0">{{ stateWithHighestPercentage.state }} {{ stateWithHighestPercentage.percentage | number:'1.1-1' }}%</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+         <!-- KPI Estado con mayor porcentaje de Denuncias -->
+         <div class="row">
+          <div class="col">
+            <div class="card border-0 shadow-lg rounded-4 mb-4 hover-scale" (click)="makeBig(4)"
+              style="background-color: #E2CBF7;">
+              <div class="card-body position-relative">
+                <i class="bi bi-percent position-absolute top-50 end-0 translate-middle-y me-4"
+                  style="font-size: 2.5rem; color: #b976f7; opacity: 0.8;"></i>
+                <div class="pe-5">
+                  <h6 class="text-secondary mb-2">Estado con Menor Porcentaje</h6>
+                  <h3 class="mb-0">{{ stateWithLowestPercentage.state }} {{ stateWithLowestPercentage.percentage | number:'1.1-1' }}%</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+              </div>
       <!-- Grafico de columnas -->
       <div class="col-12" *ngIf="status === 1">
         <div class="card border-0 shadow rounded-4 h-100 w-100">
@@ -320,7 +354,7 @@
                 <h5 class="card-title text-secondary mb-1">
                   Comparación de Tipos
                 </h5>
-                <small class="text-secondary">Tipos por periodo</small>
+                <small class="text-secondary">Cantidad por tipo</small>
               </div>
               <div class="badge bg-warning px-3 py-2">
                 Total de Multas: {{ totalFines }}
@@ -414,7 +448,7 @@
                 <h5 class="card-title text-secondary mb-1">
                   Evolución de Multas
                 </h5>
-                <small class="text-secondary">Tendencia mensual</small>
+                <small class="text-secondary"></small>
               </div>
               <div class="badge bg-success px-3 py-2">
                 Promedio de multas por período:
@@ -505,6 +539,29 @@
           </div>
         </div>
       </div>
+
+      <!-- KPI Multa de Menor Monto -->
+      <div class="row">
+        <div class="col">
+          <div
+            class="card border-0 shadow-lg rounded-4 mb-4 hover-scale"
+            (click)="makeBig(2)"
+            style="background-color: #fff3cd">
+            <div class="card-body position-relative">
+              <i
+                class="bi bi-cash-stack position-absolute top-50 end-0 translate-middle-y me-4"
+                style="font-size: 2.5rem; color: #856404; opacity: 0.8"
+              ></i>
+              <div class="pe-5">
+                <h6 class="text-secondary mb-2">Multa de Menor Monto</h6>
+                <h3 class="mb-0">{{ lowestFine?.amount | currency }}</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
     </div>
 
     <!-- Gráficos -->
@@ -524,7 +581,7 @@
             </div>
             <div>
               <h5 class="card-title text-secondary mb-1">Comparación de Tipos</h5>
-              <small class="text-secondary">Evolución de Multas</small>
+              <small class="text-secondary">Cantidad por tipo</small>
             </div>
             <div class="badge bg-warning px-3 py-2">
               Total de Multas: {{ totalFines }}
@@ -595,7 +652,7 @@
                   Evolución de 
                   Multas
                 </h5>
-                <small class="text-secondary">Tendencia mensual</small>
+                <small class="text-secondary"></small>
 
               </div>
               <div class="badge bg-success px-3 py-2">

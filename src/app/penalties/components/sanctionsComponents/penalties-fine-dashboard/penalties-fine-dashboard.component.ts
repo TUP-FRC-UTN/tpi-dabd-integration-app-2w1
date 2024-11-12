@@ -40,6 +40,10 @@ export class PenaltiesFineDashboardComponent {
   finesByState: { [key: string]: number } = {};
   highestFine: Fine | null = null;
   finesByReason: { [key: string]: number } = {};
+  lowestFine: Fine | null = null;
+  finesByStatePercentage: { state: string; percentage: number }[] = [];
+  stateWithHighestPercentage: { state: string; percentage: number } = { state: '', percentage: 0 };
+  stateWithLowestPercentage: { state: string; percentage: number } = { state: '', percentage: 0 };
 
   // Datos para gráficos
   pieChartData: any[] = [];
@@ -48,7 +52,7 @@ export class PenaltiesFineDashboardComponent {
 
   // Tipos de gráficos
   pieChartType = ChartType.PieChart;
-  lineChartType = ChartType.LineChart;
+  lineChartType = ChartType.ColumnChart;
   columnChartType = ChartType.ColumnChart;
 
   // pieChartOptions = {
@@ -90,7 +94,7 @@ export class PenaltiesFineDashboardComponent {
 
   lineChartOptions = {
     backgroundColor: 'transparent',
-    colors: ['#24f73f'],
+    colors: ['#E2CBF7'],
     legend: { position: 'none' },
     chartArea: { width: '90%', height: '80%' },
     vAxis: {
@@ -376,6 +380,28 @@ export class PenaltiesFineDashboardComponent {
       acc[reason] = (acc[reason] || 0) + 1;
       return acc;
     }, {});
+
+    // Calcular porcentaje de denuncias por estado
+this.finesByStatePercentage = Object.entries(this.finesByState).map(([state, count]) => {
+  const percentage = (count / this.totalFines) * 100;
+  return { state, percentage };
+});
+
+// Encontrar el estado con el mayor porcentaje
+this.stateWithHighestPercentage = this.finesByStatePercentage.reduce((max, current) => {
+  return current.percentage > max.percentage ? current : max;
+}, { state: '', percentage: 0 });
+
+// Encontrar el estado con el menor porcentaje
+this.stateWithLowestPercentage = this.finesByStatePercentage.reduce((min, current) => {
+  return current.percentage < min.percentage ? current : min;
+}, { state: '', percentage: Infinity });
+
+// Multa de menor monto
+this.lowestFine = this.finesData.reduce((min: Fine | null, fine: Fine) => {
+  return fine.amount < (min?.amount || Infinity) ? fine : min;
+  }, null as Fine | null);
+    
   }
   
 }

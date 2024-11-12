@@ -37,6 +37,9 @@ export class PenaltiesComplaintDashboardComponent {
   complaintsByState?: { [key: string]: number };
   complaintsByReason?: { [key: string]: number };
   complaintsByUser?: { [key: number]: number };
+  complaintsByStatePercentage: { state: string; percentage: number }[] = [];
+  stateWithHighestPercentage: { state: string; percentage: number } = { state: '', percentage: 0 };
+  stateWithLowestPercentage: { state: string; percentage: number } = { state: '', percentage: 0 };
   /////////////////////////
   state = '';
   reportReason = '';
@@ -50,7 +53,7 @@ export class PenaltiesComplaintDashboardComponent {
   columnChartData: any[] = [];
 
   pieChartType = ChartType.PieChart;
-  lineChartType = ChartType.LineChart;
+  lineChartType = ChartType.ColumnChart;
   columnChartType = ChartType.ColumnChart;
   pieChartOptions = {
     backgroundColor: 'transparent',
@@ -91,7 +94,7 @@ export class PenaltiesComplaintDashboardComponent {
   // };
   lineChartOptions = {
     backgroundColor: 'transparent',
-    colors: ['#24f73f'],
+    colors: ['#E2CBF7'],
     legend: { position: 'none' },
     chartArea: { width: '90%', height: '80%' },
     vAxis: {
@@ -389,11 +392,30 @@ export class PenaltiesComplaintDashboardComponent {
     acc[complaint.userId] = (acc[complaint.userId] || 0) + 1;
     return acc;
   }, {});
+
+
+// Calcular porcentaje de denuncias por estado
+this.complaintsByStatePercentage = Object.entries(this.complaintsByState).map(([state, count]) => {
+  const percentage = (count / this.totalComplaints) * 100;
+  return { state, percentage };
+});
+
+// Encontrar el estado con el mayor porcentaje
+this.stateWithHighestPercentage = this.complaintsByStatePercentage.reduce((max, current) => {
+  return current.percentage > max.percentage ? current : max;
+}, { state: '', percentage: 0 });
+
+// Encontrar el estado con el menor porcentaje
+this.stateWithLowestPercentage = this.complaintsByStatePercentage.reduce((min, current) => {
+  return current.percentage < min.percentage ? current : min;
+}, { state: '', percentage: Infinity });
+    
 }
 // getMostFrequentUser(): number {
 //   if (!this.complaintsByUser) return 0;
 //   return Object.entries(this.complaintsByUser)
 //     .reduce((a, b) => a[1] > b[1] ? a : b)[0] as unknown as number;
 // }
-  
 }
+
+
