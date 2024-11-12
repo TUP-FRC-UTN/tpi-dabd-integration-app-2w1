@@ -1,4 +1,4 @@
-<div class="container mt-5">
+<div class="container">
   <!-- Filtors -->
   <div class="row mb-4">
     @if (status == 0) {
@@ -232,7 +232,7 @@
     <div class="container d-flex gap-3" *ngIf="status !== 0">
       <!-- Grafico de columnas -->
       <div class="col-12" *ngIf="status === 1">
-        <div class="card border-0 shadow rounded-4 h-100 w-100">
+        <div class="card border-0 shadow rounded-4">
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-4">
               <div class="back-arrow" (click)="makeBig(0)">
@@ -246,7 +246,7 @@
                 <h5 class="card-title text-secondary mb-1">
                   Comparación de Tipos
                 </h5>
-                <small class="text-secondary">tipos por periodo</small>
+                <small class="text-secondary">Tipos por periodo</small>
               </div>
               <div class="badge bg-warning px-3 py-2">Total de denuncias realizadas: {{totalComplaints}}</div>
             </div>

@@ -75,15 +75,16 @@ export class PenaltiesFineDashboardComponent {
     pieHole: 0,
     height: '80%',
     slices: {
-      0: { color: '#8A2BE2' }, // MP siempre azul
-      1: { color: '#00BFFF' }, // STRIPE siempre violeta
-      2: { color: '#FF4500' },
-      3: { color: '#32CD32' },
-      4: { color: '#666666' }, // EFECTIVO siempre verde
+      0: { color: '#FCAE7C' }, // MP siempre azul
+      1: { color: '#D1BDFF' }, // STRIPE siempre violeta
+      2: { color: '#F9FFB5' },
+      3: { color: '#D6F6FF' },
+      4: { color: '#E2CBF7' }, // EFECTIVO siempre verde
+      5: { color: '#B3F5BC' },
     },
     pieSliceTextStyle: {
       color: 'black',
-      fontSize: 14,
+      fontSize: 12,
     },
   };
 
@@ -110,7 +111,7 @@ export class PenaltiesFineDashboardComponent {
 
   columnChartOptions = {
     backgroundColor: 'transparent',
-    colors: ['#24473f', '#FF4500', '#32CD32', '#8A2BE2'],
+    colors: ['#FCAE7C', '#F9FFB5', '#E2CBF7', '#B3F5BC'],
     legend: { position: 'none' },
     chartArea: { width: '80%', height: '75%' },
     vAxis: {
@@ -126,7 +127,7 @@ export class PenaltiesFineDashboardComponent {
       easing: 'out',
       startup: true,
     },
-    height: 600,
+    height: 500,
     width: '100%',
     bar: { groupWidth: '70%' },
     title: 'Cantidad de Multas por Estado',
