@@ -11,11 +11,12 @@ import { CommonModule } from '@angular/common';
 import { State } from '@popperjs/core';
 import { ReportReason } from '../../../models/Dashboard-models';
 import { ReportReasonDto } from '../../../models/ReportReasonDTO';
+import { PenaltiesKpiComponent } from '../penalties-kpi/penalties-kpi.component';
 
 @Component({
   selector: 'app-penalties-complaint-dashboard',
   standalone: true,
-  imports: [GoogleChartsModule, FormsModule, CommonModule],
+  imports: [GoogleChartsModule, FormsModule, CommonModule, PenaltiesKpiComponent],
   templateUrl: './penalties-complaint-dashboard.component.html',
   styleUrl: './penalties-complaint-dashboard.component.scss',
 })
@@ -55,87 +56,61 @@ export class PenaltiesComplaintDashboardComponent {
   pieChartType = ChartType.PieChart;
   lineChartType = ChartType.ColumnChart;
   columnChartType = ChartType.ColumnChart;
+
+    //MODIFICADO OPTIONS
   pieChartOptions = {
-    backgroundColor: 'transparent',
-
-    legend: {
-      position: 'right',
-      textStyle: { color: '#6c757d', fontSize: 17 },
-    },
-    chartArea: { width: '100%', height: '100%' },
-    pieHole: 0,
-    height: '80%',
-    slices: {
-      0: { color: '#FCAE7C' }, // MP siempre azul
-      1: { color: '#D1BDFF' }, // STRIPE siempre violeta
-      2: { color: '#F9FFB5' },
-      3: { color: '#D6F6FF' },
-      4: { color: '#E2CBF7' }, // EFECTIVO siempre verde
-      5: { color: '#B3F5BC' },
-    },
-    pieSliceTextStyle: {
-      color: 'black',
-      fontSize: 12,
-    },
+    pieHole: 0.4,
+    chartArea: { width: '100%', height: '90%' },
+    sliceVisibilityThreshold: 0.01,
   };
 
-  // pieChartOptions = {
-  //   backgroundColor: 'transparent',
-  //   colors: ['#8A2BE2', '#00BFFF', '#FF4500', '#32CD32'],
-  //   legend: {
-  //     position: 'right',
-  //     textStyle: { color: '#000000', fontSize: 17 },
-  //   },
-  //   pieSliceText: 'none',  // Oculta los porcentajes dentro del gráfico
-  //   chartArea: { width: '80%', height: '80%' },
-  //   pieHole: 0.7,
-  //   height: '80%',
-  //   title: 'Distribución de Tipos de Multas',
-  // };
+  //MODIFICADO OPTIONS
   lineChartOptions = {
-    backgroundColor: 'transparent',
-    colors: ['#D1BDFF'],
-    legend: { position: 'none' },
-    chartArea: { width: '90%', height: '80%' },
-    vAxis: {
-      textStyle: { color: '#6c757d' },
-      title: 'Cantidad de Denuncias',
-    },
     hAxis: {
-      textStyle: { color: '#6c757d' },
-      title: 'Periodo',
+      title: 'Período',
+      slantedText: true,
+      slantedTextAngle: 45,
+      showTextEvery: 1,
+      textStyle: { fontSize: 12 },
+      minValue: 0,
     },
-    animation: {
-      duration: 1000,
-      easing: 'out',
-      startup: true,
-    },
-    title: 'Cantidad de Denuncias por Mes',
+    vAxis: { title: 'Cantidad', minValue: 0 },
+    chartArea: { width: '70%', height: '55%' },
+    legend: { position: 'right' },
+    colors: ['#4285F4', '#EA4335', '#34A853', '#FBBC05'],
+    //tooltip: { isHtml: true }
   };
 
+    //MODIFICADO OPTIONS
   columnChartOptions = {
-    backgroundColor: 'transparent',
-    colors: ['#FCAE7C', '#F9FFB5', '#E2CBF7', '#B3F5BC'], // Colores por estado
-    legend: { position: 'none' },
-    chartArea: { width: '80%', height: '75%' },
-    vAxis: {
-      textStyle: { color: '#6c757d' },
-      title: 'Cantidad',
-    },
     hAxis: {
-      textStyle: { color: '#6c757d' },
-      title: 'Estado de Denuncias',
+      title: 'Estado',
+      slantedText: true,
+      slantedTextAngle: 45,
+      showTextEvery: 1,
+      textStyle: { fontSize: 12 },
+      minValue: 0,
     },
-    animation: {
-      duration: 1000,
-      easing: 'out',
-      startup: true,
-    },
-    height: 500,
-    width: '100%',
-    bar: { groupWidth: '70%' },
-    title: 'Cantidad de Denuncias por Estado',
+    vAxis: { title: 'Cantidad', minValue: 0},
+    chartArea: { width: '70%', height: '55%' },
+    legend: { position: 'right' },
+    colors: ['#4285F4', '#EA4335', '#34A853', '#FBBC05'],
+    //tooltip: { isHtml: true }
   };
+
+  //AÑADIR
+  changeView(view: number) {
+    this.status = view;
+    if (view == 1) {
+      this.updateColumnChart();
+    }
+    if (view == 2) {
+      this.updatePieChart();
+    }
+    if (view == 3) {
+      this.updateLineChart();
+    }
+  }
 
   //constructor(private sanctionsService: SanctionsService) {}
 
