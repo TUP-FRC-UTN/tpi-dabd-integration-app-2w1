@@ -423,27 +423,29 @@
         <hr />
         <div class="row">
           <div class="col-3 gap-2 d-flex flex-column justify-content-center">
-            <app-penalties-kpi
-              [amount]="differenceInDaysResolution"
-              title="Resolución Denuncias"
-              subTitle="Días Promedio"
-              tooltip="Promedio"
-              [customStyles]="{ 'background-color': '#FFE699' }"
-              icon="bi bi-clock"
-              formatPipe=""
-            ></app-penalties-kpi>
-            <app-penalties-kpi
-              [amount]="weekWithMostComplaints.count"
-              title="Semana con más Denuncias"
-              subTitle="{{
-                weekWithMostComplaints.month.charAt(0).toUpperCase() +
-                  weekWithMostComplaints.month.slice(1)
-              }} - {{ weekWithMostComplaints.week }}ª"
-              tooltip="Semana con más Denuncias"
-              [customStyles]="{ 'background-color': '#FFCCCB' }"
-              icon="bi bi-calendar-week"
-              formatPipe=""
-            ></app-penalties-kpi>
+            <div class="col-12 m-1">
+              <app-penalties-kpi
+                [amount]="differenceInDaysResolution"
+                title="Resolución Denuncias"
+                subTitle="Días Promedio"
+                tooltip="Promedio"
+                [customStyles]="{ 'background-color': '#FFE699' }"
+                icon="bi bi-clock"
+                formatPipe=""
+              ></app-penalties-kpi>
+              <app-penalties-kpi
+                [amount]="weekWithMostComplaints.count"
+                title="Semana con más Denuncias"
+                subTitle="{{
+                  weekWithMostComplaints.month.charAt(0).toUpperCase() +
+                    weekWithMostComplaints.month.slice(1)
+                }} - {{ weekWithMostComplaints.week }}ª"
+                tooltip="Semana con más Denuncias"
+                [customStyles]="{ 'background-color': '#FFCCCB' }"
+                icon="bi bi-calendar-week"
+                formatPipe=""
+              ></app-penalties-kpi>
+            </div>
           </div>
 
           <div class="col-9">

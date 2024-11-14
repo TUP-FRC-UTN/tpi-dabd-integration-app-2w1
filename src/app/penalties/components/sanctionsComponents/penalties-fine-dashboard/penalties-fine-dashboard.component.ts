@@ -70,9 +70,9 @@ export class PenaltiesFineDashboardComponent {
      //MODIFICADO OPTIONS
      pieChartOptions = {
       pieHole: 0.4,
-      chartArea: { width: '100%', height: '90%' },
+      chartArea: { width: '100%', height: '100%' },
       sliceVisibilityThreshold: 0.01,
-      textStyle:{ fontSize: 12},
+      textStyle:{ fontSize: 9},
     };
   
     //MODIFICADO OPTIONS
@@ -105,7 +105,7 @@ export class PenaltiesFineDashboardComponent {
       vAxis: { title: 'Cantidad', minValue: 0},
       chartArea: { width: '70%', height: '55%' },
       legend: { position: 'right' },
-      colors: ['#4285F4', '#EA4335', '#34A853', '#FBBC05'],
+      colors: ['#4285F4', '#EA4335', '#34A853', '#FBBC05', '#FF5733', '#C70039', '#900C3F', '#581845'],
       //tooltip: { isHtml: true }
     };
   
@@ -457,5 +457,5 @@ this.lowestFine = this.finesData.reduce((min: Fine | null, fine: Fine) => {
     
   }
 
-  
+
 
