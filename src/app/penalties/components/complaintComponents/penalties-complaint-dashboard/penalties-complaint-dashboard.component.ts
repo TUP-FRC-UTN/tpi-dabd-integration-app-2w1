@@ -12,6 +12,7 @@ import { State } from '@popperjs/core';
 import { ReportReason } from '../../../models/Dashboard-models';
 import { ReportReasonDto } from '../../../models/ReportReasonDTO';
 import { PenaltiesKpiComponent } from '../penalties-kpi/penalties-kpi.component';
+import { textShadow } from 'html2canvas/dist/types/css/property-descriptors/text-shadow';
 
 @Component({
   selector: 'app-penalties-complaint-dashboard',
@@ -65,8 +66,9 @@ export class PenaltiesComplaintDashboardComponent {
     //MODIFICADO OPTIONS
   pieChartOptions = {
     pieHole: 0.4,
-    chartArea: { width: '100%', height: '90%' },
+    chartArea: { width: '100%', height: '100%' },
     sliceVisibilityThreshold: 0.01,
+    textStyle: { fontSize: 4 },
   };
 
   //MODIFICADO OPTIONS
