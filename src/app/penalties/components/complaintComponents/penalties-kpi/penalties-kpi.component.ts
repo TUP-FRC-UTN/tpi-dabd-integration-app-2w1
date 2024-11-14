@@ -13,6 +13,7 @@ export class PenaltiesKpiComponent{
   constructor() { }
 
   @Input() amount : number =0
+  @Input() amountundefined : number| undefined =0
   @Input() title : string =''
   @Input() subTitle: string=''
   @Input() tooltip: string=''

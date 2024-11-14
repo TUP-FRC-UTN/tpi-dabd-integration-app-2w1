@@ -13,11 +13,12 @@ import { textShadow } from 'html2canvas/dist/types/css/property-descriptors/text
 import { ReportReasonDto } from '../../../models/ReportReasonDTO';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PenaltiesModalFineComponent } from '../modals/penalties-get-fine-modal/penalties-get-fine-modal.component';
+import { PenaltiesKpiComponent } from '../../complaintComponents/penalties-kpi/penalties-kpi.component';
 
 @Component({
   selector: 'app-penalties-fine-dashboard',
   standalone: true,
-  imports: [GoogleChartsModule, CommonModule, FormsModule],
+  imports: [GoogleChartsModule, CommonModule, FormsModule,PenaltiesKpiComponent],
   templateUrl: './penalties-fine-dashboard.component.html',
   styleUrl: './penalties-fine-dashboard.component.scss',
 })
@@ -62,74 +63,60 @@ export class PenaltiesFineDashboardComponent {
   columnChartType = ChartType.ColumnChart;
 
   
-  pieChartOptions = {
-    backgroundColor: 'transparent',
-
-    legend: {
-      position: 'right',
-      textStyle: { color: '#6c757d', fontSize: 17 },
-    },
-    chartArea: { width: '100%', height: '100%' },
-    pieHole: 0,
-    height: '80%',
-    slices: {
-      0: { color: '#FCAE7C' }, // MP siempre azul
-      1: { color: '#D1BDFF' }, // STRIPE siempre violeta
-      2: { color: '#F9FFB5' },
-      3: { color: '#D6F6FF' },
-      4: { color: '#E2CBF7' }, // EFECTIVO siempre verde
-      5: { color: '#B3F5BC' },
-    },
-    pieSliceTextStyle: {
-      color: 'black',
-      fontSize: 12,
-    },
-  };
-
-  lineChartOptions = {
-    backgroundColor: 'transparent',
-    colors: ['#D1BDFF'],
-    legend: { position: 'none' },
-    chartArea: { width: '90%', height: '80%' },
-    vAxis: {
-      textStyle: { color: '#6c757d' },
-      title: 'Cantidad de Multas',
-    },
-    hAxis: {
-      textStyle: { color: '#6c757d' },
-      title: 'Mes',
-    },
-    animation: {
-      duration: 1000,
-      easing: 'out',
-      startup: true,
-    },
-    title: 'Cantidad de Multas por Mes',
-  };
-
-  columnChartOptions = {
-    backgroundColor: 'transparent',
-    colors: ['#FCAE7C', '#F9FFB5', '#E2CBF7', '#B3F5BC'],
-    legend: { position: 'none' },
-    chartArea: { width: '80%', height: '75%' },
-    vAxis: {
-      textStyle: { color: '#6c757d' },
-      title: 'Cantidad',
-    },
-    hAxis: {
-      textStyle: { color: '#6c757d' },
-      title: 'Estado de Multas',
-    },
-    animation: {
-      duration: 1000,
-      easing: 'out',
-      startup: true,
-    },
-    height: 500,
-    width: '100%',
-    bar: { groupWidth: '70%' },
-    title: 'Cantidad de Multas por Estado',
-  };
+     //MODIFICADO OPTIONS
+     pieChartOptions = {
+      pieHole: 0.4,
+      chartArea: { width: '100%', height: '90%' },
+      sliceVisibilityThreshold: 0.01,
+    };
+  
+    //MODIFICADO OPTIONS
+    lineChartOptions = {
+      hAxis: {
+        title: 'Período',
+        slantedText: true,
+        slantedTextAngle: 45,
+        showTextEvery: 1,
+        textStyle: { fontSize: 12 },
+        minValue: 0,
+      },
+      vAxis: { title: 'Cantidad', minValue: 0 }, // Asegurarse de que el valor mínimo sea 0
+      chartArea: { width: '70%', height: '55%' },
+      legend: { position: 'right' },
+      colors: ['#4285F4', '#EA4335', '#34A853', '#FBBC05'],
+      //tooltip: { isHtml: true }
+    };
+  
+      //MODIFICADO OPTIONS
+    columnChartOptions = {
+      hAxis: {
+        title: 'Estado',
+        slantedText: true,
+        slantedTextAngle: 45,
+        showTextEvery: 1,
+        textStyle: { fontSize: 12 },
+        minValue: 0,
+      },
+      vAxis: { title: 'Cantidad', minValue: 0},
+      chartArea: { width: '70%', height: '55%' },
+      legend: { position: 'right' },
+      colors: ['#4285F4', '#EA4335', '#34A853', '#FBBC05'],
+      //tooltip: { isHtml: true }
+    };
+  
+    //AÑADIR
+    changeView(view: number) {
+      this.status = view;
+      if (view == 1) {
+        this.updateColumnChart();
+      }
+      if (view == 2) {
+        this.updatePieChart();
+      }
+      if (view == 3) {
+        this.updateLineChart();
+      }
+    }
 
   ngOnInit() {
     this.updateCharts();
@@ -172,7 +159,7 @@ export class PenaltiesFineDashboardComponent {
     return this.getCurrentYearMonth();
   }
 
-  private getCurrentYearMonth(): string {
+  getCurrentYearMonth(): string {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(
       2,
@@ -180,7 +167,7 @@ export class PenaltiesFineDashboardComponent {
     )}`;
   }
 
-  private getDefaultFromDate(): string {
+  getDefaultFromDate(): string {
     const date = new Date();
     date.setMonth(date.getMonth() - 6);
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
@@ -385,7 +372,9 @@ export class PenaltiesFineDashboardComponent {
     // Multa de mayor monto
     this.highestFine = this.finesData.reduce((max: Fine | null, fine: Fine) => {
       return fine.amount > (max?.amount || 0) ? fine : max;
+      
     }, null as Fine | null);
+    console.log("la multa",this.highestFine?.amount)
   
     // Distribución de multas por estado
     this.finesByState = this.finesData.reduce((acc: { [key: string]: number }, fine) => {
