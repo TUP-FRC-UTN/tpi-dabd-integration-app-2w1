@@ -30,7 +30,7 @@ export class PenaltiesFineDashboardComponent {
   finesData: Fine[] = [];
   status: number = 0;
   periodFrom: string = this.getDefaultFromDate();
-  periodTo: string = this.getCurrentYearMonth();
+  periodTo: string = this.getCurrentDate();
   constructor(
     private _modal: NgbModal) {}
 
@@ -168,33 +168,27 @@ export class PenaltiesFineDashboardComponent {
     return new Date(dateArray[0], dateArray[1] - 1, dateArray[2]);
   }
 
-  get currentYearMonth(): string {
-    return this.getCurrentYearMonth();
-  }
+  // get currentYearMonth(): string {
+  //   return this.getCurrentYearMonth();
+  // }
 
-  getCurrentYearMonth(): string {
+  getCurrentDate(): string {
     const now = new Date();
-    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(
-      2,
-      '0'
-    )}`;
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   }
 
   getDefaultFromDate(): string {
     const date = new Date();
-    date.setMonth(date.getMonth() - 6);
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-      2,
-      '0'
-    )}`;
+    date.setDate(date.getDate() - 30); // Cambiar a 30 días atrás
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   }
 
   private updateCharts() {
     this.sanctionsService.getAllFines().subscribe({
       next: (fines: Fine[]) => {
-        const fromDate = new Date(this.periodFrom + '-01');
-        const toDate = new Date(this.periodTo + '-01');
-        toDate.setMonth(toDate.getMonth() + 1);
+        const fromDate = new Date(this.periodFrom);
+        const toDate = new Date(this.periodTo);
+        toDate.setDate(toDate.getDate() + 1);
 
         // Filtrar multas por rango de fecha
         this.finesData = fines.filter((fine) => {
@@ -252,37 +246,37 @@ export class PenaltiesFineDashboardComponent {
   private updateLineChart() {
     console.log(this.reportReason2)
     if(this.reportReason2 == ""){
-    const fromDate = new Date(this.periodFrom + '-01');
-    const toDate = new Date(this.periodTo + '-01');
-    toDate.setMonth(toDate.getMonth() + 1);
-
-    const finesByMonth: { [key: string]: number } = {};
-
-    this.finesData.forEach((fine) => {
-      const fineDate = new Date(fine.createdDate);
-      const monthKey = fineDate.toLocaleString('default', {
-        month: 'short',
-        year: 'numeric',
+      const fromDate = new Date(this.periodFrom);
+      const toDate = new Date(this.periodTo);
+      toDate.setMonth(toDate.getMonth() + 1);
+  
+      const finesByMonth: { [key: string]: number } = {};
+  
+      this.finesData.forEach((fine) => {
+        const fineDate = new Date(fine.createdDate);
+        const monthKey = fineDate.toLocaleString('default', {
+          month: 'short',
+          year: 'numeric',
+        });
+        finesByMonth[monthKey] = (finesByMonth[monthKey] || 0) + 1;
       });
-      finesByMonth[monthKey] = (finesByMonth[monthKey] || 0) + 1;
-    });
-
-    const lineChartData = [];
-    let currentDate = new Date(fromDate);
-
-    while (currentDate < toDate) {
-      const monthLabel = currentDate.toLocaleString('default', {
-        month: 'short',
-        year: 'numeric',
-      });
-      lineChartData.push([monthLabel, finesByMonth[monthLabel] || 0]);
-      currentDate.setMonth(currentDate.getMonth() + 1);
-    }
-    this.lineChartData = lineChartData;
+  
+      const lineChartData = [];
+      let currentDate = new Date(fromDate);
+  
+      while (currentDate < toDate) {
+        const monthLabel = currentDate.toLocaleString('default', {
+          month: 'short',
+          year: 'numeric',
+        });
+        lineChartData.push([monthLabel, finesByMonth[monthLabel] || 0]);
+        currentDate.setMonth(currentDate.getMonth() + 1);
+      }
+      this.lineChartData = lineChartData;
     }
     else{
-      const fromDate = new Date(this.periodFrom + '-01');
-      const toDate = new Date(this.periodTo + '-01');
+      const fromDate = new Date(this.periodFrom);
+      const toDate = new Date(this.periodTo);
       toDate.setMonth(toDate.getMonth() + 1);
     
       const filteredFines = this.reportReason2

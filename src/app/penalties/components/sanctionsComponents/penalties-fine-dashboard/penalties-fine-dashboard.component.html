@@ -7,7 +7,7 @@
       <div class="col">
         <div class="input-group">
           <input
-            type="month"
+            type="date"
             (ngModelChange)="applyFilters()"
             class="form-control border-0 bg-light"
             [(ngModel)]="periodFrom"
@@ -18,12 +18,12 @@
       <div class="col-md-6">
         <div class="input-group">
           <input
-            type="month"
+            type="date"
             (ngModelChange)="applyFilters()"
             class="form-control border-0 bg-light"
             [(ngModel)]="periodTo"
             [min]="periodFrom"
-            [max]="getCurrentYearMonth()"
+            [max]="getCurrentDate()"
           />
         </div>
       </div>
@@ -41,7 +41,7 @@
         <div class="input-group">
           <input
             (ngModelChange)="applyFilters()"
-            type="month"
+            type="date"
             class="form-control border-0 bg-light"
             [(ngModel)]="periodFrom"
             [max]="periodTo"
@@ -52,11 +52,11 @@
         <div class="input-group">
           <input
             (ngModelChange)="applyFilters()"
-            type="month"
+            type="date"
             class="form-control border-0 bg-light"
             [(ngModel)]="periodTo"
             [min]="periodFrom"
-            [max]="getCurrentYearMonth()"
+            [max]="getCurrentDate()"
           />
         </div>
       </div>
@@ -80,7 +80,7 @@
         <div class="input-group">
           <input
             (ngModelChange)="applyFilters()"
-            type="month"
+            type="date"
             class="form-control border-0 bg-light"
             [(ngModel)]="periodFrom"
             [max]="periodTo"
@@ -91,11 +91,11 @@
         <div class="input-group">
           <input
             (ngModelChange)="applyFilters()"
-            type="month"
+            type="date"
             class="form-control border-0 bg-light"
             [(ngModel)]="periodTo"
             [min]="periodFrom"
-            [max]="getCurrentYearMonth()"
+            [max]="getCurrentDate()"
           />
         </div>
       </div>
@@ -117,7 +117,7 @@
         <div class="input-group">
           <input
             (ngModelChange)="applyFilters()"
-            type="month"
+            type="date"
             class="form-control border-0 bg-light"
             [(ngModel)]="periodFrom"
             [max]="periodTo"
@@ -128,11 +128,11 @@
         <div class="input-group">
           <input
             (ngModelChange)="applyFilters()"
-            type="month"
+            type="date"
             class="form-control border-0 bg-light"
             [(ngModel)]="periodTo"
             [min]="periodFrom"
-            [max]="getCurrentYearMonth()"
+            [max]="getCurrentDate()"
           />
         </div>
       </div>

@@ -124,19 +124,13 @@ export class PenaltiesComplaintDashboardComponent {
 
   getCurrentYearMonth(): string {
     const now = new Date();
-    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(
-      2,
-      '0'
-    )}`;
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   }
 
   getDefaultFromDate(): string {
     const date = new Date();
     date.setMonth(date.getMonth() - 6);
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-      2,
-      '0'
-    )}`;
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   }
 
   ngOnInit() {
@@ -208,19 +202,16 @@ export class PenaltiesComplaintDashboardComponent {
 
   private updateLineChart() {
     if (this.reportReason2 == '') {
-      const fromDate = new Date(this.periodFrom + '-01');
-      const toDate = new Date(this.periodTo + '-01');
-      toDate.setMonth(toDate.getMonth() + 1);
+      const fromDate = new Date(this.periodFrom);
+      const toDate = new Date(this.periodTo);
+      toDate.setDate(toDate.getDate() + 1);
       const complaintsInRange = this.complaintsData.filter((complaint) => {
         const complaintDate = new Date(complaint.createdDate);
         return complaintDate >= fromDate && complaintDate < toDate;
       });
       const complaintsByMonth = complaintsInRange.reduce(
         (acc: any, complaint) => {
-          const month = new Date(complaint.createdDate).toLocaleString(
-            'default',
-            { month: 'short', year: 'numeric' }
-          );
+          const month = new Date(complaint.createdDate).toLocaleString('default', { month: 'short', year: 'numeric' });
           acc[month] = (acc[month] || 0) + 1;
           return acc;
         },
@@ -229,19 +220,16 @@ export class PenaltiesComplaintDashboardComponent {
       const lineChartData = [];
       let currentDate = new Date(fromDate);
       while (currentDate < toDate) {
-        const monthLabel = currentDate.toLocaleString('default', {
-          month: 'short',
-          year: 'numeric',
-        });
-        lineChartData.push([monthLabel, complaintsByMonth[monthLabel] || 0]); // 0 si no hay denuncias en ese mes
-        currentDate.setMonth(currentDate.getMonth() + 1); // Avanzar al siguiente mes
+        const monthLabel = currentDate.toLocaleString('default', { month: 'short', year: 'numeric' });
+        lineChartData.push([monthLabel, complaintsByMonth[monthLabel] || 0]);
+        currentDate.setMonth(currentDate.getMonth() + 1);
       }
 
       this.lineChartData = lineChartData;
     } else {
-      const fromDate = new Date(this.periodFrom + '-01');
-      const toDate = new Date(this.periodTo + '-01');
-      toDate.setMonth(toDate.getMonth() + 1);
+      const fromDate = new Date(this.periodFrom);
+      const toDate = new Date(this.periodTo);
+      toDate.setDate(toDate.getDate() + 1);
       const complaintsInRange = this.complaintsData.filter((complaint) => {
         const complaintDate = new Date(complaint.createdDate);
         const isWithinDateRange =
@@ -253,10 +241,7 @@ export class PenaltiesComplaintDashboardComponent {
       });
       const complaintsByMonth = complaintsInRange.reduce(
         (acc: any, complaint) => {
-          const month = new Date(complaint.createdDate).toLocaleString(
-            'default',
-            { month: 'short', year: 'numeric' }
-          );
+          const month = new Date(complaint.createdDate).toLocaleString('default', { month: 'short', year: 'numeric' });
           acc[month] = (acc[month] || 0) + 1;
           return acc;
         },
@@ -265,10 +250,7 @@ export class PenaltiesComplaintDashboardComponent {
       const lineChartData = [];
       let currentDate = new Date(fromDate);
       while (currentDate < toDate) {
-        const monthLabel = currentDate.toLocaleString('default', {
-          month: 'short',
-          year: 'numeric',
-        });
+        const monthLabel = currentDate.toLocaleString('default', { month: 'short', year: 'numeric' });
         lineChartData.push([monthLabel, complaintsByMonth[monthLabel] || 0]);
         currentDate.setMonth(currentDate.getMonth() + 1);
       }
@@ -315,9 +297,9 @@ export class PenaltiesComplaintDashboardComponent {
   updateCharts() {
     this.sanctionsService.getAllComplaints().subscribe({
       next: (complaints) => {
-        const fromDate = new Date(this.periodFrom + '-01');
-        const toDate = new Date(this.periodTo + '-01');
-        toDate.setMonth(toDate.getMonth() + 1);
+        const fromDate = new Date(this.periodFrom);
+        const toDate = new Date(this.periodTo);
+        toDate.setDate(toDate.getDate() + 1);
         this.complaintsData = complaints.filter((complaint) => {
           const complaintDate = new Date(complaint.createdDate);
           return complaintDate >= fromDate && complaintDate < toDate;
