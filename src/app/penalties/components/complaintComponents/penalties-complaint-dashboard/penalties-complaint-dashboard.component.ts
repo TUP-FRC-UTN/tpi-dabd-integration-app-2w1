@@ -391,15 +391,46 @@ export class PenaltiesComplaintDashboardComponent {
     }, { state: '', percentage: Infinity });
 
 // Calcular promedio de días de resolución de denuncias
-// const totalDaysResolution = this.complaintsData.reduce((totalDays, complaint) => {
-//   const createdDate = new Date((complaint.createdDate as unknown as string).replace(" ", "T"));
-//   const lastUpdatedDate = new Date((complaint.lastUpdatedDate as unknown as string).replace(" ", "T"));
-  
-//   const differenceInDays = (lastUpdatedDate.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24);
-//   return totalDays + differenceInDays;
-// }, 0);
+const totalDaysResolution = this.complaintsData.reduce((totalDays, complaint) => {
+  // Obtener las fechas en formato de cadena
+  const createdDateStr = complaint.createdDate as unknown as string;
+  const lastUpdatedDateStr = complaint.lastUpdatedDate as unknown as string;
 
-// this.differenceInDaysResolution = totalDaysResolution / this.totalComplaints;
+  // Verificar que ambas fechas no sean nulas o indefinidas
+  if (createdDateStr && lastUpdatedDateStr) {
+    // Reemplazar el espacio por 'T' para formar un formato ISO adecuado
+    const createdDateFormatted = createdDateStr.replace(" ", "T");
+    const lastUpdatedDateFormatted = lastUpdatedDateStr.replace(" ", "T");
+
+    // Crear objetos Date
+    const createdDate = new Date(createdDateFormatted);
+    const lastUpdatedDate = new Date(lastUpdatedDateFormatted);
+
+    // Verificar si las fechas son válidas
+    if (isNaN(createdDate.getTime()) || isNaN(lastUpdatedDate.getTime())) {
+      console.error('Fecha inválida:', createdDateFormatted, lastUpdatedDateFormatted);
+      return totalDays;  // Si alguna de las fechas es inválida, retornamos el total sin cambios
+    }
+
+    // Calcular la diferencia en días
+    const differenceInDays = (lastUpdatedDate.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24);
+    
+    // Depurar los valores
+    console.log('Días de diferencia:', differenceInDays, createdDateFormatted, lastUpdatedDateFormatted);
+    
+    return totalDays + differenceInDays;
+  } else {
+    // Si alguna de las fechas es nula o indefinida, no calculamos la diferencia
+    console.error('Datos de fecha inválidos:', createdDateStr, lastUpdatedDateStr);
+    return totalDays;
+  }
+}, 0);
+
+// Calcular el promedio de días de resolución
+this.differenceInDaysResolution = totalDaysResolution / this.totalComplaints;
+
+console.log('Promedio de días de resolución:', this.differenceInDaysResolution);
+
 
 
 // Calcular día de la semana con más denuncias
