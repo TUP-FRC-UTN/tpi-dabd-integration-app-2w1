@@ -391,15 +391,15 @@ export class PenaltiesComplaintDashboardComponent {
     }, { state: '', percentage: Infinity });
 
 // Calcular promedio de días de resolución de denuncias
-const totalDaysResolution = this.complaintsData.reduce((totalDays, complaint) => {
-  const createdDate = new Date((complaint.createdDate as unknown as string).replace(" ", "T"));
-  const lastUpdatedDate = new Date((complaint.lastUpdatedDate as unknown as string).replace(" ", "T"));
+// const totalDaysResolution = this.complaintsData.reduce((totalDays, complaint) => {
+//   const createdDate = new Date((complaint.createdDate as unknown as string).replace(" ", "T"));
+//   const lastUpdatedDate = new Date((complaint.lastUpdatedDate as unknown as string).replace(" ", "T"));
   
-  const differenceInDays = (lastUpdatedDate.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24);
-  return totalDays + differenceInDays;
-}, 0);
+//   const differenceInDays = (lastUpdatedDate.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24);
+//   return totalDays + differenceInDays;
+// }, 0);
 
-this.differenceInDaysResolution = totalDaysResolution / this.totalComplaints;
+// this.differenceInDaysResolution = totalDaysResolution / this.totalComplaints;
 
 
 // Calcular día de la semana con más denuncias

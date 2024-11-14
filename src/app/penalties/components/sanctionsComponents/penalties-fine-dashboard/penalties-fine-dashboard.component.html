@@ -116,18 +116,6 @@
         [customStyles]="{ 'background-color': '#FFE699' }" icon="bi bi-calendar-day" formatPipe="currency"></app-penalties-kpi>
       <app-penalties-kpi [amountundefined]="lowestFine?.amount" title="Multa más baja" subTitle="Periodo" tooltip="Total del Periodo"
         [customStyles]="{ 'background-color': '#FFE699' }" icon="bi bi-calendar-day" formatPipe="currency"></app-penalties-kpi>
-      <div class="row justify-content-center text-center align-items-center">
-        <div class="col-8 mb-1">
-          <app-penalties-kpi [amount]="paidFinesCount" title="Multas Pagadas" subTitle="Periodo" tooltip="Total del Periodo"
-            [customStyles]="{ 'background-color': '#D6F6FF' }" icon="bi bi-check-circle" formatPipe=""></app-penalties-kpi>
-        </div>
-      </div>
-      <div class="row justify-content-center text-center align-items-center">
-        <div class="col-8 mb-1">
-          <app-penalties-kpi [amount]="pendingFinesCount" title="Multas Pendientes de Pago" subTitle="Periodo" tooltip="Total del Periodo"
-            [customStyles]="{ 'background-color': '#FFE699' }" icon="bi bi-exclamation-circle" formatPipe=""></app-penalties-kpi>
-        </div>
-      </div>
     </div>
     <div class="col-10">
       <!-- Graficos chicos (pie, lines, list)-->
@@ -209,27 +197,20 @@
               (click)="changeView(0)"></button></h4>
           <hr>
           <div class="row">
-            <div class="col-4">
-              <div class="row justify-content-center text-center align-items-center">
-                <div class="row justify-content-center text-center align-items-center">
-                  <div class="col-8 mb-1">
+            <div class="col-3 gap-2 d-flex flex-column justify-content-center">
+              
                     <app-penalties-kpi [amount]="stateWithHighestPercentage.percentage" title="Estado Mayor"
                       [subTitle]="stateWithHighestPercentage.state" tooltip="Total del Periodo"
                       [customStyles]="{ 'background-color': '#D6F6FF' }" icon="bi bi-percent"
                       formatPipe="percent"></app-penalties-kpi>
-                  </div>
-                </div>
-                <div class="row justify-content-center text-center align-items-center">
-                  <div class="col-8 mb-1">
+                  
                     <app-penalties-kpi [amount]="stateWithLowestPercentage.percentage" title="Estado Menor"
                       [subTitle]="stateWithLowestPercentage.state" tooltip="Total del Periodo"
                       [customStyles]="{ 'background-color': '#FFE699' }" icon="bi bi-percent"
                       formatPipe="percent"></app-penalties-kpi>
-                  </div>
-                </div>
-              </div>
+                  
             </div>
-            <div class="col-8">
+            <div class="col-9">
               <div class="row flex-grow-1 d-flex justify-content-center align-items-center mt-1 h-100">
                 @if(columnChartData.length > 0){
                 <google-chart [type]="columnChartType" [data]="columnChartData" [options]="columnChartOptions"
@@ -258,29 +239,22 @@
               (click)="changeView(0)"></button></h4>
           <hr>
           <div class="row">
-            <div class="col-6">
-              <div class="row justify-content-center text-center align-items-center">
-                <div class="row justify-content-center text-center align-items-center">
-                  <div class="row justify-content-center text-center align-items-center">
-                    <div class="col-8 mb-1">
+            <div class="col-3 gap-2 d-flex flex-column justify-content-center">
                       <app-penalties-kpi [amount]="stateWithHighestPercentage.percentage" title="Estado Mayor"
                         [subTitle]="stateWithHighestPercentage.state" tooltip="Total del Periodo"
                         [customStyles]="{ 'background-color': '#D6F6FF' }" icon="bi bi-percent"
                         formatPipe="percent"></app-penalties-kpi>
-                    </div>
-                  </div>
-                  <div class="row justify-content-center text-center align-items-center">
-                    <div class="col-8 mb-1">
+                    
+                  
                       <app-penalties-kpi [amount]="stateWithHighestPercentage.percentage" title="Estado Mayor"
                         [subTitle]="stateWithHighestPercentage.state" tooltip="Total del Periodo"
                         [customStyles]="{ 'background-color': '#D6F6FF' }" icon="bi bi-percent"
                         formatPipe="percent"></app-penalties-kpi>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                    
+              
             </div>
-            <div class="col-6">
+            <div class="col-2"></div>
+            <div class="col-7">
               <div class="row flex-grow-1 d-flex justify-content-center align-items-center mt-1 h-100">
                 @if(pieChartData.length > 0){
                 <google-chart [type]="pieChartType" [data]="pieChartData" [options]="pieChartOptions"
@@ -310,18 +284,13 @@
         <div class="row">
           <div class="col-3 gap-2 d-flex flex-column justify-content-center">
             <!-- KPI Placeholder -->
-            <div class="row justify-content-center text-center align-items-center">
-              <div class="col-8 mb-1">
+
                 <app-penalties-kpi [amount]="paidFinesCount" title="Multas Pagadas" subTitle="Periodo" tooltip="Total del Periodo"
                   [customStyles]="{ 'background-color': '#D6F6FF' }" icon="bi bi-check-circle" formatPipe=""></app-penalties-kpi>
-              </div>
-            </div>
-            <div class="row justify-content-center text-center align-items-center">
-              <div class="col-8 mb-1">
+
                 <app-penalties-kpi [amount]="pendingFinesCount" title="Multas Pendientes de Pago" subTitle="Periodo" tooltip="Total del Periodo"
                   [customStyles]="{ 'background-color': '#FFE699' }" icon="bi bi-exclamation-circle" formatPipe=""></app-penalties-kpi>
-              </div>
-            </div>
+
           </div>
           <div class="col-9">
             <!-- Graficos Grande (stonk, column) -->
