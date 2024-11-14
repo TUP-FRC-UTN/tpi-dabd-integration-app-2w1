@@ -44,6 +44,8 @@ export class PenaltiesComplaintDashboardComponent {
   stateWithLowestPercentage: { state: string; percentage: number } = { state: '', percentage: 0 };
   dayWithMostComplaints: { day: number; count: number; } = { day: 0, count: 0 }
   dayWithMostComplaintsName: string = "";
+  dayWithLeastComplaints: { day: number; count: number; } = { day: 0, count: 0 }
+  dayWithLeastComplaintsName: string = "";
   /////////////////////////
   state = '';
   reportReason = '';
@@ -418,6 +420,13 @@ this.dayWithMostComplaints = Object.entries(complaintsByDayOfWeek).reduce((max, 
 const daysOfWeek = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 this.dayWithMostComplaintsName = daysOfWeek[this.dayWithMostComplaints.day];
     
+// Determinar el día con el menor número de denuncias
+this.dayWithLeastComplaints = Object.entries(complaintsByDayOfWeek).reduce((min, [day, count]) => {
+  return count < min.count ? { day: Number(day), count } : min;
+}, { day: -1, count: Infinity }); // Inicializamos con Infinity para asegurar que cualquier número será menor
+
+// Para mostrar el nombre del día con la menor cantidad de denuncias
+this.dayWithLeastComplaintsName = daysOfWeek[this.dayWithLeastComplaints.day];
 
   }
 
