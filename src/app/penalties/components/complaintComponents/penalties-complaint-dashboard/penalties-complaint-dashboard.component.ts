@@ -47,6 +47,7 @@ export class PenaltiesComplaintDashboardComponent {
   dayWithMostComplaintsName: string = "";
   dayWithLeastComplaints: { day: number; count: number; } = { day: 0, count: 0 }
   dayWithLeastComplaintsName: string = "";
+  weekWithMostComplaints: { week: number; month: string; count: number } = { week: 0, month: '', count: 0 };
   /////////////////////////
   state = '';
   reportReason = '';
@@ -68,7 +69,7 @@ export class PenaltiesComplaintDashboardComponent {
     pieHole: 0.4,
     chartArea: { width: '100%', height: '100%' },
     sliceVisibilityThreshold: 0.01,
-    textStyle: { fontSize: 4 },
+    textStyle: { fontSize:11 },
   };
 
   //MODIFICADO OPTIONS
@@ -461,6 +462,34 @@ this.dayWithLeastComplaints = Object.entries(complaintsByDayOfWeek).reduce((min,
 // Para mostrar el nombre del día con la menor cantidad de denuncias
 this.dayWithLeastComplaintsName = daysOfWeek[this.dayWithLeastComplaints.day];
 
+  // Calcular semana con más denuncias
+  const complaintsByWeek = this.complaintsData.reduce((acc: { [key: string]: number }, complaint) => {
+    const complaintDate = new Date((complaint.createdDate as unknown as string).replace(" ", "T"));
+    const weekNumber = this.getWeekNumberInMonth(complaintDate);
+    const month = complaintDate.toLocaleString('default', { month: 'long' });
+    const key = `${month} - Semana ${weekNumber}`;
+    acc[key] = (acc[key] || 0) + 1;
+    return acc;
+  }, {});
+
+  const maxWeek = Object.entries(complaintsByWeek).reduce((max, [week, count]) => {
+    return count > max.count ? { week, count } : max;
+  }, { week: '', count: 0 });
+
+  const [month, week] = maxWeek.week.split(' - Semana ');
+  this.weekWithMostComplaints = { week: Number(week), month, count: maxWeek.count };
+  }
+
+  private getWeekNumber(date: Date): number {
+    const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
+    const pastDaysOfYear = (date.getTime() - firstDayOfYear.getTime()) / 86400000;
+    return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+  }
+
+  private getWeekNumberInMonth(date: Date): number {
+    const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+    const pastDaysOfMonth = (date.getTime() - firstDayOfMonth.getTime()) / 86400000;
+    return Math.ceil((pastDaysOfMonth + firstDayOfMonth.getDay() + 1) / 7);
   }
 
   // getMostFrequentUser(): number {

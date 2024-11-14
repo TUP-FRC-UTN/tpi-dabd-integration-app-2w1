@@ -386,23 +386,23 @@
           <div class="row">
             <div class="col-3 gap-2 d-flex flex-column justify-content-center">
               <app-penalties-kpi
-                [amount]="stateWithHighestPercentage.percentage"
-                title="Estado Mayor"
-                [subTitle]="stateWithHighestPercentage.state"
-                tooltip="Total del Periodo"
-                [customStyles]="{ 'background-color': '#D6F6FF' }"
-                icon="bi bi-percent"
-                formatPipe="percent"
+                [amount]="0"
+                title="Mayor Cantidad"
+                [subTitle]="dayWithMostComplaintsName"
+                tooltip="Promedio"
+                [customStyles]="{ 'background-color': '#E2CBF7' }"
+                icon="bi bi-clock"
+                formatPipe=""
               ></app-penalties-kpi>
 
               <app-penalties-kpi
-                [amount]="stateWithHighestPercentage.percentage"
-                title="Estado Mayor"
-                [subTitle]="stateWithHighestPercentage.state"
-                tooltip="Total del Periodo"
-                [customStyles]="{ 'background-color': '#D6F6FF' }"
-                icon="bi bi-percent"
-                formatPipe="percent"
+                [amount]="0"
+                title="Menor Cantidad"
+                [subTitle]="dayWithLeastComplaintsName"
+                tooltip="Promedio"
+                [customStyles]="{ 'background-color': '#F9FFB5' }"
+                icon="bi bi-clock"
+                formatPipe=""
               ></app-penalties-kpi>
             </div>
             <div class="col-2"></div>

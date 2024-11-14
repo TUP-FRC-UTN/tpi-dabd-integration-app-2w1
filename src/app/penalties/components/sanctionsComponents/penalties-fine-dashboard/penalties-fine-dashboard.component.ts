@@ -14,6 +14,7 @@ import { ReportReasonDto } from '../../../models/ReportReasonDTO';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PenaltiesModalFineComponent } from '../modals/penalties-get-fine-modal/penalties-get-fine-modal.component';
 import { PenaltiesKpiComponent } from '../../complaintComponents/penalties-kpi/penalties-kpi.component';
+import { fontWeight } from 'html2canvas/dist/types/css/property-descriptors/font-weight';
 
 @Component({
   selector: 'app-penalties-fine-dashboard',
@@ -51,7 +52,10 @@ export class PenaltiesFineDashboardComponent {
   stateWithLowestPercentage: { state: string; percentage: number } = { state: '', percentage: 0 };
   paidFinesCount: any;
   pendingFinesCount: any;
-
+  dayWithMostComplaints: { day: number; count: number; } = { day: 0, count: 0 }
+  dayWithMostComplaintsName: string = "";
+  dayWithLeastComplaints: { day: number; count: number; } = { day: 0, count: 0 }
+  dayWithLeastComplaintsName: string = "";
   // Datos para gráficos
   pieChartData: any[] = [];
   lineChartData: any[] = [];
@@ -68,6 +72,7 @@ export class PenaltiesFineDashboardComponent {
       pieHole: 0.4,
       chartArea: { width: '100%', height: '90%' },
       sliceVisibilityThreshold: 0.01,
+      textStyle:{ fontSize: 6},
     };
   
     //MODIFICADO OPTIONS
@@ -422,9 +427,35 @@ this.stateWithLowestPercentage = this.finesByStatePercentage.reduce((min, curren
 this.lowestFine = this.finesData.reduce((min: Fine | null, fine: Fine) => {
   return fine.amount < (min?.amount || Infinity) ? fine : min;
   }, null as Fine | null);
-
+  const complaintsByDayOfWeek = this.finesData.reduce((acc: { [key: number]: number }, complaint) => {
+    const createdDate = new Date((complaint.createdDate as unknown as string).replace(" ", "T"));
+    const dayOfWeek = createdDate.getDay(); // Obtiene el día de la semana (0 = domingo, 1 = lunes, ..., 6 = sábado)
+  
+    acc[dayOfWeek] = (acc[dayOfWeek] || 0) + 1; // Contar denuncias por día de la semana
+    return acc;
+  }, {});
+  
+  // Determinar el día con el mayor número de denuncias
+  this.dayWithMostComplaints = Object.entries(complaintsByDayOfWeek).reduce((max, [day, count]) => {
+    return count > max.count ? { day: Number(day), count } : max;
+  }, { day: -1, count: 0 });
+  
+  // Para mostrar el nombre del día
+  const daysOfWeek = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+  this.dayWithMostComplaintsName = daysOfWeek[this.dayWithMostComplaints.day];
+      
+  // Determinar el día con el menor número de denuncias
+  this.dayWithLeastComplaints = Object.entries(complaintsByDayOfWeek).reduce((min, [day, count]) => {
+    return count < min.count ? { day: Number(day), count } : min;
+  }, { day: -1, count: Infinity }); // Inicializamos con Infinity para asegurar que cualquier número será menor
+  
+  // Para mostrar el nombre del día con la menor cantidad de denuncias
+  this.dayWithLeastComplaintsName = daysOfWeek[this.dayWithLeastComplaints.day];
+  
+    }
 
     
   }
+
   
-}
+
