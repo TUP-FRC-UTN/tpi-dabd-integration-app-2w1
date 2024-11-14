@@ -72,7 +72,7 @@ export class PenaltiesFineDashboardComponent {
       pieHole: 0.4,
       chartArea: { width: '100%', height: '90%' },
       sliceVisibilityThreshold: 0.01,
-      textStyle:{ fontSize: 6},
+      textStyle:{ fontSize: 12},
     };
   
     //MODIFICADO OPTIONS
