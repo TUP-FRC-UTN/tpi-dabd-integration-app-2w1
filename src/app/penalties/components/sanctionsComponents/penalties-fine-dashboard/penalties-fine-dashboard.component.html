@@ -4,7 +4,7 @@
   <div class="row">
     <div class="col d-flex gap-3">
       @if (status == 0) {
-      <div class="col">
+      <div class="col-md-5">
         <div class="input-group">
           <input
             type="date"
@@ -15,7 +15,7 @@
           />
         </div>
       </div>
-      <div class="col-md-6">
+      <div class="col-md-5">
         <div class="input-group">
           <input
             type="date"
@@ -27,13 +27,16 @@
           />
         </div>
       </div>
-      <div class="col-md-4 d-flex gap-2">
+      <div class="col-md-2 d-flex gap-2">
         <button
           type="button"
           class="btn btn-primary bi bi-funnel"
           (click)="openFilterModal()"
         ></button>
-        <button class="btn btn-secondary bi-trash" (click)="eraseFilters()"></button>
+        <button
+          class="btn btn-secondary bi-trash"
+          (click)="eraseFilters()"
+        ></button>
       </div>
       } @if (status == 1) {
       <div class="col">
@@ -75,7 +78,10 @@
         </select>
       </div>
       <div class="col-auto d-flex gap-1 ms-auto">
-          <button class="btn btn-secondary bi-trash" (click)="eraseFilters()"></button>
+        <button
+          class="btn btn-secondary bi-trash"
+          (click)="eraseFilters()"
+        ></button>
       </div>
       } @if (status == 2) {
       <div class="col">
@@ -115,7 +121,10 @@
         </select>
       </div>
       <div class="col-auto d-flex gap-1 ms-auto">
-          <button class="btn btn-secondary bi-trash" (click)="eraseFilters()"></button>
+        <button
+          class="btn btn-secondary bi-trash"
+          (click)="eraseFilters()"
+        ></button>
       </div>
       } @if (status == 3) {
       <div class="col">
@@ -157,7 +166,10 @@
         </select>
       </div>
       <div class="col-auto d-flex gap-1 ms-auto">
-          <button class="btn btn-secondary bi-trash" (click)="eraseFilters()"></button>
+        <button
+          class="btn btn-secondary bi-trash"
+          (click)="eraseFilters()"
+        ></button>
       </div>
       }
     </div>
@@ -554,12 +566,24 @@
 </div>
 
 <!-- Modal de filtros -->
-<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true" data-bs-keyboard="true">
+<div
+  class="modal fade"
+  id="filterModal"
+  tabindex="-1"
+  aria-labelledby="filterModalLabel"
+  aria-hidden="true"
+  data-bs-keyboard="true"
+>
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="filterModalLabel">Filtros Avanzados</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
       </div>
       <div class="modal-body">
         <div class="row d-flex justify-content-start align-items-center mb-3">
@@ -604,8 +628,17 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="applyFilters()">Aplicar</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cerrar
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          data-bs-dismiss="modal"
+          (click)="applyFilters()"
+        >
+          Aplicar
+        </button>
       </div>
     </div>
   </div>
