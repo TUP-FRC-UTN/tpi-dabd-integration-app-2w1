@@ -3,13 +3,19 @@
       <h5 class="card-title">{{title}} <i [class]="icon"></i></h5>
       <h6 class="card-subtitle">{{subTitle}}</h6>
       @if(formatPipe=='currency'){
-          <span>{{ amount | currency: 'ARS':'symbol':'1.2-2':'es-AR' }} </span>
+          <span>{{ amount | currency}} </span>
       }
       @if(formatPipe=='percent'){
           <span>{{ amount | number:'1.1-1' }}%</span>
       }
       @if(formatPipe==''){
-          <span>{{ amount }}</span>
+        @if(amount == 0){
+            <span></span>
+        }
+        @else {
+            <span>{{ amount | number:'1.0-1' }}</span>
+        }
+          
       }
       
   </div>

@@ -38,9 +38,12 @@ export class PenaltiesComplaintDashboardComponent {
   complaintsByState?: { [key: string]: number };
   complaintsByReason?: { [key: string]: number };
   complaintsByUser?: { [key: number]: number };
+  differenceInDaysResolution : number=0;
   complaintsByStatePercentage: { state: string; percentage: number }[] = [];
   stateWithHighestPercentage: { state: string; percentage: number } = { state: '', percentage: 0 };
   stateWithLowestPercentage: { state: string; percentage: number } = { state: '', percentage: 0 };
+  dayWithMostComplaints: { day: number; count: number; } = { day: 0, count: 0 }
+  dayWithMostComplaintsName: string = "";
   /////////////////////////
   state = '';
   reportReason = '';
@@ -385,7 +388,39 @@ export class PenaltiesComplaintDashboardComponent {
       return current.percentage < min.percentage ? current : min;
     }, { state: '', percentage: Infinity });
 
+// Calcular promedio de días de resolución de denuncias
+const totalDaysResolution = this.complaintsData.reduce((totalDays, complaint) => {
+  const createdDate = new Date((complaint.createdDate as unknown as string).replace(" ", "T"));
+  const lastUpdatedDate = new Date((complaint.lastUpdatedDate as unknown as string).replace(" ", "T"));
+  
+  const differenceInDays = (lastUpdatedDate.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24);
+  return totalDays + differenceInDays;
+}, 0);
+
+this.differenceInDaysResolution = totalDaysResolution / this.totalComplaints;
+
+
+// Calcular día de la semana con más denuncias
+const complaintsByDayOfWeek = this.complaintsData.reduce((acc: { [key: number]: number }, complaint) => {
+  const createdDate = new Date((complaint.createdDate as unknown as string).replace(" ", "T"));
+  const dayOfWeek = createdDate.getDay(); // Obtiene el día de la semana (0 = domingo, 1 = lunes, ..., 6 = sábado)
+
+  acc[dayOfWeek] = (acc[dayOfWeek] || 0) + 1; // Contar denuncias por día de la semana
+  return acc;
+}, {});
+
+// Determinar el día con el mayor número de denuncias
+this.dayWithMostComplaints = Object.entries(complaintsByDayOfWeek).reduce((max, [day, count]) => {
+  return count > max.count ? { day: Number(day), count } : max;
+}, { day: -1, count: 0 });
+
+// Para mostrar el nombre del día
+const daysOfWeek = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+this.dayWithMostComplaintsName = daysOfWeek[this.dayWithMostComplaints.day];
+    
+
   }
+
   // getMostFrequentUser(): number {
   //   if (!this.complaintsByUser) return 0;
   //   return Object.entries(this.complaintsByUser)

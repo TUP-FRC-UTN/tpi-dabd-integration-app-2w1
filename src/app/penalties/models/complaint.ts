@@ -37,6 +37,7 @@ export interface ComplaintDto {
     complaintState: string;
     description: string;
     createdDate: Date;
+    lastUpdatedDate: Date;
     fileQuantity: number;
 }
 
