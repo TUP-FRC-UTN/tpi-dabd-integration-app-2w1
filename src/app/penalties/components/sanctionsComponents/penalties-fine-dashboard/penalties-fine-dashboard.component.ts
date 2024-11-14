@@ -214,7 +214,7 @@ export class PenaltiesFineDashboardComponent {
 
   getDefaultFromDate(): string {
     const date = new Date();
-    date.setDate(date.getDate() - 30); // Cambiar a 30 días atrás
+    date.setMonth(date.getMonth() - 6); // Cambiar a 6 meses atrás
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   }
 
