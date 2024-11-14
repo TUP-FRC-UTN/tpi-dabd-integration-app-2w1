@@ -485,43 +485,15 @@ console.log('Denuncias filtradas:', filteredComplaints.length, filteredComplaint
       return count > max.count ? { day: Number(day), count } : max;
     }, { day: -1, count: 0 });
 
-    // Para mostrar el nombre del día
-    const daysOfWeek = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-    const mostComplaintsDate = filteredComplaints.find(complaint => {
-      const createdDate = new Date((complaint.createdDate as unknown as string).replace(" ", "T"));
-      return createdDate.getDay() === this.dayWithMostComplaints.day;
-    })?.createdDate;
-    if (mostComplaintsDate) {
-      const date = new Date((mostComplaintsDate as unknown as string).replace(" ", "T"));
-      const month = date.toLocaleString('default', { month: 'long' });
-      const day = date.getDate();
-      const formattedMonth = month.toLowerCase();
-      const capitalizedMonth = formattedMonth.charAt(0).toUpperCase() + formattedMonth.slice(1);
-      this.dayWithMostComplaintsName = `${daysOfWeek[this.dayWithMostComplaints.day]}, ${day} de ${capitalizedMonth}`;
-    } else {
-      this.dayWithMostComplaintsName = daysOfWeek[this.dayWithMostComplaints.day];
-    }
-      
     // Determinar el día con el menor número de denuncias
     this.dayWithLeastComplaints = Object.entries(complaintsByDayOfWeek).reduce((min, [day, count]) => {
       return count < min.count ? { day: Number(day), count } : min;
     }, { day: -1, count: Infinity }); // Inicializamos con Infinity para asegurar que cualquier número será menor
 
     // Para mostrar el nombre del día con la menor cantidad de denuncias
-    const leastComplaintsDate = filteredComplaints.find(complaint => {
-      const createdDate = new Date((complaint.createdDate as unknown as string).replace(" ", "T"));
-      return createdDate.getDay() === this.dayWithLeastComplaints.day;
-    })?.createdDate;
-    if (leastComplaintsDate) {
-      const date = new Date((leastComplaintsDate as unknown as string).replace(" ", "T"));
-      const month = date.toLocaleString('default', { month: 'long' });
-      const day = date.getDate();
-      const formattedMonth = month.toLowerCase();
-      const capitalizedMonth = formattedMonth.charAt(0).toUpperCase() + formattedMonth.slice(1);
-      this.dayWithLeastComplaintsName = `${daysOfWeek[this.dayWithLeastComplaints.day]}, ${day} de ${capitalizedMonth}`;
-    } else {
-      this.dayWithLeastComplaintsName = daysOfWeek[this.dayWithLeastComplaints.day];
-    }
+    const daysOfWeek = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    this.dayWithMostComplaintsName = daysOfWeek[this.dayWithMostComplaints.day];
+    this.dayWithLeastComplaintsName = daysOfWeek[this.dayWithLeastComplaints.day];
 
     // Calcular semana con más denuncias
     const complaintsByWeek = filteredComplaints.reduce((acc: { [key: string]: number }, complaint) => {

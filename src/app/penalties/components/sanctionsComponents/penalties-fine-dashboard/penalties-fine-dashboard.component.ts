@@ -414,15 +414,10 @@ export class PenaltiesFineDashboardComponent {
         return matchesState && matchesReason;
       });
     }
-    /*const filteredFines = this.finesData.filter(fine => {
-      const matchesState = this.state ? fine.fineState === this.state : true;
-      const matchesReason = this.reportReason ? fine.report.reportReason.reportReason === this.reportReason : true;
-      return matchesState && matchesReason;
-    });*/
-  
+    
     // Total de multas realizadas
     this.totalFines = filteredFines.length;
-  
+    
     // Calcular multas por mes para obtener el promedio
     const finesByMonth: { [key: string]: number } = {};
     filteredFines.forEach(fine => {
@@ -431,100 +426,71 @@ export class PenaltiesFineDashboardComponent {
       finesByMonth[monthKey] = (finesByMonth[monthKey] || 0) + 1;
     });
     this.averageFinesPerMonth = this.totalFines / Object.keys(finesByMonth).length;
-  
+    
     // Multa de mayor monto
     this.highestFine = filteredFines.reduce((max: Fine | null, fine: Fine) => {
       return fine.amount > (max?.amount || 0) ? fine : max;
     }, null as Fine | null);
-  
+    
     // Distribución de multas por estado
     this.finesByState = filteredFines.reduce((acc: {  [key: string]: number }, fine) => {
       acc[fine.fineState] = (acc[fine.fineState] || 0) + 1;
       return acc;
     }, {});
-  
+    
     // Calcular el total de multas en estado "Pagada" y "Pendiente de Pago"
     this.paidFinesCount = filteredFines.filter(fine => fine.fineState === 'Pagada').length;
     this.pendingFinesCount = filteredFines.filter(fine => fine.fineState === 'Pendiente de pago').length;
-  
+    
     // Distribución de multas por razón
     this.finesByReason = filteredFines.reduce((acc: { [key: string]: number }, fine) => {
       const reason = fine.report.reportReason.reportReason;
       acc[reason] = (acc[reason] || 0) + 1;
       return acc;
     }, {});
-  
+    
     // Calcular porcentaje de denuncias por estado
-  this.finesByStatePercentage = Object.entries(this.finesByState).map(([state, count]) => {
-    const percentage = (count / this.totalFines) * 100;
-    return { state, percentage };
-  });
-  
-  // Encontrar el estado con el mayor porcentaje
-  this.stateWithHighestPercentage = this.finesByStatePercentage.reduce((max, current) => {
-    return current.percentage > max.percentage ? current : max;
-  }, { state: '', percentage: 0 });
-  
-  // Encontrar el estado con el menor porcentaje
-  this.stateWithLowestPercentage = this.finesByStatePercentage.reduce((min, current) => {
-    return current.percentage < min.percentage ? current : min;
-  }, { state: '', percentage: Infinity });
-  
-  // Multa de menor monto
-  this.lowestFine = filteredFines.reduce((min: Fine | null, fine: Fine) => {
-    return fine.amount < (min?.amount || Infinity) ? fine : min;
-    }, null as Fine | null);
-    const complaintsByDayOfWeek = filteredFines.reduce((acc: { [key: number]: number }, complaint) => {
-      const createdDate = new Date((complaint.createdDate as unknown as string).replace(" ", "T"));
-      const dayOfWeek = createdDate.getDay(); // Obtiene el día de la semana (0 = domingo, 1 = lunes, ..., 6 = sábado)
+    this.finesByStatePercentage = Object.entries(this.finesByState).map(([state, count]) => {
+      const percentage = (count / this.totalFines) * 100;
+      return { state, percentage };
+    });
     
-      acc[dayOfWeek] = (acc[dayOfWeek] || 0) + 1; // Contar denuncias por día de la semana
-      return acc;
-    }, {});
+    // Encontrar el estado con el mayor porcentaje
+    this.stateWithHighestPercentage = this.finesByStatePercentage.reduce((max, current) => {
+      return current.percentage > max.percentage ? current : max;
+    }, { state: '', percentage: 0 });
     
-    // Determinar el día con el mayor número de denuncias
-    this.dayWithMostComplaints = Object.entries(complaintsByDayOfWeek).reduce((max, [day, count]) => {
-      return count > max.count ? { day: Number(day), count } : max;
-    }, { day: -1, count: 0 });
+    // Encontrar el estado con el menor porcentaje
+    this.stateWithLowestPercentage = this.finesByStatePercentage.reduce((min, current) => {
+      return current.percentage < min.percentage ? current : min;
+    }, { state: '', percentage: Infinity });
     
-    // Para mostrar el nombre del día
-    const daysOfWeek = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-    const mostComplaintsDate = filteredFines.find(complaint => {
-      const createdDate = new Date((complaint.createdDate as unknown as string).replace(" ", "T"));
-      return createdDate.getDay() === this.dayWithMostComplaints.day;
-    })?.createdDate;
-    if (mostComplaintsDate) {
-      const date = new Date((mostComplaintsDate as unknown as string).replace(" ", "T"));
-      const month = date.toLocaleString('default', { month: 'long' });
-      const day = date.getDate();
-      const formattedMonth = month.toLowerCase();
-      const capitalizedMonth = formattedMonth.charAt(0).toUpperCase() + formattedMonth.slice(1);
-      this.dayWithMostComplaintsName = `${daysOfWeek[this.dayWithMostComplaints.day]}, ${day} de ${capitalizedMonth}`;
-    } else {
+    // Multa de menor monto
+    this.lowestFine = filteredFines.reduce((min: Fine | null, fine: Fine) => {
+      return fine.amount < (min?.amount || Infinity) ? fine : min;
+      }, null as Fine | null);
+      const complaintsByDayOfWeek = filteredFines.reduce((acc: { [key: number]: number }, complaint) => {
+        const createdDate = new Date((complaint.createdDate as unknown as string).replace(" ", "T"));
+        const dayOfWeek = createdDate.getDay(); // Obtiene el día de la semana (0 = domingo, 1 = lunes, ..., 6 = sábado)
+      
+        acc[dayOfWeek] = (acc[dayOfWeek] || 0) + 1; // Contar denuncias por día de la semana
+        return acc;
+      }, {});
+      
+      // Determinar el día con el mayor número de denuncias
+      this.dayWithMostComplaints = Object.entries(complaintsByDayOfWeek).reduce((max, [day, count]) => {
+        return count > max.count ? { day: Number(day), count } : max;
+      }, { day: -1, count: 0 });
+      
+      // Determinar el día con el menor número de denuncias
+      this.dayWithLeastComplaints = Object.entries(complaintsByDayOfWeek).reduce((min, [day, count]) => {
+        return count < min.count ? { day: Number(day), count } : min;
+      }, { day: -1, count: Infinity }); // Inicializamos con Infinity para asegurar que cualquier número será menor
+      
+      // Para mostrar el nombre del día con la menor cantidad de denuncias
+      const daysOfWeek = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
       this.dayWithMostComplaintsName = daysOfWeek[this.dayWithMostComplaints.day];
-    }
-  
-    // Determinar el día con el menor número de denuncias
-    this.dayWithLeastComplaints = Object.entries(complaintsByDayOfWeek).reduce((min, [day, count]) => {
-      return count < min.count ? { day: Number(day), count } : min;
-    }, { day: -1, count: Infinity }); // Inicializamos con Infinity para asegurar que cualquier número será menor
-  
-    // Para mostrar el nombre del día con la menor cantidad de denuncias
-    const leastComplaintsDate = filteredFines.find(complaint => {
-      const createdDate = new Date((complaint.createdDate as unknown as string).replace(" ", "T"));
-      return createdDate.getDay() === this.dayWithLeastComplaints.day;
-    })?.createdDate;
-    if (leastComplaintsDate) {
-      const date = new Date((leastComplaintsDate as unknown as string).replace(" ", "T"));
-      const month = date.toLocaleString('default', { month: 'long' });
-      const day = date.getDate();
-      const formattedMonth = month.toLowerCase();
-      const capitalizedMonth = formattedMonth.charAt(0).toUpperCase() + formattedMonth.slice(1);
-      this.dayWithLeastComplaintsName = `${daysOfWeek[this.dayWithLeastComplaints.day]}, ${day} de ${capitalizedMonth}`;
-    } else {
       this.dayWithLeastComplaintsName = daysOfWeek[this.dayWithLeastComplaints.day];
-    }
-    
       }
     
   
