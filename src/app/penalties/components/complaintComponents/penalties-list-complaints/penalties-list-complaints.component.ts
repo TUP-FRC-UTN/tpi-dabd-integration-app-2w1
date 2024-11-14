@@ -245,7 +245,9 @@ export class PenaltiesListComplaintComponent implements OnInit {
     this.selectedStates = [];
     this.searchTerm = '';
     this.resetDates();
-    this.customSelect.setData(this.selectedStates);
+    if (this.customSelect) {
+      this.customSelect.setData(this.selectedStates);
+    }
   }
 
 
