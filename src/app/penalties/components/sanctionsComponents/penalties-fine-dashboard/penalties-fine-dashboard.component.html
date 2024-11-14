@@ -111,10 +111,15 @@
         [customStyles]="{ 'background-color': '#D6F6FF' }" icon="bi bi-flag-fill" formatPipe=""></app-penalties-kpi>
       <app-penalties-kpi [amount]="averageFinesPerMonth" title="Promedio" subTitle="Periodo" tooltip="Total del Periodo"
         [customStyles]="{ 'background-color': '#FFE699' }" icon="bi bi-calendar-day" formatPipe="percent"></app-penalties-kpi>
-      <app-penalties-kpi [amountundefined]="highestFine?.amount"     title="Multa más alta" subTitle="Periodo" tooltip="Total del Periodo"
+      <div class="lowestHighest" (click)="openModalPreview(5)">
+        <app-penalties-kpi [amountundefined]="highestFine?.amount"     title="Multa más alta" subTitle="Periodo" tooltip="Total del Periodo"
         [customStyles]="{ 'background-color': '#FFE699' }" icon="bi bi-calendar-day" formatPipe="currency"></app-penalties-kpi>
-      <app-penalties-kpi [amountundefined]="lowestFine?.amount" title="Multa más baja" subTitle="Periodo" tooltip="Total del Periodo"
+      </div>
+      <div class="lowestHighest" (click)="openModalPreview(6)">
+        <app-penalties-kpi [amountundefined]="lowestFine?.amount" title="Multa más baja" subTitle="Periodo" tooltip="Total del Periodo"
         [customStyles]="{ 'background-color': '#FFE699' }" icon="bi bi-calendar-day" formatPipe="currency"></app-penalties-kpi>
+      </div>
+        
     </div>
     <div class="col-10">
       <!-- Graficos chicos (pie, lines, list)-->

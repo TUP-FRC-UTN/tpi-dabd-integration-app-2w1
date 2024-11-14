@@ -118,6 +118,14 @@ export class PenaltiesFineDashboardComponent {
       }
     }
 
+    openModalPreview(nro:number){
+      if (nro === 5 && this.highestFine) {
+        this.openFineModal(this.highestFine.id);
+      } else if (nro === 6 && this.lowestFine) {
+        this.openFineModal(this.lowestFine.id);
+      }
+    }
+
   ngOnInit() {
     this.updateCharts();
     this.getReportsReasons();
