@@ -5,6 +5,7 @@ import {
   EstadoDenuncia,
   TipoDenuncia,
 } from '../../../models/complaint';
+import 'bootstrap';
 import { ChartType, GoogleChartsModule } from 'angular-google-charts';
 import { FormControl, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -14,6 +15,7 @@ import { ReportReasonDto } from '../../../models/ReportReasonDTO';
 import { PenaltiesKpiComponent } from '../penalties-kpi/penalties-kpi.component';
 import { textShadow } from 'html2canvas/dist/types/css/property-descriptors/text-shadow';
 
+declare let bootstrap: any;
 @Component({
   selector: 'app-penalties-complaint-dashboard',
   standalone: true,
@@ -50,8 +52,25 @@ export class PenaltiesComplaintDashboardComponent {
   weekWithMostComplaints: { week: number; month: string; count: number } = { week: 0, month: '', count: 0 };
   /////////////////////////
   state = '';
-  reportReason = '';
-  reportReason2 = '';
+  private _reportReason: string = '';
+  get reportReason(): string {
+    return this._reportReason;
+  }
+  set reportReason(value: string) {
+    this._reportReason = value;
+    this._reportReason2 = value;
+    this.applyFilters();
+  }
+
+  private _reportReason2: string = '';
+  get reportReason2(): string {
+    return this._reportReason2;
+  }
+  set reportReason2(value: string) {
+    this._reportReason2 = value;
+    this._reportReason = value;
+    this.applyFilters();
+  }
   //filtros avanzados
   complaintState: EstadoDenuncia = EstadoDenuncia.Aprobada;
   complaintType: TipoDenuncia = TipoDenuncia.Daño;
@@ -119,7 +138,7 @@ export class PenaltiesComplaintDashboardComponent {
       this.updateLineChart();
     }
   }
-
+  
   //constructor(private sanctionsService: SanctionsService) {}
 
   getCurrentYearMonth(): string {
@@ -137,7 +156,25 @@ export class PenaltiesComplaintDashboardComponent {
     this.updateCharts();
     this.getReportReasons();
     this.getStates();
+
   }
+
+  checkChartData(): boolean {
+    return this.lineChartData && this.lineChartData.length > 0 && 
+                        this.lineChartData.some(row => row.length > 0);
+  }
+  //Limpia los filtros
+  eraseFilters() {
+    this.periodFrom = this.getDefaultFromDate();
+    this.periodTo = this.getCurrentYearMonth();
+    this.state = '';
+    this.reportReason = '';
+    this.reportReason2 = '';
+    this.updateCharts();
+    this.getReportReasons();
+    this.getStates();
+  }
+
   getReportReasons() {
     this.sanctionsService.getAllReportReasons().subscribe(
       (respuesta) => {
@@ -322,12 +359,31 @@ export class PenaltiesComplaintDashboardComponent {
   }
 
   private calculateKPIs() {
+    // Filtrar datos según los filtros seleccionados
+    
+    var filteredComplaints;
+    if (this.status == 3) {
+      filteredComplaints = this.complaintsData.filter(complaint => {
+        const matchesState = this.state ? complaint.complaintState === this.state : true;
+        const matchesReason = this.reportReason2 ? complaint.complaintReason === this.reportReason2 : true;
+        return matchesState && matchesReason;
+      });
+    } else {
+      filteredComplaints = this.complaintsData.filter(complaint => {
+        const matchesState = this.state ? complaint.complaintState === this.state : true;
+        const matchesReason = this.reportReason ? complaint.complaintReason === this.reportReason : true;
+        return matchesState && matchesReason;
+      });
+    }
+    
+console.log('Filtro por state:', this.state, 'Filtro por reason:', this.reportReason);
+console.log('Denuncias filtradas:', filteredComplaints.length, filteredComplaints);
     // Total de denuncias realizadas
-    this.totalComplaints = this.complaintsData.length;
+    this.totalComplaints = filteredComplaints.length;
 
     // Calcular denuncias por mes para obtener el promedio
     const complaintsByMonth: { [key: string]: number } = {};
-    this.complaintsData.forEach(complaint => {
+    filteredComplaints.forEach(complaint => {
       const complaintDate = new Date(complaint.createdDate);
       const monthKey = complaintDate.toLocaleString('default', { month: 'short', year: 'numeric' });
       complaintsByMonth[monthKey] = (complaintsByMonth[monthKey] || 0) + 1;
@@ -335,29 +391,28 @@ export class PenaltiesComplaintDashboardComponent {
     this.averageComplaintsPerMonth = this.totalComplaints / Object.keys(complaintsByMonth).length;
 
     // Denuncia con mayor cantidad de archivos adjuntos
-    this.complaintWithMostFiles = this.complaintsData.reduce((max: ComplaintDto | null, complaint: ComplaintDto) => {
+    this.complaintWithMostFiles = filteredComplaints.reduce((max: ComplaintDto | null, complaint: ComplaintDto) => {
       return complaint.fileQuantity > (max?.fileQuantity || 0) ? complaint : max;
     }, null as ComplaintDto | null);
 
     // Distribución de denuncias por estado
-    this.complaintsByState = this.complaintsData.reduce((acc: { [key: string]: number }, complaint) => {
+    this.complaintsByState = filteredComplaints.reduce((acc: { [key: string]: number }, complaint) => {
       acc[complaint.complaintState] = (acc[complaint.complaintState] || 0) + 1;
       return acc;
     }, {});
 
     // Distribución de denuncias por razón
-    this.complaintsByReason = this.complaintsData.reduce((acc: { [key: string]: number }, complaint) => {
+    this.complaintsByReason = filteredComplaints.reduce((acc: { [key: string]: number }, complaint) => {
       const reason = complaint.complaintReason || complaint.anotherReason;
       acc[reason] = (acc[reason] || 0) + 1;
       return acc;
     }, {});
 
     // Distribución de denuncias por usuario
-    this.complaintsByUser = this.complaintsData.reduce((acc: { [key: number]: number }, complaint) => {
+    this.complaintsByUser = filteredComplaints.reduce((acc: { [key: number]: number }, complaint) => {
       acc[complaint.userId] = (acc[complaint.userId] || 0) + 1;
       return acc;
     }, {});
-
 
     // Calcular porcentaje de denuncias por estado
     this.complaintsByStatePercentage = Object.entries(this.complaintsByState).map(([state, count]) => {
@@ -375,91 +430,88 @@ export class PenaltiesComplaintDashboardComponent {
       return current.percentage < min.percentage ? current : min;
     }, { state: '', percentage: Infinity });
 
-// Calcular promedio de días de resolución de denuncias
-const totalDaysResolution = this.complaintsData.reduce((totalDays, complaint) => {
-  // Obtener las fechas en formato de cadena
-  const createdDateStr = complaint.createdDate as unknown as string;
-  const lastUpdatedDateStr = complaint.lastUpdatedDate as unknown as string;
+    // Calcular promedio de días de resolución de denuncias
+    const totalDaysResolution = filteredComplaints.reduce((totalDays, complaint) => {
+      // Obtener las fechas en formato de cadena
+      const createdDateStr = complaint.createdDate as unknown as string;
+      const lastUpdatedDateStr = complaint.lastUpdatedDate as unknown as string;
 
-  // Verificar que ambas fechas no sean nulas o indefinidas
-  if (createdDateStr && lastUpdatedDateStr) {
-    // Reemplazar el espacio por 'T' para formar un formato ISO adecuado
-    const createdDateFormatted = createdDateStr.replace(" ", "T");
-    const lastUpdatedDateFormatted = lastUpdatedDateStr.replace(" ", "T");
+      // Verificar que ambas fechas no sean nulas o indefinidas
+      if (createdDateStr && lastUpdatedDateStr) {
+        // Reemplazar el espacio por 'T' para formar un formato ISO adecuado
+        const createdDateFormatted = createdDateStr.replace(" ", "T");
+        const lastUpdatedDateFormatted = lastUpdatedDateStr.replace(" ", "T");
 
-    // Crear objetos Date
-    const createdDate = new Date(createdDateFormatted);
-    const lastUpdatedDate = new Date(lastUpdatedDateFormatted);
+        // Crear objetos Date
+        const createdDate = new Date(createdDateFormatted);
+        const lastUpdatedDate = new Date(lastUpdatedDateFormatted);
 
-    // Verificar si las fechas son válidas
-    if (isNaN(createdDate.getTime()) || isNaN(lastUpdatedDate.getTime())) {
-      console.error('Fecha inválida:', createdDateFormatted, lastUpdatedDateFormatted);
-      return totalDays;  // Si alguna de las fechas es inválida, retornamos el total sin cambios
-    }
+        // Verificar si las fechas son válidas
+        if (isNaN(createdDate.getTime()) || isNaN(lastUpdatedDate.getTime())) {
+          console.error('Fecha inválida:', createdDateFormatted, lastUpdatedDateFormatted);
+          return totalDays;  // Si alguna de las fechas es inválida, retornamos el total sin cambios
+        }
 
-    // Calcular la diferencia en días
-    const differenceInDays = (lastUpdatedDate.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24);
+        // Calcular la diferencia en días
+        const differenceInDays = (lastUpdatedDate.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24);
+        
+        // Depurar los valores
+        console.log('Días de diferencia:', differenceInDays, createdDateFormatted, lastUpdatedDateFormatted);
+        
+        return totalDays + differenceInDays;
+      } else {
+        // Si alguna de las fechas es nula o indefinida, no calculamos la diferencia
+        console.error('Datos de fecha inválidos:', createdDateStr, lastUpdatedDateStr);
+        return totalDays;
+      }
+    }, 0);
+
+    // Calcular el promedio de días de resolución
+    this.differenceInDaysResolution = totalDaysResolution / this.totalComplaints;
+
+    console.log('Promedio de días de resolución:', this.differenceInDaysResolution);
+
+    // Calcular día de la semana con más denuncias
+    const complaintsByDayOfWeek = filteredComplaints.reduce((acc: { [key: number]: number }, complaint) => {
+      const createdDate = new Date((complaint.createdDate as unknown as string).replace(" ", "T"));
+      const dayOfWeek = createdDate.getDay(); // Obtiene el día de la semana (0 = domingo, 1 = lunes, ..., 6 = sábado)
+
+      acc[dayOfWeek] = (acc[dayOfWeek] || 0) + 1; // Contar denuncias por día de la semana
+      return acc;
+    }, {});
+
+    // Determinar el día con el mayor número de denuncias
+    this.dayWithMostComplaints = Object.entries(complaintsByDayOfWeek).reduce((max, [day, count]) => {
+      return count > max.count ? { day: Number(day), count } : max;
+    }, { day: -1, count: 0 });
+
+    // Determinar el día con el menor número de denuncias
+    this.dayWithLeastComplaints = Object.entries(complaintsByDayOfWeek).reduce((min, [day, count]) => {
+      return count < min.count ? { day: Number(day), count } : min;
+    }, { day: -1, count: Infinity }); // Inicializamos con Infinity para asegurar que cualquier número será menor
+
+    // Para mostrar el nombre del día con la menor cantidad de denuncias
+    const daysOfWeek = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    this.dayWithMostComplaintsName = daysOfWeek[this.dayWithMostComplaints.day];
+    this.dayWithLeastComplaintsName = daysOfWeek[this.dayWithLeastComplaints.day];
+
+    // Calcular semana con más denuncias
+    const complaintsByWeek = filteredComplaints.reduce((acc: { [key: string]: number }, complaint) => {
+      const complaintDate = new Date((complaint.createdDate as unknown as string).replace(" ", "T"));
+      const weekNumber = this.getWeekNumberInMonth(complaintDate);
+      const month = complaintDate.toLocaleString('default', { month: 'long' });
+      const key = `${month} - Semana ${weekNumber}`;
+      acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    }, {});
+
+    const maxWeek = Object.entries(complaintsByWeek).reduce((max, [week, count]) => {
+      return count > max.count ? { week, count } : max;
+    }, { week: '', count: 0 });
+
+    const [month, week] = maxWeek.week.split(' - Semana ');
+    this.weekWithMostComplaints = { week: Number(week), month, count: maxWeek.count };
     
-    // Depurar los valores
-    console.log('Días de diferencia:', differenceInDays, createdDateFormatted, lastUpdatedDateFormatted);
-    
-    return totalDays + differenceInDays;
-  } else {
-    // Si alguna de las fechas es nula o indefinida, no calculamos la diferencia
-    console.error('Datos de fecha inválidos:', createdDateStr, lastUpdatedDateStr);
-    return totalDays;
-  }
-}, 0);
-
-// Calcular el promedio de días de resolución
-this.differenceInDaysResolution = totalDaysResolution / this.totalComplaints;
-
-console.log('Promedio de días de resolución:', this.differenceInDaysResolution);
-
-
-
-// Calcular día de la semana con más denuncias
-const complaintsByDayOfWeek = this.complaintsData.reduce((acc: { [key: number]: number }, complaint) => {
-  const createdDate = new Date((complaint.createdDate as unknown as string).replace(" ", "T"));
-  const dayOfWeek = createdDate.getDay(); // Obtiene el día de la semana (0 = domingo, 1 = lunes, ..., 6 = sábado)
-
-  acc[dayOfWeek] = (acc[dayOfWeek] || 0) + 1; // Contar denuncias por día de la semana
-  return acc;
-}, {});
-
-// Determinar el día con el mayor número de denuncias
-this.dayWithMostComplaints = Object.entries(complaintsByDayOfWeek).reduce((max, [day, count]) => {
-  return count > max.count ? { day: Number(day), count } : max;
-}, { day: -1, count: 0 });
-
-// Para mostrar el nombre del día
-const daysOfWeek = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-this.dayWithMostComplaintsName = daysOfWeek[this.dayWithMostComplaints.day];
-    
-// Determinar el día con el menor número de denuncias
-this.dayWithLeastComplaints = Object.entries(complaintsByDayOfWeek).reduce((min, [day, count]) => {
-  return count < min.count ? { day: Number(day), count } : min;
-}, { day: -1, count: Infinity }); // Inicializamos con Infinity para asegurar que cualquier número será menor
-
-// Para mostrar el nombre del día con la menor cantidad de denuncias
-this.dayWithLeastComplaintsName = daysOfWeek[this.dayWithLeastComplaints.day];
-
-  // Calcular semana con más denuncias
-  const complaintsByWeek = this.complaintsData.reduce((acc: { [key: string]: number }, complaint) => {
-    const complaintDate = new Date((complaint.createdDate as unknown as string).replace(" ", "T"));
-    const weekNumber = this.getWeekNumberInMonth(complaintDate);
-    const month = complaintDate.toLocaleString('default', { month: 'long' });
-    const key = `${month} - Semana ${weekNumber}`;
-    acc[key] = (acc[key] || 0) + 1;
-    return acc;
-  }, {});
-
-  const maxWeek = Object.entries(complaintsByWeek).reduce((max, [week, count]) => {
-    return count > max.count ? { week, count } : max;
-  }, { week: '', count: 0 });
-
-  const [month, week] = maxWeek.week.split(' - Semana ');
-  this.weekWithMostComplaints = { week: Number(week), month, count: maxWeek.count };
   }
 
   private getWeekNumber(date: Date): number {
@@ -479,6 +531,11 @@ this.dayWithLeastComplaintsName = daysOfWeek[this.dayWithLeastComplaints.day];
   //   return Object.entries(this.complaintsByUser)
   //     .reduce((a, b) => a[1] > b[1] ? a : b)[0] as unknown as number;
   // }
+
+  openFilterModal() {
+    const filterModal = new bootstrap.Modal(document.getElementById('filterModal'));
+    filterModal.show();
+  }
 }
 
 

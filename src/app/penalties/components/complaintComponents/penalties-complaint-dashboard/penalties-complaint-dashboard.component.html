@@ -5,7 +5,7 @@
     <!-- Filtors -->
     <div class="col d-flex gap-3">
       @if (status == 0) {
-      <div class="col">
+      <div class="col-md-5">
         <div class="input-group">
           <input
             type="date"
@@ -16,7 +16,7 @@
           />
         </div>
       </div>
-      <div class="col-md-6">
+      <div class="col-md-5">
         <div class="input-group">
           <input
             type="date"
@@ -27,6 +27,17 @@
             [max]="getCurrentYearMonth()"
           />
         </div>
+      </div>
+      <div class="col-md-2 d-flex gap-2">
+        <button
+          type="button"
+          class="btn btn-primary bi bi-funnel"
+          (click)="openFilterModal()"
+        ></button>
+        <button
+          class="btn btn-secondary bi-trash"
+          (click)="eraseFilters()"
+        ></button>
       </div>
       } @if (status == 1) {
       <div class="col">
@@ -68,6 +79,13 @@
           }
         </select>
       </div>
+
+      <div class="col-auto d-flex gap-1 ms-auto">
+        <button
+          class="btn btn-secondary bi-trash"
+          (click)="eraseFilters()"
+        ></button>
+      </div>
       } @if (status == 2) {
       <div class="col">
         <div class="input-group">
@@ -104,6 +122,13 @@
           <option value="{{ item.value }}">{{ item.value }}</option>
           }
         </select>
+      </div>
+
+      <div class="col-auto d-flex gap-1 ms-auto">
+        <button
+          class="btn btn-secondary bi-trash"
+          (click)="eraseFilters()"
+        ></button>
       </div>
 
       } @if (status == 3) {
@@ -145,6 +170,13 @@
           }
         </select>
       </div>
+
+      <div class="col-auto d-flex gap-1 ms-auto">
+        <button
+          class="btn btn-secondary bi-trash"
+          (click)="eraseFilters()"
+        ></button>
+      </div>
       }
     </div>
   </div>
@@ -160,8 +192,8 @@
       <app-penalties-kpi
         [amount]="totalComplaints"
         title="Total Denuncias"
-        subTitle="Periodo"
-        tooltip="Total del Periodo"
+        subTitle="Período"
+        tooltip="Total del Período"
         [customStyles]="{ 'background-color': '#D6F6FF' }"
         icon="bi bi-flag-fill"
         formatPipe=""
@@ -169,8 +201,8 @@
       <app-penalties-kpi
         [amount]="averageComplaintsPerMonth"
         title="Promedio"
-        subTitle="Periodo"
-        tooltip="Total del Periodo"
+        subTitle="Período"
+        tooltip="Total del Período"
         [customStyles]="{ 'background-color': '#FFE699' }"
         icon="bi bi-calendar-day"
         formatPipe=""
@@ -260,7 +292,7 @@
           <div class="card border-0 shadow-lg rounded-4 h-100">
             <div class="card-body">
               <h4 class="card-title align-items-center">
-                Comparación del Periodo
+                Comparación del Período
                 <button
                   type="button"
                   class="btn btn-sm btn-link text-muted bi bi-arrows-angle-expand fs-5 float-end"
@@ -305,7 +337,7 @@
                 [amount]="stateWithHighestPercentage.percentage"
                 title="Estado Mayor"
                 [subTitle]="stateWithHighestPercentage.state"
-                tooltip="Total del Periodo"
+                tooltip="Total del Período"
                 [customStyles]="{ 'background-color': '#FCAE7C' }"
                 icon="bi bi-percent"
                 formatPipe="percent"
@@ -315,7 +347,7 @@
                 [amount]="stateWithLowestPercentage.percentage"
                 title="Estado Menor"
                 [subTitle]="stateWithLowestPercentage.state"
-                tooltip="Total del Periodo"
+                tooltip="Total del Período"
                 [customStyles]="{ 'background-color': '#D6F6FF' }"
                 icon="bi bi-percent"
                 formatPipe="percent"
@@ -412,7 +444,7 @@
     <div class="card">
       <div class="card-body">
         <h4 class="card-title">
-          Comparación del Periodo
+          Comparación del Período
           <button
             type="button"
             class="btn btn-sm btn-link text-muted bi bi-arrow-left fs-5 float-end"
@@ -423,44 +455,60 @@
         <hr />
         <div class="row">
           <div class="col-3 gap-2 d-flex flex-column justify-content-center">
-            <div class="col-12 m-1">
-              <app-penalties-kpi
-                [amount]="differenceInDaysResolution"
-                title="Resolución Denuncias"
-                subTitle="Días Promedio"
-                tooltip="Promedio"
-                [customStyles]="{ 'background-color': '#FFE699' }"
-                icon="bi bi-clock"
-                formatPipe=""
-              ></app-penalties-kpi>
-              <app-penalties-kpi
-                [amount]="weekWithMostComplaints.count"
-                title="Semana con más Denuncias"
-                subTitle="{{
-                  weekWithMostComplaints.month.charAt(0).toUpperCase() +
-                    weekWithMostComplaints.month.slice(1)
-                }} - {{ weekWithMostComplaints.week }}ª"
-                tooltip="Semana con más Denuncias"
-                [customStyles]="{ 'background-color': '#FFCCCB' }"
-                icon="bi bi-calendar-week"
-                formatPipe=""
-              ></app-penalties-kpi>
-            </div>
+            <app-penalties-kpi
+              [amount]="differenceInDaysResolution"
+              title="Resolución Denuncias"
+              subTitle="Días Promedio"
+              tooltip="Promedio"
+              [customStyles]="{ 'background-color': '#FFE699' }"
+              icon="bi bi-clock"
+              formatPipe=""
+            ></app-penalties-kpi>
+
+            <app-penalties-kpi
+              [amount]="weekWithMostComplaints.count"
+              title="Semana con más Denuncias"
+              subTitle="{{
+                weekWithMostComplaints.month
+                  ? weekWithMostComplaints.month.charAt(0).toUpperCase() +
+                    weekWithMostComplaints.month.slice(1) +
+                    ' - ' +
+                    weekWithMostComplaints.week +
+                    'ª'
+                  : 'No disponible'
+              }}"
+              tooltip="Semana con más Denuncias"
+              [customStyles]="{ 'background-color': '#FFCCCB' }"
+              icon="bi bi-calendar-week"
+              formatPipe=""
+            ></app-penalties-kpi>
           </div>
 
           <div class="col-9">
             <!-- Graficos Grande (stonk, column) -->
             <div class="row">
               <!-- Grafico Columna -->
+
               <div class="col">
-                <google-chart
-                  [type]="lineChartType"
-                  [data]="lineChartData"
-                  [options]="lineChartOptions"
-                  class="w-100"
-                  style="width: 100%; height: 500px"
+                <div
+                  *ngIf="lineChartData.length > 0 && checkChartData()"
+                  class="col-12 hover-scale flex-grow-1 d-flex align-items-center"
                 >
-                </google-chart>
+                  <google-chart
+                    [type]="lineChartType"
+                    [data]="lineChartData"
+                    [options]="lineChartOptions"
+                    class="w-100"
+                    style="width: 100%; height: 500px"
+                  >
+                  </google-chart>
+                </div>
+                <div
+                  *ngIf="!checkChartData()"
+                  class="text-center text-secondary"
+                >
+                  No se encontraron datos para los filtros seleccionados
+                </div>
               </div>
             </div>
           </div>
@@ -520,6 +568,85 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
           Aceptar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de filtros -->
+<div
+  class="modal fade"
+  id="filterModal"
+  tabindex="-1"
+  aria-labelledby="filterModalLabel"
+  aria-hidden="true"
+  data-bs-keyboard="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="filterModalLabel">Filtros Avanzados</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="row d-flex justify-content-start align-items-center mb-3">
+          <div class="col-4">
+            <label for="reportReasonSelect" class="form-label">Razones</label>
+          </div>
+          <div class="col">
+            <select
+              id="reportReasonSelect"
+              (change)="applyFilters()"
+              class="form-select"
+              [(ngModel)]="reportReason"
+              aria-label="Default select example"
+            >
+              <option value="" selected>Razones...</option>
+              @for (item of reportsReasons; track $index) {
+              <option value="{{ item.reportReason }}">
+                {{ item.reportReason }}
+              </option>
+              }
+            </select>
+          </div>
+        </div>
+        <div class="row d-flex justify-content-start align-items-center mb-3">
+          <div class="col-4">
+            <label for="stateSelect" class="form-label">Estados</label>
+          </div>
+          <div class="col">
+            <select
+              id="stateSelect"
+              (change)="applyFilters()"
+              class="form-select"
+              aria-label="Default select example"
+              [(ngModel)]="state"
+            >
+              <option value="" selected>Estados...</option>
+              @for (item of states; track $index) {
+              <option value="{{ item.value }}">{{ item.value }}</option>
+              }
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cerrar
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          data-bs-dismiss="modal"
+          (click)="applyFilters()"
+        >
+          Aplicar
         </button>
       </div>
     </div>
