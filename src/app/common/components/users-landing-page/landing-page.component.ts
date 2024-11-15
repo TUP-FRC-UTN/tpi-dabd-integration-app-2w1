@@ -1,54 +1,95 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
-import { ModalInfoUserComponent } from '../../../users/users-components/users/users-modal-info-user/modal-info-user.component';
+import { Component, inject, OnInit } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterOutlet } from '@angular/router';
-import { FileService } from '../../../users/users-servicies/file.service';
-import { AuthService } from '../../../users/users-servicies/auth.service';
-import { UsersNavbarComponent } from "../users-navbar/users-navbar.component";
+import { PlotService } from '../../../users/users-servicies/plot.service';
+import { GetPlotModel } from '../../../users/users-models/plot/GetPlot';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-landing-page',
   standalone: true,
-  imports: [RouterOutlet, ModalInfoUserComponent, UsersNavbarComponent],
+  imports: [RouterOutlet, ReactiveFormsModule, CommonModule],
   templateUrl: './landing-page.component.html',
-  styleUrls: ['./landing-page.component.css'],  // Corrige 'styleUrl' a 'styleUrls'
+  styleUrls: ['./landing-page.component.css'], 
 })
-export class LandingPageComponent implements OnInit, OnDestroy {
+export class LandingPageComponent implements OnInit {
 
-  constructor(private router : Router){}
+  //Injects
+  private router = inject(Router);
+  private plotService = inject(PlotService);
+  //-----------------------------------------implementar el servicio de notificaciones para enviar un mail-------------------------------
 
-  private intervalId!: ReturnType<typeof setInterval>; // Corrige el tipo de intervalId
+  formMessage : FormGroup;
+  plotsCard : {number : number, blockNumber : number, totalArea : number, type : string, status : string}[] = [];
 
-  private readonly file: FileService = inject(FileService);
-  private readonly authService: AuthService = inject(AuthService);
-
+  //Formulario para hacer consultas
+  constructor(private fb : FormBuilder){
+    this.formMessage = this.fb.group({
+      name: new FormControl('', [Validators.required]),
+      email: new FormControl('', [Validators.required, Validators.email]),
+      message: new FormControl('', [Validators.required])
+    })
+  }
   ngOnInit(): void {
-    // Inicia el intervalo al inicializar el componente
-    this.intervalId = setInterval(() => this.currentTime(), 1000);
+    this.getPlots();
   }
 
-  ngOnDestroy(): void {
-    // Limpia el intervalo cuando se destruye el componente
-    clearInterval(this.intervalId);
+  //Trae los primeros 3 lotes disponibles
+  getPlots(){
+    this.plotService.getAllPlotsAvailables().subscribe({
+      next: (data: GetPlotModel[]) => {
+        
+        const firstThreePlots = data.slice(0, 3);
+        this.plotsCard = firstThreePlots.map(d => ({
+          number: d.plot_number,
+          blockNumber: d.block_number,
+          totalArea: d.total_area_in_m2,
+          type: d.plot_type,
+          status: d.plot_state
+          }));
+          
+      },
+      error: (err) => {
+        console.error('Error al cargar los lotes', err);
+      }
+    });
   }
 
-  downloadTmpFile(): void {
-    // Cambia 'fileId123' por el identificador del archivo deseado
-    this.file.downloadFile('88673b48-49c3-4e41-bbf4-20294dde51c9');
-  }
-
-  getUserName(): string {
-    const user = this.authService.getUser();
-    return `${user.name} ${user.lastname}`;
-  }
-
-  currentTime(): string {
-    const date = new Date();
-    const hh = date.getHours().toString().padStart(2, '0');
-    const mm = date.getMinutes().toString().padStart(2, '0');
-    return `${hh}:${mm}`;
-  }
-
-  redirect(path: string){
+  //Método para redireccionar
+  redirect(path : string){
     this.router.navigate([path]);
   }
+
+  //Enviar el formulario con la consulta
+  sendMessage(){
+    if(this.formMessage.valid){
+      //implementar enviar mensaje
+    }
+  }
+
+  //Mostrar si el campo es válido o no
+  onValidate(controlName: string) {
+    const control = this.formMessage.get(controlName);
+    return {
+      'is-invalid': control?.invalid && (control?.dirty || control?.touched),
+      'is-valid': control?.valid
+    }
+  }
+
+  //Mostrar los errores del los campos
+  showError(controlName: string): string {
+    const control = this.formMessage.get(controlName);
+  
+    if (!control || !control.errors) return '';
+  
+    const errorKey = Object.keys(control.errors)[0];
+  
+    const errorMessages: { [key: string]: string } = {
+      required: 'Este campo no puede estar vacío.',
+      email: 'Formato de correo electrónico inválido.',
+    };
+
+    return errorMessages[errorKey] || 'Error desconocido';
+  }
+  
 }
