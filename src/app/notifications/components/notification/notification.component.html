@@ -1,350 +1,127 @@
-  <div class="container">
-    <div class="container">
-      <div
-        class="btn-group"
-        style="
-          margin-top: 20px;
-          padding: 10px;
-          background-color: #f8f9fa;
-          border-radius: 8px;
-          box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-        "
-      >
-      <button style="margin-top: 15px" type="button" class="btn btn-primary dropdown-togglek" routerLink="/home">Volver</button>
-        <button
-          type="button"
-          class="btn btn-primary dropdown-toggle"
-          style="margin-right: 10px; margin-top: 15px"
-          data-bs-toggle="dropdown"
-          aria-expanded="false"
-        >
-          Ver
-        </button>
-        <ul class="dropdown-menu shadow">
-          <li><a class="dropdown-item" (click)="cambiar('Multas')">Multas</a></li>
-          <li>
-            <a class="dropdown-item" (click)="cambiar('Accesos')">Accesos</a>
-          </li>
-          <li><a class="dropdown-item" (click)="cambiar('Pagos')">Pagos</a></li>
-          <li>
-            <a class="dropdown-item" (click)="cambiar('Generales')">Generales</a>
-          </li>
-        </ul>
-        <div [formGroup]="form" display="flex; gap: 10px; margin-top: 15px;">
-          <div class="row">
-            <input
-            type="date"
-            class="form-control date-input shadow-sm"
-            formControlName="startDate"
-            style="margin-right: 10px; margin-top: 15px"
-            />
-            <input
-            type="date"
-            class="form-control date-input shadow-sm"
-            style="margin-right: 10px; margin-top: 15px" 
-            formControlName="endDate"
-            />
-          </div>
+<section class="py-5">
+  <div class="container p-3 border border-2 rounded shadow-lg" style="margin-top: 0;">
+    <div class="row mb-2">
+      <div class="d-flex">
+        <!-- filtro buscar -->
+        <div class="col-3">
+          <input
+            type="text"
+            id="searchTerm"
+            placeholder="Buscar..."
+            class="form-control"
+            aria-label="Search"
+            style="margin-top: 15px"
+          />
         </div>
-          
 
-        
-
-  <!--       @if (userRole.endsWith("Admin")) {
-  -->
-  @if (rolactual =="Admin") {
-    <button
-    class="btn btn-outline-secondary shadow-sm"
-    [routerLink]="['/home/admin-all-notifications']"
-    routerLinkActive="router-link-active"
-    style="margin-top: 15px"
-  >
-    Ver registro
-  </button>
-
-  }
-
-  <!--       }
-  -->
-      </div>
-
-      @if (selected == 'Generales') {
-      <div>
-        <h1>Notificaciones {{ selected }}</h1>
-      </div>
-      }@else {
-      <div>
-        <h1>{{ selected }}</h1>
-      </div>
-      }
-
-      <!-- fines -->
-      @if (selected == 'Multas') {
-      <div *ngIf="data2.fines.length === 0 && showAlert" class="empty-state">
-        <div class="custom-alert">
-          <i class="bi bi-exclamation-circle"></i> No hay notificaciones nuevas.
-          <button
-            type="button"
-            class="btn-close"
-            (click)="closeAlert()"
-            aria-label="Close"
-          ></button>
+        <!-- dropdown -->
+        <div class="col-2 ms-2" style="margin-top: 15px">
+          <app-select-multiple
+            [options]="notificationTypes"
+            [optionsChecked]="selectedNotificationType"
+            (sendList)="recibirSeleccionadas($event)"
+          ></app-select-multiple>
         </div>
-      </div>
-      @for (item of data2.fines; track $index) {
-      <div *ngIf="data2.fines.length > 0" class="notification-list">
-        <div class="notification-card">
-          <h5>{{ item.subject }} - {{ item.date }}</h5>
-          <p>{{ item.description }}</p>
-          <button class="btn btn-dark" (click)="selectNotification()">
-            Mostrar detalle
+
+        <!-- filtro fecha -->
+        <div [formGroup]="dateFilterForm" class="col-2 ms-2">
+          <input type="date" class="form-control me-2" formControlName="startDate" 
+            style="margin-top: 15px; border: 1px solid #ddd; border-radius: 5px;" />
+        </div>
+
+        <div [formGroup]="dateFilterForm" class="col-2 ms-2">
+          <input type="date" class="form-control me-2" formControlName="endDate" 
+            style="margin-top: 15px; border: 1px solid #ddd; border-radius: 5px;" />
+        </div>
+
+     
+        <div class="col-3 text-end" style="margin-top: 15px;">
+          <button (click)="borrar()" class="btn mx-1 btn-secondary filterbutton">
+            <i class="bi bi-trash"></i>
+          </button>
+
+          <button class="btn mx-1 btn-success filterbutton" (click)="exportarAExcel()">
+            <i class="bi bi-file-earmark-excel"></i>
+          </button>
+
+          <button class="btn mx-1 btn-danger me-4 filterbutton" (click)="exportarAPDF()">
+            <i class="bi bi-file-earmark-pdf"></i>
           </button>
         </div>
+      
       </div>
+    </div>
 
-      <div
-        *ngIf="showModal"
-        class="modal fade show d-block"
-        tabindex="-1"
-        role="dialog"
-      >
-        <div class="modal-dialog modal-dialog-centered" role="document">
-          <div class="modal-content">
-            <div class="modal-header bg-dark text-white">
-              <h5 class="modal-title">{{ item.subject }}</h5>
-              <button
-                type="button"
-                class="btn-close btn-close-white"
-                (click)="closeModal()"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div class="modal-body">
-              <div class="details mb-3">
-                <div class="detail-item">
-                  <i class="bi bi-calendar-fill"></i> <span>{{ item.date }}</span>
+    <div class="table-responsive">
+      <table id="myTable" class="table table-striped table-hover align-middle">
+        <thead class="table">
+          <tr>
+            <th>Fecha</th>
+            <th>Tipo</th>
+            <th>Asunto</th>
+            <th>Descripción</th>
+            <th>Acciones</th>
+            <!--    <td>
+                <div *ngIf="!data.access[i].markedRead; else readIcon">
+                  <i class="bi bi-envelope-fill" style="color: black; cursor: pointer;" (click)="leida(data.access[i])"></i>
                 </div>
-                <div class="detail-item">
-                  <i class="bi bi-person-fill"></i> <span>{{ "Usuario" }}</span>
-                </div>
-              </div>
-              <p>{{ item.description }}</p>
-            </div>
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                (click)="closeModal()"
-              >
-                Cerrar
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      } }
-
-      <!-- access -->
-      @if (selected == 'Accesos') {
-      <div *ngIf="data2.access.length === 0 && showAlert" class="empty-state">
-        <div class="custom-alert">
-          <i class="bi bi-exclamation-circle"></i> No hay notificaciones nuevas.
-          <button
-            type="button"
-            class="btn-close"
-            (click)="closeAlert()"
-            aria-label="Close"
-          ></button>
-        </div>
-      </div>
-      @for (item of data2.access; track $index) {
-      <div *ngIf="data2.access.length > 0" class="notification-list">
-        <div class="notification-card">
-          <h5>{{ item.subject }} - {{ item.created_datetime }}</h5>
-          <p>{{ item.message }}</p>
-          <button class="btn btn-dark" (click)="selectNotification()">
-            Mostrar detalle
-          </button>
-        </div>
-      </div>
-
-      <div
-        *ngIf="showModal"
-        class="modal fade show d-block"
-        tabindex="-1"
-        role="dialog"
-      >
-        <div class="modal-dialog modal-dialog-centered" role="document">
-          <div class="modal-content">
-            <div class="modal-header bg-dark text-white">
-              <h5 class="modal-title">{{ item.subject }}</h5>
-              <button
-                type="button"
-                class="btn-close btn-close-white"
-                (click)="closeModal()"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div class="modal-body">
-              <div class="details mb-3">
-                <div class="detail-item">
-                  <i class="bi bi-calendar-fill"></i>
-                  <span>{{ item.created_datetime }}</span>
-                </div>
-                <div class="detail-item">
-                  <i class="bi bi-person-fill"></i> <span>{{ "Usuario" }}</span>
-                </div>
-              </div>
-              <p>{{ item.message }}</p>
-            </div>
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                (click)="closeModal()"
-              >
-                Cerrar
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      } }
-
-      <!-- payments -->
-      @if (selected == 'Pagos') {
-      <div *ngIf="data2.payments.length === 0 && showAlert" class="empty-state">
-        <div class="custom-alert">
-          <i class="bi bi-exclamation-circle"></i> No hay notificaciones nuevas.
-          <button
-            type="button"
-            class="btn-close"
-            (click)="closeAlert()"
-            aria-label="Close"
-          ></button>
-        </div>
-      </div>
-      @for (item of data2.payments; track $index) {
-      <div *ngIf="data2.payments.length > 0" class="notification-list">
-        <div class="notification-card">
-          <h5>{{ item.subject }} - {{ item.date  }}</h5>
-          <p>{{ item.message }}</p>
-          <button class="btn btn-dark" (click)="selectNotification()">
-            Mostrar detalle
-          </button>
-        </div>
-      </div>
-
-      <div
-        *ngIf="showModal"
-        class="modal fade show d-block"
-        tabindex="-1"
-        role="dialog"
-      >
-        <div class="modal-dialog modal-dialog-centered" role="document">
-          <div class="modal-content">
-            <div class="modal-header bg-dark text-white">
-              <h5 class="modal-title">{{ item.subject }}</h5>
-              <button
-                type="button"
-                class="btn-close btn-close-white"
-                (click)="closeModal()"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div class="modal-body">
-              <div class="details mb-3">
-                <div class="detail-item">
-                  <i class="bi bi-calendar-fill"></i>
-                  <span>{{ item.date }}</span>
-                </div>
-                <div class="detail-item">
-                  <i class="bi bi-person-fill"></i> <span>{{ "Usuario" }}</span>
-                </div>
-              </div>
-              <p>{{ item.message }}</p>
-            </div>
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                (click)="closeModal()"
-              >
-                Cerrar
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      } }
-
-      <!-- generals -->
-      @if (selected == 'Generales') {
-      <div *ngIf="data2.generals.length === 0 && showAlert" class="empty-state">
-        <div class="custom-alert">
-          <i class="bi bi-exclamation-circle"></i> No hay notificaciones nuevas.
-          <button
-            type="button"
-            class="btn-close"
-            (click)="closeAlert()"
-            aria-label="Close"
-          ></button>
-        </div>
-      </div>
-      @for (item of data2.generals; track $index) {
-      <div *ngIf="data2.generals.length > 0" class="notification-list">
-        <div class="notification-card">
-          <h5>
-            {{ item.subject }} - {{ item.created_datetime  }}
-          </h5>
-          <p>{{ item.message }}</p>
-          <button class="btn btn-dark" (click)="selectNotification()">
-            Mostrar detalle
-          </button>
-        </div>
-      </div>
-
-      <div
-        *ngIf="showModal"
-        class="modal fade show d-block"
-        tabindex="-1"
-        role="dialog"
-      >
-        <div class="modal-dialog modal-dialog-centered" role="document">
-          <div class="modal-content">
-            <div class="modal-header bg-dark text-white">
-              <h5 class="modal-title">{{ item.subject }}</h5>
-              <button
-                type="button"
-                class="btn-close btn-close-white"
-                (click)="closeModal()"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div class="modal-body">
-              <div class="details mb-3">
-                <div class="detail-item">
-                  <i class="bi bi-calendar-fill"></i>
-                  <span>{{ item.created_datetime | date : "yyyy-MM-dd" }}</span>
-                </div>
-                <div class="detail-item">
-                  <i class="bi bi-person-fill"></i> <span>{{ "Usuario" }}</span>
-                </div>
-              </div>
-              <p>{{ item.message }}</p>
-            </div>
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                (click)="closeModal()"
-              >
-                Cerrar
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      } }
+                <ng-template #readIcon>
+                  <i class="bi bi-envelope-open-fill" style="color: black; cursor: pointer;" (click)="leida(data.access[i])"></i>
+                </ng-template>
+              </td>      -->
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
     </div>
   </div>
+
+  <!--modal para detalle de notificacion-->
+  <div
+    class="modal fade"
+    id="idMODAL"
+    role="dialog"
+    aria-labelledby="modal"
+    style="width: 100%"
+    aria-hidden=""
+  >
+    <div class="modal-dialog" style="width: 100%">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">
+            Detalle de notificación
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <h6>Asunto:</h6>
+            <p>{{ selectedNotification.subject }}</p>
+          </div>
+          <div class="mb-3">
+            <h6>Descripción:</h6>
+            <p>{{ selectedNotification.message }}</p>
+          </div>
+          <div class="mb-3">
+            <h6>Fecha:</h6>
+            <p>{{ selectedNotification.date }}</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

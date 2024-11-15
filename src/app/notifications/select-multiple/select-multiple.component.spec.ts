@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { UsersNavbarComponent } from './users-navbar.component';
+import { SelectMultipleComponent } from './select-multiple.component';
 
-describe('UsersNavbarComponent', () => {
-  let component: UsersNavbarComponent;
-  let fixture: ComponentFixture<UsersNavbarComponent>;
+describe('SelectMultipleComponent', () => {
+  let component: SelectMultipleComponent;
+  let fixture: ComponentFixture<SelectMultipleComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [UsersNavbarComponent]
+      imports: [SelectMultipleComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(UsersNavbarComponent);
+    fixture = TestBed.createComponent(SelectMultipleComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
