@@ -1,38 +1,50 @@
 
 <section class="py-5">
-  <div class="container p-3 border border-2 rounded shadow-lg">
-    <main style="width: 70%; margin: 0 auto;">
+  <div class="container p-3 border border-2 rounded shadow-lg" style="width: 80%;">
+    <main>
 
 <!--       <h2 class="text-center">Envio de Notificaciones Generales</h2>
  -->      <form class="row g-3 needs-validation" #form="ngForm" (ngSubmit)="onSubmit(form)">
-        <div class="col-md-12">
+        <div class="col-md-12" style="display: flex; gap: 60px;">
           <label for="inputSubject" class="form-label">Asunto</label>
-          <input type="text" class="form-control" id="inputSubject" name="subject" required maxlength="20" #subject="ngModel" [(ngModel)]="newNotification.subject">
-          @if ((subject.invalid && (subject.dirty || subject.touched)) || (subject.invalid && form.submitted)) {
-            <div class="alert alert-danger mt-3">
-              El asunto es requerido y debe tener máximo 20 caracteres.
-            </div>
-          }
+          <input type="text" class="form-control" id="inputSubject" name="subject" required 
+          maxlength="20" #subject="ngModel" 
+          [(ngModel)]="newNotification.subject"
+          [ngClass]="{
+            'is-invalid': subject.invalid && subject.touched,
+            'is-valid': subject.valid && subject.touched
+          }"
+          >
         </div>
+        @if ((subject.invalid && (subject.dirty || subject.touched)) || (subject.invalid && form.submitted)) {
+          <div style="color: red; margin-left: 7em;">
+            El asunto es requerido y debe tener máximo 20 caracteres.
+          </div>
+        } 
     
-        <div class="col-md-12">
+        <div class="col-md-12" style="display: flex; gap: 50px;">
           <label for="inputDescription" class="form-label">Mensaje</label>
           <!-- <input type="text" class="form-control" id="inputDescription" name="description" required #description="ngModel" [(ngModel)]="notification.description"> -->
            <textarea class="form-control" id="inputDescription" name="description" 
                       required 
                       #description="ngModel" [(ngModel)]="newNotification.description"
-                      style="resize: none;height: 6em;" >
+                      style="resize: none;height: 6em;" 
+                      [ngClass]="{
+                        'is-invalid': description.invalid && description.touched,
+                        'is-valid': description.valid && description.touched
+                      }"
+                      >
           </textarea>
-          @if ((description.invalid && (description.dirty || description.touched)) || (description.invalid && form.submitted) ){
-            <div class="alert alert-danger mt-3">
-              La descripcion no debe estar vacia
-            </div>
-          }
         </div>
+        @if ((description.invalid && (description.dirty || description.touched)) || (description.invalid && form.submitted) ){
+          <div style="color: red; margin-left: 7em;">
+            El mensaje no debe estar vacío
+          </div>
+        }
     
         
         <div class="col-md-12 mb-3">
-          <h5>Notificar a:</h5>
+          <h6>Notificar a:</h6>
             <div class="row justify-content-center d-flex">
               
               <div class="col-auto mt-2">
@@ -48,21 +60,27 @@
         
                 <div class="form-check form-check-inline">
                   <input class="form-check-input" type="radio" name="usersRbt" id="excludeRbt" value="exclude" [(ngModel)]="radioButtonValue">
-                  <label class="form-check-label" for="inlineRadio2">Excluir a </label>
+                  <label class="form-check-label" for="inlineRadio2">Excluír a </label>
                 </div>
               </div>
               
               <div class="col-5 ">
                 
-                <select [(ngModel)]="selectValue" [ngModelOptions]="{standalone: true}" class="form-select" required>
+                <select [(ngModel)]="selectValue" [ngModelOptions]="{standalone: true}" 
+                class="form-select" 
+                required
+                [ngClass]="{
+                  'is-invalid': form.submitted && selectValue=='1',
+                  'is-valid': form.submitted && selectValue!='1'
+                }"
+                >
                   <option value="1"selected disabled>Canal de comunicación</option>
                   <option value="EMAIL">Email</option>
                   <option value="TELEGRAM">Telegram</option>
-                  <option value="SMS">SMS</option>
                 </select>
                 @if(form.submitted && selectValue=="1") {
-                  <div class="alert alert-danger mt-3">
-                    Debe elegir un canal de comunicación
+                  <div class="">
+                    <p style="color:red">Debe elegir un canal de comunicación</p>
                   </div>
                 }
               </div>
@@ -72,15 +90,26 @@
             
         </div>
         <div class="container" [ngClass]="{hidden: radioButtonValue == 'allUsers'}">
-            
-          <table id="myTable" class="table table-striped table-bordered display " style="width:100%">
+          <div class="col-4">
+            <input
+              type="text"
+              id="searchTerm"
+              placeholder="Buscar..."
+              class="form-control"
+              aria-label="Search" 
+              style="margin-bottom: 15px;  "
+            />
+        </div>
+
+          <table id="myTable" class="table table-striped table-hover align-middle" style="width:100%">
             <thead>
+              
                 <tr>
                     <th>Nombre</th>
                     <th>Apellido</th>
                     <th>DNI</th>
                     <th>Email</th>
-                    
+                    <th>Seleccionar</th>
                 </tr>
             </thead>
             <tbody>
@@ -95,9 +124,9 @@
         </div>
 
 
-        <div class="col-12 d-flex justify-content-between g-4">
-          <button class="btn btn-secondary" type="button" style="width: 150px;" (click)="clearForm(form)">Cancelar</button>
-          <button class="btn btn-success" type="submit" style="width: 150px;">Enviar</button>
+        <div class="col-12 d-flex justify-content-end g-4">
+          <button class="btn btn-secondary" type="button" style="width: 5.5em;margin-right:2em" (click)="clearForm(form)">Cancelar</button>
+          <button class="btn btn-success" type="submit" style="width: 5.5em;">Enviar</button>
         </div>
         
       </form>
@@ -111,3 +140,5 @@
 
   </div>
 </section>
+
+

@@ -44,6 +44,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
 
   selectedState: string = '';
   selectedStates: string[] = [];   //Valor select
+  today: string = '';
 
   options: { value: string, name: string }[] = []
   @ViewChild(CustomSelectComponent) customSelect!: CustomSelectComponent;
@@ -89,6 +90,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
       }
     })
     this.resetDates()
+    this.today = new Date().toISOString().split('T')[0];
   }
 
   resetDates() {
@@ -99,6 +101,8 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
     previousMonthDate.setMonth(previousMonthDate.getMonth() - 1);
     this.filterDateStart = this.formatDateToString(previousMonthDate); // Fecha de inicio con hora 00:00:00
   }
+
+
 
   // Función para convertir la fecha al formato `YYYY-MM-DD`
   private formatDateToString(date: Date): string {
