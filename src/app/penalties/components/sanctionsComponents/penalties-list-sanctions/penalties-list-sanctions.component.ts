@@ -45,6 +45,7 @@ export class PenaltiesSanctionsListComponent implements OnInit {
   filterDateEnd: string = '';
   selectedState: string = '';
   selectedStates: string[] = [];
+  today: string = '';
 
   options: { name: string, value: any }[] = []
   @ViewChild(CustomSelectComponent) customSelect!: CustomSelectComponent;
@@ -79,6 +80,7 @@ export class PenaltiesSanctionsListComponent implements OnInit {
       }
     });
     this.resetDates()
+    this.today = new Date().toISOString().split('T')[0];
   }
 
 

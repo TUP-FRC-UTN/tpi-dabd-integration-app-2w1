@@ -41,6 +41,7 @@ export class PenaltiesListComplaintComponent implements OnInit {
   searchTerm: string = '';        //Valor de la barra de busqueda
   filterDateStart: string = '';   //Valor fecha inicio
   filterDateEnd: string = '';     //Valor fecha fin
+  minDateEnd: string = '';        //Valor mínimo para la fecha fin
   selectedStates: string[] = [];  //Valor select
 
   options: { value: string, name: string }[] = []
@@ -74,12 +75,14 @@ export class PenaltiesListComplaintComponent implements OnInit {
     previousMonthDate.setMonth(previousMonthDate.getMonth() - 1);
     this.filterDateStart = this.formatDateToString(previousMonthDate); // Fecha de inicio con hora 00:00:00
   }
-
+  get maxDate(): string {
+    return this.formatDateToString(new Date());
+  }
   //Función para convertir la fecha al formato `YYYY-MM-DD`
-  private formatDateToString(date: Date): string {
-    //Crea una fecha ajustada a UTC-3 y establecer la hora a 00:00:00 para evitar horas residuales
+  formatDateToString(date: Date): string {
+    // Crea una fecha ajustada a UTC-3 y establece la hora a 00:00:00 para evitar horas residuales
     const adjustedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0);
-    return adjustedDate.toLocaleDateString('en-CA'); // Formato estándar `YYYY-MM-DD`
+    return adjustedDate.toLocaleDateString('en-CA'); // Formato `YYYY-MM-DD`
   }
 
 
@@ -218,6 +221,20 @@ export class PenaltiesListComplaintComponent implements OnInit {
 
   //Método para manejar el cambio de fechas
   filterDate() {
+    const today = new Date();
+    const startDate = new Date(this.filterDateStart);
+    const endDate = new Date(this.filterDateEnd);
+
+    if (startDate > today) {
+      this.filterDateStart = this.formatDateToString(today);
+    }
+
+    if (endDate > today) {
+      this.filterDateEnd = this.formatDateToString(today);
+    }
+
+    this.minDateEnd = this.filterDateStart; // Establecer el valor mínimo para la fecha fin
+
     this.filterComplaintData();
   }
 
@@ -228,7 +245,9 @@ export class PenaltiesListComplaintComponent implements OnInit {
     this.selectedStates = [];
     this.searchTerm = '';
     this.resetDates();
-    this.customSelect.setData(this.selectedStates);
+    if (this.customSelect) {
+      this.customSelect.setData(this.selectedStates);
+    }
   }
 
 
