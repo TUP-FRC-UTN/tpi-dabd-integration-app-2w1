@@ -24,9 +24,12 @@ import { NotificationRegisterService } from "../service/notification-register.se
   styleUrl: './notification-home.component.scss'
 })
 export class NotificationHomeComponent implements OnInit{
-  //output para mostrar el titulo de la pag
+  //    //output para mostrar el titulo de la pag
   @Output() sendTitle = new EventEmitter<string>();
-
+  
+  kpiTotalRead = 0
+  kpiTotalUnread = 0
+  kpiGeneral = 0
   maxNotificationsDay: string = "";
   maxNotificationsType: string = "";
   maxNotificationsCount: number = 0;
@@ -90,10 +93,10 @@ export class NotificationHomeComponent implements OnInit{
   }
 
   columnChartOptions = {
-    title: "Notificaciones Enviadas por Día de la Semana",
+    //title: "Notificaciones Enviadas por Día de la Semana",
     legend: { position: "right" },
     chartArea: { width: "95%", height: "80%" },
-    
+    vAxis: {format:'0'},
     colors: [
       "#4285F4",
       "#34A853",
@@ -106,8 +109,7 @@ export class NotificationHomeComponent implements OnInit{
   };
 
   columnChartOptions2 = {
-    title:
-      "Notificaciones Enviadas por Tipo (Accesos, Pagos, Multas, Inventario)",
+    //title:"Notificaciones Enviadas por Tipo (Accesos, Pagos, Multas, Inventario)",
     hAxis: {
       title: "Cantidad de Notificaciones",
       textStyle: {
@@ -197,6 +199,7 @@ export class NotificationHomeComponent implements OnInit{
       this.maxNotificationsMonthCount = maxMonth.count;
     //calcular total de notificaciones enviadas para mostrar en el KPI
     this.allNotificationsCounter = this.calculateTotalNotifications();
+    console.log(this.columnChartData5);
     })
   }
 
@@ -623,13 +626,15 @@ export class NotificationHomeComponent implements OnInit{
     ]);
 
     // Datos para el segundo gráfico: Notificaciones por Tipo (Access, Payment, Fine, Inventory)
+
+
     this.columnChartData2 = [
       ["Acc", this.allNotifications.access.length],
       ["Pag", this.allNotifications.payments.length],
       ["Mult", this.allNotifications.fines.length],
       ["Inv", this.allNotifications.inventories.length],
     ];
-
+    
     // Datos para el tercer gráfico: Notificaciones por Día y Tipo de Notificación
     this.columnChartData3 = daysOfWeek.map((day) => [
       day,
@@ -686,6 +691,7 @@ export class NotificationHomeComponent implements OnInit{
         (f) => getMonthOfYear(new Date(f.created_datetime)) === day
       ).length,
     ]);
+    this.calculatePercentages()
   }
 
   makeBig(status: number) {
@@ -770,6 +776,10 @@ export class NotificationHomeComponent implements OnInit{
   }
 
   filterListByStatus() {
+    //no actualizar KPIs, mantener valor actual
+    let currentReadAmount = this.columnChartData5[1][1]
+    let currentUnreadAmount = this.columnChartData5[0][1]
+
     if (this.filterForm.get("readStatus")?.value === "Todas") {
     } else if (this.filterForm.get("readStatus")?.value === "Leídas") {
       this.allNotifications.access = this.allNotifications.access.filter(
@@ -798,12 +808,35 @@ export class NotificationHomeComponent implements OnInit{
       );
       console.log("no LEIDAS", this.allNotifications);
     }
+    
     this.loadChartData();
+    this.columnChartData5[0][1] = currentUnreadAmount
+    this.columnChartData5[1][1] = currentReadAmount
     return this.allNotifications;
   }
   //calcula el total de notificaciones enviadas para mostrar en el KPI
   calculateTotalNotifications(){
     return Object.values(this.allNotifications).reduce((sum, arr) => sum + arr.length, 0);
   }
+  clearFiltered() {
+    this.initializeDates()
+    this.filterForm.patchValue({
+      readStatus: "Todas"
+    })
+  }
+  calculatePercentages() {
+    let currentReadAmount = this.columnChartData5[1][1]
+    let currentUnreadAmount = this.columnChartData5[0][1]
 
+    let total = currentReadAmount + currentUnreadAmount
+
+    const readPercentage = (currentReadAmount / total) * 100;
+    const unreadPercentage = (currentUnreadAmount / total) * 100;
+
+    this.kpiTotalRead = readPercentage
+    this.kpiTotalUnread = unreadPercentage
+    this.kpiGeneral = this.generalsList.length
+  }
+
+  
 }
