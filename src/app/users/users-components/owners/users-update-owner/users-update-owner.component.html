@@ -161,8 +161,7 @@
                     <div class="row">
                         <label class="col-2 col-form-label">Lotes</label>
                         <div class="col-10">
-                           
-                            <!-- <app-users-multiple-select [options]="plotsOptions" [placeholder]="'Seleccione un lote...'" [selectedOptions]="editOwner.get('plots')?.value" (selectedOptionsChange)="editOwner.get('plots')?.setValue($event)" /> -->
+                            <!-- ==============================CheckMe========================== -->
                             <app-custom-select [options]="plotsOptions" [selectedOptions]="editOwner.get('plots')?.value" (selectedOptionsChange)="editOwner.get('plots')?.setValue($event)" />
                             <div class="invalid-feedback">{{showError('state')}}</div>
                         </div>

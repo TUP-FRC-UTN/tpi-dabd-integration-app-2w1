@@ -40,8 +40,8 @@ export class UsersListPlotsComponent {
   userToDeactivate: number = 0;
 
   //Filtros
-  selectType = new FormControl("Seleccione un tipo");
-  selectState = new FormControl("Seleccione un estado");
+  selectType = new FormControl();
+  selectState = new FormControl();
 
 
   plotTypes: string[] = [];

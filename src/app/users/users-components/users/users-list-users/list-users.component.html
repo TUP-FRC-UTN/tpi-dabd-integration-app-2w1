@@ -7,14 +7,7 @@
       </div>
 
       <div id="myTable_filter" class="dataTables_filter me-3" style="text-align: left">
-        <!-- <select class="form-select m-3" aria-controls="myTable" style="width: 300px" aria-controls="myTable"
-          (change)="updateFilterRol()" [formControl]="selectRol">
-          <option value disabled>Seleccionar rol</option>
-          @for (role of roles; track $index) {
-            <option [value]="role.description">{{ role.description }}</option>
-          }
-        </select> -->
-        <!-- CheckMe -->
+        <!-- ========================================CheckMe=============================== -->
         <app-custom-select [options]="rolesFilter" (selectedOptionsChange)="fillOptionsSelected($event)"/>
       </div>
       <div>

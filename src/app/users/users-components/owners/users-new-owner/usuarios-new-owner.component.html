@@ -26,6 +26,7 @@
         <div class="row">
           <label class="col-2 col-form-label">Tipo de Documento</label>
           <div class="col-10">
+            <!-- FixMe: Usen el componente de select personalizado -->
             <select id="selectOption" class="form-select" formControlName="documentType"
               [ngClass]="onValidate('documentType')"
               (ngModelChange)="documentTypeChange()">

@@ -12,12 +12,12 @@ import Swal from 'sweetalert2';
 import { PlotService } from '../../../users-servicies/plot.service';
 import { GetPlotDto } from '../../../users-models/plot/GetPlotDto';
 import { ValidatorsService } from '../../../users-servicies/validators.service';
-import { UsersMultipleSelectComponent } from '../../utils/users-multiple-select/users-multiple-select.component';
+import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
 
 @Component({
   selector: 'app-new-user',
   standalone: true,
-  imports: [FormsModule, CommonModule, ReactiveFormsModule, RouterModule, UsersMultipleSelectComponent],
+  imports: [FormsModule, CommonModule, ReactiveFormsModule, RouterModule, CustomSelectComponent],
   templateUrl: './new-user.component.html',
   styleUrl: './new-user.component.css'
 })
@@ -88,12 +88,12 @@ export class NewUserComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly plotService = inject(PlotService);
   private readonly validatorService = inject(ValidatorsService);
-  @ViewChild(UsersMultipleSelectComponent) rolesComponent!: UsersMultipleSelectComponent;
+  @ViewChild(CustomSelectComponent) rolesComponent!: CustomSelectComponent;
 
   reactiveForm : FormGroup;
   rolesSelected : string[] = [];
   roles: RolModel[] = [];
-  rolesHtmlString: string = '';  //
+  rolesHtmlString: string = '';
   rolesString: string = "Roles añadidos:";
   rolesInput: string[] = [];
   select: string = "";
@@ -118,7 +118,6 @@ export class NewUserComponent implements OnInit {
               this.lotes = data.filter(lote => this.authService.getUser().plotId.includes(lote.id));
               this.reactiveForm.get('plot')?.setValue(this.authService.getUser().plotId.toString());
               this.reactiveForm.get('plot')?.disable();
-
           }else{
             this.lotes = data;
           }
@@ -195,7 +194,6 @@ verifyOptions() {
       this.checkOption = true;
     }
   }
-  
 
   //Se crea el usuario
   createUser() {
@@ -227,8 +225,6 @@ verifyOptions() {
     }else{
       userData.plot_id = 0;
     }
-    
-    
 
     this.userService.postUser(userData).subscribe({
       next: (response) => {

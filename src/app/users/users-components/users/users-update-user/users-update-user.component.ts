@@ -1,18 +1,15 @@
-import { CommonModule, formatDate } from '@angular/common';
-import { AfterContentInit, AfterViewInit, Component, inject, OnInit, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators, FormBuilder } from '@angular/forms';
 import { UserService } from '../../../users-servicies/user.service';
 import { RolModel } from '../../../users-models/users/Rol';
 import { UserGet } from '../../../users-models/users/UserGet';
 import { UserPut } from '../../../users-models/users/UserPut';
-import { data } from 'jquery';
 import { Router, ActivatedRoute } from '@angular/router';
-import { LoginComponent } from '../../../../common/components/users-login/login.component'; 
 import { DateService } from '../../../users-servicies/date.service';
 import { AuthService } from '../../../users-servicies/auth.service';
 import Swal from 'sweetalert2';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { BehaviorSubject } from 'rxjs';
 import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component'; 
 
 @Component({
@@ -37,10 +34,10 @@ throw new Error('Method not implemented.');
       email: new FormControl(''),
       avatar_url: new FormControl(''),
       datebirth: new FormControl(''),
-      roles: new FormControl([],)
+      roles: new FormControl([], [Validators.required])
     })
   }
-  @ViewChild(CustomSelectComponent) rolesComponent!: CustomSelectComponent;
+  @ViewChild(CustomSelectComponent) rolesComponent!: CustomSelectComponent; //FixMe: Usar el customSelect en este componente
 
   private readonly userService = inject(UserService);
   private readonly authService = inject(AuthService);
@@ -50,17 +47,16 @@ throw new Error('Method not implemented.');
   id: string = '';
   checkRole: boolean = false;
 
-  existingRoles: string[] = [];       //Listado de todos los roles
-  userRoles: string[] = [];           //Listado de roles actuales del usuario
-  filteredRoles : string[] = [];      //Listado de roles a mostrar    
-  filteredUserRoles : string[] = [];  //Listado de roles del usuario a mostrar    
-  optionRoles : any[] = [];           //Listado de objetos para el select
-  blockedRoles: string[] = [];        //Listado de roles del usuario sin mostrar
+  existingRoles: string[] = [];                       //Listado de todos los roles
+  userRoles: string[] = [];                           //Listado de roles actuales del usuario
+  filteredRoles : string[] = [];                      //Listado de roles a mostrar    
+  filteredUserRoles : string[] = [];                  //Listado de roles del usuario a mostrar    
+  optionRoles : {name: string, value: any}[] = [];    //Listado de objetos para el select
+  blockedRoles: string[] = [];                        //Listado de roles del usuario sin mostrar
 
   rolesSelected: any[] = [];
 
   
-
   opt: any[] = [];
   checkedOpt: string[] = [];
 

@@ -24,10 +24,10 @@ export class UsersModaInfoPlotComponent implements OnInit {
   plotForm: FormGroup;
   filesPlot: FileDto[];
 
-  ownerName: string = ''; // Para almacenar el nombre del propietario
-  ownerLastName: string = ''; // Para almacenar el apellido del propietario
-  ownerDNI: string = ''; // Para almacenar el DNI del propietario
-  ownerType: string = '' //Tipo de propietario
+  ownerName: string = '';           // Para almacenar el nombre del propietario
+  ownerLastName: string = '';      // Para almacenar el apellido del propietario
+  ownerDNI: string = '';          // Para almacenar el DNI del propietario
+  ownerType: string = ''         //Tipo de propietario
 
   private readonly ownerService = inject(OwnerService);
   private readonly fileService = inject(FileService);
@@ -82,23 +82,4 @@ export class UsersModaInfoPlotComponent implements OnInit {
   downloadFile(fileId: string) {
     this.fileService.downloadFile(fileId);
   }
-
-  // showOwnerType(type : string) : string {
-    
-  //     let color : string = "";
-  //     switch (type) {
-  //       case "Persona Física":
-  //         color = "danger";
-  //         break;
-  //       case "Persona Jurídica":
-  //         color = "primary";
-  //         break;
-  //       case "Otro":
-  //         color = "secondary";
-  //         break;
-  //     }
-
-  //     return `<button class='btn btn-${color} rounded-pill m-1' disabled>${type}</button>`;
-  // }
-
 }
