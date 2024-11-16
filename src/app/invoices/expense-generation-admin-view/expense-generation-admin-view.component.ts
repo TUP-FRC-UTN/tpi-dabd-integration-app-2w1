@@ -4,7 +4,7 @@ import { CommonModule, registerLocaleData } from '@angular/common';
 import { ExpenseGenerationExpenseService } from '../expense-generation-services/expense-generation-expense.service';
 import { ExpenseGenerationExpenseInterface } from '../expense-generation-interfaces/expense-generation-expense-interface';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { Owner } from '../expense-generation-interfaces/owner';
+import { Owner } from '../expense-generation-interfaces/expense-generation-owner';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';

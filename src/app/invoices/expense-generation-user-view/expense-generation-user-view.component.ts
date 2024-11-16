@@ -8,6 +8,8 @@ import { ExpenseGenerationCardComponent } from '../expense-generation-card/expen
 import { ExpenseGenerationPaymentService } from '../expense-generation-services/expense-generation-payment.service';
 import {Router, RouterLink} from '@angular/router';
 import localeEsAr from '@angular/common/locales/es-AR';
+import { OwnerService } from '../expense-generation-services/expense-generation-owner-service';
+import { AuthService } from '../../users/users-servicies/auth.service';
 registerLocaleData(localeEsAr, 'es-AR');
 @Component({
   selector: 'app-expense-generation-user-view',
@@ -30,7 +32,9 @@ export class ExpenseGenerationUserViewComponent implements OnInit {
     private expenseService: ExpenseGenerationExpenseService,
     private paymentService: ExpenseGenerationPaymentService,
     private router:Router,
-    private datePipe:DatePipe
+    private datePipe:DatePipe,
+    private ownerService: OwnerService,
+    private authService: AuthService,
   ) {}
 
 
@@ -54,7 +58,7 @@ export class ExpenseGenerationUserViewComponent implements OnInit {
 
   // Variables
   total: number = 0;
-  ownerId: number = 3;
+  ownerId: number = 0;
   itemsPerPage: number = 5;
   currentPage: number = 1;
   totalItems: number = 0;
@@ -65,15 +69,33 @@ export class ExpenseGenerationUserViewComponent implements OnInit {
   @Output() status = new EventEmitter<number>();
 
   ngOnInit() {
-    const today = new Date();
-    const localDate = new Date(today.getTime() - today.getTimezoneOffset() * 60000);
-    this.endDate = localDate.toISOString().split('T')[0];
-    this.maxEndDate = localDate.toISOString().split('T')[0];
-    this.startDate = new Date(localDate.getFullYear(),0,1).toISOString().split('T')[0];
-    this.getExpensesByOwner();
-    this.selectedExpenses = this.expenseService.getSelectedExpenses();
-    this.calculateTotal();
-    this.updateButtonState();
+    // Obtener el ID del usuario logueado
+    const userId = this.authService.getUser().id;
+    
+    // Buscar el propietario correspondiente
+    this.ownerService.getOwnerByUserId(userId).subscribe({
+      next: (owner) => {
+        if (owner) {
+          this.ownerId = owner.id; 
+          this.getExpensesByOwner(); 
+          
+          const today = new Date();
+          const localDate = new Date(today.getTime() - today.getTimezoneOffset() * 60000);
+          this.endDate = localDate.toISOString().split('T')[0];
+          this.maxEndDate = localDate.toISOString().split('T')[0];
+          this.startDate = new Date(localDate.getFullYear(), 0, 1).toISOString().split('T')[0];
+          
+          this.selectedExpenses = this.expenseService.getSelectedExpenses();
+          this.calculateTotal();
+          this.updateButtonState();
+        } else {
+          console.error('No se encontró un propietario para el usuario logueado');
+        }
+      },
+      error: (error) => {
+        console.error('Error al obtener el propietario:', error);
+      }
+    });
   }
 
   goToPaymentForm(){

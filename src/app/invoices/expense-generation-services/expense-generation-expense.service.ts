@@ -2,8 +2,8 @@ import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http
 import { Injectable } from '@angular/core';
 import { catchError, forkJoin, map, mergeMap, Observable, throwError } from 'rxjs';
 import { ExpenseGenerationExpenseInterface } from '../expense-generation-interfaces/expense-generation-expense-interface';
-import { Owner } from '../expense-generation-interfaces/owner';
-import { ExpenseUpdateDTO } from '../expense-generation-interfaces/expense-update.interface';
+import { Owner } from '../expense-generation-interfaces/expense-generation-owner';
+import { ExpenseUpdateDTO } from '../expense-generation-interfaces/expense-generation-update.interface';
 import { ExpensePaymentUpdateDTO } from '../expense-generation-interfaces/expense-generation-payment-interface';
 @Injectable({
   providedIn: 'root'
@@ -126,7 +126,6 @@ updateExpense(expenseData: ExpenseUpdateDTO, observation: string): Observable<an
       catchError(this.handleError)
     );
 }
-// ----------------------------------------------------------------------------------
 
 getMultipliers(): Observable<{ latePayment: number; expiration: number }> {
   const latePaymentUrl = `${this.ApiBaseUrl}late-payment-multiplier`;
