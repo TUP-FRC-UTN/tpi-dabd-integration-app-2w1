@@ -1,19 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, inject, OnInit, Output } from '@angular/core';
-import {
-  FormControl,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
-import { UserService } from '../../../users-servicies/user.service';
-import { LoginUser } from '../../../users-models/users/Login';
+import {FormControl,FormGroup,FormsModule,ReactiveFormsModule,Validators,} from '@angular/forms';
+import { UserService } from '../../../users/users-servicies/user.service';
+import { LoginUser } from '../../../users/users-models/users/Login';
 import { Router, RouterModule } from '@angular/router';
-import { LoginService } from '../../../users-servicies/login.service';
-import { AuthService } from '../../../users-servicies/auth.service';
-import { UserLoged } from '../../../users-models/users/UserLoged';
-import { ValidatorsService } from '../../../users-servicies/validators.service';
+import { LoginService } from '../../../users/users-servicies/login.service';
+import { AuthService } from '../../../users/users-servicies/auth.service';
+import { UserLoged } from '../../../users/users-models/users/UserLoged';
+import { ValidatorsService } from '../../../users/users-servicies/validators.service';
 
 @Component({
   selector: 'app-login',
@@ -85,7 +79,7 @@ export class LoginComponent {
       next: async (data) => {
         await this.authService.login(data);
         this.errorLog = false;
-        this.router.navigate(['home']);
+        this.router.navigate(['main/home']);
       
       },
       error: (error) => {

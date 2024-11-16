@@ -453,7 +453,7 @@ export class UsersListPlotsComponent {
       case "Residencial":
         color = "text-bg-success";
         break;
-      case "Baldío":
+      case "Baldio":
         color = "text-bg-danger";
         break;
     }
@@ -471,7 +471,7 @@ export class UsersListPlotsComponent {
       case "Habitado":
         color = "text-bg-secondary";
         break;
-      case "En construcción":
+      case "En construccion":
         color = "text-bg-danger";
         break;
     }

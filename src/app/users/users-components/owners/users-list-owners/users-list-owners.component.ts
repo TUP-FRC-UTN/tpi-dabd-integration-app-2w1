@@ -192,10 +192,10 @@ export class UsersListOwnersComponent {
     let color = '';
     
     switch (ownerType) {
-      case 'Persona Física':
+      case 'Persona Fisica':
         color = 'text-bg-primary';
         break;
-      case 'Persona Jurídica':
+      case 'Persona Juridica':
         color = 'text-bg-danger';
         break;
     }

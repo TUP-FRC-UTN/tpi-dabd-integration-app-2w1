@@ -1,7 +1,7 @@
 import { Component, inject, Input, OnInit } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { ChangePasswordService } from '../../../users-servicies/change-password.service';
+import { ChangePasswordService } from '../../../users/users-servicies/change-password.service';
 import Swal from 'sweetalert2';
 @Component({
   selector: 'app-users-change-password',

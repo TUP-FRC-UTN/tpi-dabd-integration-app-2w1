@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { RecoveryPasswordService } from '../../../users-servicies/recoveryPassword.service';
+import { RecoveryPasswordService } from '../../../users/users-servicies/recoveryPassword.service';
 
 @Component({
   selector: 'app-users-recovery-password',

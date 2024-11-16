@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from '../../../users-servicies/auth.service';
-import { UserLoged } from '../../../users-models/users/UserLoged';
-import { WeatherService } from '../../../users-servicies/weather.service';
-import { WeatherData } from '../../../users-models/weather/WeatherData';
+import { AuthService } from '../../../users/users-servicies/auth.service';
+import { UserLoged } from '../../../users/users-models/users/UserLoged';
+import { WeatherService } from '../../../users/users-servicies/weather.service';
+import { WeatherData } from '../../../users/users-models/weather/WeatherData';
 import { CommonModule } from '@angular/common';
-import { Notification } from '../../../users-models/notifications/Notification';
-import { NotificationsService } from '../../../users-servicies/notifications.service';
+import { LandingNotification } from '../../models/Landing-notification';
+import { NotificationService } from '../../../notifications/service/notification.service';
+import { NotificationsService } from '../../../users/users-servicies/notifications.service';
 
 @Component({
   selector: 'app-users-home',
@@ -24,7 +25,7 @@ export class UsersHomeComponent implements OnInit {
   userName: string = '';
   weather: WeatherData | null = null;
   forecast: WeatherData[] = [];
-  notifications: Notification[] = [];
+  notifications: LandingNotification[] = [];
 
   ngOnInit() {
     this.weatherService.getForecast();
