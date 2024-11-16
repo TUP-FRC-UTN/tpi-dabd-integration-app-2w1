@@ -1,25 +1,24 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators} from '@angular/forms';
 import { ExpenseGenerationExpenseInterface } from '../expense-generation-interfaces/expense-generation-expense-interface';
 import { ExpenseGenerationExpenseService } from '../expense-generation-services/expense-generation-expense.service';
 import { ExpenseGenerationPaymentService } from '../expense-generation-services/expense-generation-payment.service';
 import { Stripe, StripeCardElement } from '@stripe/stripe-js';
 import { CurrencyPipe, DatePipe, NgClass, NgFor, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from "@angular/common";
 import { loadStripe } from '@stripe/stripe-js';
-import { buffer } from 'stream/consumers';
+import {RouterLink, Router} from '@angular/router';
+import { ExpensePaymentUpdateDTO } from '../expense-generation-interfaces/expense-generation-payment-interface';
 
 declare var Swal: any;
-
 
 @Component({
   selector: 'app-expense-generation-payment-form',
   standalone: true,
   imports: [ReactiveFormsModule,
-    NgClass,
     DatePipe,
     CurrencyPipe,
+    RouterLink,
     NgFor,
-    NgIf,
     NgSwitch,
     NgSwitchCase,
     NgSwitchDefault],
@@ -39,26 +38,38 @@ export class ExpenseGenerationPaymentFormComponent implements OnInit {
 
   expensesToPay: ExpenseGenerationExpenseInterface[] = [];
   paymentIntentId: string = "";
-  clientSecret: string = "";
   error: string = '';
   paymentStatusMessage: string = '';
+  clientSecret: string = "";
   processing: boolean = false;
   paymentSuccessful: boolean = false;
 
   constructor(
     private formBuilder: FormBuilder,
     public expenseService: ExpenseGenerationExpenseService,
-    public checkout: ExpenseGenerationPaymentService
+    public checkout: ExpenseGenerationPaymentService,
+    private router: Router
   ) {
     this.paymentForm = this.formBuilder.group({
-      cardHolderName: ['', Validators.required],
-      dni: ['', Validators.required]
+      cardHolderName: ['', [Validators.required,Validators.minLength(5)]],
+      dni: ['', [Validators.required,this.validDni]],
     });
+  }
+
+  validDni(control:FormControl){
+    const dni = control.value;
+    if (dni.length != 8) {
+      return {invalidDni: true};
+    }
+    if (!/^\d+$/.test(dni)) {
+      return { invalidDni: true };
+    }
+    return null;
   }
 
   async ngOnInit() {
     this.expensesToPay = this.expenseService.getSelectedExpenses();
-    this.total = this.expensesToPay.reduce((sum, expense) => sum + expense.first_expiration_amount, 0);
+    this.total = this.expensesToPay.reduce((sum, expense) => sum + expense.actual_amount, 0);
 
     this.stripe = await loadStripe('pk_test_51Q3iwwRwJDdlWggbw9AqW6ETZEuj0aRgDME6NdDAbamdDihYRdK4k0G1dbR3IPNYqm3k2vt1tCpIJKrQ85IR8rNE00mGz2BoE9');
     if (this.stripe) {
@@ -82,6 +93,7 @@ export class ExpenseGenerationPaymentFormComponent implements OnInit {
       console.error("Stripe no se pudo inicializar");
     }
   }
+
 
   async onSubmit() {
     if (this.paymentForm.invalid || !this.stripe || !this.cardElement) {
@@ -112,10 +124,14 @@ export class ExpenseGenerationPaymentFormComponent implements OnInit {
         throw new Error(result.error.message || "Error al confirmar el pago");
       }
 
-      this.paymentSuccessful = true;
+      this.confirmPayment();
+
       this.updateExpenseStatus(result.paymentIntent.id);
 
+      this.paymentSuccessful = true;
+
       //----   sweet alert message   ------
+
       Swal.fire({
         title: "Pago realizado con exito!",
         text: "Deseas descargar el comprobante ?",
@@ -137,7 +153,6 @@ export class ExpenseGenerationPaymentFormComponent implements OnInit {
           this.goBack();
 
         }
-        
         else if (result.isDenied) {
           // Si presiona Descargar
           Swal.fire({
@@ -147,16 +162,11 @@ export class ExpenseGenerationPaymentFormComponent implements OnInit {
             showConfirmButton: false,
             didOpen: () => {
               Swal.showLoading();
-              // Aquí tu lógica de descarga
               this.openPdf().then(() => {
-                Swal.fire(
-                  "¡Listo!",
-                  "El comprobante se ha descargado correctamente",
-                  "success"
-                  
-                );
+                Swal.close();
                 this.goBack();
               }).catch(() => {
+                Swal.close();
                 Swal.fire(
                   "Error",
                   "No se pudo descargar el comprobante",
@@ -166,6 +176,7 @@ export class ExpenseGenerationPaymentFormComponent implements OnInit {
               });
             }
           });
+
         }
       });
 
@@ -182,6 +193,8 @@ export class ExpenseGenerationPaymentFormComponent implements OnInit {
       this.processing = false;
     }
   }
+
+
 
   async createPaymentIntent(): Promise<{ clientSecret: string } | undefined> {
     const currency = 'ars';
@@ -203,10 +216,19 @@ export class ExpenseGenerationPaymentFormComponent implements OnInit {
     return response;
   }
 
+  async confirmPayment() {
+    const resut = await this.checkout.confirmPayment(this.paymentIntentId).toPromise();
+    if (resut == "succeded") {
+      console.log('Payment confirmed successfully', resut);
+    }
+
+  }
+
 
   goBack() {
     this.expenseService.clearSelectedExpenses();
     this.status.emit(1);
+    this.router.navigate(['/expense-generation-user-view']);
   }
 
 
@@ -226,23 +248,35 @@ export class ExpenseGenerationPaymentFormComponent implements OnInit {
   }
 
   updateExpenseStatus(paymentId: string) {
-    const updateDTO = {
-      expenseId: this.expensesToPay[0].id,
+    const updateDTOs: ExpensePaymentUpdateDTO[] = this.expensesToPay.map(expense => ({
+      expenseId: expense.id,
       status: 'Pago',
-      paymentId: paymentId
-    };
+      paymentId: paymentId,
+      paymentPlatform: 'Stripe',
+      amount: expense.actual_amount,
+      paymentMethod: "Tarjeta"
+    }));
 
-    this.expenseService.updateStatus(updateDTO).subscribe(
-      (response) => {
+    console.log('Sending payload:', updateDTOs);
+
+    this.expenseService.updateStatus(updateDTOs).subscribe({
+      next: (response) => {
         console.log('Status updated successfully', response);
+        // Aquí puedes agregar lógica adicional después de una actualización exitosa
       },
-      (error) => {
-        console.error('Error updating status', error);
+      error: (error) => {
+        console.error('Error updating status:', error);
+        let errorMessage = 'No se pudo actualizar el estado de las boletas.';
+
+        // Manejo específico de errores
+        if (error.status === 400) {
+          errorMessage += ' Verifique los datos enviados.';
+        } else if (error.status === 500) {
+          errorMessage += ' Error interno del servidor.';
+        }
       }
-    );
+    });
   }
-
-
 }
 
 

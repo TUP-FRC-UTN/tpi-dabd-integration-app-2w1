@@ -2,11 +2,11 @@ export interface ExpenseGenerationExpenseInterface {
 
     id: number;
     owner_id : number;
+    dni_type : string;
     period: string;
     issueDate: Date;
     status: string;
     uuid: string;
-
     first_expiration_date: string;
     first_expiration_amount: number;
     second_expiration_date: string;
@@ -17,8 +17,8 @@ export interface ExpenseGenerationExpenseInterface {
     payment_platform: string;
     payment_id: string;
     selected?: boolean;
-    paymentDate?: Date; 
-    //status tipe : Pago, Pendiente, Exceptuado pero el exceptuado no lo uso
+    paymentDate?: Date;
+    
 
 
 }

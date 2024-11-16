@@ -1,0 +1,679 @@
+
+<br>
+<br>
+
+
+<div class="container">
+
+    <!-- Filtors -->
+    <div class="row sticky-section border-0 rounded-4 p-3 shadow mb-4">
+
+        <div class="row">
+            <!-- Filtro de fechas -->
+            <div class="col d-flex gap-3">
+                <div class="col">
+                    <input type="month" class="form-control border-1 bg-light" [(ngModel)]="periodFrom"
+                        (ngModelChange)="aplyFilters()" [max]="periodTo" [min]="minDateFrom">
+                </div>
+                <div class="col">
+                    <input type="month" class="form-control border-1 bg-light" [(ngModel)]="periodTo"
+                        (ngModelChange)="aplyFilters()" [min]="periodFrom">
+                </div>
+            </div>
+
+            <!-- Botones de exportar -->
+            <div class="col-auto d-flex gap-1 ms-auto">
+                <button class="btn btn-primary filterbutton" data-bs-toggle="modal" title="Filtros Avanzados"
+                    data-bs-target="#filtrosAvanzados">
+                    <i class="bi bi-funnel-fill"></i>
+                </button>
+                <button type="button" class="btn btn-secondary bi bi-trash filterbutton"
+                    title="Limpiar Filtros"></button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ---------------------------------------------------------------------------------------- -->
+
+
+    <!-- Grilla del dashboard -->
+    <div class="row position-relative min-vh-75">
+
+        <!-- Contenedor para cuando un grafico es grande -->
+        <div class="container d-flex gap-3" *ngIf="status !== 0">
+
+            <!-- Grafico de columnas -->
+
+            <div class="col-md-9" *ngIf="status === 1">
+                <div class="card border-0 shadow-lg  rounded-4 h-100 w-100">
+                    <div class="card-body">
+                        <div class=" align-items-center mb-4">
+                            <div class="back-arrow d-flex justify-content-start" (click)="makeBig(0)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="gray"
+                                    class="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
+                                    <path
+                                        d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h5 class="card-title text-secondary mb-1  d-flex justify-content-center">Comparacion de
+                                    Ingresos</h5>
+                                <small class="text-secondary d-flex justify-content-center">Rendimiento por
+                                    periodo</small>
+                            </div>
+                        </div>
+                        <google-chart [type]="columnChartType" [data]="columnChartData" [options]="columnChartOptions"
+                            class="w-100 expanded-chart-content">
+                        </google-chart>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KPIs para el gráfico de columnas cuando es grande-->
+            <div class="col-md-3" *ngIf="status === 1">
+                <!-- Total Recaudado/Morosos -->
+                <div class="row">
+                    <div class="col mb-3">
+                        <div class="card border-0 shadow-lg mb-3 rounded-4 h-100 w-100"
+                            style="background-color: #d8ffedde;">
+                            <div class="card-body position-relative">
+                                <i class="bi bi-cash-stack position-absolute top-50 end-0 translate-middle-y me-4"
+                                    style="font-size: 2.5rem; color: #198754; opacity: 0.8;"></i>
+                                <div class="pe-5">
+                                    <h6 class="text-secondary mb-2">{{ columnPaymentStatus === 'Aprobado' ? 'Total Recaudado'
+                                        : 'Total Morosos'}}</h6>
+                                    <h3 class="mb-0">{{ columnKPIs.totalPeriod | number:'1.0-0' }}
+                                        <small class="text-muted">{{ columnPaymentStatus === 'Aprobado' ? '$' : '' }}</small>
+                                    </h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Promedio Mensual -->
+                <div class="row">
+                    <div class="col mb-3">
+                        <div class="card border-0 shadow-lg mb-3 rounded-4 h-100 w-100"
+                            style="background-color: #e8f5e9;">
+                            <div class="card-body position-relative">
+                                <i class="bi bi-calendar3 position-absolute top-50 end-0 translate-middle-y me-4"
+                                    style="font-size: 2.5rem; color: #2e7d32; opacity: 0.8;"></i>
+                                <div class="pe-5">
+                                    <h6 class="text-secondary mb-2">Promedio Mensual</h6>
+                                    <h3 class="mb-0">{{ columnKPIs.monthlyAverage | number:'1.0-0' }}
+                                        <small class="text-muted">{{ columnPaymentStatus === 'Aprobado' ? '$' : '' }}</small>
+                                    </h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mejor Mes -->
+                <div class="row">
+                    <div class="col mb-3">
+                        <div class="card border-0 shadow-lg mb-3 rounded-4 h-100 w-100"
+                            style="background-color: #e3f2fd;">
+                            <div class="card-body position-relative">
+                                <i class="bi bi-trophy position-absolute top-50 end-0 translate-middle-y me-4"
+                                    style="font-size: 2.5rem; color: #1565c0; opacity: 0.8;"></i>
+                                <div class="pe-5">
+                                    <h6 class="text-secondary mb-2">Mejor Mes</h6>
+                                    <h3 class="mb-0">{{ columnKPIs.bestMonth.value | number:'1.0-0' }}
+                                        <small class="text-muted">{{ columnPaymentStatus === 'Aprobado' ? '$' : '' }}</small>
+                                    </h3>
+                                    <small class="text-muted">{{ columnKPIs.bestMonth.month }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KPIs para el gráfico de pie cuando el grafico es grande -->
+            <div class="col-md-3" *ngIf="status === 2">
+                <!-- Método más usado -->
+                <div class="row">
+                    <div class="col mb-3">
+                        <div class="card border-0 shadow-lg mb-3 rounded-4 h-100 w-100" [ngClass]="{
+                                'bg-mp': pieKPIs.topMethod.name === 'Mercadopago',
+                                'bg-stripe': pieKPIs.topMethod.name === 'Stripe',
+                                'bg-efectivo': pieKPIs.topMethod.name === 'Efectivo'
+                             }">
+                            <div class="card-body position-relative">
+                                <i class="bi bi-credit-card position-absolute top-50 end-0 translate-middle-y me-4"
+                                    style="font-size: 2.5rem; color: #e65100; opacity: 0.8;"></i>
+                                <div class="pe-5">
+                                    <h6 class="text-secondary mb-2">Método más usado</h6>
+                                    <h3 class="mb-0">{{ pieKPIs.topMethod.name }}</h3>
+                                    <small class="text-muted">{{ pieKPIs.topMethod.percentage | number:'1.0-1' }}% del
+                                        total</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Transacciones -->
+                <div class="row">
+                    <div class="col mb-3">
+                        <div class="card border-0 shadow-lg mb-3 rounded-4 h-100 w-100"
+                            style="background-color: #fff3e0;">
+                            <div class="card-body position-relative">
+                                <i class="bi bi-arrow-left-right position-absolute top-50 end-0 translate-middle-y me-4"
+                                    style="font-size: 2.5rem; color: #e65100; opacity: 0.8;"></i>
+                                <div class="pe-5">
+                                    <h6 class="text-secondary mb-2">Total Transacciones</h6>
+                                    <h3 class="mb-0">{{ pieKPIs.totalTransactions | number }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Promedio por Transacción -->
+                <div class="row">
+                    <div class="col mb-3">
+                        <div class="card border-0 shadow-lg mb-3 rounded-4 h-100 w-100"
+                            style="background-color: #e7f1ff;">
+                            <div class="card-body position-relative">
+                                <i class="bi bi-graph-up position-absolute top-50 end-0 translate-middle-y me-4"
+                                    style="font-size: 2.5rem; color: #004085; opacity: 0.8;"></i>
+                                <div class="pe-5">
+                                    <h6 class="text-secondary mb-2">Promedio por Transacción</h6>
+                                    <div *ngFor="let method of pieKPIs.averagePerMethod | keyvalue">
+                                        <small class="text-muted">{{ method.key }}: ${{ method.value | number:'1.0-0'
+                                            }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TOP 5 KPIs cuando el grafico es grande -->
+            <div class="col-md-3" *ngIf="status === 3">
+                <!-- Boleta más alta -->
+                <div class="row">
+                    <div class="col mb-3">
+                        <div class="card border-0 shadow-lg mb-3 rounded-4 h-100 w-100"
+                            style="background-color: #fff3cd;">
+                            <div class="card-body position-relative">
+                                <i class="bi bi-receipt position-absolute top-50 end-0 translate-middle-y me-4"
+                                    style="font-size: 2.5rem; color: #856404; opacity: 0.8;"></i>
+                                <div class="pe-5">
+                                    <h6 class="text-secondary mb-2">Boleta más alta</h6>
+                                    <h3 class="mb-0">{{ topExpenseKPIs.highestAmount | number:'1.0-0' }}
+                                        <small class="text-muted">$</small>
+                                    </h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Promedio Top 5 -->
+                <div class="row">
+                    <div class="col mb-3">
+                        <div class="card border-0 shadow-lg mb-3 rounded-4 h-100 w-100"
+                            style="background-color: #fff3cd;">
+                            <div class="card-body position-relative">
+                                <i class="bi bi-bar-chart position-absolute top-50 end-0 translate-middle-y me-4"
+                                    style="font-size: 2.5rem; color: #856404; opacity: 0.8;"></i>
+                                <div class="pe-5">
+                                    <h6 class="text-secondary mb-2">Promedio Top 5</h6>
+                                    <h3 class="mb-0">{{ topExpenseKPIs.averageTop5 | number:'1.0-0' }}
+                                        <small class="text-muted">$</small>
+                                    </h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Top 5 -->
+                <div class="row">
+                    <div class="col mb-3">
+                        <div class="card border-0 shadow-lg mb-3 rounded-4 h-100 w-100"
+                            style="background-color: #fff3cd;">
+                            <div class="card-body position-relative">
+                                <i class="bi bi-calculator position-absolute top-50 end-0 translate-middle-y me-4"
+                                    style="font-size: 2.5rem; color: #856404; opacity: 0.8;"></i>
+                                <div class="pe-5">
+                                    <h6 class="text-secondary mb-2">Total Top 5</h6>
+                                    <h3 class="mb-0">{{ topExpenseKPIs.totalTop5 | number:'1.0-0' }}
+                                        <small class="text-muted">$</small>
+                                    </h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Grafico de pie -->
+            <div class="col-9" *ngIf="status === 2">
+                <div class="card border-0 shadow-lg  rounded-4 h-100">
+                    <div class="card-body">
+                        <div class=" align-items-center mb-4">
+                            <div class="back-arrow d-flex justify-content-start" (click)="makeBig(0)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="gray"
+                                    class="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
+                                    <path
+                                        d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h5 class="card-title text-secondary mb-1 d-flex justify-content-center">Promedios de
+                                    pagos</h5>
+                                <small class="text-secondary d-flex justify-content-center">Metodos de pago</small>
+                            </div>
+                        </div>
+                        <google-chart [type]="pieChartType" [data]="pieChartData" [options]="pieChartOptions"
+                            class="w-100 " style="height:80%">
+                        </google-chart>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- TOP 5 Chart -->
+            <div class="col-9" *ngIf="status === 3">
+                <div class="card border-0 shadow-lg rounded-4 h-75">
+                    <div class="card-body">
+                        <div class=" align-items-center mb-4">
+                            <div class="back-arrow d-flex justify-content-start" (click)="makeBig(0)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="gray"
+                                    class="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
+                                    <path
+                                        d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h5 class="card-title text-secondary mb-1 d-flex justify-content-center">TOP 5</h5>
+                                <small class="text-secondary d-flex justify-content-center">Expensas más caras</small>
+                            </div>
+                        </div>
+                        <google-chart [type]="barChartType" [data]="top5ChartData" [options]="top5ChartOptions"
+                            class="w-100" style="height: 80%">
+                        </google-chart>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- --------------------------------------------------------------------------------------------------- -->
+
+        <!-- KPIs generales, cuando se ven todos los graficos juntos -->
+        <div class="col-md-3" *ngIf="status === 0">
+
+            <!-- KPI General para Columnas -->
+            <div class="row">
+                <div class="col">
+                    <div class="card border-0 shadow-lg rounded-4  mb-4 hover-scale" (click)="makeBig(1)"
+                        style="background-color: #d8ffedde;">
+                        <div class="card-body position-relative">
+                            <!-- Icono de dinero -->
+                            <i class="bi bi-cash-stack position-absolute top-50 end-0 translate-middle-y me-4"
+                                style="font-size: 2.5rem; color: #198754; opacity: 0.8;"></i>
+
+                            <!-- Contenido existente -->
+                            <div class="pe-5"> <!-- Añadimos padding-end para dar espacio al icono -->
+                                <h6 class="text-secondary mb-2">Resumen de {{ columnPaymentStatus === 'Aprobado' ? 'Ingresos'
+                                    : 'Morosos' }}</h6>
+                                <h3 class="mb-0">{{ columnKPIs.totalPeriod | number:'1.0-0' }}
+                                    <small class="text-muted">{{ columnPaymentStatus === 'Aprobado' ? '$' : '' }}</small>
+                                </h3>
+                                <small class="text-muted">Promedio mensual: {{ columnKPIs.monthlyAverage |
+                                    number:'1.0-0' }}{{ columnPaymentStatus === 'Aprobado' ? '$' : '' }}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- KPI General para Métodos de Pago -->
+            <div class="row">
+                <div class="col">
+                    <div class="card border-0 shadow-lg rounded-4  mb-4 hover-scale" (click)="makeBig(2)" [ngClass]="{
+                        'bg-mp': topMethodName === 'Mercadopago',
+                        'bg-stripe': topMethodName === 'Stripe',
+                        'bg-efectivo': topMethodName === 'EFECTIVO'
+                      }">
+                        <div class="card-body">
+                            <h6 class="text-secondary mb-2">Métodos de Pago</h6>
+                            <h3 class="mb-0">{{ pieKPIs.totalTransactions | number }}</h3>
+                            <small class="text-muted">Método principal: {{ pieKPIs.topMethod.name }} ({{
+                                pieKPIs.topMethod.percentage | number:'1.0-1' }}%)</small>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- KPI Boleta más alta -->
+            <div class="row">
+                <div class="col">
+                    <div class="card border-0 shadow-lg rounded-4 mb-4 hover-scale" (click)="makeBig(3)"
+                        style="background-color: #fff3cd;">
+                        <div class="card-body position-relative">
+                            <i class="bi bi-receipt position-absolute top-50 end-0 translate-middle-y me-4"
+                                style="font-size: 2.5rem; color: #856404; opacity: 0.8;"></i>
+                            <div class="pe-5">
+                                <h6 class="text-secondary mb-2">Boleta más alta</h6>
+                                <h3 class="mb-0">{{ topExpenseKPIs.highestAmount | number:'1.0-0' }}
+                                    <small class="text-muted">$</small>
+                                </h3>
+                                <small class="text-muted">Promedio Top 5: {{ topExpenseKPIs.averageTop5 | number:'1.0-0'
+                                    }}$</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--  KPI Método más usado con promedio -->
+            <div class="row">
+                <div class="col">
+                    <div class="card border-0 shadow-lg rounded-4 mb-4 hover-scale" (click)="makeBig(2)"
+                        style="background-color: #e7f1ff;">
+                        <div class="card-body position-relative">
+                            <i class="bi bi-graph-up position-absolute top-50 end-0 translate-middle-y me-4"
+                                style="font-size: 2.5rem; color: #004085; opacity: 0.8;"></i>
+                            <div class="pe-5">
+                                <h6 class="text-secondary mb-2">{{ pieKPIs.topMethod.name }} - Promedio</h6>
+                                <h3 class="mb-0">{{ pieKPIs.averagePerMethod[pieKPIs.topMethod.name] | number:'1.0-0' }}
+                                    <small class="text-muted">$</small>
+                                </h3>
+                                <small class="text-muted">{{ pieKPIs.topMethod.percentage | number:'1.0-1' }}% de las
+                                    transacciones</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+        </div>
+
+
+        <!-- Grafico de columnas  -->
+        <div class="col-12 col-lg-5 mb-4" *ngIf="status === 0">
+            <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover-scale" (click)="makeBig(1)">
+                <div class="card-body ">
+                    <div class="d-flex justify-content-center align-items-center ">
+                        <div class="text-center">
+                            <h5 class="card-title  text-secondary mb-1">Comparacion de Ingresos</h5>
+                            <small class="text-secondary ">Rendimiento por periodo</small>
+                        </div>
+                    </div>
+
+                    <google-chart [type]="columnChartType" [data]="columnChartData" [options]="columnChartOptions"
+                        class="w-100">
+                    </google-chart>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Graficos de torta y top 5 -->
+        <div class="col-12 col-lg-4" *ngIf="status === 0">
+            <div class="mb-4">
+                <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover-scale" (click)="makeBig(2)">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-center align-items-center mb-4">
+                            <div>
+                                <h5 class="card-title text-secondary mb-1">Promedios de pagos</h5>
+                                <small class="text-secondary">Medios de pago</small>
+                            </div>
+                        </div>
+                        <google-chart [type]="pieChartType" [data]="pieChartData" [options]="pieChartOptions"
+                            class="w-100">
+                        </google-chart>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover-scale" (click)="makeBig(3)">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-center align-items-center mb-4">
+                            <div>
+                                <h5 class="card-title text-secondary mb-1">TOP 5</h5>
+                                <small class="text-secondary">Expensas mas caras</small>
+                            </div>
+                        </div>
+                        <google-chart [type]="barChartType" [data]="top5ChartData" [options]="top5ChartOptions"
+                            class="w-100">
+                        </google-chart>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- Modal de info -->
+<div class="modal fade" id="infoModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Información del Dashboard</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bienvenido al Dashboard de Generación de Gastos. Este panel te permite:</p>
+                <ul>
+                    <li>Visualizar estadísticas de gastos en tiempo real, incluyendo gráficos y tablas detalladas.</li>
+                    <li>Generar reportes personalizados basados en diferentes criterios como fechas, categorías y más.
+                    </li>
+                    <li>Acceder a un historial completo de tus gastos y realizar análisis comparativos.</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Modal de filtros avanzados -->
+<div class="modal fade" id="filtrosAvanzados" tabindex="-1" aria-labelledby="filtrosAvanzadosLabel" aria-hidden="true"
+    data-bs-keyboard="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="filtrosAvanzadosLabel">Filtros Avanzados</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                @if (status == 0) {
+                      <!-- Filtros para Gráfico de Columnas -->
+                <div class="mb-4">
+                    <h6 class="border-bottom pb-2">Filtros para Comparación de Ingresos</h6>
+                    <div class="row g-3">
+                        <!-- Estado de Pago -->
+                        <div class="col">
+                            <label class="form-label">Estado de Pago</label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="columnPaymentStatus" id="columnApproved"
+                                [(ngModel)]="columnPaymentStatus" value="Aprobado" (ngModelChange)="aplyFilters()">
+                                <label class="btn btn-outline-primary" for="columnApproved">
+                                    <i class="bi bi-check-circle me-1"></i>Ingresos
+                                </label>
+                                <input type="radio" class="btn-check" name="columnPaymentStatus" id="columnRejected"
+                                [(ngModel)]="columnPaymentStatus" value="Rechazado" (ngModelChange)="aplyFilters()">
+                                <label class="btn btn-outline-primary" for="columnRejected">
+                                    <i class="bi bi-x-circle me-1"></i>Morosos
+                                </label>
+                            </div>
+                        </div>
+                       
+                    </div>
+                </div>
+
+                <!-- Filtros para Gráfico de Torta -->
+                <div class="mb-4">
+                    <h6 class="border-bottom pb-2">Filtros para Promedios de Pagos</h6>
+                    <div class="row g-3">
+                        <!-- Estado de Aprobación -->
+                        <div class="col">
+                            <label class="form-label">Estado de Aprobación</label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="pieApprovalStatus" id="pieApproved"
+                                [(ngModel)]="pieApprovalStatus"  value="Aprobado" (ngModelChange)="aplyFilters()">
+                                <label class="btn btn-outline-primary" for="pieApproved">
+                                    <i class="bi bi-check-circle me-1"></i>Aprobados
+                                </label>
+                                <input type="radio" class="btn-check" name="pieApprovalStatus" id="pieRejected"
+                                [(ngModel)]="pieApprovalStatus"  value="Rechazado" (ngModelChange)="aplyFilters()">
+                                <label class="btn btn-outline-primary" for="pieRejected">
+                                    <i class="bi bi-x-circle me-1"></i>Rechazados
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filtros para TOP 5 -->
+                <div class="mb-4">
+                    <h6 class="border-bottom pb-2">Filtros para TOP 5 Expensas</h6>
+                    <div class="row g-3">
+                        <!-- Plataforma de Pago -->
+                        <div class="col mt-4">
+                            <label class="form-label">Plataforma de Pago</label>
+                            <div class="dropdown">
+                                <button class="btn  border dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    
+                                </button>
+                                <ul class="dropdown-menu w-100">
+                                    <li *ngFor="let platform of paymentPlatforms">
+                                        <label class="dropdown-item">
+                                            <div class="form-check">
+                                                <input class="form-check-input" 
+                                                       type="checkbox" 
+                                                       [checked]="selectedPaymentPlatforms.includes(platform.id)"
+                                                       (change)="toggleSelection(platform.id)">
+                                                <span class="ms-2">
+                                                    {{platform.name}}
+                                                </span>
+                                            </div>
+                                        </label>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                }
+
+                @if (status == 1) {
+                           <!-- Filtros para Gráfico de Columnas -->
+                <div class="mb-4">
+                    <h6 class="border-bottom pb-2">Filtros para Comparación de Ingresos</h6>
+                    <div class="row g-3">
+                        <!-- Estado de Pago -->
+                        <div class="col">
+                            <label class="form-label">Estado de Pago</label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="columnPaymentStatus" id="columnApproved"
+                                [(ngModel)]="columnPaymentStatus" value="Aprobado" (ngModelChange)="aplyFilters()">
+                                <label class="btn btn-outline-primary" for="columnApproved">
+                                    <i class="bi bi-check-circle me-1"></i>Ingresos
+                                </label>
+                                <input type="radio" class="btn-check" name="columnPaymentStatus" id="columnRejected"
+                                [(ngModel)]="columnPaymentStatus" value="Rechazado" (ngModelChange)="aplyFilters()">
+                                <label class="btn btn-outline-primary" for="columnRejected">
+                                    <i class="bi bi-x-circle me-1"></i>Morosos
+                                </label>
+                            </div>
+                        </div>
+                       
+                    </div>
+                </div>
+                }
+
+                @if (status == 2) {
+                      <!-- Filtros para Gráfico de Torta -->
+                <div class="mb-4">
+                    <h6 class="border-bottom pb-2">Filtros para Promedios de Pagos</h6>
+                    <div class="row g-3">
+                        <!-- Estado de Aprobación -->
+                        <div class="col">
+                            <label class="form-label">Estado de Aprobación</label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="pieApprovalStatus" id="pieApproved"
+                                [(ngModel)]="pieApprovalStatus"  value="Aprobado" (ngModelChange)="aplyFilters()">
+                                <label class="btn btn-outline-primary" for="pieApproved">
+                                    <i class="bi bi-check-circle me-1"></i>Aprobados
+                                </label>
+                                <input type="radio" class="btn-check" name="pieApprovalStatus" id="pieRejected"
+                                [(ngModel)]="pieApprovalStatus"  value="Rechazado" (ngModelChange)="aplyFilters()">
+                                <label class="btn btn-outline-primary" for="pieRejected">
+                                    <i class="bi bi-x-circle me-1"></i>Rechazados
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                }
+
+                @if (status == 3) {
+                <!-- Filtros para TOP 5 -->
+                <div class="mb-4">
+                    <h6 class="border-bottom pb-2">Filtros para TOP 5 Expensas</h6>
+                    <div class="row g-3">
+                        <!-- Plataforma de Pago -->
+                        <div class="col mt-4">
+                            <label class="form-label">Plataforma de Pago</label>
+                            <div class="dropdown">
+                                <button class="btn  border dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    
+                                </button>
+                                <ul class="dropdown-menu w-100">
+                                    <li *ngFor="let platform of paymentPlatforms">
+                                        <label class="dropdown-item">
+                                            <div class="form-check">
+                                                <input class="form-check-input" 
+                                                       type="checkbox" 
+                                                       [checked]="selectedPaymentPlatforms.includes(platform.id)"
+                                                       (change)="toggleSelection(platform.id)">
+                                                <span class="ms-2">
+                                                    {{platform.name}}
+                                                </span>
+                                            </div>
+                                        </label>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                }
+
+              
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,43 @@
+
+.min-vh-75 {
+    min-height: 75vh;
+}
+.hover-scale{
+    transition: all 0.3s ease;
+}
+.hover-scale:hover{
+    transform: scale(1.01);
+    cursor: pointer;
+}
+
+.back-arrow {
+    cursor: pointer;
+}
+google-chart {
+    transition: all 0.4s ease;
+    height: 100%;
+}
+
+
+.bg-mp{
+    background-color: rgb(206, 248, 255);
+}
+
+.bg-stripe{
+    background-color: rgb(248, 204, 250);
+}
+
+.bg-efectivo{
+    background-color: #d8ffedde;
+}
+
+
+
+.sticky-section {
+    position: sticky;
+    top: 70px;
+    z-index: 10;
+    background-color: white; 
+  }
+
+  
