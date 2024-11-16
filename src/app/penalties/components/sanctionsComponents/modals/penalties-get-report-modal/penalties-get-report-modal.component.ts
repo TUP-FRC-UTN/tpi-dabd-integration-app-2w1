@@ -1,6 +1,6 @@
 import { Component, inject, Input, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { PenaltiesSanctionsServicesService } from '../../../../services/sanctionsService/sanctions.service';
+import { PenaltiesSanctionsServicesService } from '../../../../services/sanctions.service';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 

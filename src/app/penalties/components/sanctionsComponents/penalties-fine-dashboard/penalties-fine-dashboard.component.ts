@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { PenaltiesSanctionsServicesService } from '../../../services/sanctionsService/sanctions.service';
+import { PenaltiesSanctionsServicesService } from '../../../services/sanctions.service';
 import { ChartType, GoogleChartsModule } from 'angular-google-charts';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';

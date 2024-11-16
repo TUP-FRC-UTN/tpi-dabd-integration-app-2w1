@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { PenaltiesSanctionsServicesService } from '../../../services/sanctionsService/sanctions.service';
+import { PenaltiesSanctionsServicesService } from '../../../services/sanctions.service';
 import { ReportDTO } from '../../../models/reportDTO';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';

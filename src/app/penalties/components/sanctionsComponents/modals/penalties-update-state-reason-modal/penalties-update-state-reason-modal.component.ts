@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { PenaltiesSanctionsServicesService } from '../../../../services/sanctionsService/sanctions.service';
+import { PenaltiesSanctionsServicesService } from '../../../../services/sanctions.service';
 import Swal from 'sweetalert2';
 
 @Component({

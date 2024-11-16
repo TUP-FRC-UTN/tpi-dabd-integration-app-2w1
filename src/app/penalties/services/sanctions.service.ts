@@ -1,12 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { ReportDTO } from '../../models/reportDTO';
+import { ReportDTO } from '../models/reportDTO';
 import { Observable } from 'rxjs/internal/Observable';
-import { SanctionsDTO } from '../../models/SanctionsDTO';
-import { PutReportDTO } from '../../models/PutReportDTO';
+import { SanctionsDTO } from '../models/SanctionsDTO';
+import { PutReportDTO } from '../models/PutReportDTO';
 import { Subject } from 'rxjs';
-import { Fine } from '../../models/Dashboard-models';
-import { ReportReasonDto } from '../../models/ReportReasonDTO';
+import { Fine } from '../models/Dashboard-models';
+import { ReportReasonDto } from '../models/ReportReasonDTO';
 
 @Injectable({
   providedIn: 'root'

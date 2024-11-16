@@ -1,7 +1,7 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ComplaintService } from '../../../../services/complaintsService/complaints.service';
+import { ComplaintService } from '../../../../services/complaints.service';
 import { ComplaintDto } from '../../../../models/complaint';
 
 @Component({

@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { PutStateComplaintDto } from '../../../../models/complaint';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ComplaintService } from '../../../../services/complaintsService/complaints.service';
+import { ComplaintService } from '../../../../services/complaints.service';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 @Component({

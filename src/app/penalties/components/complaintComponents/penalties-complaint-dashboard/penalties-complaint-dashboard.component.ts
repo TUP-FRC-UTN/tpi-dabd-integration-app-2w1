@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { ComplaintService } from '../../../services/complaintsService/complaints.service';
+import { ComplaintService } from '../../../services/complaints.service';
 import {
   ComplaintDto,
   EstadoDenuncia,

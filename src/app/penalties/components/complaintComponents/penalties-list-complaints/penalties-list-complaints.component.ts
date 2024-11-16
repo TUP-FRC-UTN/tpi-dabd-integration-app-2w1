@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, input, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import * as XLSX from 'xlsx';
 
@@ -15,7 +15,7 @@ import 'datatables.net-buttons/js/buttons.print';
 //Imports propios de multas
 import { PenaltiesModalConsultComplaintComponent } from '../modals/penalties-get-complaint-modal/penalties-get-complaint.component';
 import { PenaltiesModalStateReasonComponent } from '../modals/penalties-update-stateReason-modal/penalties-update-stateReason-modal.component';
-import { ComplaintService } from '../../../services/complaintsService/complaints.service';
+import { ComplaintService } from '../../../services/complaints.service';
 import { ComplaintDto } from '../../../models/complaint';
 import { RoutingService } from '../../../../common/services/routing.service';
 import { CustomSelectComponent } from "../../../../common/components/custom-select/custom-select.component";
@@ -133,12 +133,12 @@ export class PenaltiesListComplaintComponent implements OnInit {
           searchable: false,
           render: (data) =>
             `<div class="text-center">
-               <div class="btn-group">
-                 <div class="dropdown">
-                   <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
-                   <ul class="dropdown-menu">
-                     <li><a class="dropdown-item" onclick="viewComplaint(${data.id})">Ver más</a></li>
-                      ${data.complaintState == "Pendiente" ? `
+                <div class="btn-group">
+                  <div class="dropdown">
+                    <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
+                    <ul class="dropdown-menu">
+                      <li><a class="dropdown-item" onclick="viewComplaint(${data.id})">Ver más</a></li>
+                        ${data.complaintState == "Pendiente" ? `
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" onclick="changeState('REJECTED', ${data.id}, ${data.userId})">Rechazar</a></li>` : ``}
                       </ul>
