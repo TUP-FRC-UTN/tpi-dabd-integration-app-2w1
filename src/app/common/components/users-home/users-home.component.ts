@@ -4,7 +4,8 @@ import { UserLoged } from '../../../users/users-models/users/UserLoged';
 import { WeatherService } from '../../../users/users-servicies/weather.service';
 import { WeatherData } from '../../../users/users-models/weather/WeatherData';
 import { CommonModule } from '@angular/common';
-import { Notification } from '../../../users/users-models/notifications/Notification';
+import { LandingNotification } from '../../models/Landing-notification';
+import { NotificationService } from '../../../notifications/service/notification.service';
 import { NotificationsService } from '../../../users/users-servicies/notifications.service';
 
 @Component({
@@ -24,7 +25,7 @@ export class UsersHomeComponent implements OnInit {
   userName: string = '';
   weather: WeatherData | null = null;
   forecast: WeatherData[] = [];
-  notifications: Notification[] = [];
+  notifications: LandingNotification[] = [];
 
   ngOnInit() {
     this.weatherService.getForecast();

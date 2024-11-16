@@ -27,6 +27,10 @@ export const routes: Routes = [
         component: MainComponent,
         children: [
             {
+                path: 'home',
+                component: UsersHomeComponent
+            },
+            {
                 path: 'entries',
                 loadChildren: () => import("./entries/entry.routes").then((m) => m.ENTRY_ROUTES)
             },

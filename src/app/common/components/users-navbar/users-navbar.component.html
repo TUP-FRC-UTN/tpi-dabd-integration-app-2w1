@@ -28,8 +28,8 @@
         </div>
 
         <div class="col-4 text-end d-flex justify-content-end align-items-center">
-            <app-navbar-notification ></app-navbar-notification>
-            <button class="btn btn-dark fs-5" (click)="changePath({path: 'main/users/profile', title: 'Mi perfil'})">Nombre de usuario
+            <app-navbar-notification></app-navbar-notification>
+            <button class="btn btn-dark fs-5" (click)="changePath({path: 'main/users/profile', title: 'Mi perfil'})">{{username + ' ' + userLastname}}
                 <i class="bi-person-circle fs-5"></i>
             </button>
         </div>
@@ -39,7 +39,7 @@
     <aside class="myside text-bg-dark h-100 pt-5 fixed-top animation"
         [class]="expand ? 'side-expanded' : 'side-compressed'" style="z-index: 9;">
         <div class="pt-3 fs-5 d-flex flex-column h-100">
-            <button class="nav-link d-flex text-light w-100 px-3 py-2" (click)="changePath({path: 'main', title: 'Página principal'})" title="Home">
+            <button class="nav-link d-flex text-light w-100 px-3 py-2" (click)="changePath({path: 'main/home', title: 'Página principal'})" title="Home">
                 <i class="bi-house-fill"></i>
                 @if (expand) {<span class="ms-2">Home</span>}
             </button>

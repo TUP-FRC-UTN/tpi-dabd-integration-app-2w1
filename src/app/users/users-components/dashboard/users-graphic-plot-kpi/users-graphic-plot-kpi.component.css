@@ -1,0 +1,61 @@
+
+.kpi-container {
+  display: flex;
+  flex-direction: column; /* Los KPI se apilan verticalmente */
+  gap: 20px; /* Espacio entre los KPI */
+  width: 50%;
+}
+
+.kpi-card {
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  text-align: center;
+  color: white;
+}
+
+.kpi-card h3 {
+  margin: 0;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.kpi-value {
+  font-size: 32px;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.hover-shadow {
+  transition: all 0.3s ease;
+}
+
+.hover-shadow:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+}
+
+.primary-gradient {
+  background: linear-gradient(135deg, #f5e025ef 0%, #f7e224 100%);
+}
+
+.success-gradient {
+  background: linear-gradient(135deg, #ffb6c1 0%, #ffc0cb 100%);
+}
+
+.info-gradient {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+}
+
+.warning-gradient {
+  background: linear-gradient(135deg, #556B2F 0%, #5e7c21 100%); /* Cambiado a verde oscuro pastel */
+}
+
+/* Contenedor del gráfico de torta */
+.chart-container {
+  width: 100%; /* Asegura que el gráfico ocupe todo el espacio disponible */
+  height: 400px; /* Ajusta el tamaño del gráfico */
+  display: flex;
+  justify-content: center; /* Centra el gráfico */
+  align-items: center; /* Centra el gráfico */
+}

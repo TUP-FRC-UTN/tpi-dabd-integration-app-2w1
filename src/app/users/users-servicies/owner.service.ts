@@ -7,6 +7,8 @@ import { OwnerModel } from '../users-models/owner/PostOwnerDto';
 import { Owner } from '../users-models/owner/Owner';
 import { PutOwnerDto } from '../users-models/owner/PutOwnerDto';
 import { OwnerPlotUserDto } from '../users-models/owner/OwnerPlotUserDto';
+import { DniTypeModel } from '../users-models/owner/DniTypeModel';
+import { DeleteUser } from '../users-models/owner/DeleteUser';
 
 @Injectable({
   providedIn: 'root'
@@ -14,12 +16,20 @@ import { OwnerPlotUserDto } from '../users-models/owner/OwnerPlotUserDto';
 export class OwnerService {
 
   private readonly http: HttpClient = inject(HttpClient);
-  private readonly url = 'http://localhost:8081/';
+  private readonly url = 'http://localhost:9062/';
 
   constructor() { }
 
+  getOwnerByPlotId(plotId : number): Observable<Owner[]>{
+    return this.http.get<Owner[]>('http://localhost:9062/owners/plot/' + plotId);
+  }
+
   getAll(): Observable<Owner[]>{
     return this.http.get<Owner[]>(this.url + 'owners');
+  }
+
+  getAllWithTheirPlots(): Observable<Owner[]>{
+    return this.http.get<Owner[]>(this.url + 'owners/allOwnersWithTheirPlots');
   }
 
   getById(id : number): Observable<Owner>{
@@ -33,6 +43,14 @@ export class OwnerService {
   getAllTypes(): Observable<OwnerTypeModel[]>{
     return this.http.get<OwnerTypeModel[]>(this.url + 'owners/ownertypes');
   }
+
+  getAllDniTypes(): Observable<DniTypeModel[]>{
+    return this.http.get<DniTypeModel[]>(this.url + 'owners/dnitypes')
+  }
+
+  deleteOwner( owner: DeleteUser): Observable<any> {
+    return this.http.delete(this.url + 'owners/' + owner.id + '/' + owner.userIdUpdate); 
+  }
   
   getAllStates(): Observable<OwnerStateModel[]>{
     return this.http.get<OwnerStateModel[]>(this.url + 'owners/taxstatus');
@@ -43,7 +61,7 @@ export class OwnerService {
     formData.append('name', owner.name);
     formData.append('lastname', owner.lastname);
     formData.append('dni', owner.dni);
-    formData.append('cuitCuil', owner.cuitCuil);
+    formData.append('dni_type', owner.dni_type_id.toString());
     formData.append('dateBirth', new Date(owner.dateBirth).toISOString().split('T')[0]);
     formData.append('ownerTypeId', owner.ownerTypeId.toString());
     formData.append('taxStatusId', owner.taxStatusId.toString());
@@ -76,7 +94,7 @@ export class OwnerService {
     formData.append('name', owner.name);
     formData.append('lastname', owner.lastname);
     formData.append('dni', owner.dni);
-    formData.append('cuitCuil', owner.cuitCuil);
+    formData.append('dniTypeId', owner.dniTypeId.toString());
     formData.append('dateBirth', new Date(owner.dateBirth).toISOString().split('T')[0]);
     formData.append('ownerTypeId', owner.ownerTypeId.toString());
     formData.append('taxStatusId', owner.taxStatusId.toString());
@@ -86,6 +104,9 @@ export class OwnerService {
     formData.append('phoneNumber', owner.phoneNumber);
     formData.append('userCreateId', owner.userUpdateId.toString());
     formData.append('telegramId', "123123");
+    owner.plotId.forEach((plot) => {
+      formData.append('plotId', plot.toString());
+    });
     owner.files.forEach((file, index) => {
       formData.append('files', file);
     });

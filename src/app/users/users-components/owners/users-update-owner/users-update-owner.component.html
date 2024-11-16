@@ -1,196 +1,181 @@
 <section class="py-5">
-  <div class="container p-3 border border-2 rounded shadow-lg">
+    <div class="container p-3 border border-2 rounded shadow-lg">
+        <h3>Editar Propietario</h3>
+        <form [formGroup]="editOwner" (ngSubmit)="updateOwner(editOwner)">
 
-    <form [formGroup]="editOwner" (ngSubmit)="updateOwner(editOwner)">
+            <div class="row">
 
-        <div class="row">
-
-            <!-- Nombre -->
-            <div class="col-lg-6 mb-3">
-                <div class="row">
-                    <label class="col-2 col-form-label">Nombre</label>
-                    <div class="col-10">
-                        <input type="text" class="form-control" formControlName="name" [ngClass]="onValidate('name')">
-                        <div class="invalid-feedback">{{showError('name')}}</div>
-                </div>
-              </div>
-
-            <!-- Apellido -->
-            <div class="col-lg-6 mb-3">
-                <div class="row">
-                    <label class="col-2 col-form-label">Apellido</label>
-                    <div class="col-10">
-                        <input type="text" class="form-control" formControlName="lastname" [ngClass]="onValidate('lastname')">
-                        <div class="invalid-feedback">{{showError('lastname')}}</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Dni -->
-            <div class="col-lg-6 mb-3">
-                <div class="row">
-                    <label class="col-2 col-form-label">Dni</label>
-                    <div class="col-10">
-                        <input type="text" class="form-control" formControlName="dni" [ngClass]="onValidate('dni')">
-                        <div class="invalid-feedback">{{showError('dni')}}</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Dni -->
-            <div class="col-lg-6 mb-3">
-                <div class="row">
-                    <label class="col-2 col-form-label">CUIT / CUIL</label>
-                    <div class="col-10">
-                        <input type="text" class="form-control" formControlName="cuitCuil" [ngClass]="onValidate('cuitCuil')">
-                        <div class="invalid-feedback">{{showError('cuitCuil')}}</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Fecha -->
-            <div class="col-lg-6 mb-3">
-                <div class="row">
-                    <label class="col-2 col-form-label">Fecha de nacimiento</label>
-                    <div class="col-10">
-                        <input type="date" class="form-control" formControlName="birthdate" [ngClass]="onValidate('birthdate')">
-                        <div class="invalid-feedback">{{showError('birthdate')}}</div>
-                    </div>
-                </div>
-            </div>
-
-
-            <!-- Nombre de empresa -->
-            <div class="col-lg-6 mb-3">
-                <div class="row">
-                    <label class="col-2 col-form-label">Nombre de la Empresa</label>
-                    <div class="col-10">
-                        <input type="text" class="form-control" formControlName="bussinesName" [ngClass]="onValidate('bussinesName')">
-                        <div class="invalid-feedback">{{showError('bussinesName')}}</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Estado fiscal-->
-            <div class="col-lg-6 mb-3">
-                <div class="row">
-                    <label class="col-2 col-form-label">Estado fiscal</label>
-                    <div class="col-10">
-                        <select id="selectOption" class="form-select" formControlName="taxStatus"
-                        [ngClass]="onValidate('taxStatus')">
-                            @for (state of states; track $index) {
-                            <option [value]="state.id">{{state.description}}</option>
-                            }
-                        </select>
-                        <div class="invalid-feedback">{{showError('taxStatus')}}</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tipo de propietario -->
-            <div class="col-lg-6 mb-3">
-                <div class="row">
-                    <label class="col-2 col-form-label">Tipo propietario</label>
-                    <div class="col-10">
-                        <select id="selectOption" class="form-select" formControlName="ownerType"
-                        [ngClass]="onValidate('ownerType')">
-                            @for (type of types; track $index) {
-                            <option [value]="type.id">{{type.description}}</option>
-                            }
-                        </select>
-                        <div class="invalid-feedback">{{showError('ownerType')}}</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Telefono -->
-            <div class="col-lg-6 mb-3">
-                <div class="row">
-                    <label class="col-2 col-form-label">Telefono</label>
-                    <div class="col-10">
-                        <input type="text" class="form-control" formControlName="phoneNumber" [ngClass]="onValidate('phoneNumber')">
-                        <div class="invalid-feedback">{{showError('phoneNumber')}}</div>
-                    </div>
-                </div>
-            </div>
-
-
-            <div class="col-lg-6 mb-3">
-                <div class="row">
-                    <label class="col-2 col-form-label">Email</label>
-                    <div class="col-10">
-                        <input type="email" class="form-control" formControlName="email" [ngClass]="onValidate('email')">
-                        <div class="invalid-feedback">{{showError('email')}}</div>
-                    </div>
-                </div>
-            </div>
-
-
-            <div class="col-lg-6 mb-3">
-                <div class="row">
-                    <label class="col-2 col-form-label">Subir archivos</label>
-                    <div class="col-10">
-                        <input type="file" class="form-control" multiple accept="image/*" formControlName="file"
-                        [ngClass]="onValidate('file')" (change)="onFileChange($event)">
-                        <div class="invalid-feedback">{{showError('file')}}</div>
-                        <div class="list-group mt-3">
-                            @for (file of newFiles; track $index) {
-                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                    <div class="d-flex align-items-center">
-                                        <i class="bi-file-earmark-text me-3 text-primary fs-5"></i>
-                                        <span>{{file.name.length > 40 ? file.name.slice(0, 40)+'...' : file.name}}</span>
-                                    </div>
-                                    <span>{{ (file.size / (1024 * 1024)).toFixed(2) }} MB</span>
-                                </div>
-                            }
+                <!-- Nombre -->
+                <div class="col-lg-6 mb-3">
+                    <div class="row">
+                        <label class="col-2 col-form-label">Nombre</label>
+                        <div class="col-10">
+                            <input type="text" class="form-control" formControlName="name"
+                                [ngClass]="onValidate('name')">
+                            <div class="invalid-feedback">{{showError('name')}}</div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-      </div>
-    <div class="col-6">
-      <app-file-upload
-        (filesChange)="getFiles($event)"
-        [filesLoaded]="existingFiles"
-      />
-    </div>
-    <!-- <div *ngFor="let e of existingFilesDownload; let i = index">
-            <span>{{ e.name }}</span>
-            <button (click)="downloadFile(e.uuid)" class="btn btn-primary">
-              Descargar
-            </button>
-        </div>  -->
 
-    <div class="row mb-3 justify-content-end sticky-right">
-      <div class="col-auto">
-        <button
-          type="button"
-          class="btn btn-secondary me-3"
-          (click)="confirmExit()"
-        >
-          Cancelar
-        </button>
-      </div>
-      <div class="col-auto">
-        <button
-          type="submit"
-          class="btn btn-primary"
-          [disabled]="!editOwner.valid"
-        >
-          Guardar
-        </button>
-      </div>
-    </div>
-        <!-- Botones de Enviar / Cancelar -->
-        <div class="row">
-            <div class="col d-flex justify-content-end gap-3">
-                <button type="button" class="btn btn-secondary" (click)="confirmExit()">Cancelar</button>
-                <button type="submit" class="btn btn-primary" disabled [disabled]="editOwner.invalid">Guardar</button>
-            </div>
-        </div>
-    </form>
+                <!-- Apellido -->
+                <div class="col-lg-6 mb-3">
+                    <div class="row">
+                        <label class="col-2 col-form-label">Apellido</label>
+                        <div class="col-10">
+                            <input type="text" class="form-control" formControlName="lastname"
+                                [ngClass]="onValidate('lastname')">
+                            <div class="invalid-feedback">{{showError('lastname')}}</div>
+                        </div>
+                    </div>
+                </div>
 
-  </div>
+                <!-- Tipo Documento -->
+                <div class="col-lg-6 mb-3">
+                    <div class="row">
+                        <label class="col-2 col-form-label">Tipo de Documento</label>
+                        <div class="col-10">
+                            <select id="selectOption" class="form-select" formControlName="dniType"
+                                [ngClass]="onValidate('dniType')">
+                                @for (dniType of dniTypes; track $index) {
+                                <option [value]="dniType.id">{{dniType.description}}</option>
+                                }
+                            </select>
+                            <div class="invalid-feedback">{{showError('dniType')}}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dni -->
+                <div class="col-lg-6 mb-3">
+                    <div class="row">
+                        <label class="col-2 col-form-label">Documento</label>
+                        <div class="col-10">
+                            <input type="text" class="form-control" formControlName="dni" [ngClass]="onValidate('dni')">
+                            <div class="invalid-feedback">{{showError('dni')}}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tipo de propietario -->
+                <div class="col-lg-6 mb-3">
+                    <div class="row">
+                        <label class="col-2 col-form-label">Tipo Propietario</label>
+                        <div class="col-10">
+                            <select id="selectOption" class="form-select" formControlName="ownerType"
+                                [ngClass]="onValidate('ownerType')">
+                                @for (type of types; track $index) {
+                                <option [value]="type.id">{{type.description}}</option>
+                                }
+                            </select>
+                            <div class="invalid-feedback">{{showError('ownerType')}}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nombre de empresa -->
+                <div class="col-lg-6 mb-3">
+                    <div class="row">
+                        <label class="col-2 col-form-label">Razón Social</label>
+                        <div class="col-10">
+                            <input type="text" class="form-control" formControlName="bussinesName"
+                                [ngClass]="onValidate('bussinesName')">
+                            <div class="invalid-feedback">{{showError('bussinesName')}}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estado fiscal-->
+                <div class="col-lg-6 mb-3">
+                    <div class="row">
+                        <label class="col-2 col-form-label">Estado Fiscal</label>
+                        <div class="col-10">
+                            <!-- ===================================CheckMe========================== -->
+                            <app-custom-select [options]="stateOptions" [selectedOptions]="editOwner.get('state')?.value" (selectedOptionsChange)="editOwner.get('state')?.setValue($event)" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fecha -->
+                <div class="col-lg-6 mb-3">
+                    <div class="row">
+                        <label class="col-2 col-form-label">Fecha de Nacimiento</label>
+                        <div class="col-10">
+                            <input type="date" class="form-control" formControlName="birthdate"
+                                [ngClass]="onValidate('birthdate')">
+                            <div class="invalid-feedback">{{showError('birthdate')}}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Telefono -->
+                <div class="col-lg-6 mb-3">
+                    <div class="row">
+                        <label class="col-2 col-form-label">Telefono</label>
+                        <div class="col-10">
+                            <input type="text" class="form-control" formControlName="phoneNumber"
+                                [ngClass]="onValidate('phoneNumber')">
+                            <div class="invalid-feedback">{{showError('phoneNumber')}}</div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-lg-6 mb-3">
+                    <div class="row">
+                        <label class="col-2 col-form-label">Email</label>
+                        <div class="col-10">
+                            <input type="email" class="form-control" formControlName="email"
+                                [ngClass]="onValidate('email')">
+                            <div class="invalid-feedback">{{showError('email')}}</div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="col-lg-6 mb-3">
+                    <div class="row">
+                        <label class="col-2 col-form-label">Subir Archivos</label>
+                        <div class="col-10">
+                            <input type="file" class="form-control" multiple formControlName="file"
+                                [ngClass]="onValidate('file')" (change)="onFileChange($event)">
+                            <div class="invalid-feedback">{{showError('file')}}</div>
+                            <!-- Listado de archivos -->
+                            <div class="list-group mt-3">
+                                @for (file of files; track $index) {
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi-file-earmark-text me-3 text-primary fs-5"></i>
+                                        <span>{{file.name.length > 40 ? file.name.slice(0, 40)+'...' :
+                                            file.name}}</span>
+                                    </div>
+                                    <button type="button" class="btn bi-x-lg" (click)="deleteFile($index)"></button>
+
+                                </div>
+
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <label class="col-2 col-form-label">Lotes</label>
+                        <div class="col-10">
+                            <!-- ==============================CheckMe========================== -->
+                            <app-custom-select [options]="plotsOptions" [selectedOptions]="editOwner.get('plots')?.value" (selectedOptionsChange)="editOwner.get('plots')?.setValue($event)" />
+                            <div class="invalid-feedback">{{showError('state')}}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de Enviar / Cancelar -->
+                <div class="row">
+                    <div class="col d-flex justify-content-end gap-3">
+                        <button type="button" class="btn btn-secondary" (click)="confirmExit()">Cancelar</button>
+                        <button type="submit" class="btn btn-primary" [disabled]="editOwner.invalid">Guardar</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
 </section>
-

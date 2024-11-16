@@ -5,6 +5,9 @@ import { Owner } from '../../../users-models/owner/Owner';
 import { FileService } from '../../../users-servicies/file.service';
 import { FileDto } from '../../../users-models/owner/FileDto';
 import { CommonModule } from '@angular/common';
+import { PlotService } from '../../../users-servicies/plot.service';
+import { GetPlotDto } from '../../../users-models/plot/GetPlotDto';
+import { OwnerService } from '../../../users-servicies/owner.service';
 
 @Component({
   selector: 'app-users-modal-info-owner',
@@ -17,18 +20,20 @@ export class UsersModalInfoOwnerComponent implements OnInit{
   @Input() ownerModel: Owner = new Owner();
   infoOwner : FormGroup;
   filesOwner: FileDto[];
-
+  plotsOwner : GetPlotDto[] = [];
   fullName : string = "";
 
   private readonly fileService = inject(FileService);
+  private readonly ownerService = inject(OwnerService);
 
   ngOnInit(): void {
     this.infoOwner.patchValue({
       name: this.ownerModel.name,
       lastname: this.ownerModel.lastname,
+      dni_type: this.ownerModel.dni_type,
       dni: this.ownerModel.dni,
-      cuitCuil: this.ownerModel.cuitCuil,
-      birthdate: this.ownerModel.dateBirth,
+      dno_type: this.ownerModel.dni_type,
+      birthdate: this.formatDate(this.ownerModel.dateBirth),
       ownerType: this.ownerModel.ownerType,
       taxStatus: this.ownerModel.taxStatus,
       businessName: this.ownerModel.businessName
@@ -36,6 +41,17 @@ export class UsersModalInfoOwnerComponent implements OnInit{
     this.filesOwner =  this.ownerModel.files;
     this.infoOwner.disable();
     this.fullName = this.ownerModel.name + " " + this.ownerModel.lastname;
+
+    this.ownerService.getByIdWithUser(this.ownerModel.id).subscribe({
+      next: (data: any) => {     
+        
+        this.plotsOwner = data.plot;
+        console.log(this.plotsOwner);
+        
+      }
+    });
+
+    
   }
 
   constructor(public activeModal: NgbActiveModal, private fb: FormBuilder) {
@@ -43,8 +59,8 @@ export class UsersModalInfoOwnerComponent implements OnInit{
     this.infoOwner = this.fb.group({
       name: [''],
       lastname: [''],
+      dni_type: [''],
       dni: [''],
-      cuitCuil: [''],
       birthdate: [''],
       ownerType: [''],
       taxStatus: [''],
@@ -57,6 +73,12 @@ export class UsersModalInfoOwnerComponent implements OnInit{
 
   closeModal(){
     this.activeModal.close();
+  }
+
+  private formatDate(date: string): string {
+    if (!date) return '';
+    const [day, month, year] = date.split('-');
+    return `${day}/${month}/${year}`;
   }
 
   downloadFile(fileId: string) {
