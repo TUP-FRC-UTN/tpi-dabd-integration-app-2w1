@@ -8,7 +8,7 @@
 
       <div id="myTable_filter" class="dataTables_filter me-3" style="text-align: left">
         <!-- ========================================CheckMe=============================== -->
-        <app-custom-select [options]="rolesFilter" (selectedOptionsChange)="fillOptionsSelected($event)"/>
+        <app-custom-select [options]="rolesFilter" [multiple]="true" (selectedOptionsChange)="fillOptionsSelected($event)"/>
       </div>
       <div>
         <input type="date" class="form-control me-3" formControlName="datebirth" style="width: 200px" [formControl]="initialDate" (change)="filterByDate()"/>
