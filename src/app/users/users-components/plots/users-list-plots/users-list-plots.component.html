@@ -9,13 +9,13 @@
 
       <!-- Filtro por tipo de lote -->
       <div id="myTable_filter" class="dataTables_filter" style="text-align: left;">
-        <app-custom-select [options]="plotTypes" [multiple]="true" [selectedOptions]="selectType?.value"
+        <app-custom-select [options]="typesForFilter" [multiple]="true" [selectedOptions]="selectType?.value"
           (selectedOptionsChange)="selectType.setValue($event)" />
       </div>
 
       <!-- Filtro por estado de lote -->
       <div id="myTable_filter" class="dataTables_filter" style="text-align: left;">
-        <app-custom-select [options]="plotStatus" [multiple]="true" [selectedOptions]="selectState?.value"
+        <app-custom-select [options]="statusForFilter" [multiple]="true" [selectedOptions]="selectState?.value"
           (selectedOptionsChange)="selectState.setValue($event)" />
       </div>
 
