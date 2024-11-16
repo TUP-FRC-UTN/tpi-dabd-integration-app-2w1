@@ -1,0 +1,18 @@
+.modal-backdrop {
+    --bs-backdrop-opacity: 0.8 !important; /* Valor por defecto es 0.5 */
+    background-color: rgba(0, 0, 0, var(--bs-backdrop-opacity)) !important;
+  }
+  
+  /* O si prefieres no usar variables CSS */
+  .modal-backdrop {
+    opacity: 0.8 !important;
+    background-color: #000 !important;
+  }
+  
+  /* Si necesitas especificidad adicional */
+  .modal-backdrop.show {
+    opacity: 0.8 !important;
+  }
+
+
+  

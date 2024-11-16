@@ -3,6 +3,8 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { PenaltiesSanctionsServicesService } from '../../../services/sanctionsService/sanctions.service';
+import Swal from 'sweetalert2';
+import { RoutingService } from '../../../../common/services/routing.service';
 
 @Component({
   selector: 'app-penalties-post-disclaimer',
@@ -17,7 +19,12 @@ export class PenaltiesPostDisclaimerComponent implements OnInit {
   fine: any;
   reactiveForm:FormGroup;
 
-  constructor(private penaltiesService: PenaltiesSanctionsServicesService,private router: Router, private route: ActivatedRoute, formBuilder:FormBuilder){
+  constructor(private penaltiesService: PenaltiesSanctionsServicesService,
+    private router: Router,
+     private route: ActivatedRoute,
+      formBuilder:FormBuilder,
+      private routingService: RoutingService
+    ){
     this.userId = 1;
     this.fineIdFromList = 0; //Esto deberia venir del listado
     this.reactiveForm = formBuilder.group({
@@ -51,16 +58,31 @@ export class PenaltiesPostDisclaimerComponent implements OnInit {
       disclaimer: this.reactiveForm.value.disclaimerControl
     };
 
-    //Envio de formulario
-    this.penaltiesService.addDisclaimer(disclaimerData).subscribe({
-      next: (response) => {
-        console.log('Reclamo enviado correctamente', response);
-        this.router.navigate(['/home/sanctions/sanctionsList']);
-      },
-      error: (error) => {
-        console.error('Error al enviar el reclamo', error);
-      }
-    });
+    // Confirmación antes de enviar el formulario
+
+    this.penaltiesService.addDisclaimer(disclaimerData).subscribe( res => {
+        Swal.fire({
+          title: '¡Descargo enviado!',
+          text: 'El descargo ha sido enviado correctamente.',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false
+        });
+        this.routingService.redirect("main/sanctions/sanctions-list", "Listado de Infracciones")
+      }, error => {
+        console.error('Error al enviar el descargo', error);
+        Swal.fire({
+          title: 'Error',
+          text: 'No se pudo enviar el descargo. Inténtalo de nuevo.',
+          icon: 'error',
+          confirmButtonText: 'Aceptar'
+        });
+      })
+
+  }
+
+  cancel(){
+    this.routingService.redirect("main/sanctions/sanctions-list", "Listado de Infracciones")
   }
 
   //Retorna una clase para poner el input en verde o rojo dependiendo si esta validado

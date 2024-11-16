@@ -1,0 +1,47 @@
+<ng-select
+  [items]="providersList"
+  bindLabel="name"
+  bindValue=""
+  [multiple]="true"
+  [(ngModel)]="selectValue"
+  [closeOnSelect]="false"
+  (change)="onProviderChange()"
+  [selectableGroup]="true"
+  [clearable] = "true"
+  >
+  <!-- [items]="providersList" es la lista a mostrar
+  bindLabel="description"  el nombre del atributo que muestra en el select
+  [bindValue]="multiple ? '' : 'id'" si es multiple el valor que devuelve es el objeto y si es individual el id.
+                                    EL ID DEPENDE DE SU OBJETO, PONER EL NOMBRE DEL ATRIBUTO QUE CORRESPONDE
+  [multiple]="multiple"
+  [(ngModel)]="selectValue"
+  [closeOnSelect]="!multiple" Si es seleccion multiple no se cierra
+  (change)="onProviderChange()" //Cada vez que cambia el select
+  [selectableGroup]="true"
+  [clearable] = "multiple"  si es multiple habilita la X para eliminar la seleccion y si es individual lo saco
+  -->
+  <!-- Esta parte es lo que muestra el select
+      Si no es multiple, usa el por defecto, no me intereso modificarlo
+   -->
+ 
+    <!--
+      Esto es lo que muestra seleccionado, si es uno muestra la descripcion del elemento(poner nombre atributo que corresponde)
+      pero si es mayor a uno, va contandolos. Si no hay nada marcado no muestra nada
+    -->
+    <ng-template ng-multi-label-tmp let-items="items">
+      @if(items.length == 1){
+          {{ items[0].description }}
+      }
+      @if(items.length>1){
+          {{ items.length }} seleccionados
+      }
+    </ng-template>
+    <!--
+      Esto es para dibujar el desplegable
+    -->
+    <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+      <input id="item-{{ index }}" type="checkbox" [ngModel]="item$.selected" /> {{ item.name }}
+    </ng-template>
+  
+</ng-select>
+

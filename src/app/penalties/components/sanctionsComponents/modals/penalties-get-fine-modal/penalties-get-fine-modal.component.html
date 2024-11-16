@@ -1,111 +1,68 @@
 <div class="modal-content border border-2">
-    <div class="modal-header">
-      <h1 class="modal-title fs-5" id="complaintModal">Multa</h1>
-      <button type="button" class="btn-close" (click)="close()"></button>
-    </div>
-    <div class="modal-body">
-  
-      <div class="row">
-  
-        <!-- Select Motivo -->
-        <div class="col-lg-6 mb-3">
-          <div class="row">
-            <label class="col-2 col-form-label">Motivo</label>
-            <div class="col-10">
-              <select class="form-select" disabled>
-                <option value="" selected>{{fine?.report.reportReason.reportReason}}</option>
-              </select>
-            </div>
-          </div>
-        </div>
-  
-  
-        <!-- Input fecha -->
-        <div class="col-lg-6 mb-3">
-          <div class="row">
-            <label class="col-2 col-form-label">Fecha</label>
-            <div class="col-10">
-              <input type="datetime-local" class="form-control" [value]="fine?.createdDate" disabled>
-            </div>
-          </div>
-        </div>
-  
-  
-        <!-- Input Descripcion -->
-        <div class="col-lg-12 mb-3">
-          <div class="row">
-            <label class="col-2 col-lg-1 col-form-label">Descripcion</label>
-            <div class="col-10 col-lg-11">
-              <textarea class="form-control" rows="8" style="resize: none;" [value]="fine?.report.description"
-                disabled></textarea>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-lg-12 mb-3">
-            <div class="row">
-              <label class="col-2 col-lg-1 col-form-label">Descargo</label>
-              <div class="col-10 col-lg-11">
-                <textarea class="form-control" rows="8" style="resize: none;" [value]="fine?.disclaimer"
-                  disabled></textarea>
-              </div>
-            </div>
-        </div>
-
-        <!--Si la multa esta apelada muestra la opcion de aceptar o rechazar el mismo-->
-        @if(fine.fineState == "Apelada"){
-          <div class="col-lg-12 mb-3">
-          <div class="buttons-box d-flex justify-content-end">
-            <div class="submit-box">
-              <button
-                type="button"
-                class="btn btn-secondary me-3"
-                (click)="changeState('PAYMENT_PAYMENT')"
-              >
-                Rechazar
-              </button>
-              <button
-                type="button"
-                class="btn btn-success"
-                (click)="changeState('ACQUITTED')"
-              >
-                Aceptar
-              </button>
-            </div>
-          </div>
-        </div>
-        }
-        
-  
-  
-
-        <!-- Select Estado -->
-        <div class="col-lg-6 mb-3">
-          <div class="row">
-            <label class="col-2 col-form-label">Estado</label>
-            <div class="col-10">
-              <select class="form-select" disabled>
-                <option value="" disabled selected>{{fine?.fineState}}</option>
-              </select>
-            </div>
-          </div>
-        </div>
-  
-  
-        <!-- Input Motivo del estado -->
-        <div class="col-lg-6 mb-3">
-          <div class="row">
-            <label class="col-2 col-form-label">Razon</label>
-            <div class="col-10">
-              <input type="text" class="form-control" [value]="fine?.stateReason" disabled>
-            </div>
-          </div>
-        </div>
-  
-      </div>
-  
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" (click)="close()">Cerrar</button>
-    </div>
+  <div class="modal-header">
+    <h1 class="modal-title fs-5" id="complaintModal">Multa <i
+      class="bi bi-question-circle ms-2" data-bs-toggle="tooltip" data-bs-placement="right"
+      [title]="tooltipTitle"></i> </h1>
+    <button type="button" class="btn-close" (click)="close()"></button>
   </div>
+  <div class="modal-body">
+
+    <h5>Información de la Multa</h5>
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <p><strong>Motivo</strong> {{ fine?.report.reportReason.reportReason || 'N/A' }}</p>
+            <p><strong>Fecha</strong> {{ fine?.createdDate | date:"dd/MM/yyyy" || 'N/A' }}</p>
+        </div>
+    
+        <div class="col-md-6">
+            <p><strong>Descripción</strong> {{ fine?.report.description || 'N/A' }}</p>
+        </div>
+    </div>
+    <hr>
+    <h5>Descargo</h5>
+      <div class="row mb-3">
+          <div class="col-md-6">
+              <p><strong>Motivo</strong> {{ fine?.disclaimer || 'N/A' }}</p>
+          </div>
+          <div class="col-md-6">
+              <!--Si la multa esta apelada muestra la opcion de aceptar o rechazar el mismo-->
+      @if(fine.fineState == "Apelada"){
+        <div class="col-lg-12 mb-3">
+        <div class="buttons-box d-flex justify-content-end">
+          <div class="submit-box">
+            <button
+              type="button"
+              class="btn btn-secondary me-3"
+              (click)="changeState('PAYMENT_PAYMENT')"
+            >
+              Rechazar
+            </button>
+            <button
+              type="button"
+              class="btn btn-success"
+              (click)="changeState('ACQUITTED')"
+            >
+              Aceptar
+            </button>
+          </div>
+        </div>
+      </div>
+      }
+          </div>
+      </div>
+
+      <hr>
+      <h5>Estado de la Multa</h5>
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <p><strong>Estado</strong> {{ fine?.fineState || 'N/A' }}</p>
+            <p><strong>Razón</strong> {{ fine?.stateReason || 'N/A' }}</p>
+        </div>
+    </div>
+    
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="close()">Cerrar</button>
+  </div>
+</div>

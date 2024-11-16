@@ -2,7 +2,6 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import 'datatables.net';
 import 'datatables.net-bs5';
 import moment from 'moment';
-import 'bootstrap';
 import $ from 'jquery';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';

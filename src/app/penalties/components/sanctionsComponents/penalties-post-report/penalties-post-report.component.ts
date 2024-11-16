@@ -1,25 +1,38 @@
-import { Component, OnDestroy } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { RouterLink, Router, Routes } from '@angular/router';
+import { Component, inject, OnDestroy } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterLink, Router, Routes, RouterModule } from '@angular/router';
 // import { MockapiService } from '../../../services/mock/mockapi.service';
 import { PostReportDTO } from '../../../models/PostReportDTO';
 import { ReportReasonDto } from '../../../models/ReportReasonDTO';
 import { ReportService } from '../../../services/report.service';
 import { error } from 'jquery';
-import { routes } from '../sanctionRouting.routing';
 import { ModalComplaintsListComponent } from '../../complaintComponents/modals/penalties-list-complaints-modal/penalties-list-complaints-modal.component';
-
+import { RoutingService } from '../../../../common/services/routing.service';
+import Swal from 'sweetalert2';
+import { PlotService } from '../../../../users/users-servicies/plot.service';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { PlotModel } from '../../../../users/users-models/plot/Plot';
+import { CommonModule } from '@angular/common';
+import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
 
 @Component({
   selector: 'app-new-report',
   standalone: true,
-  imports: [FormsModule, RouterLink, ModalComplaintsListComponent],
+  imports: [FormsModule, RouterLink, ModalComplaintsListComponent, RouterModule, CommonModule,ReactiveFormsModule,CustomSelectComponent],
   templateUrl: './penalties-post-report.component.html',
   styleUrl: './penalties-post-report.component.scss'
 })
 export class NewReportComponent {
-
-  selectedReasonId = 0;
+  url = 'https://my-json-server.typicode.com/405786MoroBenjamin/users-responses/plots';
+  private readonly plotService = inject(PlotService);
+  private readonly mockPlotService = inject(HttpClient);
+  mockGetPlots(): Observable<any[]> {
+    return this.mockPlotService.get<any[]>(this.url);
+  }
+  plot = "";
+  plots: any[] = [];
+  selectedReasonId = "";
   selectedDate = '';
   dateView = '';
   textareaPlaceholder = 'Ingrese su mensaje aquí...';
@@ -27,9 +40,32 @@ export class NewReportComponent {
   reportReasons: ReportReasonDto[] = [];
   complaintsList: any[] = [];
   selectedComplaints: any[] = [];
+  selectedComplaintsCount = 0;
 
-  constructor(private reportService: ReportService, private router: Router) {
+  reactiveForm: FormGroup;
+  otroSelected: boolean = false;
+  options: { name: string, value: any }[] = []
+  optionsplot: { name: string, value: any }[] = []
+
+  constructor(private reportService: ReportService,
+     private router: Router,
+     private routingService: RoutingService, 
+     private formBuilder : FormBuilder
+    ) {
     this.dateView = this.setTodayDate();
+
+    this.reactiveForm = this.formBuilder.group({  //Usen las validaciones que necesiten, todo lo de aca esta puesto a modo de ejemplo
+      reportReason: new FormControl([], [Validators.required]),
+      descriptionControl: new FormControl('', [Validators.required, Validators.minLength(10), Validators.maxLength(800)]),
+      plotId: new FormControl([], [Validators.required])
+    });
+  }
+
+  updateSelect(data : any){
+    this.reactiveForm.get('reportReason')?.setValue(data)
+  }
+  updateSelectplot(data : any){
+    this.reactiveForm.get('plotId')?.setValue(data)
   }
 
   setTodayDate(): string {
@@ -42,82 +78,97 @@ export class NewReportComponent {
 
   ngOnInit(): void {
     this.getReportReasons();
+    this.getPlots();
   }
 
   getReportReasons(): void {
     this.reportService.getAllReportReasons().subscribe(
       (reasons: ReportReasonDto[]) => {
-        reasons.forEach((reason) => this.reportReasons.push(reason))
-        console.log("Reports: " + this.reportReasons)
+        reasons.forEach((reason) => this.reportReasons.push({ reportReason: reason.reportReason, id: reason.id, baseAmount: reason.baseAmount}))
+        this.options = this.reportReasons.map(opt => ({ name: opt.reportReason, value: opt.id }))
       },
       (error) => {
         console.error('Error al cargar report reasons: ', error);
       }
     );
+    
 
+  }
+
+  getPlots(): void {
+    //el mock se usa para no pegarle a usuarios
+    // this.plotService.getAllPlots().subscribe(
+    this.mockGetPlots().subscribe(
+      (plots: any[]) => {
+        plots.forEach((plot) => this.plots.push({ name:`Bloque ${plot.block_number}, Lote ${plot.plot_number}` , value: plot.id }))
+        this.optionsplot = this.plots.map(opt => ({ name: opt.name, value: opt.value }))
+      },
+      (error) => {
+        console.error('Error al cargar plots: ', error);
+      }
+    );
   }
 
   handleSelectedComplaints(selectedComplaints: any[]): void {
     console.log('Denuncias recibidas del modal:', selectedComplaints);
     this.complaintsList = selectedComplaints;
+    this.selectedComplaintsCount = selectedComplaints.length;
   }
 
   onSubmit(): void {
     console.log("Submit");
     const userId = 1;
-    const plotId = 1;
+    const plotId = this.plot;
 
     const complaintsIds = this.complaintsList.length > 0
       ? this.complaintsList.map(complaint => complaint.id)
       : [];
 
-    if (this.validateParams()) {
-      const reportDTO: PostReportDTO = {
-        reportReasonId: this.selectedReasonId,
-        plotId: plotId,
-        description: this.description,
+    if (complaintsIds.length === 0) {
+      Swal.fire({
+        title: '¡Advertencia!',
+        text: 'Debe cargar al menos una denuncia.',
+        icon: 'warning',
+        confirmButtonText: 'Aceptar',
+        customClass: {
+          confirmButton: 'btn btn-secondary'
+        },
+      });
+      return;
+    }
+
+    if (this.reactiveForm.valid) {
+      let formData = this.reactiveForm.value;
+      let reportDTO = {
+        reportReasonId:  formData.reportReason,
+        plotId:  formData.plotId,
+        description: formData.descriptionControl,
         complaints: complaintsIds,
         userId: userId,
       };
       console.log(reportDTO);
       this.reportService.postReport(reportDTO).subscribe({
         next: (response) => {
-          (window as any).Swal.fire({
+          Swal.fire({
             title: '¡Informe creado!',
             text: 'El informe ha sido creado correctamente.',
             icon: 'success',
             timer: 1500,
             showConfirmButton: false
           });
-          this.router.navigate(["home/sanctions/reportList"]);
+          this.routingService.redirect("main/sanctions/report-list", "Listado de Informes")
         },
         error: (error) => {
           console.error('Error al enviar la denuncia', error);
         }
       });
+    } else {
+      console.log("Los campos no estaban validados")
     }
-
-    else {
-      console.log("Los campos no estab validados")
-    }
-
   }
 
-  validateParams(): boolean {
-    if (this.selectedReasonId == 0 || this.selectedReasonId == null) {
-      return false
-    }
-    /*
-    if (this.plotId == 0 || this.plotId == null) {
-      return false
-    }*/
-    if (this.description == null || this.description == '') {
-      return false
-    }
-    if (this.reportReasons == null || this.reportReasons[0] == null) {
-      return false;
-    }
-    return true;
+  cancel(){
+    this.routingService.redirect("main/sanctions/report-list/", "Listado de Informes")
   }
 
   openSelectComplaints(): void {
@@ -126,6 +177,51 @@ export class NewReportComponent {
       const modal = new (window as any).bootstrap.Modal(modalElement);
       modal.show();
     }
+  }
+
+
+  //
+  onValidate(controlName: string) {
+    const control = this.reactiveForm.get(controlName);
+    return {
+      'is-invalid': control?.invalid && (control?.dirty || control?.touched),
+      'is-valid': control?.valid
+    }
+  }
+
+  show(){
+    console.log("Formulario:", this.reactiveForm.value)
+  }
+
+
+  //
+  showError(controlName: string): string {
+    const control = this.reactiveForm.get(controlName);
+    
+    if (control?.errors && control.invalid && (control.dirty || control.touched)) {
+      const errorKey = Object.keys(control.errors)[0];
+      return this.getErrorMessage(errorKey, control.errors[errorKey]);
+    }
+    return '';
+  }
+
+  private getErrorMessage(errorKey: string, errorValue: any): string {
+    const errorMessages: { [key: string]: (error: any) => string } = {
+      required: () => 'Este campo no puede estar vacío.',
+      email: () => 'Formato de correo electrónico inválido.',
+      minlength: (error) => `El valor ingresado es demasiado corto. Mínimo ${error.requiredLength} caracteres.`,
+      maxlength: (error) => `El valor ingresado es demasiado largo. Máximo ${error.requiredLength} caracteres.`,
+      pattern: () => 'El formato ingresado no es válido.',
+      min: (error) => `El valor es menor que el mínimo permitido (${error.min}).`,
+      max: (error) => `El valor es mayor que el máximo permitido (${error.max}).`,
+      requiredTrue: () => 'Debe aceptar el campo requerido para continuar.',
+      date: () => 'La fecha ingresada es inválida.',
+      url: () => 'El formato de URL ingresado no es válido.',
+      number: () => 'Este campo solo acepta números.',
+      customError: () => 'Error personalizado: verifique el dato ingresado.'
+    };
+
+    return errorMessages[errorKey]?.(errorValue) ?? 'Error no identificado en el campo.';
   }
 
 }

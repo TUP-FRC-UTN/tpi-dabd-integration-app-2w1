@@ -1,0 +1,23 @@
+.min-vh-75 {
+    min-height: 75vh;
+}
+.hover-scale{
+    transition: all 0.3s ease;
+}
+.hover-scale:hover{
+    transform: scale(1.01);
+    cursor: pointer;
+}
+
+.back-arrow:hover {
+    transform: scale(1.1);
+    cursor: pointer;
+}
+google-chart {
+    transition: all 0.4s ease;
+    height: 100%;
+}
+
+.lowestHighest:hover {
+    cursor: pointer;
+}

@@ -5,6 +5,8 @@ import { Observable } from 'rxjs/internal/Observable';
 import { SanctionsDTO } from '../../models/SanctionsDTO';
 import { PutReportDTO } from '../../models/PutReportDTO';
 import { Subject } from 'rxjs';
+import { Fine } from '../../models/Dashboard-models';
+import { ReportReasonDto } from '../../models/ReportReasonDTO';
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +15,8 @@ export class PenaltiesSanctionsServicesService {
 
   private readonly http: HttpClient = inject(HttpClient);
   private readonly url = 'http://localhost:8042/api/';
+  private readonly reportReasonUrl = 'http://localhost:8042/api/report-reason';
+
 
   constructor() { }
 
@@ -30,6 +34,12 @@ export class PenaltiesSanctionsServicesService {
   getState(): Observable<any> {
     return this.http.get(this.url + "report/states")
   }
+
+   ///report/states
+   getStateFines(): Observable<any> {
+    return this.http.get(this.url + "sanction/allFinesState")
+  }
+
 
   //esto es unicamente para mostrar fechas 
   formatDate(date: any): string {
@@ -73,6 +83,10 @@ export class PenaltiesSanctionsServicesService {
     return this.http.put(this.url + 'sanction/changeStateFine', data);
   }
 
+  updateFine(fineData: any): Observable<any> {
+    return this.http.put(this.url + 'sanction/updateFine', fineData);
+  }
+
   //Metodo para hacer refresh desde dos modales adentro de una lista
   private refreshSubject = new Subject<void>();
 
@@ -82,4 +96,18 @@ export class PenaltiesSanctionsServicesService {
     this.refreshSubject.next();
   }
 
+  getAllFines():Observable<Fine[]>{
+    return this.http.get<Fine[]>(this.url + "sanction/allFines")
+  } 
+
+    // Obtiene todos los tipos de razones
+    getAllReportReasons(): Observable<any> {
+      return this.http.get<ReportReasonDto[]>(this.reportReasonUrl + "/all");
+    }
+
+  getDefaultFromDate(): string {
+    const date = new Date();
+    date.setMonth(date.getMonth() - 6); // Cambiar a 6 meses atrás
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  }
 }
