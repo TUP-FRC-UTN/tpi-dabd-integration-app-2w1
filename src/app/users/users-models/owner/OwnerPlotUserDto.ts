@@ -116,10 +116,10 @@ export class UserDtoForOwner {
 
 export class OwnerPlotUserDto {
     owner: Owner;
-    plot: PlotDtoForOwner;
+    plot: PlotDtoForOwner[];
     user: UserDtoForOwner;
 
-    constructor(owner: Owner, plot: PlotDtoForOwner, user: UserDtoForOwner) {
+    constructor(owner: Owner, plot: PlotDtoForOwner[], user: UserDtoForOwner) {
         this.owner = owner;
         this.plot = plot;
         this.user = user;

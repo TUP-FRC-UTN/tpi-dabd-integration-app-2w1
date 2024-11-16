@@ -1,67 +1,127 @@
 <div class="modal-header">
-    <h4 class="modal-title" id="modal-basic-title">Información del Usuario</h4>
-    <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
+  <h4 class="modal-title" id="modal-basic-title">Información del Usuario</h4>
+  <button
+    type="button"
+    class="btn-close"
+    aria-label="Close"
+    (click)="activeModal.dismiss('Cross click')"
+  ></button>
 </div>
 
 <div class="modal-body">
-    <form [formGroup]="editUser">
-        <!-- Información Personal -->
-        <h5>Información Personal</h5>
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <p><strong>Nombre Completo:</strong> {{ editUser.get('fullname')?.value || 'N/A' }}</p>
-                <p><strong>Usuario:</strong> {{editUser.get('username')?.value || 'N/A'}}</p>
-                <p><strong>{{ editUser.get('dni_type')?.value || 'N/A' }}</strong> {{ editUser.get('dni')?.value || 'N/A' }}</p>
-            </div>
-            <div class="col-md-6">
-                <p><strong>Fecha de nacimiento:</strong> {{ editUser.get('birthdate')?.value | date: 'dd-MM-yyyy' || 'N/A' }}</p>
-                <p><strong>Fecha de alta:</strong> {{ editUser.get('create_date')?.value | date: 'dd-MM-yyyy' || 'N/A' }}</p>
-            </div>
-        </div>
+  <form [formGroup]="editUser">
+    <!-- Información Personal -->
+    <h5>Información Personal</h5>
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <p>
+          <strong>Nombre Completo:</strong>
+          {{ editUser.get("fullname")?.value || "N/A" }}
+        </p>
+        <p>
+          <strong>Usuario:</strong>
+          {{ editUser.get("username")?.value || "N/A" }}
+        </p>
+        <p>
 
-        <!-- Información de Contacto -->
-        <h5>Información de Contacto</h5>
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <p><strong>Teléfono:</strong> {{ editUser.get('phoneNumber')?.value || 'N/A' }}</p>
-                <p><strong>Telegram id:</strong> {{ editUser.get('telegram_id')?.value || 'N/A' }}</p>
-            </div>
-            <div class="col-md-6">
-                <p><strong>Email:</strong> {{ editUser.get('email')?.value || 'N/A' }}</p>
-            </div>
-        </div>
+          <strong>Tipo de Documento:</strong> {{ editUser.get("dni_type")?.value || "N/A" }}
 
-        <h5>Información de Lote</h5>
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <p><strong>Nro. de lote:</strong> {{ editUser.get('plot_number')?.value || 'N/A' }}</p>
-            </div>
-            <div class="col-md-6">
-                <p><strong>Nro. de manzana:</strong> {{ editUser.get('block_number')?.value || 'N/A' }}</p>
-            </div>
-        </div>
+          
+        </p>
+      </div>
+      <div class="col-md-6">
+        <p>
+          <strong>Fecha de Nacimiento:</strong>
+          {{ editUser.get("birthdate")?.value | date : "dd/MM/yyyy" }}
+        </p>
+        <p>
+          <strong>Fecha de Alta:</strong>
+          {{
+            editUser.get("create_date")?.value | date : "dd/MM/yyyy"
+          }}
+        </p>
+        <p>
+          <strong>Número de Documento:</strong> {{ editUser.get("dni")?.value || "N/A" }}
+        </p>
+      </div>
+    </div>
+    <hr>
+    <!-- Información de Contacto -->
+    <h5>Información de Contacto</h5>
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <p>
+          <strong>Teléfono:</strong>
+          {{ editUser.get("phoneNumber")?.value || "N/A" }}
+        </p>
+        <p>
+          <strong>Telegram Id:</strong>
+          {{ editUser.get("telegram_id")?.value || "N/A" }}
+        </p>
+      </div>
+      <div class="col-md-6">
+        <p>
+          <strong>Email:</strong> {{ editUser.get("email")?.value || "N/A" }}
+        </p>
+      </div>
+    </div>
+    <hr>
+    <h5>Información de los Lotes</h5>
+    <div class="row mb-3 mt-3">
+      @if(plotModal.length == 0){
+      <div class="col-md-6">
+        <p><strong>Nro. de Lote:</strong> N/A</p>
+        <p><strong>Nro. de Manzana:</strong> N/A</p>
+      </div>
+      }@else { @for (plot of plotModal; track $index) {
+      <div class="col-md-6">
+        <p><strong>Nro. de Lote:</strong> {{ plot.plot_number }}</p>
+      </div>
+      <div class="col-md-6">
+        <p><strong>Nro. de Manzana:</strong> {{ plot.block_number }}</p>
+      </div>
 
-        <!-- Roles -->
-        <h5>Roles</h5>
-        <div class="row mb-3">
-            <div class="col-md-12">
-                <div class="container">
-                    <ul>
-                        <li *ngFor="let rol of userModal?.roles">{{ rol }}</li>
-                    </ul>
-                </div>
-            </div>
+      } }
+    </div>
+    <hr>
+    <!-- Roles -->
+    <h5>Roles</h5>
+    <div class="row mb-3">
+      <div class="col-md-12">
+        <div class="container">
+          <ul>
+            @for (rol of userModal.roles; track $index) {
+              <li>{{rol}}</li>
+            }
+          </ul>
         </div>
-    </form>
+      </div>
+    </div>
+  </form>
 </div>
 
 <!-- Footer -->
 <div class="modal-footer">
-    @if(typeModal == "info"){
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="closeModal()">Cerrar</button>
-    }@else {
-        <button type="button" class="btn btn-danger" (click)="confirmDelete()">Eliminar</button>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="closeModal()">Cerrar</button>
-    }
+  @if(typeModal == "info"){
+  <button
+    type="button"
+    class="btn btn-secondary"
+    data-bs-dismiss="modal"
+    (click)="closeModal()"
+  >
+    Cerrar
+  </button>
+  }@else {
+  <button type="button" class="btn btn-danger" (click)="confirmDelete()">
+    Eliminar
+  </button>
+  <button
+    type="button"
+    class="btn btn-secondary"
+    data-bs-dismiss="modal"
+    (click)="closeModal()"
+  >
+    Cerrar
+  </button>
+  }
 </div>
-<!-- TODO: HACER LA LOGICA DE MOSTRAR LOS DATOS DESDE EL TS NO EN EL HTML  -->

@@ -6,7 +6,7 @@
                         @if(haveIcon(selectedIconUrl)){
                             <img [src]="selectedIconUrl" alt="Selected Icon" style="max-width: 120px;" class="border rounded-circle p-3 dropdown btn btn btn-outline-secondary dropdown-toggle"  data-bs-toggle="modal" data-bs-target="#exampleModal">
                         }@else {
-                            <img [src]="selectedIconUrl" alt="Selected Icon" style="max-width: 120px;" class="border rounded-circle p-3 dropdown btn btn btn-outline-secondary dropdown-toggle"  data-bs-toggle="modal" data-bs-target="#exampleModal">
+                            <img [src]="noIcon" alt="Selected Icon" style="max-width: 120px;" class="border rounded-circle p-3 dropdown btn btn btn-outline-secondary dropdown-toggle"  data-bs-toggle="modal" data-bs-target="#exampleModal">
                         }
                         <div class="modal fade " id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered">
@@ -37,6 +37,7 @@
                 </div>
             }
     </div>
+
     <form [formGroup]="formProfile" class=" mt-5" (ngSubmit)="updateUser()">
         <div class="row mb-3">
 
@@ -89,7 +90,7 @@
     
             <div class="col-lg-6 mb-3">
                 <div class="row">
-                    <label class="col-2 col-form-label">Tipo de documento</label>
+                    <label class="col-2 col-form-label">Tipo de Documento</label>
                     <div class="col-10">
                         <input type="text" class="form-control" formControlName="dniType"
                             [ngClass]="onValidate('dniType')">
@@ -103,8 +104,9 @@
                 <div class="row">
                     <label class="col-2 col-form-label">Teléfono</label>
                     <div class="col-10">
-                        <input type="number" class="form-control" formControlName="phoneNumber"
-                            [ngClass]="onValidate('phoneNumber')">
+                        <input type="text" class="form-control" formControlName="phoneNumber"
+       [ngClass]="onValidate('phoneNumber')">
+
                         <div class="invalid-feedback">{{showError('phoneNumber')}}</div>
                     </div>
                 </div>
@@ -114,9 +116,9 @@
             
             <div class="col-lg-6 mb-3">
                 <div class="row">
-                    <label class="col-2 col-form-label">Fecha de nacimiento</label>
+                    <label class="col-2 col-form-label">Fecha de Nacimiento</label>
                     <div class="col-10">
-                        <input type="date" class="form-control" formControlName="datebirth" value="2000-01-01">
+                        <input type="date" class="form-control" formControlName="datebirth" value="01/01/2000">
                     </div>
                 </div>
             </div>
@@ -135,11 +137,9 @@
             
             <div class="col-lg-6 mb-3">
                 <div class="row">
-                    <label class="col-2 col-form-label">Telegram id</label>
+                    <label class="col-2 col-form-label">Telegram Id</label>
                     <div class="col-10">
-                        <input type="number" class="form-control" formControlName="telegram_id"
-                            [ngClass]="onValidate('telegram_id')">
-                        <div class="invalid-feedback">{{showError('telegram_id')}}</div>
+                        <input type="number" class="form-control" formControlName="telegram_id">
                     </div>
                 </div>
             </div>
@@ -148,23 +148,28 @@
             
             <div class="col-lg-6 mb-3">
                 <div class="row">
-                    <label class="col-2 col-form-label">Nombre de usuario</label>
+                    <label class="col-2 col-form-label">Nombre de Usuario</label>
                     <div class="col-10">
                         <input type="text" class="form-control" formControlName="username">
                     </div>
                 </div>
             </div>
 
+             <!-- Aca abre el componente de abrir formulario -->
+             @if(type == 'edit') {
+
+                <app-users-change-password [email]="formProfile.controls.email.value ?? ''"></app-users-change-password>
+            }
+
             <hr>
             <div class="col-lg-6 mb-3">
                 <div class="row d-flex flex-column">
-                    <h4>Mis lotes:</h4>
+                    <h4>Mis lotes</h4>
                     <div class="col-10">
                         @for (p of plots; track $index) {
-                            <div class="card mb-2">
-                                <div class="card-body">
-                                    {{'Lote: ' + p.plot_number + " Manzana: " + p.block_number}}
-                                </div>
+                        
+                            <div class="mt-2">
+                                {{'Lote: ' + p.plot_number + " Manzana: " + p.block_number}}
                             </div>
                         }
                        
@@ -183,4 +188,28 @@
         </div>
 
     </form>
+
+
+    <!-- Modal de info -->
+<div class="modal fade" id="infoModal" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Información de la pantalla</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          Funcionalidades de esta pantalla:
+          <ul>
+            <li>Ver tus datos personales y de tus lotes</li>
+            <li>Editar tus datos personales incluyendo tu contraseña</li>
+            <li>Se puede editar tu icono!</li>
+          </ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>

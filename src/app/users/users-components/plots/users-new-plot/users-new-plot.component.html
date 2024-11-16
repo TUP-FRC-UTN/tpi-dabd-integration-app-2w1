@@ -2,21 +2,22 @@
     <form [formGroup]="formReactivo" (ngSubmit)="createPlot()">
         <div class="row">
 
+            <!-- Campo nro de lote -->
             <div class="col-lg-6 mb-3">
                 <div class="row">
-                    <label class="col-2 col-form-label">N°. de lote</label>
+                    <label class="col-2 col-form-label">N°. de Lote</label>
                     <div class="col-10">
-                        <input type="number" class="form-control" formControlName="plotNumber" min="0"
+                        <input type="number" class="form-control" formControlName="plotNumber" min="1"
                             [ngClass]="onValidate('plotNumber')">
                         <div class="invalid-feedback">{{showError('plotNumber')}}</div>
                     </div>
                 </div>
             </div>
 
-
+            <!-- Campo nro de manzana -->
             <div class="col-lg-6 mb-3">
                 <div class="row">
-                    <label class="col-2 col-form-label">N°. de manzana</label>
+                    <label class="col-2 col-form-label">N°. de Manzana</label>
                     <div class="col-10">
                         <input type="number" class="form-control" formControlName="blockNumber"
                             [ngClass]="onValidate('blockNumber')">
@@ -25,10 +26,10 @@
                 </div>
             </div>
 
-
+            <!-- Campo area del terreno -->
             <div class="col-lg-6 mb-3">
                 <div class="row">
-                    <label class="col-2 col-form-label">Terreno del lote (m²)</label>
+                    <label class="col-2 col-form-label">Terreno m²</label>
                     <div class="col-10">
                         <input type="number" class="form-control" formControlName="totalArea"
                             [ngClass]="onValidate('totalArea')">
@@ -37,10 +38,10 @@
                 </div>
             </div>
 
-
+            <!-- Campo area construida -->
             <div class="col-lg-6 mb-3">
                 <div class="row">
-                    <label class="col-2 col-form-label">Área construida (m²)</label>
+                    <label class="col-2 col-form-label">Construido m²</label>
                     <div class="col-10">
                         <input type="number" class="form-control" formControlName="totalBuild"
                             [ngClass]="onValidate('totalBuild')">
@@ -49,7 +50,7 @@
                 </div>
             </div>
 
-
+            <!-- Campo estado -->
             <div class="col-lg-6 mb-3">
                 <div class="row">
                     <label class="col-2 col-form-label">Estado</label>
@@ -66,7 +67,7 @@
                 </div>
             </div>
 
-
+            <!-- Campo tipo de lote -->
             <div class="col-lg-6 mb-3">
                 <div class="row">
                     <label class="col-2 col-form-label">Tipo</label>
@@ -83,10 +84,10 @@
                 </div>
             </div>
 
-
+            <!-- Campo para subir archivos -->
             <div class="col-lg-6 mb-3">
                 <div class="row">
-                  <label class="col-2 col-form-label">Subir archivos</label>
+                  <label class="col-2 col-form-label">Subir Archivos</label>
                   <div class="col-10">
                     <input type="file" class="form-control" multiple formControlName="file" [ngClass]="onValidate('file')"
                       (change)="onFileChange($event)">
@@ -100,9 +101,7 @@
                           <span>{{file.name.length > 40 ? file.name.slice(0, 40)+'...' : file.name}}</span>
                         </div>
                         <button type="button" class="btn bi-x-lg" (click)="deleteFile($index)"></button>
-  
                       </div>
-
                       }
                     </div>
                   </div>
@@ -110,13 +109,35 @@
               </div>
 
             <div class="row mb-3 justify-content-end">
+
+                <!-- Botón para redireccionar -->
                 <div class="col-auto">
                   <button class="btn btn-secondary" type="submit" (click)="redirect('home/plots/list')">Cancelar</button>
                 </div>
+                <!-- Botón para hacer el submit -->
                 <div class="col-auto">
-                    <button class="btn btn-primary" type="submit" [disabled]="formReactivo.invalid">Guardar</button>
+                    <button class="btn btn-success" type="submit" [disabled]="formReactivo.invalid">Registrar</button>
                 </div>
               </div>
         </div>
     </form>
+
+    <!-- Modal de info -->
+    <div class="modal fade" id="infoModal" role="dialog">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Información de la pantalla</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>En esta pantalla, puedes registrar un nuevo lote, ingresando su número, área, estado, y tipo, además de adjuntar archivos relevantes.</p>
+                <p>Completa los campos obligatorios y selecciona "Guardar" para confirmar el registro o "Cancelar" para salir sin guardar.</p>
+              </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+          </div>
+        </div>
+      </div>
 </section>

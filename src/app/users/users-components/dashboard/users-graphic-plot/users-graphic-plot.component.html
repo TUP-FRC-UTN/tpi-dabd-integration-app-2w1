@@ -1,0 +1,13 @@
+<div *ngIf="loading" class="loading">Cargando...</div>
+<div *ngIf="error" class="error">{{ error }}</div>
+
+<div *ngIf="!loading && !error">
+  <h4 class="card-title align-items-center">Estado de los Lotes</h4>
+  <h6 class="card-subtitle">Cantidad de lotes Disponibles y Habitados</h6>
+  <hr>
+  <google-chart 
+    [type]="pieChart" 
+    [data]="plotStateData" 
+    [options]="pieChartOptions">
+  </google-chart>
+</div>

@@ -1,5 +1,5 @@
 import { Routes } from "@angular/router";
-import { UserHomeComponent } from "./user-home/user-home.component";
+import { UsersHomeComponent } from "../common/components/users-home/users-home.component";
 import { roleGuard } from "../notifications/guard";
 import { NotFoundComponent } from "../common/components/not-found/not-found.component";
 import { UnauthorizedComponent } from "../common/components/unauthorized/unauthorized.component";
@@ -27,5 +27,5 @@ export const USER_ROUTES: Routes = [
   { path: 'list', component: ListUsersComponent, data: { roles: ['Gerente', 'SuperAdmin'] } },
   { path: 'add', component: NewUserComponent },
   { path: 'edit/:id', component: UsersUpdateUserComponent },
-  { path: 'dashboard', component: UserHomeComponent } // Cambiar por el componente correspondiente
+  { path: 'dashboard', component: UsersHomeComponent } // Cambiar por el componente correspondiente
 ];

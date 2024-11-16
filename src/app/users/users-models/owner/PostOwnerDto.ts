@@ -2,7 +2,7 @@ export class OwnerModel {
     name: string;
     lastname: string;
     dni: string;
-    cuitCuil: string;
+    dni_type_id: number;
     dateBirth: Date;
     ownerTypeId: number;
     taxStatusId: number;
@@ -15,7 +15,7 @@ export class OwnerModel {
     avatarUrl: string;
     roles: string[];
     userCreateId: number;
-    plotId: number;
+    plotId: number[];
     telegramId: number;
     files: File[];
 
@@ -23,7 +23,7 @@ export class OwnerModel {
         this.name = '';        
         this.lastname = '';          
         this.dni = '';             
-        this.cuitCuil = '';          
+        this.dni_type_id = 0;          
         this.dateBirth = new Date();
         this.ownerTypeId = 0;        
         this.taxStatusId = 0;   
@@ -35,7 +35,7 @@ export class OwnerModel {
         this.avatarUrl = '';
         this.roles = [];
         this.userCreateId = 0;
-        this.plotId = 0;
+        this.plotId = [];
         this.telegramId = 0;
         this.files = [];
     }

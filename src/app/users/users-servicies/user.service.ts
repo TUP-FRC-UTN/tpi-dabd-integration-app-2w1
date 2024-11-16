@@ -55,6 +55,10 @@ export class UserService {
     return this.http.get<UserGet[]>(this.url + "getall/" + plotId);
   }
 
+  getUsersByOwner(ownerId: number): Observable<UserGet> {
+    return this.http.get<UserGet>(this.url + "byOwner/"+ ownerId + "/WithoutTheOwner");
+  }
+
   deleteUser( user: DeleteUser): Observable<any> {
     return this.http.delete(this.url + 'delete/' + user.id + '/' + user.userIdUpdate); 
   }

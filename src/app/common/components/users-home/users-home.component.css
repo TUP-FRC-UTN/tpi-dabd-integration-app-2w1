@@ -1,0 +1,62 @@
+.greeting-container {
+    padding: 10px;
+    background: rgb(235, 231, 231);
+}
+
+.card-title {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    font-size: 1.2em;
+    opacity: 0.8;
+    margin-top: 10px;
+}
+
+.weather-details {
+    margin-bottom: 0.25rem; 
+  }
+
+.announcements {
+    background: rgb(202, 197, 197);
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+.announcement-item {
+    border-left: 4px solid gray;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+.time {
+    font-size: 2.5em;
+    font-weight: 700;
+    margin: 0;
+}
+
+.priority-high {
+    border-color: gray;
+}
+
+h2 {
+    margin-bottom: 15px;
+}
+
+h3 {
+    color: #333;
+    margin-bottom: 5px;
+}
+
+small {
+    color: #666;
+    display: block;
+    margin-top: 5px;
+}
+
+.custom-header {
+    background-color:  rgb(235, 231, 231); 
+    color: black;  
+}
