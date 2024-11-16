@@ -20,5 +20,20 @@
 
   section{
     box-shadow: 5px 0px 15px rgba(0, 0, 0, 0.2)
+
+    
 }
 
+.floating-btn {
+  position: fixed;           
+  bottom: 20px;                
+  right: 20px;                 
+  width: 50px !important;      
+  height: 50px !important;     
+  border-radius: 50% !important; 
+  border: none !important;     
+  display: flex;               
+  align-items: center;        
+  justify-content: center;     
+  z-index: 15;                
+}

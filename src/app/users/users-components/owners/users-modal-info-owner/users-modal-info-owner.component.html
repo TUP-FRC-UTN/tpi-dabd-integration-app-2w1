@@ -1,55 +1,72 @@
 <div class="modal-header">
-        <h4 class="modal-title" id="modal-basic-title">Información del Propietario</h4>
-        <button type="button" class="btn-close" aria-label="Close"
-            (click)="activeModal.dismiss('Cross click')"></button>
-    </div>
+    <h4 class="modal-title" id="modal-basic-title">Información del Propietario</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
+</div>
 
-    <div class="modal-body">
-        <form [formGroup]="infoOwner">
-            
-            <h5>Información Personal</h5>
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <p><strong>Nombre Completo:</strong> {{ fullName }}</p>
-                    <p><strong>DNI:</strong> {{ infoOwner.get('dni')?.value || 'N/A' }}</p>
-                </div>    
-                <div class="col-md-6">
-                    <p><strong>Fecha de nacimiento:</strong> {{ infoOwner.get('birthdate')?.value || 'N/A' }}</p>
-                    <p><strong>CUIT - CUIL:</strong> {{ infoOwner.get('cuitCuil')?.value || 'N/A' }}</p>
-                </div>
-            </div>
+<div class="modal-body">
+    <form [formGroup]="infoOwner">
 
-            <h5>Información Comercial</h5>
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <p><strong>Tipo de propietario:</strong> {{ infoOwner.get('ownerType')?.value || 'N/A' }}</p>
-                    <p><strong>Nombre de la empresa:</strong> {{ infoOwner.get('businessName')?.value || 'N/A' }}</p>
-                </div>
-                <div class="col-md-6">
-                    <p><strong>Estado fiscal:</strong> {{ infoOwner.get('taxStatus')?.value || 'N/A' }}</p>
-                </div>
+        <h5>Información Personal</h5>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <p><strong>Nombre Completo:</strong> {{ fullName }}</p>
+                <p><strong>Tipo de Documento:</strong> {{ infoOwner.get('dni_type')?.value || 'N/A' }}</p>
             </div>
+            <div class="col-md-6">
+                <p><strong>Fecha de Nacimiento:</strong> {{ infoOwner.get('birthdate')?.value || 'N/A' }}</p>
+                <p><strong>Número de Documento:</strong> {{ infoOwner.get('dni')?.value || 'N/A' }}</p>
+            </div>
+        </div>
+        <hr>
+        <h5>Información Comercial</h5>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <p><strong>Tipo de Propietario:</strong> {{ infoOwner.get('ownerType')?.value || 'N/A' }}</p>
+                <p><strong>Nombre de la Empresa:</strong> {{ infoOwner.get('businessName')?.value || 'N/A' }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Estado Fiscal:</strong> {{ infoOwner.get('taxStatus')?.value || 'N/A' }}</p>
+            </div>
+        </div>
+        <hr>
+        <h5>Lotes</h5>
+        <div class="row mb-3">
+            @for (plot of plotsOwner; track $index) {
+                <div class="col-md-6">
+                    <p><strong>Nro. de Lote:</strong> {{ plot.plot_number }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Nro. de Manzana:</strong> {{ plot.block_number }}</p>
+                </div>
+            }
 
-            <div class="mt-4">
-                <h5 class="mb-3">Archivos adjuntos</h5>
-                <div class="list-group">
-                    @for (e of filesOwner; track $index) {
-                        <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                            <div class="d-flex align-items-center">
-                                <i class="bi bi-file-earmark-text me-3 text-primary fs-5"></i>
-                                <span> {{ ((e.name.length>30) ? (e.name.slice(0,30) + "...") : e.name)}}</span>
-                            </div>
-                            <button (click)="downloadFile(e.uuid)" class="btn btn-success btn-sm">
-                                <i class="bi bi-download me-2"></i>
-                                Descargar
-                            </button>
-                        </div>
-                    }
+        </div>
+        <hr>
+        <div class="mt-4">
+            <h5 class="mb-3">Archivos Adjuntos</h5>
+            <div class="list-group">
+                @if(!filesOwner.length){
+                <p>No hay archivos disponibles</p>
+                }
+                @else {
+                @for (e of filesOwner; track $index) {
+                <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-file-earmark-text me-3 text-primary fs-5"></i>
+                        <span> {{ ((e.name.length>30) ? (e.name.slice(0,30) + "...") : e.name)}}</span>
+                    </div>
+                    <button (click)="downloadFile(e.uuid)" class="btn btn-success btn-sm">
+                        <i class="bi bi-download me-2"></i>
+                        Descargar
+                    </button>
                 </div>
+                }
+                }
             </div>
-    
-        </form>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="closeModal()">Atrás</button>
-    </div>
+        </div>
+
+    </form>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="closeModal()">Atrás</button>
+</div>

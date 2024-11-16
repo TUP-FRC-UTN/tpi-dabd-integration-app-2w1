@@ -1,6 +1,4 @@
 <section class="container p-5 border rounded border-3 border-secundary">
-  <h3 class="mb-3">Añadir Usuario</h3>
-
   <form (ngSubmit)="createUser()" [formGroup]="reactiveForm">
     <div class="row">
       <div class="col-lg-6 mb-3">
@@ -27,7 +25,7 @@
 
         <div class="col-lg-6 mb-3">
           <div class="row">
-            <label class="col-2 col-form-label">Tipo de documento</label>
+            <label class="col-2 col-form-label">Tipo de Documento</label>
             <div class="col-10">
               <select id="selectOption" class="form-select" formControlName="dniType" [ngClass]="onValidate('dniType')">
                 <option value="" disabled selected>Seleccione una opción</option>
@@ -61,21 +59,23 @@
           </div>
         </div>
 
-
-        <div class="col-lg-6 mb-3">
-          <div class="row">
-            <label class="col-2 col-form-label">Lote</label>
-            <div class="col-10">
-              <select id="selectOption" class="form-select" formControlName="plot" [ngClass]="onValidate('plot')">
-                <option value="" disabled selected>Seleccione una opción</option>
-                @for (s of lotes; track $index) {
-                <option value="{{s.id}}">Numero de lote: {{s.plot_number}}, Manzana: {{s.block_number}}</option>
-                }
-              </select>
-              <div class="invalid-feedback">{{showError('plot')}}</div>
+        @if (actualRole === 'Gerente') {
+          <div class="col-lg-6 mb-3">
+            <div class="row">
+              <label class="col-2 col-form-label">Lote</label>
+              <div class="col-10">
+                <select id="selectOption" class="form-select" formControlName="plot" [ngClass]="onValidate('plot')">
+                  <option value="" disabled selected>Seleccione una opción</option>
+                  @for (s of lotes; track $index) {
+                  <option value="{{s.id}}">Numero de lote: {{s.plot_number}}, Manzana: {{s.block_number}}</option>
+                  }
+                </select>
+                <div class="invalid-feedback">{{showError('plot')}}</div>
+              </div>
             </div>
           </div>
-        </div>
+        }
+        
 
 
         <div class="col-lg-6 mb-3">
@@ -89,12 +89,12 @@
           </div>
         </div>
 
-
+        
         <div class="col-lg-6 mb-3">
           <div class="row">
-            <label class="col-2 col-form-label">Fecha de nacimiento</label>
+            <label class="col-2 col-form-label">Fecha de Nacimiento</label>
             <div class="col-10">
-              <input type="date" class="form-control" formControlName="datebirth" value="2000-01-01"
+              <input type="date" class="form-control" formControlName="datebirth" [formControl]="initialDate"
                 [ngClass]="onValidate('datebirth')">
               <div class="invalid-feedback">{{showError('datebirth')}}</div>
             </div>
@@ -107,10 +107,10 @@
           <div class="row">
             <label class="col-2 col-form-label">Roles</label>
             <div class="col-10">
-              <app-users-select-multiple (rolesEmited)="fillRolesSelected($event); verifyRole()"
-                (click)="verifyRole()" />
+              <app-users-multiple-select [options]="options" (selectedOptionsChange)="reactiveForm.get('roles')?.setValue($event)" />
               <div class="text-danger form-error">
-                @if(!checkRole){ Ingrese al menos un rol }
+                @if(reactiveForm.get('roles')?.hasError('required')){ Ingrese al menos una opción }
+
               </div>
             </div>
           </div>
@@ -119,7 +119,7 @@
 
         <div class="col-lg-6 mb-3">
           <div class="row">
-            <label class="col-2 col-form-label">Nombre de usuario</label>
+            <label class="col-2 col-form-label">Nombre de Usuario</label>
             <div class="col-10">
               <input type="text" class="form-control" formControlName="username" [ngClass]="onValidate('username')">
               <div class="invalid-feedback">{{showError('username')}}</div>
@@ -128,7 +128,7 @@
         </div>
 
 
-        <div class="col-lg-6 mb-3">
+        <!-- <div class="col-lg-6 mb-3">
           <div class="row">
             <label class="col-2 col-form-label">Telegram id</label>
             <div class="col-10">
@@ -137,29 +137,33 @@
               <div class="invalid-feedback">{{showError('telegram_id')}}</div>
             </div>
           </div>
-        </div>
+        </div> -->
 
 
 
         <div class="col-lg-6 mb-3">
           <div class="row">
             <label class="col-2 col-form-label">Contraseña</label>
-            <div class="col-10">
-              <input type="password" class="form-control" formControlName="password" autocomplete="current-password"
+            <div class="col-10 position: relative">
+              <input [type]="passwordVisible ? 'text' : 'password'" class="form-control" formControlName="password" autocomplete="current-password"
                 [ngClass]="onValidate('password')">
+                <i class="bi" 
+                  [ngClass]="passwordVisible ? 'bi-eye-slash' : 'bi-eye'" 
+                  (click)="togglePasswordVisibility()" 
+                  style="cursor: pointer; position: absolute; right: 780px; top: auto; transform: translateY(-125%);"></i>
               <div class="invalid-feedback">{{showError('password')}}</div>
             </div>
           </div>
         </div>
-
+        
 
         <div class="row mb-3 justify-content-end">
           <div class="col-auto">
             <button type="button" class="btn btn-secondary" (click)="redirect()">Cancelar</button>
           </div>
           <div class="col-auto">
-            <button type="submit" class="btn btn-primary" [disabled]="!reactiveForm.valid || rolesSelected.length === 0">
-              Guardar
+            <button type="submit" class="btn btn-success" [disabled]="!reactiveForm.valid">
+              Registrar
             </button>
           </div>
         </div>
@@ -176,9 +180,13 @@
       </div>
       <div class="modal-body">
         <!-- body con tus inputs -->
-        Esta página es utilizada para dar de alta a un usuario , todos los campos son obligatorios excepto
-        el telegram id que se refiere al identificador de la cuenta personal de telegram del usuario a cargar,
-        este campo es utilzado para contactar a usuario por medio de la aplicación "Telegram".
+        Esta página es utilizada para dar de alta a un usuario, todos los campos son obligatorios excepto
+        el telegram, que es utilzado para contactar a usuario por medio de la aplicación "Telegram". <br>
+        <ul>
+          <li>Para conocer tu ID de telegram, debes ingresar a la aplicación y buscar el bot "" y escribirle "/start".</li>
+          <li>Se puede asignar varios roles al usuario.</li>
+        </ul>
+        <br>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>

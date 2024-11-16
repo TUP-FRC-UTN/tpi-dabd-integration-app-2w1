@@ -1,0 +1,167 @@
+<div class="container">
+  <!-- Filtros -->
+  <div class="row sticky-section border-0 rounded-4 p-3 shadow mb-2">
+
+    <div class="row">
+      <!-- Filtro de fechas -->
+
+
+      <div class="col d-flex gap-3" [formGroup]="filterForm">
+        <div class="col">
+          <input type="date" class="form-control border-1 bg-light" [formControl]="startDate" (change)="filterByDate()">
+          <!-- @if(errorRangeDate) {
+            <div class="text-danger">La fecha de inicio no puede ser mayor a la fecha de fin</div>
+          } -->
+        </div>
+        <div class="col">
+          <input type="date" class="form-control border-1 bg-light" [formControl]="endDate" (change)="filterByDate()">
+        </div>
+      </div>
+
+
+      <!-- Botones de exportar -->
+      <div class="col-auto d-flex gap-1 ms-auto">
+        <button class="btn btn-primary filterbutton" data-bs-toggle="modal" title="Filtros Avanzados"
+          data-bs-target="#filtrosAvanzados">
+          <i class="bi bi-funnel-fill"></i>
+        </button>
+        <button type="button" class="btn btn-secondary bi bi-trash filterbutton" (click)="clearFilters()"
+          title="Limpiar Filtros"></button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="row">
+
+    <div class="col-md-7">
+      <div class="card border-0 shadow-lg rounded-4">
+        <div class="card-body">
+          <div *ngIf="errorBarChart" class="error-container">
+            <i class="bi bi-exclamation-triangle-fill error-icon"></i>
+            <p>{{ errorBarChart }}</p>
+            <button class="btn btn-secondary mt-2" (click)="resetAll()">
+              <i class="bi bi-arrow-clockwise me-2"></i>Restablecer
+            </button>
+          </div>
+
+          @if(!errorBarChart){
+          <h4 class="card-title align-items-center">Distribución de Lotes por Manzana</h4>
+          <hr>
+          <google-chart [type]="columnChart" [data]="barChartData" [options]="barChartOptions" [width]="600"
+            [height]="360">
+          </google-chart>
+          }
+
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-5">
+
+      <div class="row">
+        <div class="col mb-2">
+          <div class="card border-0 shadow p-2 hover-shadow" style="background-color: #d8ffedde;">
+            <div class="card-body d-flex flex-column align-items-center justify-content-center text-center p-2">
+              <h6 class="card-title">Ocupación Total<i class="bi bi-house-fill me-2"></i></h6>
+              <span>{{ filteredPlotsStats?.occupiedPlots }} de {{ filteredPlotsStats?.totalPlots }}
+                lotes</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col mb-2">
+          <div class="card border-0 shadow p-2 hover-shadow" style="background-color: #e7f1ff;">
+            <div class="card-body d-flex flex-column align-items-center justify-content-center text-center p-2">
+              <h6 class="card-title">En Construcción<i class="bi bi-hammer me-2"></i></h6>
+              <span>{{ filteredPlotsStats?.constructionPlots }} lotes</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col mb-2">
+          <div class="card border-0 shadow p-2 hover-shadow" style="background-color: #fff3e0;">
+            <div class="card-body d-flex flex-column align-items-center justify-content-center text-center p-2">
+              <h6 class="card-title">Disponibles<i class="bi bi-door-open-fill me-2"></i></h6>
+              <span>{{ filteredPlotsStats?.availablePlots }} lotes</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col mb-2">
+          <div class="card border-0 shadow p-2 hover-shadow" style="background-color: #e7f1ff;">
+            <div class="card-body d-flex flex-column align-items-center justify-content-center text-center p-2">
+              <h6 class="card-tite">Área construida<i class="bi bi-building me-2"></i></h6>
+              <span>{{ filteredPlotsStats?.constructedArea }} m²</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-lg mb-3 rounded-4">
+        <div class="card-body position-relative">
+
+          <div *ngIf="errorPieChart" class="error-container">
+            <i class="bi bi-exclamation-triangle-fill error-icon"></i>
+            <p>{{ errorPieChart }}</p>
+            <button class="btn btn-secondary mt-2" (click)="resetAll()">
+              <i class="bi bi-arrow-clockwise me-2"></i>Restablecer
+            </button>
+          </div>
+
+          @if(!errorPieChart){
+          <h5 class="card-title align-items-center text-center">Distribución de Lotes por Propietarios</h5>
+          <hr>
+          <google-chart [type]="pieChart" [data]="pieChartData" [options]="pieChartOptions" [width]="400"
+            [height]="184">
+          </google-chart>
+          }
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal para filtros avanzados -->
+<div class="modal fade" id="filtrosAvanzados" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Información del Dashboard</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+
+        <form [formGroup]="filterForm">
+
+          <div class="col mb-3">
+            <label for="blockFilter" class="form-label">Manzana:</label>
+            <app-users-multiple-select [options]="blocksNumber"
+              (selectedOptionsChange)="filterForm.get('block')?.setValue($event)" />
+          </div>
+
+          <div class="col mb-3">
+            <label for="typeFilter" class="form-label">Tipo:</label>
+            <select class="form-select" id="typeFilter" formControlName="type">
+              <option value="" selected>Seleccione una opción</option>
+              <option *ngFor="let type of plotsTypes" [value]="type.name">{{ type.name }}</option>
+            </select>
+          </div>
+          <div class="col mb-3">
+            <label for="statusFilter" class="form-label">Estado:</label>
+            <select class="form-select" id="statusFilter" formControlName="status">
+              <option value="" selected>Seleccione una opción</option>
+              <option *ngFor="let status of plotsStatus" [value]="status.name">{{ status.name }}</option>
+            </select>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

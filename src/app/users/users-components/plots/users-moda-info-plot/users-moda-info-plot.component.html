@@ -1,37 +1,58 @@
 <div class="modal-header">
     <h4 class="modal-title" id="modal-basic-title">Información del Lote</h4>
     <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
-  </div>
-  <div class="modal-body">
+</div>
+<div class="modal-body">
     <form [formGroup]="plotForm">
-      
+
         <h5>Información del Lote</h5>
         <div class="row mb-3">
             <div class="col-md-6">
                 <p><strong>Lote:</strong> {{ plotForm.get('plot')?.value || 'N/A' }}</p>
                 <p><strong>Mts Total:</strong> {{ plotForm.get('total_area')?.value || 'N/A' }}</p>
-            </div>         
-          
+            </div>
+        
             <div class="col-md-6">
                 <p><strong>Manzana:</strong> {{ plotForm.get('block')?.value || 'N/A' }}</p>
                 <p><strong>Mts Construidos:</strong> {{ plotForm.get('built_area')?.value || 'N/A' }}</p>
             </div>
         </div>
-
+        <hr>
         <h5>Información Adicional</h5>
         <div class="row mb-3">
-          <div class="col-md-6">
-            <p><strong>Tipo:</strong> {{ plotForm.get('type')?.value || 'N/A' }}</p>
-          </div>
-          <div class="col-md-6">
-            <p><strong>Estado:</strong> {{ plotForm.get('state')?.value || 'N/A' }}</p>
-          </div>
+            <div class="col-md-6">
+                <p><strong>Tipo:</strong> {{ plotForm.get('type')?.value || 'N/A' }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Estado:</strong> {{ plotForm.get('state')?.value || 'N/A' }}</p>
+            </div>
         </div>
 
+        <hr>
+
+        <!-- Sección nueva para mostrar información del propietario -->
+        <h5>Información del Propietario</h5>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <p><strong>Nombre:</strong> {{ ownerName || 'N/A' }}</p> <!-- Muestra el nombre del propietario -->
+            </div>
+            <div class="col-md-6">
+                <p><strong>Apellido:</strong> {{ ownerLastName || 'N/A' }}</p>
+                <!-- Muestra el apellido del propietario -->
+            </div>
+            <div class="col-md-6">
+                <p><strong>DNI:</strong> {{ ownerDNI || 'N/A' }}</p> <!-- Muestra el DNI del propietario -->
+            </div>
+            <div class="col-md-6">
+                <p><strong>Tipo Propietario:</strong> {{ ownerType || 'N/A'}}<p>
+            </div>
+        </div>
+        <hr>
         <div class="mt-4">
-            <h5 class="mb-3">Archivos adjuntos</h5>
+            <h5 class="mb-3">Archivos Adjuntos</h5>
             <div class="list-group">
-                <div *ngFor="let e of filesPlot; let i = index" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                <div *ngFor="let e of filesPlot; let i = index"
+                    class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center">
                         <i class="bi bi-file-earmark-text me-3 text-primary fs-5"></i>
                         <span> {{ ((e.name.length>30) ? (e.name.slice(0,30) + "...") : e.name)}}</span>
@@ -43,11 +64,9 @@
                 </div>
             </div>
         </div>
-        
-  </form>
-  </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="closeModal()">Atrás</button>
-    </div>
-    
 
+    </form>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="closeModal()">Atrás</button>
+</div>

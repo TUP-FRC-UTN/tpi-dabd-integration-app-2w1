@@ -1,41 +1,70 @@
 <section class="container p-5 border rounded border-3 border-secundary" style="min-height: 70vh;">
-    <div class="d-flex align-items-center">
-      <h3 class="m-0 me-3">Grupo Familiar</h3>
-      <i class="bi bi-plus-circle-fill fs-2 btn-hover" (click)="redirectAdd()"></i>
-    </div>
-      <div class="d-flex flex-wrap  justify-content-start">
-      @for(familiar of familyGroup; track $index){
-        <div class="card mb-3 me-5" style="max-width: 350px;">
-          <div class="row g-0">
-            <div class="col-md-8">
-              <div class="card-body">
-                <h5 class="card-title">{{showName(familiar.name + ", " + familiar.lastname)}}</h5>
-                <p class="card-text">Roles: {{showRoles( familiar.roles)}}</p>
-                <p class="card-text">Email: {{showEmail(familiar.email)}}</p>
-                <p class="card-text">Teléfono: {{familiar.phone_number}}</p>
-              </div>
-            </div>
-            <div class="col-md-4 d-flex flex-column justify-content-evenly align-items-center">
-              @if(familiar.avatar_url != "asd") {
-                <img src="{{familiar.avatar_url}}" class="w-75 img-fluid rounded-start" alt="...">
-              }@else {
-                <img src="../../../../assets/icons/avatar.png" class="w-75 img-fluid rounded-start" alt="...">
-              }
-              <div class="dropdown-center d-flex align-items-center">
-                <button class="btn btn-light border border-1 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  Acciones
-                </button>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item view-user hover" (click)="abrirModal('info', familiar.id)">Ver más</a></li>
-                  <li><hr class="dropdown-divider"></li>
-                  <li><a class="dropdown-item edit-user hover" (click)="redirectEdit(familiar.id)">Editar</a></li>
-                  <li><hr class="dropdown-divider"></li>
-                  <li><a class="dropdown-item delete-user hover" (click)="abrirModal('delete', familiar.id)">Eliminar</a></li>
-                </ul>
-              </div>
-            </div>
+  <div class="d-flex align-items-center">
+    <h3 class="m-0 me-3">Grupo Familiar</h3>
+    <i class="bi bi-plus-circle-fill fs-2 btn-hover" (click)="redirectAdd()"></i>
+  </div>
+  <div class="d-flex flex-wrap mt-4 justify-content-start">
+    @for(familiar of familyGroup; track $index){
+    <div class="card mb-3 me-5" style="max-width: 350px;">
+      <div class="row g-0 p-3">
+        <div class="col-md-8">
+          <div class="card-body p-0">
+            <h5 class="card-title">{{showName(familiar.name + ", " + familiar.lastname)}}</h5>
+            <p class="card-text">Roles: {{showRoles( familiar.roles)}}</p>
+            <p class="card-text">Email: {{showEmail(familiar.email)}}</p>
+            <p class="card-text">Teléfono: {{familiar.phone_number}}</p>
           </div>
         </div>
-      }
+        <div class="col-md-4 d-flex flex-column justify-content-evenly align-items-center">
+          @if(familiar.avatar_url != "asd") {
+          <img src="{{familiar.avatar_url}}" class="w-75 img-fluid rounded-start" alt="...">
+          }@else {
+          <img src="../../../../assets/icons/avatar.png" class="w-75 img-fluid rounded-start" alt="...">
+          }
+          <div class="dropdown-center d-flex align-items-center">
+            <button class="btn btn-light border border-1 " type="button" data-bs-toggle="dropdown" title="Acciones"
+              aria-expanded="false">
+              <i class="bi bi-three-dots-vertical"></i>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item view-user hover" (click)="abrirModal('info', familiar.id)">Ver más</a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li><a class="dropdown-item edit-user hover" (click)="redirectEdit(familiar.id)">Editar</a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li><a class="dropdown-item delete-user hover" (click)="openModalEliminar(familiar.id)">Eliminar</a>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
+    </div>
+    }
+  </div>
+
+  <div class="modal fade" id="infoModal" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Información de la pantalla</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          Aquí podras gestionar tu grupo familiar, teniendo acceso a acciones como:
+          <ul>
+            <li>Agregar un nuevo familiar</li>
+            <li>Ver su información</li>
+            <li>Editar su información</li>
+            <li>Eliminar al familiar</li>
+          </ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>

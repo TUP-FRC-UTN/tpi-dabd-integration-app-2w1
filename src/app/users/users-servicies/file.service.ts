@@ -5,7 +5,7 @@ import { catchError, map, Observable, throwError } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class FileService {
+export class FileService { //FixMe: Mover a common
 
   private baseUrl = 'http://localhost:8084/fileManager';  // Cambia esto por tu URL base
 

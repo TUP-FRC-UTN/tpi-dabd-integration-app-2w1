@@ -2,7 +2,32 @@
   <div class="d-flex justify-content-between align-items-center mb-2">
     <div class="d-flex align-items-center">
       <div id="myTable_filter" class="dataTables_filter" style="text-align: left;">
-        <input class="form-control" placeholder="Buscar" style="width: 300px;" aria-controls="myTable">
+        <input class="form-control me-3" placeholder="Buscar" style="width: 300px;" aria-controls="myTable">
+      </div>
+      <div id="myTable_filter" class="dataTables_filter" style="text-align: left;">
+        <select class="form-select m-3" aria-controls="myTable" style="width: 300px;" aria-controls="myTable"
+          (change)="updateFilterTypeSimple()" [formControl]="selectType">
+          <option value="" disabled >Seleccionar tipo</option>
+          @for (type of plotTypes; track $index) {
+          <option [value]="type">{{type}}</option>
+          }
+        </select>
+        <!-- <app-users-multiple-select [options]="typesForFilter" (sendList)="updateFilterType($event)" /> -->
+      </div>
+      <div id="myTable_filter" class="dataTables_filter" style="text-align: left;">
+        <select class="form-select m-3" aria-controls="myTable" style="width: 300px;" aria-controls="myTable place"
+          (change)="updateFilterStateSimple()" [formControl]="selectState">
+          <option value disabled selected >Seleccionar estado</option>
+          @for (status of plotStatus; track $index) {
+          <option [value]="status">{{status}}</option>
+          }
+        </select>
+        <!-- <app-users-multiple-select [options]="statusForFilter" (sendList)="updateFilterState($event)" /> -->
+      </div>
+      <div>
+        <button class="btn btn-secondary" (click)="resetFilters()">
+          <i class="bi bi-trash"></i>
+        </button>
       </div>
     </div>
     <div>
@@ -14,9 +39,40 @@
       </button>
     </div>
   </div>
-
   <div class="mb-3">
     <table id="myTable" class="table table-striped table-hover border border-3 rounded"></table>
   </div>
-</section>
 
+  <button class="floating-btn btn btn-primary" (click)="addPlot()">
+    <span class="bi-plus-lg"></span>
+  </button>
+
+
+  <div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="infoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="infoModalLabel">Información sobre la pantalla</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>En esta pantalla puedes ver un listado completo de lotes ordenado por su numeración de manera ascendente, incluyendo los detalles principales de cada uno:</p>
+          <ul>
+            <li><strong>Número de Lote:</strong> Identificación del lote dentro de su manzana.</li>
+            <li><strong>Manzana:</strong> Identificación de la manzana donde se ubica el lote.</li>
+            <li><strong>M² Terreno:</strong> Superficie total del terreno del lote en metros cuadrados.</li>
+            <li><strong>M² Construidos:</strong> Área construida en el lote, en metros cuadrados.</li>
+            <li><strong>Tipo de Lote:</strong> Clasificación del lote, por ejemplo, residencial o comercial.</li>
+            <li><strong>Estado:</strong> Estado actual del lote, como disponible, en venta, o vendido.</li>
+            <li><strong>Propietario:</strong> Nombre del propietario actual del lote.</li>
+          </ul>
+          <p>Además, puedes usar los filtros por tipo y estado de lote y la barra de búsqueda para refinar la lista. También tienes opciones para exportar el listado en formatos PDF y Excel.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+</section>

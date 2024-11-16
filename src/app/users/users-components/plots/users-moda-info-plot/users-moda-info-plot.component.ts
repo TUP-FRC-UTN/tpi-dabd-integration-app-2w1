@@ -8,6 +8,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { GetPlotModel } from '../../../users-models/plot/GetPlot';
 import { FileDto } from '../../../users-models/owner/FileDto';
 import { FileService } from '../../../users-servicies/file.service';
+import { OwnerService } from '../../../users-servicies/owner.service';
 
 @Component({
   selector: 'app-users-moda-info-plot',
@@ -23,6 +24,12 @@ export class UsersModaInfoPlotComponent implements OnInit {
   plotForm: FormGroup;
   filesPlot: FileDto[];
 
+  ownerName: string = ''; // Para almacenar el nombre del propietario
+  ownerLastName: string = ''; // Para almacenar el apellido del propietario
+  ownerDNI: string = ''; // Para almacenar el DNI del propietario
+  ownerType: string = '' //Tipo de propietario
+
+  private readonly ownerService = inject(OwnerService);
   private readonly fileService = inject(FileService);
 
   constructor(public activeModal: NgbActiveModal, private fb: FormBuilder) {
@@ -49,13 +56,49 @@ export class UsersModaInfoPlotComponent implements OnInit {
       });
       this.plotForm.disable();
       this.filesPlot = this.plotModel.files;
+
+      // Obtener información del propietario
+    this.ownerService.getOwnerByPlotId(this.plotModel.id).subscribe({
+      next: (owners) => {
+        if (owners.length > 0) {
+          this.ownerName = owners[0].name;
+          this.ownerLastName = owners[0].lastname;
+          this.ownerDNI = owners[0].dni;
+          this.ownerType = owners[0].ownerType;
+        }
+      },
+      error: (error) => {
+        console.error('Error al obtener el propietario:', error);
+      }
+    });
   }
 
+  //Cierra el modal
   closeModal(){
     this.activeModal.close();
   }
 
+  //Descarga los archivos
   downloadFile(fileId: string) {
     this.fileService.downloadFile(fileId);
   }
+
+  // showOwnerType(type : string) : string {
+    
+  //     let color : string = "";
+  //     switch (type) {
+  //       case "Persona Física":
+  //         color = "danger";
+  //         break;
+  //       case "Persona Jurídica":
+  //         color = "primary";
+  //         break;
+  //       case "Otro":
+  //         color = "secondary";
+  //         break;
+  //     }
+
+  //     return `<button class='btn btn-${color} rounded-pill m-1' disabled>${type}</button>`;
+  // }
+
 }

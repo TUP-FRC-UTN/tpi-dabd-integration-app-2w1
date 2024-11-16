@@ -1,0 +1,102 @@
+<div class="container">
+  <div class="row sticky-section border-0 rounded-4 p-3 shadow mb-2">
+
+    <!-- Sección de Filtros -->
+    <div class="row mb-3">
+      <div class="col d-flex gap-3">
+        <div class="col">
+          <input type="date" class="form-control border-1 bg-light" [formControl]="startDate" (change)="filterByDate()">
+        </div>
+        <div class="col">
+          <input type="date" class="form-control border-1 bg-light" [formControl]="endDate" (change)="filterByDate()">
+        </div>
+      </div>
+
+      <div class="col-auto d-flex gap-1 ms-auto">
+        <button class="btn btn-primary filterbutton" data-bs-toggle="modal" title="Filtros Avanzados"
+          data-bs-target="#filtrosAvanzados">
+          <i class="bi bi-funnel-fill"></i>
+        </button>
+        <button type="button" class="btn btn-secondary bi bi-trash filterbutton" (click)="clearFilters()"
+          title="Limpiar Filtros"></button>
+      </div>
+    </div>
+  </div>
+  <!-- Sección Principal -->
+  <div class="row">
+    <!-- Gráfico de Estado de los Lotes -->
+
+
+    <!-- Distribución de Lotes y KPIs -->
+    <div class="col-md-4">
+      <!-- <div>
+        <h2 class="h4 mb-3 text-primary text-center p-2">Distribución de Lotes</h2>
+        <p class="text-muted mb-3 text-center">Cantidad de lotes por tipo (Residencial, Comercial, Baldío)</p>
+      </div> -->
+      <!-- KPI Cards -->
+      <div class="card border-0 shadow mb-2 p-3 hover-shadow" style="background-color: #d8ffedde;">
+        <div class="card-body d-flex flex-column align-items-center justify-content-center p-2 text-center">
+          <h6 class="card-title">Cantidad de Lotes<i class="bi bi-houses"></i></h6>
+          <span>{{ totalLots }}</span>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow mb-2 p-3 hover-shadow" style="background-color: #e7f1ff;">
+        <div class="card-body d-flex flex-column align-items-center justify-content-center p-2 text-center">
+          <h6 class="card-title">Residenciales<i class="bi bi-house-heart"></i></h6>
+          <span>{{ residentialLots }}</span>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow mb-2 p-3 hover-shadow" style="background-color: #fff3e0;">
+        <div class="card-body d-flex flex-column align-items-center justify-content-center p-2 text-center">
+          <h6 class="card-title">Comerciales<i class="bi bi-shop"></i></h6>
+          <span>{{ commercialLots }}</span>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow mb-2 p-3 hover-shadow" style="background-color: #d8ffedde;">
+        <div class="card-body d-flex flex-column align-items-center justify-content-center p-2 text-center">
+          <h6 class="card-title">Baldíos<i class="bi bi-tree"></i></h6>
+          <span>{{ emptyLots }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-7">
+      <div class="card border-0 shadow-lg rounded-4">
+        <div class="card-body align-items-center">
+          <app-users-graphic-plot></app-users-graphic-plot>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para filtros avanzados de tipo de lote -->
+<div class="modal fade" id="filtrosAvanzados" tabindex="-1" role="dialog" aria-labelledby="modalTitle"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalTitle">Información del Dashboard</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="plotTypeSelect" class="form-label fw-semibold mb-2">Seleccione el Tipo de Lote</label>
+          <select id="plotTypeSelect" class="form-select" [(ngModel)]="selectedPlotType">
+            <option value="" disabled selected>Seleccione una opción</option>
+            <option value="Residencial">Residencial</option>
+            <option value="Comercial">Comercial</option>
+            <option value="Baldío">Baldío</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        <!-- <button type="button" class="btn btn-primary" (click)="applyAdvancedFilters()">Aplicar Filtro</button> -->
+      </div>
+    </div>
+  </div>
+</div>
