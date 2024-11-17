@@ -165,7 +165,7 @@ private resetEverything(): void {
             return;
         }
 
-        if (!this.visitorRecord.authRange || this.visitorRecord.authRange == null) {
+        if (!this.visitorRecord.authRange || this.visitorRecord.authRange == null || this.visitorRecord.authRange.allowedDays.length < 1) {
             Swal.fire({
                 icon: 'error',
                 title: 'Error',

@@ -339,10 +339,13 @@ disableDateInputs: boolean = false;
   }
 
   deleteAllowedDay(allowedDay: AccessAllowedDay): void {
-    this._allowedDays = this._allowedDays.filter(dp => dp.day.name !== allowedDay.day.name);
+    const index = this._allowedDays.findIndex(dp => dp.day.name === allowedDay.day.name);
+    if (index !== -1) {
+        this._allowedDays.splice(index, 1);
+    }
     this.visitorService.updateAllowedDays(this._allowedDays);
     this.updateDaysSelected();
-  }
+}
 
   formatHour(schedule: AccessAllowedDay): string {
     const formatHour = (date: Date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
