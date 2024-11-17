@@ -3,16 +3,15 @@ export interface Owner {
   name: string;
   lastname: string;
   dni_type : string;
-  dni: number;
+  dni: string;
 
   active?: boolean;
-  plot?: Plot[];
+  plots?: Plot[];
   username?: string;
   email?: string;
   contactId?: number;
   avatarUrl?: string;
   dateBirth?: string;
-  cuitCuil? : number;
   roles?: string[];
   businessName?: string;
   ownerType?: string;
