@@ -273,41 +273,26 @@ export class RoutingService {
       roles: ["SuperAdmin", "Gerente general", "Seguridad", "Propietario", "Inquilino"],
       childButtons: [
         {
-          icon: "bi-person-lines-fill",
-          name: "Registro",
-          title: "Registro de Ingreso/Egreso",
-          route: "main/entries/visitors",
-          roles: ["SuperAdmin", "Gerente general", "Seguridad"]
-        },
-        {
-          icon: "bi-list-check",
-          name: "Informes",
-          title: "Informes Mensuales",
+          icon: "bi bi-person-lines-fill",
+          name: "Informe",
+          title: "Informe de Ingresos/Egresos",
           route: "main/entries/reports",
-          roles: ["SuperAdmin", "Gerente general"]
-        },
-        {
-          //Esto tendria que ir o va a ser un boton flotante???
-          icon: "bi-door-open-fill",
-          name: "Agregar",
-          title: "Añadir Visitante",
-          route: "main/entries/register",
-          roles: ["SuperAdmin", "Gerente general", "Seguridad", "Propietario", "Inquilino"]
-        },
-        {
-          icon: "bi-pencil-square",
-          name: "Modificar",
-          title: "Editar Visitante",
-          route: "main/entries/edit",
-          roles: ["SuperAdmin", "Gerente general", "Propietario", "Inquilino"]
-        },
-        {
-          icon: "bi-calendar-date-fill",
-          name: "Entradas",
-          title: "Entradas Diarias",
-          route: "main/entries/entry",
           roles: ["SuperAdmin", "Gerente general", "Seguridad"]
-        }
+        },
+        {
+          icon: "bi bi-door-open-fill",
+          name: "Registro",
+          title: "Añadir Visitante",
+          route: "main/entries/visitor",
+          roles: ["SuperAdmin", "Gerente general","Propietario", "Inquilino"]
+        },
+        {
+          icon: "bi bi-car-front-fill",
+          name: "Vehiculos",
+          title: "Registro de Vehículos",
+          route: "main/entries/vehicles",
+          roles: ["SuperAdmin", "Gerente general","Seguridad"]
+         },
       ]
     }
   ]
