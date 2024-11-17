@@ -11,6 +11,7 @@ import { RequestWakeUpCallDTO, RequestWakeUpCallGroupDTO } from "../../Models/ll
 import { ListadoDesempeñoService } from "../../services/listado-desempeño.service";
 import Swal from 'sweetalert2';
 import { UsersMockIdService } from "../../../common-services/users-mock-id.service";
+import { AuthService } from "../../../../users/users-servicies/auth.service";
 
 @Component({
   selector: 'app-iep-attention-call',
@@ -43,7 +44,7 @@ export class IepAttentionCallComponent implements OnInit{
     private fb: FormBuilder,
     private wakeUpCallService: LlamadoAtencionService,
     private ListDesempeño: ListadoDesempeñoService,
-    private UsersMockIdService: UsersMockIdService
+    private UsersMockIdService: AuthService
   ) {
     const hoy = new Date();
     this.fechaMaxima = hoy.toISOString().split('T')[0];
@@ -60,8 +61,8 @@ export class IepAttentionCallComponent implements OnInit{
   ngOnInit() {
     this.loadEmployees();
     console.log('ID del empleado:', this.employeeId);
-    this.UpdateUser = this.UsersMockIdService.getMockId();
-    this.createduser = this.UsersMockIdService.getMockId();
+    this.UpdateUser = this.UsersMockIdService.getUser().id;
+    this.createduser = this.UsersMockIdService.getUser().id;
     
   }
 
