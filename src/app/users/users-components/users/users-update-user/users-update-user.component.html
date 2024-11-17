@@ -79,6 +79,7 @@
                     <label class="col-2 col-form-label">Roles</label>
                     <div class="col-10">
                         <app-custom-select [options]="optionRoles"
+                            [multiple]="true"
                             (selectedOptionsChange)="updateForm.get('roles')?.setValue($event)"
                             [selectedOptions]="updateForm.get('roles')?.value"
                             [validations]="updateForm.get('roles')?.validator" />
@@ -93,7 +94,7 @@
 
             <div class="row mb-3 justify-content-end">
                 <div class="col-auto">
-                    <button type="button" class="btn btn-secondary" (click)="confirmExit()">Cancelar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#cancelarConfirmacion">Cancelar</button>
                 </div>
                 <div class="col-auto">
                     <button type="submit" class="btn btn-primary" [disabled]="!updateForm.valid">Guardar</button>
@@ -134,4 +135,61 @@
             </div>
         </div>
     </div>
+    <div
+   #modalConfirmDelete
+   class="modal"
+   id="modalConfirmationDeleteExpense"
+   tabindex="-1"
+   role="dialog"
+ >
+   <div class="modal-dialog" role="document">
+     <div class="modal-content">
+       <div class="modal-header">
+         <h5 class="modal-title">Confirmación</h5>
+       </div>
+       
+       <div class="modal-body">
+         <p class="mb-4">¿Está seguro que quiere cancelar la operación?</p> >
+       </div>
+ 
+       <div class="modal-footer">
+         <button
+           type="button"
+           class="btn btn-danger"
+         >
+           Zi
+         </button> 
+         <button
+           type="button"
+           class="btn btn-secondary"
+         >
+           Nao nao
+         </button>
+       </div>
+     </div>
+   </div>
+ </div>
+
+
+ <!-- MODAL DE BOOTSTRAP -->
+
+  <!-- Modal -->
+  <div class="modal fade" id="cancelarConfirmacion" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">Cancelar operación</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="mb-4">¿Está seguro? Los datos no guardados se perderán</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Volver</button>
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="confirmExit()">Aceptar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </section>

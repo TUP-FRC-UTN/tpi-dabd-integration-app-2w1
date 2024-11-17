@@ -1,0 +1,15 @@
+.carousel-control-prev,
+  .carousel-control-next {
+    width: 5%;
+    opacity: 1;
+  }
+
+  .carousel-control-prev-icon,
+  .carousel-control-next-icon {
+    padding: 1rem;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  .carousel-item {
+    padding: 1rem 2rem;
+  }

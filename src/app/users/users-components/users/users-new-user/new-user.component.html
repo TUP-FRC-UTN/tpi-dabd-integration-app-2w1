@@ -33,7 +33,7 @@
               <option value="2">Pasaporte</option>
             </select> -->
             <!-- CheckMe -->
-            <app-custom-select [options]="[{id: 1, name: 'DNI'}, {id: 2, name: 'Pasaporte'}]"
+            <app-custom-select [options]="[{value: 1, name: 'DNI'}, {value: 2, name: 'Pasaporte'}, {value: 2, name: 'CUIT/CUIL'}]"
               [selectedOptions]="reactiveForm.get('dniType')?.value"
               (selectedOptionsChange)="reactiveForm.get('dniType')?.setValue($event)"
               [validations]="reactiveForm.get('dniType')?.validator" />
@@ -142,7 +142,7 @@
             <input [type]="passwordVisible ? 'text' : 'password'" class="form-control" formControlName="password"
               autocomplete="current-password" [ngClass]="onValidate('password')">
             <i class="bi" [ngClass]="passwordVisible ? 'bi-eye-slash' : 'bi-eye'" (click)="togglePasswordVisibility()"
-              style="cursor: pointer; position: absolute; right: 780px; top: auto; transform: translateY(-125%);"></i>
+              style="cursor: pointer; position: absolute; right: 270px; top: auto; transform: translateY(-125%);"></i>
             <div class="invalid-feedback">{{showError('password')}}</div>
           </div>
         </div>
@@ -154,7 +154,7 @@
           <button type="button" class="btn btn-secondary" (click)="redirect()">Cancelar</button>
         </div>
         <div class="col-auto">
-          <button type="submit" class="btn btn-success" [disabled]="!reactiveForm.valid">
+          <button type="submit" class="btn btn-success" (click)="showFormErrors()" [disabled]="reactiveForm.invalid">
             Registrar
           </button>
         </div>

@@ -25,7 +25,7 @@ import "datatables.net";
 import "datatables.net-bs5";
 import { Inventory } from "../../models/inventory";
 import { NgSelectComponent } from "@ng-select/ng-select";
-import { single } from "rxjs";
+import { single, Subscription } from "rxjs";
 import { SelectMultipleComponent } from "../../select-multiple/select-multiple.component";
 
 
@@ -48,10 +48,9 @@ import { SelectMultipleComponent } from "../../select-multiple/select-multiple.c
 })
 export class NotificationComponent implements OnInit {
   //Titulo de la pagina
- @Output() sendTitle = new EventEmitter<string>();
+  @Output() sendTitle = new EventEmitter<string>();
   userId = 1;
   rolactual: string = "";
-  selected: string = "Todas";
   accessList: Access[] = [];
   finesList: Fine[] = [];
   paymentsList: Payments[] = [];
@@ -73,6 +72,7 @@ export class NotificationComponent implements OnInit {
     generals: [],
     inventories: []
   };
+  subscription = new Subscription()
   allNotificationsArray: any[] = [];
 
   dateFilterForm: FormGroup;
@@ -85,6 +85,7 @@ export class NotificationComponent implements OnInit {
   ];
 
   selectedNotificationType: string[] = [];
+  
 
   dropdownSeleccionadas: any[] = [];
 
@@ -95,7 +96,6 @@ export class NotificationComponent implements OnInit {
   }
   constructor(
     private service: NotificationService,
-    private serviceUser: MockUserService,
     private datePipe: DatePipe,
     private activatedRoute: ActivatedRoute
   ) {
@@ -104,9 +104,13 @@ export class NotificationComponent implements OnInit {
       endDate: new FormControl(new Date(), [Validators.required]),
     });
   }
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe()
+  }
 
   ngOnInit(): void {
     this.getNotificationsFromAPI(this.userId);
+    
 
     $(document).on("click", ".mark-read-btn", (event) => {
       console.log("CLICK EN MARCAR LEIDA");
@@ -114,7 +118,16 @@ export class NotificationComponent implements OnInit {
         let selectedNotificationId = this.selectedNotificationObject.id
         let selectedNotificationTableName = this.selectedNotificationObject.tableName.toUpperCase();
         let notification;
-        this.service.putData(selectedNotificationId,selectedNotificationTableName).subscribe()
+        
+        const putNotification =this.service.putData(selectedNotificationId,selectedNotificationTableName).subscribe({
+          next: () => {
+            this.fillTable()
+
+          },
+          error:(error) => console.log(error)
+        })
+        this.subscription.add(putNotification)
+        
         switch (this.selectedNotificationObject.tableName.toUpperCase()) {
           
           case "ACCESS": 
@@ -208,7 +221,7 @@ export class NotificationComponent implements OnInit {
   }
 
   getNotificationsFromAPI(userId: number) {
-    this.service.getData(userId).subscribe({
+    const getNotifications =  this.service.getData(userId).subscribe({
       next: (value: Notifications) => {
         
         // value.access.forEach(
@@ -243,6 +256,7 @@ export class NotificationComponent implements OnInit {
         alert("Error al obtener las notificaciones del back-end");
       },
     });
+    this.subscription.add(getNotifications)
   }
   fillTable() {
     const table = $("#myTable").DataTable();
@@ -464,7 +478,7 @@ export class NotificationComponent implements OnInit {
   @ViewChild(SelectMultipleComponent)
   selectMultipleComponent!: SelectMultipleComponent;
   borrar() {
-    this.selected = "";
+    
     this.selectedNotificationType = [];
     this.dropdownSeleccionadas = [];
 

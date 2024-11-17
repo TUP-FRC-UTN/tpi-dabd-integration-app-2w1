@@ -1,6 +1,6 @@
 <div class="notification-icons" style="display: flex; gap: 40px">
   <div class="dropdown">
-    <i class="bi bi-bell-fill" (click)="toggleNotificationsAndFetch()"></i>
+    <i class="bi bi-bell-fill" style="cursor: pointer;" (click)="toggleNotificationsAndFetch()"></i>
     <div
       *ngIf="showNotificationsDropdown"
       class="dropdown-menu dropdown-menu-end"
@@ -13,9 +13,6 @@
       <div
         *ngFor="let notification of recentNotifications"
         class="dropdown-item"
-        data-bs-toggle="modal"
-        data-bs-target="#modalNotificationBell"
-        (click)="selectNotification(notification)"
       >
         <div
           class="notification-item"
@@ -32,10 +29,17 @@
               {{ getMessage(notification) }}
             </p>
           </div>
+          <i
+          data-bs-toggle="modal"
+          data-bs-target="#modalNotificationBell"
+          class="bi bi-search"
+          style="color: black; margin-left: 8px; flex-shrink: 0; cursor: pointer;"
+          (click)="selectNotification(notification)"
+        ></i>
           @if(!notification.markedRead){
           <i
             class="bi bi-eye"
-            style="color: black; margin-left: 8px; flex-shrink: 0"
+            style="color: black; margin-left: 8px; flex-shrink: 0; cursor: pointer;"
             (click)="markAsRead(notification)"
           ></i>
           }@else{
