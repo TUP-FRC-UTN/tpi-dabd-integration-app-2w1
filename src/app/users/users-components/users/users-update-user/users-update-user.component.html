@@ -15,85 +15,81 @@
             </div>
 
 
-                <div class="col-lg-6 mb-3">
-                    <div class="row">
-                        <label class="col-2 col-form-label">Apellido</label>
-                        <div class="col-10">
-                            <input type="text" class="form-control" formControlName="lastname"
-                                [ngClass]="onValidate('lastname')">
-                            <div class="invalid-feedback">{{showError('lastname')}}</div>
-                        </div>
+            <div class="col-lg-6 mb-3">
+                <div class="row">
+                    <label class="col-2 col-form-label">Apellido</label>
+                    <div class="col-10">
+                        <input type="text" class="form-control" formControlName="lastname"
+                            [ngClass]="onValidate('lastname')">
+                        <div class="invalid-feedback">{{showError('lastname')}}</div>
                     </div>
                 </div>
+            </div>
 
 
-                <div class="col-lg-6 mb-3">
-                    <div class="row">
-                        <label class="col-2 col-form-label">DNI</label>
-                        <div class="col-10">
-                            <input type="number" class="form-control" formControlName="dni"
-                                [ngClass]="onValidate('dni')">
-                            <div class="invalid-feedback">{{showError('dni')}}</div>
-                        </div>
+            <div class="col-lg-6 mb-3">
+                <div class="row">
+                    <label class="col-2 col-form-label">DNI</label>
+                    <div class="col-10">
+                        <input type="number" class="form-control" formControlName="dni" [ngClass]="onValidate('dni')">
+                        <div class="invalid-feedback">{{showError('dni')}}</div>
                     </div>
                 </div>
+            </div>
 
 
-                <div class="col-lg-6 mb-3">
-                    <div class="row">
-                        <label class="col-2 col-form-label">Teléfono</label>
-                        <div class="col-10">
-                            <input type="text" class="form-control" formControlName="phoneNumber"
-                                [ngClass]="onValidate('phoneNumber')">
-                            <div class="invalid-feedback">{{showError('phoneNumber')}}</div>
-                        </div>
+            <div class="col-lg-6 mb-3">
+                <div class="row">
+                    <label class="col-2 col-form-label">Teléfono</label>
+                    <div class="col-10">
+                        <input type="text" class="form-control" formControlName="phoneNumber"
+                            [ngClass]="onValidate('phoneNumber')">
+                        <div class="invalid-feedback">{{showError('phoneNumber')}}</div>
                     </div>
                 </div>
+            </div>
 
 
-                <div class="col-lg-6 mb-3">
-                    <div class="row">
-                        <label class="col-2 col-form-label">Email</label>
-                        <div class="col-10">
-                            <input type="email" class="form-control" formControlName="email"
-                                [ngClass]="onValidate('email')">
-                            <div class="invalid-feedback">{{showError('email')}}</div>
-                        </div>
+            <div class="col-lg-6 mb-3">
+                <div class="row">
+                    <label class="col-2 col-form-label">Email</label>
+                    <div class="col-10">
+                        <input type="email" class="form-control" formControlName="email"
+                            [ngClass]="onValidate('email')">
+                        <div class="invalid-feedback">{{showError('email')}}</div>
                     </div>
                 </div>
+            </div>
 
 
-
-
-                <div class="col-lg-6 mb-3">
-                    <div class="row">
-                        <label class="col-2 col-form-label">Fecha de nacimiento</label>
-                        <div class="col-10">
-                            <input type="date" class="form-control" formControlName="datebirth"
-                                [ngClass]="onValidate('datebirth')">
-                            <div class="invalid-feedback">{{showError('datebirth')}}</div>
-                        </div>
+            <div class="col-lg-6 mb-3">
+                <div class="row">
+                    <label class="col-2 col-form-label">Fecha de Nacimiento</label>
+                    <div class="col-10">
+                        <input type="date" class="form-control" formControlName="datebirth"
+                            [ngClass]="onValidate('datebirth')">
+                        <div class="invalid-feedback">{{showError('datebirth')}}</div>
                     </div>
                 </div>
+            </div>
 
 
-                <div class="col-lg-6 mb-3">
-                    <div class="row">
-                        <label class="col-2 col-form-label">Roles</label>  
-                        <div class="col-10">
-                            <app-users-select-multiple (rolesEmited)="fillRolesSelected($event); verifyRole()"
-                            (click)="verifyRole()" (rolesSelected)="rolesSelected">
-                              </app-users-select-multiple>
-                        </div> 
-                        
-                    </div>
-                    <div class="text-danger form-error text-start">
-                        @if(!checkRole){
-                        Ingrese al menos un rol
+            <div class="col-lg-6 mb-3">
+                <div class="row">
+                    <label class="col-2 col-form-label">Roles</label>
+                    <div class="col-10">
+                        <app-custom-select [options]="optionRoles"
+                            (selectedOptionsChange)="updateForm.get('roles')?.setValue($event)"
+                            [selectedOptions]="updateForm.get('roles')?.value"
+                            [validations]="updateForm.get('roles')?.validator" />
+                        <!-- FixMe: Revisar esta implementacion -Gabi -->
+                        @if(!rolesSelected){
+                        <div class="text-danger">Ingrese al menos un rol</div>
                         }
                     </div>
                 </div>
             </div>
+
 
             <div class="row mb-3 justify-content-end">
                 <div class="col-auto">
@@ -102,6 +98,40 @@
                 <div class="col-auto">
                     <button type="submit" class="btn btn-primary" [disabled]="!updateForm.valid">Guardar</button>
                 </div>
-              </div>
+            </div>
+        </div>
     </form>
+
+
+    <!-- Modal de info -->
+    <div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="infoModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="infoModalLabel">Información sobre la pantalla de Edición de Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>En esta pantalla, puedes realizar modificaciones en la información de un usuario específico. Ten
+                        en cuenta las siguientes consideraciones:</p>
+                    <ul>
+                        <li>Algunos campos, como el <strong>DNI</strong>, <strong>email</strong>, <strong>fecha de
+                                nacimiento</strong> y <strong>avatar</strong>, están deshabilitados para edición y no
+                            pueden modificarse desde esta vista.</li>
+                        <li>Puedes actualizar otros datos del usuario, como el número de lote, número de manzana, y
+                            otros detalles específicos de su cuenta.</li>
+                        <li>La opción de subir archivos te permite asociar documentos o imágenes adicionales al usuario.
+                            Los archivos subidos se listarán debajo.</li>
+                        <li>Para cancelar los cambios, haz clic en el botón <strong>Cancelar</strong>, o para
+                            guardarlos, utiliza el botón <strong>Guardar</strong>, que estará habilitado solo si todos
+                            los campos obligatorios están correctamente completados.</li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>

@@ -19,7 +19,16 @@
                     </thead>
                     <tbody>
                         <tr *ngFor="let complaint of complaints">
-                            <td>{{ complaint.complaintReason }}</td>
+                            <td>
+                                @if (complaint?.complaintReason==="Otro"){
+                                    <p> {{ complaint?.complaintReason + " - " + complaint?.anotherReason || 'N/A' }}</p>
+                      
+                                  }
+                                  @else {
+                                    <p> {{ complaint?.complaintReason || 'N/A' }}</p>
+                                  }
+                            </td>
+                            
                             <td>{{ complaint.complaintState }}</td>
                             <td>{{ complaint.createdDate | date:"dd/MM/yyyy" }}</td>
                             <td class="text-center">

@@ -4,31 +4,105 @@
     <div
       *ngIf="showNotificationsDropdown"
       class="dropdown-menu dropdown-menu-end"
+      style="width: 600px"
     >
       <h6 class="dropdown-header">Notificaciones</h6>
       <div *ngIf="notifications.length === 0" class="dropdown-item">
         No hay notificaciones nuevas.
       </div>
-      <div *ngFor="let notification of notifications" class="dropdown-item">
-        <div class="notification-item">
-          <small>{{
-            notification.date || notification.created_datetime
-          }}</small>
-          <h6>
-            <b> {{ notification.subject }}</b>
-          </h6>
-          <p>{{ notification.message || notification.description }}</p>
+      <div
+        *ngFor="let notification of recentNotifications"
+        class="dropdown-item"
+        data-bs-toggle="modal"
+        data-bs-target="#modalNotificationBell"
+        (click)="selectNotification(notification)"
+      >
+        <div
+          class="notification-item"
+          style="display: flex; align-items: flex-start"
+        >
+          <div style="flex-grow: 1; overflow-wrap: break-word">
+            <small>{{
+              notification.created_datetime | date : "dd/MM/yyyy HH:mm:ss"
+            }}</small>
+            <h6>
+              <b>{{ notification.subject }}</b>
+            </h6>
+            <p style="margin-bottom: 0; white-space: normal">
+              {{ getMessage(notification) }}
+            </p>
+          </div>
+          @if(!notification.markedRead){
+          <i
+            class="bi bi-eye"
+            style="color: black; margin-left: 8px; flex-shrink: 0"
+            (click)="markAsRead(notification)"
+          ></i>
+          }@else{
+          <i
+            class="bi bi-check"
+            style="color: black; margin-left: 8px; flex-shrink: 0"
+          ></i>
+          }
         </div>
       </div>
-      <button
-        type="button"
-        class="btn btn-link"
-        (click)="showNotifications()"
-        [title]="info"
-        
-      >
+      <button type="button" class="btn btn-link" (click)="showNotifications()">
         Mostrar todas
       </button>
+    </div>
+  </div>
+</div>
+
+<div class="modalDiv">
+  <!-- Modal de detalles de la notificación -->
+  <div
+    class="modal fade"
+    id="modalNotificationBell"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="modal"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog" style="width: 100%">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="labelDetail">Detalle de notificación</h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <h6>Asunto:</h6>
+            <p>{{ selectedNotification?.subject }}</p>
+          </div>
+          <div class="mb-3">
+            <h6>Descripción:</h6>
+            <p>{{ selectedNotification?.message }}</p>
+          </div>
+          <div class="mb-3">
+            <h6>Fecha:</h6>
+            <p>
+              {{
+                selectedNotification?.created_datetime
+                  | date : "dd/MM/yyyy HH:mm:ss"
+              }}
+            </p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cerrar
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </div>

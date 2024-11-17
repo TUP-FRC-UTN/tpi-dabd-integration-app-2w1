@@ -1,67 +1,84 @@
 <section class="py-5">
-  <div class="container p-3 border border-2 rounded shadow-lg">
-    <button style="margin-top: 15px" type="button" class="btn btn-dark dropdown-togglek" style="background-color: black;" routerLink="/home/notifications/Admin">Volver</button>
-    
-    <div class="row mb-4">
-      <div class="col-md-6 col-lg-8 d-flex">
-        <button
-        type="button"
-        class="btn btn-dark dropdown-toggle"
-        style="margin-right: 10px; margin-top: 15px"
-        data-bs-toggle="dropdown"
-        aria-expanded="false"
-        
-      >
-        Tipo
-      </button>
-      <ul class="dropdown-menu shadow">
-        <li><a class="dropdown-item" (click)="cambiar('Todas')">Todas</a></li>
-        <li>
-        <li><a class="dropdown-item" (click)="cambiar('Multas')">Multas</a></li>
-        <li>
-          <a class="dropdown-item" (click)="cambiar('Accesos')">Accesos</a>
-        </li>
-        <li><a class="dropdown-item" (click)="cambiar('Pagos')">Pagos</a></li>
-        <li>
-          <a class="dropdown-item" (click)="cambiar('Generales')">Generales</a>
-        </li>
-      </ul>
-      
-        <div [formGroup]="form" class="d-flex" style="gap: 10px; margin-top: 15px;">
-          <input type="date" class="form-control me-2" formControlName="startDate">
-          <input type="date" class="form-control me-2" formControlName="endDate">
+  <div class="container p-3 border border-2 rounded shadow-lg" style="background-color: #ffffff; border: 2px solid #000000; border-radius: 8px; padding: 20px; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);">
+ 
+    <div class="row mb-2">
+      <div class="d-flex">
+        <div class="col-3">
+          <input type="text" id="searchTerm" placeholder="Buscar..." class="form-control" aria-label="Search" 
+            style="margin-top: 15px; border: 1px solid #ddd; border-radius: 5px;" />
         </div>
-      
+        
+        <!-- dropdown -->
+        <div class="col-2 ms-2" style="margin-top: 15px">
+          <app-select-multiple
+            [options]="notificationTypes"
+            [optionsChecked]="selectedNotificationType"
+            (sendList)="recibirSeleccionadas($event)"
+          ></app-select-multiple>
+        </div>
+     
+        <div [formGroup]="form" class="col-2 ms-2">
+          <input type="date" class="form-control me-2" formControlName="startDate" 
+            style="margin-top: 15px; border: 1px solid #ddd; border-radius: 5px;" />
+        </div>
 
-        <button (click)="borrar()" class="btn" style="background-color: #007bff; color: white; border: 1px solid black;">
-          <i class="bi bi-trash"></i>
-        </button>
-      </div>
+        <div [formGroup]="form" class="col-2 ms-2">
+          <input type="date" class="form-control me-2" formControlName="endDate" 
+            style="margin-top: 15px; border: 1px solid #ddd; border-radius: 5px;" />
+        </div>
 
-      <div class="col-md-6 col-lg-4 d-flex justify-content-end">
-        <button class="btn mx-1" style="background-color: #28a745; color: white; border: 1px solid black;" (click)="exportarAExcel()">
-          <i class="bi bi-file-earmark-excel"></i>
-        </button>
-        <button class="btn mx-1" style="background-color: #dc3545; color: white; border: 1px solid black;" (click)="exportarAPDF()">
-          <i class="bi bi-file-earmark-pdf"></i>
-        </button>
+     
+        <div class="col-3 text-end" style="margin-top: 15px;">
+          <button (click)="borrar()" class="btn mx-1 btn-secondary filterbutton">
+            <i class="bi bi-trash"></i>
+          </button>
+
+          <button class="btn mx-1 btn-success filterbutton" (click)="exportarAExcel()">
+            <i class="bi bi-file-earmark-excel"></i>
+          </button>
+
+          <button class="btn mx-1 btn-danger me-4 filterbutton" (click)="exportarAPDF()">
+            <i class="bi bi-file-earmark-pdf"></i>
+          </button>
+        </div>
       </div>
     </div>
 
+
     <div class="table-responsive">
-      <table id="myTable" class="table table-striped table-hover align-middle">
-        <thead class="table-dark">
-          <tr>
-            <th>Asunto</th>
-            <th>Descripción</th>
-            <th>Fecha</th>
-            <th>Destinatario</th>
-            <th>DNI</th>
+      <table id="myTable" class="table table-striped table-hover align-middle" 
+        style="margin-top: 20px; border-collapse: separate; border-spacing: 0; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05); border: 1px solid rgba(51,47,47,0.12);">
+        <thead>
+          <tr style="background-color: #FFFFFF;">
+            <th style="background-color: #FFFFFF; color: #000000; padding: 12px; text-align: center;">Fecha</th>
+            <th style="background-color: #FFFFFF; color: #000000; padding: 12px; text-align: center;">Destinatario</th>
+            <th style="background-color: #FFFFFF; color: #000000; padding: 12px; text-align: center;">DNI</th>
+            <th style="background-color: #FFFFFF; color: #000000; padding: 12px; text-align: center;">Tipo</th>
+            <th style="background-color: #FFFFFF; color: #000000; padding: 12px; text-align: center;">Asunto</th>
+            <th style="background-color: #FFFFFF; color: #000000; padding: 12px; text-align: center;">Descripción</th>
           </tr>
         </thead>
-        <tbody>
-        </tbody>
+        <tbody></tbody>
       </table>
     </div>
   </div>
 </section>
+
+<style>
+  .table tbody tr:hover {
+    background-color: #e9ecef;
+  }
+  
+  .form-control:focus, .form-select:focus {
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  }
+  
+  @media (max-width: 768px) {
+    .form-control, .form-select {
+      margin-bottom: 10px;
+    }
+    table, th, td {
+      font-size: 0.8rem;
+    }
+  }
+</style>

@@ -1,0 +1,48 @@
+.chart-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  svg {
+    width: 300px;
+    height: 300px;
+  }
+  
+  .slice {
+    transition: opacity 0.3s;
+  }
+  
+  .slice:hover {
+    opacity: 0.8;
+  }
+  
+  .legend {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+  }
+
+  
+google-chart {
+  max-width: 100%; /* Asegura que el gráfico no se desborde */
+  height: 300px; /* Ajusta el tamaño según sea necesario */
+}
+  
+  .legend-label {
+    font-size: 14px;
+  }

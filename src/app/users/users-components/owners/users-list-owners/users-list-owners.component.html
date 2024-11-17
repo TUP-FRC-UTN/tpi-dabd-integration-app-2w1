@@ -11,9 +11,17 @@
             <option [value]="type.description">{{ type.description }}</option>
           }
       </select>
+      <!-- ============================================CheckMe====================================== -->
+       <app-custom-select [options]="types" [multiple]="true" [selectedOptions]="selectType.value" (selectedOptionsChange)="selectType.setValue($event)"/>
     </div>
     <div>
-      <button class="btn btn-light" (click)="resetFilters()">
+      <input type="date" class="form-control me-3" formControlName="datebirth" style="width: 200px" [formControl]="initialDate" (change)="filterByDate()"/>
+    </div>
+    <div>
+      <input type="date" class="form-control me-3" formControlName="datebirth" style="width: 200px" [formControl]="endDate" (change)="filterByDate()"/>
+    </div>
+    <div>
+      <button class="btn btn-secondary" (click)="resetFilters()">
         <i class="bi bi-trash"></i>
       </button>
     </div>
@@ -26,10 +34,52 @@
         <i class="bi bi-file-earmark-pdf"></i>
       </button>
     </div>
+    <button class="floating-btn btn btn-primary" (click)="addOwner()">
+      <span class="bi-plus-lg"></span>
+    </button>
   </div>
 
   <div class="mb-3">
     <table id="myTable" class="table table-striped table-hover border border-3 rounded"></table>
   </div>
+
+  <!-- Modal de info -->
+<div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="infoModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="infoModalLabel">Información sobre la pantalla</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>En esta pantalla se muestra una lista de propietarios, ordenado por su fecha de creación de manera descendente con las siguientes columnas:</p>
+        <ul>
+          <li><strong>Fecha de creación</strong>: Muestra la fecha en la que se registró el propietario.</li>
+          <li><strong>Nombre</strong>: Nombre completo del propietario.</li>
+          <li><strong>Documento</strong>: Documento de identificación del propietario.</li>
+          <li><strong>Tipo</strong>: El tipo de propietario (por ejemplo, si es persona física o jurídica).</li>
+          <li><strong>Lotes</strong>: Los lotes asociados al propietario.</li>
+        </ul>
+        <p>Puedes filtrar la lista utilizando los siguientes criterios:</p>
+        <ul>
+          <li><strong>Buscar</strong>: Permite buscar por cualquier texto relacionado con los propietarios.</li>
+          <li><strong>Tipo</strong>: Un desplegable para seleccionar el tipo de propietario (por ejemplo, persona física o jurídica).</li>
+          <li><strong>Fecha de nacimiento</strong>: Filtros de fecha para seleccionar un rango de fechas y ver propietarios nacidos en ese periodo.</li>
+          <li><strong>Restablecer filtros</strong>: El botón de "reset" borra todos los filtros aplicados y muestra la lista completa.</li>
+        </ul>
+        <p>Además, puedes exportar la lista de propietarios a los siguientes formatos:</p>
+        <ul>
+          <li><strong>Excel</strong>: Exporta los datos en formato de hoja de cálculo Excel.</li>
+          <li><strong>PDF</strong>: Exporta los datos en formato PDF.</li>
+        </ul>
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </section>
 

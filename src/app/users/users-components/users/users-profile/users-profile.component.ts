@@ -7,15 +7,16 @@ import { UserPut } from '../../../users-models/users/UserPut';
 import { AuthService } from '../../../users-servicies/auth.service';
 import { DateService } from '../../../users-servicies/date.service';
 import Swal from 'sweetalert2';
-import { ImageUploadComponent } from "../../utils/image-upload/image-upload.component";
 import { GetuserDto } from '../../../users-models/users/GetUserDto';
 import { PlotService } from '../../../users-servicies/plot.service';
 import { GetPlotDto } from '../../../users-models/plot/GetPlotDto';
+import { ValidatorsService } from '../../../users-servicies/validators.service';
+import { ChangePasswordComponent } from '../../../../common/components/users-change-password/users-change-password.component';
 
 @Component({
   selector: 'app-users-profile',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, FormsModule, ImageUploadComponent],
+  imports: [ReactiveFormsModule, CommonModule, FormsModule, ChangePasswordComponent],
   templateUrl: './users-profile.component.html',
   styleUrl: './users-profile.component.css'
 })
@@ -55,7 +56,7 @@ export class UsersProfileComponent implements OnInit {
                 lastName: user.lastname,
                 email: user.email,
                 username: user.username,
-                phoneNumber: user.phone_number,
+                phoneNumber: String(user.phone_number),
                 dni: user.dni,
                 dniType: user.dni_type,
                 avatar_url: user.avatar_url,
@@ -75,9 +76,18 @@ export class UsersProfileComponent implements OnInit {
   
             // Setea la fecha de nacimiento en el input
             const formattedDate :Date = DateService.parseDateString(user.datebirth)!;
-            this.formProfile.patchValue({
-              datebirth: formattedDate ? DateService.formatDate(formattedDate) : ''
-            });
+            if (formattedDate) {
+              // Formatea la fecha a 'yyyy-MM-dd' para un input de tipo date
+              const formattedDateString = formattedDate.toISOString().split('T')[0];
+  
+              this.formProfile.patchValue({
+                datebirth: formattedDateString
+              });
+            } else {
+              this.formProfile.patchValue({
+                datebirth: ''
+              });
+            }
         }
     })
 
@@ -105,21 +115,19 @@ export class UsersProfileComponent implements OnInit {
       Validators.required,
       Validators.minLength(1),
       Validators.maxLength(30)
-    ]),
-    telegram_id: new FormControl({value: 0, disabled: true }, [
-        Validators.required,
-        Validators.minLength(1),
-        Validators.maxLength(30)
-    ]),
+    ] ),
+    telegram_id: new FormControl({value: 0, disabled: true }),
     email: new FormControl({value: '...', disabled: true }, [
         Validators.required,
         Validators.email
     ]),
-    phoneNumber: new FormControl({value: 0, disabled: true }, [
-        Validators.required,
-        Validators.minLength(10),
-        Validators.maxLength(20)
-    ]),
+
+    phoneNumber: new FormControl({ value: '', disabled: true }, [
+      Validators.required,
+      Validators.minLength(9),
+      Validators.maxLength(20),
+      Validators.pattern('^[0-9]*$')
+  ]),
     dni: new FormControl({value: 0, disabled: true }, [
         Validators.required,
         Validators.minLength(1),
@@ -157,7 +165,6 @@ export class UsersProfileComponent implements OnInit {
       this.formProfile.get('lastName')?.enable();
       this.formProfile.get('phoneNumber')?.enable();
       this.formProfile.get('avatar_url')?.enable();
-      this.formProfile.get('telegram_id')?.enable();
     }
     if(newType == 'info'){
       this.ngOnInit();

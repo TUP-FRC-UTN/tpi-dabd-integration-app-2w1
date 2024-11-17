@@ -11,11 +11,18 @@ import {
 } from '../../../models/Dashboard-models';
 import { textShadow } from 'html2canvas/dist/types/css/property-descriptors/text-shadow';
 import { ReportReasonDto } from '../../../models/ReportReasonDTO';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { PenaltiesModalFineComponent } from '../modals/penalties-get-fine-modal/penalties-get-fine-modal.component';
+import { PenaltiesKpiComponent } from '../../complaintComponents/penalties-kpi/penalties-kpi.component';
+import { fontWeight } from 'html2canvas/dist/types/css/property-descriptors/font-weight';
+import 'bootstrap';
+
+declare let bootstrap: any;
 
 @Component({
   selector: 'app-penalties-fine-dashboard',
   standalone: true,
-  imports: [GoogleChartsModule, CommonModule, FormsModule],
+  imports: [GoogleChartsModule, CommonModule, FormsModule, PenaltiesKpiComponent],
   templateUrl: './penalties-fine-dashboard.component.html',
   styleUrl: './penalties-fine-dashboard.component.scss',
 })
@@ -26,21 +33,49 @@ export class PenaltiesFineDashboardComponent {
   finesData: Fine[] = [];
   status: number = 0;
   periodFrom: string = this.getDefaultFromDate();
-  periodTo: string = this.getCurrentYearMonth();
+  periodTo: string = this.getCurrentDate();
+  constructor(
+    private _modal: NgbModal) {}
 
   //Filtros avanzados
   states: any[] = [];
   reportsReasons: ReportReasonDto[] = [];
   state = ''
-  reportReason = ''
-  reportReason2 = ''
+  private _reportReason: string = '';
+  get reportReason(): string {
+    return this._reportReason;
+  }
+  set reportReason(value: string) {
+    this._reportReason = value;
+    this._reportReason2 = value;
+    this.applyFilters();
+  }
+
+  private _reportReason2: string = '';
+  get reportReason2(): string {
+    return this._reportReason2;
+  }
+  set reportReason2(value: string) {
+    this._reportReason2 = value;
+    this._reportReason = value;
+    this.applyFilters();
+  }
   //propiedades para los kpi
   totalFines: number = 0;
   averageFinesPerMonth: number = 0;
   finesByState: { [key: string]: number } = {};
   highestFine: Fine | null = null;
   finesByReason: { [key: string]: number } = {};
-
+  lowestFine: Fine | null = null;
+  finesByStatePercentage: { state: string; percentage: number }[] = [];
+  stateWithHighestPercentage: { state: string; percentage: number } = { state: '', percentage: 0 };
+  stateWithLowestPercentage: { state: string; percentage: number } = { state: '', percentage: 0 };
+  paidFinesCount: any;
+  pendingFinesCount: any;
+  dayWithMostComplaints: { day: number; count: number; } = { day: 0, count: 0 }
+  dayWithMostComplaintsName: string = "";
+  dayWithLeastComplaints: { day: number; count: number; } = { day: 0, count: 0 }
+  dayWithLeastComplaintsName: string = "";
   // Datos para gráficos
   pieChartData: any[] = [];
   lineChartData: any[] = [];
@@ -48,89 +83,88 @@ export class PenaltiesFineDashboardComponent {
 
   // Tipos de gráficos
   pieChartType = ChartType.PieChart;
-  lineChartType = ChartType.LineChart;
+  lineChartType = ChartType.ColumnChart;
   columnChartType = ChartType.ColumnChart;
 
-  // pieChartOptions = {
-  //   backgroundColor: 'transparent',
-  //   colors: ['#8A2BE2', '#00BFFF', '#FF4500', '#32CD32'],
-  //   legend: {
-  //     position: 'right',
-  //     textStyle: { color: '#000000', fontSize: 17 },  // Cambiado a negro
-  //   },
-  //   pieSliceTextStyle: { color: '#000000' }, // Texto dentro de las porciones en negro
-  //   chartArea: { width: '80%', height: '80%' },
-  //   pieHole: 0.7,
-  //   height: '80%',
-  //   title: 'Distribución de Tipos de Multas'
-  // };
-  pieChartOptions = {
-    backgroundColor: 'transparent',
+  
+     //MODIFICADO OPTIONS
+     pieChartOptions = {
+      pieHole: 0.4,
+      chartArea: { width: '100%', height: '100%' },
+      sliceVisibilityThreshold: 0.01,
+      textStyle:{ fontSize: 9},
+    };
+  
+    //MODIFICADO OPTIONS
+    lineChartOptions = {
+      hAxis: {
+        title: 'Período',
+        slantedText: true,
+        slantedTextAngle: 45,
+        showTextEvery: 1,
+        textStyle: { fontSize: 12 },
+        minValue: 0,
+      },
+      vAxis: { title: 'Cantidad', minValue: 0 }, // Asegurarse de que el valor mínimo sea 0
+      chartArea: { width: '70%', height: '55%' },
+      legend: { position: 'right' },
+      colors: ['#4285F4', '#EA4335', '#34A853', '#FBBC05'],
+      //tooltip: { isHtml: true }
+    };
+  
+      //MODIFICADO OPTIONS
+    columnChartOptions = {
+      hAxis: {
+        title: 'Estado',
+        slantedText: true,
+        slantedTextAngle: 45,
+        showTextEvery: 1,
+        textStyle: { fontSize: 12 },
+        minValue: 0,
+      },
+      vAxis: { title: 'Cantidad', minValue: 0},
+      chartArea: { width: '70%', height: '55%' },
+      legend: { position: 'right' },
+      colors: ['#4285F4', '#EA4335', '#34A853', '#FBBC05', '#FF5733', '#C70039', '#900C3F', '#581845'],
+      //tooltip: { isHtml: true }
+    };
 
-    legend: {
-      position: 'right',
-      textStyle: { color: '#6c757d', fontSize: 17 },
-    },
-    chartArea: { width: '100%', height: '100%' },
-    pieHole: 0,
-    height: '80%',
-    slices: {
-      0: { color: '#8A2BE2' }, // MP siempre azul
-      1: { color: '#00BFFF' }, // STRIPE siempre violeta
-      2: { color: '#FF4500' },
-      3: { color: '#32CD32' },
-      4: { color: '#666666' }, // EFECTIVO siempre verde
-    },
-    pieSliceTextStyle: {
-      color: 'black',
-      fontSize: 14,
-    },
-  };
+    //Limpia los filtros
+    eraseFilters() {
+      this.periodFrom = this.getDefaultFromDate();
+      this.periodTo = this.getCurrentDate();
+      this.state = '';
+      this.reportReason = '';
+      this.reportReason2 = '';
+      this.updateCharts();
+      this.states = [];
+      this.reportsReasons = [];
+      this.getReportsReasons();
+      this.getStates();
+    }
+  
+  
+    //AÑADIR
+    changeView(view: number) {
+      this.status = view;
+      if (view == 1) {
+        this.updateColumnChart();
+      }
+      if (view == 2) {
+        this.updatePieChart();
+      }
+      if (view == 3) {
+        this.updateLineChart();
+      }
+    }
 
-  lineChartOptions = {
-    backgroundColor: 'transparent',
-    colors: ['#24f73f'],
-    legend: { position: 'none' },
-    chartArea: { width: '90%', height: '80%' },
-    vAxis: {
-      textStyle: { color: '#6c757d' },
-      title: 'Cantidad de Multas',
-    },
-    hAxis: {
-      textStyle: { color: '#6c757d' },
-      title: 'Mes',
-    },
-    animation: {
-      duration: 1000,
-      easing: 'out',
-      startup: true,
-    },
-    title: 'Evolución de Multas por Mes',
-  };
-
-  columnChartOptions = {
-    backgroundColor: 'transparent',
-    colors: ['#24473f', '#FF4500', '#32CD32', '#8A2BE2'],
-    legend: { position: 'none' },
-    chartArea: { width: '80%', height: '75%' },
-    vAxis: {
-      textStyle: { color: '#6c757d' },
-      title: 'Cantidad',
-    },
-    hAxis: {
-      textStyle: { color: '#6c757d' },
-      title: 'Estado de Multas',
-    },
-    animation: {
-      duration: 1000,
-      easing: 'out',
-      startup: true,
-    },
-    height: 600,
-    width: '100%',
-    bar: { groupWidth: '70%' },
-    title: 'Cantidad de Multas por Estado',
-  };
+    openModalPreview(nro:number){
+      if (nro === 5 && this.highestFine) {
+        this.openFineModal(this.highestFine.id);
+      } else if (nro === 6 && this.lowestFine) {
+        this.openFineModal(this.lowestFine.id);
+      }
+    }
 
   ngOnInit() {
     this.updateCharts();
@@ -169,29 +203,27 @@ export class PenaltiesFineDashboardComponent {
     return new Date(dateArray[0], dateArray[1] - 1, dateArray[2]);
   }
 
-  private getCurrentYearMonth(): string {
+  // get currentYearMonth(): string {
+  //   return this.getCurrentYearMonth();
+  // }
+
+  getCurrentDate(): string {
     const now = new Date();
-    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(
-      2,
-      '0'
-    )}`;
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   }
 
-  private getDefaultFromDate(): string {
+  getDefaultFromDate(): string {
     const date = new Date();
-    date.setMonth(date.getMonth() - 6);
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-      2,
-      '0'
-    )}`;
+    date.setMonth(date.getMonth() - 6); // Cambiar a 6 meses atrás
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   }
 
   private updateCharts() {
     this.sanctionsService.getAllFines().subscribe({
       next: (fines: Fine[]) => {
-        const fromDate = new Date(this.periodFrom + '-01');
-        const toDate = new Date(this.periodTo + '-01');
-        toDate.setMonth(toDate.getMonth() + 1);
+        const fromDate = new Date(this.periodFrom);
+        const toDate = new Date(this.periodTo);
+        toDate.setDate(toDate.getDate() + 1);
 
         // Filtrar multas por rango de fecha
         this.finesData = fines.filter((fine) => {
@@ -249,37 +281,37 @@ export class PenaltiesFineDashboardComponent {
   private updateLineChart() {
     console.log(this.reportReason2)
     if(this.reportReason2 == ""){
-    const fromDate = new Date(this.periodFrom + '-01');
-    const toDate = new Date(this.periodTo + '-01');
-    toDate.setMonth(toDate.getMonth() + 1);
-
-    const finesByMonth: { [key: string]: number } = {};
-
-    this.finesData.forEach((fine) => {
-      const fineDate = new Date(fine.createdDate);
-      const monthKey = fineDate.toLocaleString('default', {
-        month: 'short',
-        year: 'numeric',
+      const fromDate = new Date(this.periodFrom);
+      const toDate = new Date(this.periodTo);
+      toDate.setMonth(toDate.getMonth() + 1);
+  
+      const finesByMonth: { [key: string]: number } = {};
+  
+      this.finesData.forEach((fine) => {
+        const fineDate = new Date(fine.createdDate);
+        const monthKey = fineDate.toLocaleString('default', {
+          month: 'short',
+          year: 'numeric',
+        });
+        finesByMonth[monthKey] = (finesByMonth[monthKey] || 0) + 1;
       });
-      finesByMonth[monthKey] = (finesByMonth[monthKey] || 0) + 1;
-    });
-
-    const lineChartData = [];
-    let currentDate = new Date(fromDate);
-
-    while (currentDate < toDate) {
-      const monthLabel = currentDate.toLocaleString('default', {
-        month: 'short',
-        year: 'numeric',
-      });
-      lineChartData.push([monthLabel, finesByMonth[monthLabel] || 0]);
-      currentDate.setMonth(currentDate.getMonth() + 1);
-    }
-    this.lineChartData = lineChartData;
+  
+      const lineChartData = [];
+      let currentDate = new Date(fromDate);
+  
+      while (currentDate < toDate) {
+        const monthLabel = currentDate.toLocaleString('default', {
+          month: 'short',
+          year: 'numeric',
+        });
+        lineChartData.push([monthLabel, finesByMonth[monthLabel] || 0]);
+        currentDate.setMonth(currentDate.getMonth() + 1);
+      }
+      this.lineChartData = lineChartData;
     }
     else{
-      const fromDate = new Date(this.periodFrom + '-01');
-      const toDate = new Date(this.periodTo + '-01');
+      const fromDate = new Date(this.periodFrom);
+      const toDate = new Date(this.periodTo);
       toDate.setMonth(toDate.getMonth() + 1);
     
       const filteredFines = this.reportReason2
@@ -340,41 +372,134 @@ export class PenaltiesFineDashboardComponent {
   }
 
   makeBig(nro: number) {
-    this.status = nro;
+    if (nro === 5 && this.highestFine) {
+      this.openFineModal(this.highestFine.id);
+    } else if (nro === 7 && this.lowestFine) {
+      this.openFineModal(this.lowestFine.id);
+    }
+    else {
+      this.status = nro;
+    }
+  }
+  
+  private openFineModal(fineId: number) {
+    const modal = this._modal.open(PenaltiesModalFineComponent, {
+      size: 'md',
+      keyboard: false,
+    });
+    modal.componentInstance.fineId = fineId;
+    modal.result
+      .then((result: any) => {
+      })
+      .catch((error: any) => {
+        console.log("Error con modal: " + error);
+      });
   }
 
   private calculateKPIs() {
     const totalAmount = this.finesData.reduce((acc: number, fine: Fine) => acc + fine.amount, 0);
     
+    // Filtrar datos según los filtros seleccionados
+    var filteredFines;
+    if (this.status == 3) {
+      filteredFines = this.finesData.filter(fine => {
+        const matchesState = this.state ? fine.fineState === this.state : true;
+        const matchesReason = this.reportReason2 ? fine.report.reportReason.reportReason === this.reportReason2 : true;
+        return matchesState && matchesReason;
+      });
+    } else {
+      filteredFines = this.finesData.filter(fine => {
+        const matchesState = this.state ? fine.fineState === this.state : true;
+        const matchesReason = this.reportReason ? fine.report.reportReason.reportReason === this.reportReason : true;
+        return matchesState && matchesReason;
+      });
+    }
+    
     // Total de multas realizadas
-    this.totalFines = this.finesData.length;
-  
+    this.totalFines = filteredFines.length;
+    
     // Calcular multas por mes para obtener el promedio
     const finesByMonth: { [key: string]: number } = {};
-    this.finesData.forEach(fine => {
+    filteredFines.forEach(fine => {
       const fineDate = new Date(fine.createdDate);
       const monthKey = fineDate.toLocaleString('default', { month: 'short', year: 'numeric' });
       finesByMonth[monthKey] = (finesByMonth[monthKey] || 0) + 1;
     });
     this.averageFinesPerMonth = this.totalFines / Object.keys(finesByMonth).length;
-  
+    
     // Multa de mayor monto
-    this.highestFine = this.finesData.reduce((max: Fine | null, fine: Fine) => {
+    this.highestFine = filteredFines.reduce((max: Fine | null, fine: Fine) => {
       return fine.amount > (max?.amount || 0) ? fine : max;
     }, null as Fine | null);
-  
+    
     // Distribución de multas por estado
-    this.finesByState = this.finesData.reduce((acc: { [key: string]: number }, fine) => {
+    this.finesByState = filteredFines.reduce((acc: {  [key: string]: number }, fine) => {
       acc[fine.fineState] = (acc[fine.fineState] || 0) + 1;
       return acc;
     }, {});
-  
+    
+    // Calcular el total de multas en estado "Pagada" y "Pendiente de Pago"
+    this.paidFinesCount = filteredFines.filter(fine => fine.fineState === 'Pagada').length;
+    this.pendingFinesCount = filteredFines.filter(fine => fine.fineState === 'Pendiente de pago').length;
+    
     // Distribución de multas por razón
-    this.finesByReason = this.finesData.reduce((acc: { [key: string]: number }, fine) => {
+    this.finesByReason = filteredFines.reduce((acc: { [key: string]: number }, fine) => {
       const reason = fine.report.reportReason.reportReason;
       acc[reason] = (acc[reason] || 0) + 1;
       return acc;
     }, {});
-  }
+    
+    // Calcular porcentaje de denuncias por estado
+    this.finesByStatePercentage = Object.entries(this.finesByState).map(([state, count]) => {
+      const percentage = (count / this.totalFines) * 100;
+      return { state, percentage };
+    });
+    
+    // Encontrar el estado con el mayor porcentaje
+    this.stateWithHighestPercentage = this.finesByStatePercentage.reduce((max, current) => {
+      return current.percentage > max.percentage ? current : max;
+    }, { state: '', percentage: 0 });
+    
+    // Encontrar el estado con el menor porcentaje
+    this.stateWithLowestPercentage = this.finesByStatePercentage.reduce((min, current) => {
+      return current.percentage < min.percentage ? current : min;
+    }, { state: '', percentage: Infinity });
+    
+    // Multa de menor monto
+    this.lowestFine = filteredFines.reduce((min: Fine | null, fine: Fine) => {
+      return fine.amount < (min?.amount || Infinity) ? fine : min;
+      }, null as Fine | null);
+      const complaintsByDayOfWeek = filteredFines.reduce((acc: { [key: number]: number }, complaint) => {
+        const createdDate = new Date((complaint.createdDate as unknown as string).replace(" ", "T"));
+        const dayOfWeek = createdDate.getDay(); // Obtiene el día de la semana (0 = domingo, 1 = lunes, ..., 6 = sábado)
+      
+        acc[dayOfWeek] = (acc[dayOfWeek] || 0) + 1; // Contar denuncias por día de la semana
+        return acc;
+      }, {});
+      
+      // Determinar el día con el mayor número de denuncias
+      this.dayWithMostComplaints = Object.entries(complaintsByDayOfWeek).reduce((max, [day, count]) => {
+        return count > max.count ? { day: Number(day), count } : max;
+      }, { day: -1, count: 0 });
+      
+      // Determinar el día con el menor número de denuncias
+      this.dayWithLeastComplaints = Object.entries(complaintsByDayOfWeek).reduce((min, [day, count]) => {
+        return count < min.count ? { day: Number(day), count } : min;
+      }, { day: -1, count: Infinity }); // Inicializamos con Infinity para asegurar que cualquier número será menor
+      
+      // Para mostrar el nombre del día con la menor cantidad de denuncias
+      const daysOfWeek = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+      this.dayWithMostComplaintsName = daysOfWeek[this.dayWithMostComplaints.day];
+      this.dayWithLeastComplaintsName = daysOfWeek[this.dayWithLeastComplaints.day];
+      }
+    
   
+
+  openFilterModal() {
+    const filterModal = new bootstrap.Modal(document.getElementById('filterModal'));
+    filterModal.show();
+  }
 }
+
+
+

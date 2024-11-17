@@ -5,6 +5,7 @@ import { MainComponent } from './common/components/main/main.component';
 import { NotFoundComponent } from './common/components/not-found/not-found.component';
 import { UsersRecoveryPasswordComponent } from './common/components/users-recovery-password/users-recovery-password.component';
 import { UnauthorizedComponent } from './common/components/unauthorized/unauthorized.component';
+import { UsersHomeComponent } from './common/components/users-home/users-home.component';
 
 export const routes: Routes = [
     {
@@ -25,6 +26,10 @@ export const routes: Routes = [
         path: 'main',
         component: MainComponent,
         children: [
+            {
+                path: 'home',
+                component: UsersHomeComponent
+            },
             {
                 path: 'entries',
                 loadChildren: () => import("./entries/entry.routes").then((m) => m.ENTRY_ROUTES)

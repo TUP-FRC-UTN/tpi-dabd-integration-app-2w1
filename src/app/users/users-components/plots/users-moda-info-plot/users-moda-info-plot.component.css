@@ -2,3 +2,8 @@
     min-width: 150px;
     max-width: 150px;
 }
+
+.hover:hover{
+    cursor: auto !important;
+    background-color: rgb(220, 53, 69);
+}

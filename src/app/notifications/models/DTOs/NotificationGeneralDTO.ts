@@ -4,6 +4,6 @@ export interface NotificationGeneralDTO {
     users: UserDTO[],
     senderId : number,
     subject: string,
-    description: string
-    channel : string
+    description: string,
+    channel : string,
 }

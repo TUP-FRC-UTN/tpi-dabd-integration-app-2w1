@@ -84,4 +84,15 @@ export class ComplaintService {
     }
     return new Date(date).toLocaleDateString('es-ES');
   }
+
+  getCurrentYearMonth(): string {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  }
+
+  getDefaultFromDate(): string {
+    const date = new Date();
+    date.setMonth(date.getMonth() - 6);
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  }
 }

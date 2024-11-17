@@ -1,30 +1,94 @@
-<div class="mb-5">
-    <!-- NavBar -->
-    <nav class="navbar mynav d-flex justify-content-between shadow fixed-top text-bg-dark" style="z-index: 10;">
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+  <div class="container">
+      <a class="navbar-brand" href="#welcome">
+          <img src="https://www.villadelcondor.com/imagenes/villa_del_condor.png" style="height: 40px; width: 100px;" alt="logo del consorcio">
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse d-flex justify-content-end" id="navbarNav">
 
-        <!-- Lado izquierdo -->
-        <div class="col-4">
+          <button type="button" class="btn btn-primary" (click)="redirect('/login')">Iniciar Sesión
+              <i class="bi bi-person-circle"></i> 
+          </button>
+      </div>
+  </div>
+</nav>
 
-        </div>
 
-        <div class="col-4 text-center">
-            <h3>Pagina Principal</h3>
-        </div>
-
-        <div class="col-4 text-end d-flex justify-content-end align-items-center">
-            <button class="btn btn-dark" (click)="redirect('login')">Ingresar
-                <i class="bi-person-circle fs-5"></i>
-            </button>
-        </div>
-
-    </nav>
-</div>
-<section class="container py-3 border border-3" style="min-height: 100vh;">
-    <div class="row text-center">
-        <div class="col">
-            <h2>Landing page</h2>
-        </div>
-        
-    </div>
+<section class="py-5 text-center bg-light" style="margin-top: 56px;" id="welcome">
+  <div class="row py-lg-5">
+      <div class="col-lg-6 col-md-8 mx-auto">
+          <h1 class="fw-light">Bienvenido a Villa del Cóndor</h1>
+          <p class="lead text-muted">Encuentra el terreno perfecto para construir tus sueños</p>
+          <p>Villa del Cóndor es más que un consorcio: es un refugio donde la naturaleza se encuentra con la vida moderna. Ubicado en un entorno rodeado por colinas majestuosas y verdes praderas, cada rincón ofrece vistas espectaculares que invitan a la tranquilidad y a la contemplación. Aquí, el canto de las aves y el susurro del viento entre los árboles crean un ambiente sereno, ideal para aquellos que buscan un hogar en armonía con la naturaleza.</p></div>
+  </div>
 </section>
+
+
+<!-- Loteo Section -->
+<section class="py-5" id="plots">
+  <div class="container">
+      <h2 class="text-center mb-4">Nuestros Lotes</h2>
+      <p>En nuestro consorcio ofrecemos una exclusiva variedad de lotes, ideales tanto para proyectos residenciales como comerciales. 
+        Cada lote ha sido cuidadosamente seleccionado para garantizar su potencial de valorización y conectividad, 
+        brindando un espacio seguro y en constante crecimiento.</p>
+      <div class="row row-cols-1 row-cols-md-3 g-4">
+          @for (plot of plotsCard; track $index) {
+            <div class="col">
+              <div class="card">
+                  <div class="card-body">
+                      <h5 class="card-title">Lote {{plot.number}}</h5>
+                      <p class="card-text">Área total: {{plot.totalArea}}m²</p>
+                      <ul class="list-unstyled">
+                          <li><i class="bi bi-check-circle-fill text-success"></i>Tipo: {{plot.type}}</li>
+                          <li><i class="bi bi-check-circle-fill text-success"></i> Estado: {{plot.status}}</li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+          }
+          @if(plotsCard.length === 0) {
+              <div class="col">
+                  <div class="alert alert-warning" role="alert">
+                      No se han encontrado lotes disponibles
+                  </div>
+              </div>
+          }
+      </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-dark text-white py-4">
+  <div class="container">
+      <div class="row d-flex justify-content-between">
+          <div class="col-md-4">
+              <h5>Villa del Cóndor</h5>
+              <p>Desarrollando el futuro inmobiliario</p>
+              <div class="social-icons">
+                  <a href="#" class="text-white me-3"><i class="bi bi-facebook"></i></a>
+                  <a href="#" class="text-white me-3"><i class="bi bi-instagram"></i></a>
+                  <a href="#" class="text-white me-3"><i class="bi bi-twitter-x"></i></a>
+              </div>
+          </div>
+
+          <div class="col-md-4">
+              <h5>Contacto</h5>
+              <ul class="list-unstyled">
+                  <li><i class="bi bi-geo-alt"></i> Av. Principal 123</li>
+                  <li><i class="bi bi-telephone"></i> +1 234 567 890</li>
+                  <li><i class="bi bi-envelope"></i> {{'villadelcondor@gmail.com'}}</li>
+              </ul>
+          </div>
+      </div>
+      <hr>
+      <div class="text-center">
+          <small>&copy; 2024 Villa del Cóndor. Todos los derechos reservados.</small>
+      </div>
+  </div>
+</footer>
+
+<router-outlet/>
 
