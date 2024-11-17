@@ -9,6 +9,7 @@ import { ProductXDetailDto, ProductXDetailDto2 } from '../models/product-xdetail
 import { createProductDTO } from '../models/create-product-dto';
 import { UsersMockIdService } from '../../common-services/users-mock-id.service';
 import { UpdateProductDto } from '../models/update-product-dto';
+import { AuthService } from '../../../users/users-servicies/auth.service';
 @Injectable({
   providedIn: 'root',
 })
@@ -26,12 +27,10 @@ export class ProductService {
   private readonly AMOUNT_MODIFICATION_URL_GETALL: string = `${this.AMOUNT_MODIFICATION_URL}/getAllModifications`; // Enzo
   private readonly AMOUNT_MODIFICATION_URL_GETALL_PDF: string = `${this.AMOUNT_MODIFICATION_URL}/getAllModificationsPdf`;
   private readonly AMOUNT_MODIFICATION_URL_GETALL_EXCEL: string = `${this.AMOUNT_MODIFICATION_URL}/getAllModificationsExcel`;
-  private userIdService: UsersMockIdService;
 
-  constructor(private http: HttpClient,
-    userIdService:UsersMockIdService
+  constructor(private http: HttpClient
+    
   ) { 
-    this.userIdService = userIdService
   }
 
   // TOMAS C
@@ -101,10 +100,10 @@ export class ProductService {
   }
 
 
-  updateProduct(dto: UpdateProductDto): Observable<any> {
+  updateProduct(dto: UpdateProductDto,userId : number): Observable<any> {
     const url = `${this.PRODUCT_URL}/${dto.id}`;
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    const params = new HttpParams().set('idUser', this.userIdService.getMockId());
+    const params = new HttpParams().set('idUser',userId);
     return this.http.put<any>(url, dto, { headers, params });
   }
 
@@ -133,10 +132,10 @@ export class ProductService {
     });
   }
 
-  giveLogicalLow(id: number): Observable<any> {
+  giveLogicalLow(id: number,userId : number): Observable<any> {
     const url = `${this.PRODUCT_URL}/${id}/logicalLow`;
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    const params = new HttpParams().set('idUser', this.userIdService.getMockId()).set('id', id.toString());
+    const params = new HttpParams().set('idUser', userId).set('id', id.toString());
     return this.http.put<any>(url, {}, { headers, params });
   }
 

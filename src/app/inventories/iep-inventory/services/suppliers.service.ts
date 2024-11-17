@@ -19,7 +19,7 @@ export class SuppliersService {
     return this.http.post(this.SUPPLIERS_URL, formData);
   }
 
-  createSupplierAccess(formData: any){
+  createSupplierAccess(formData: any ){
     return this.http.post(this.ACCESSES_URL, formData, { responseType: 'text' });
   }
 
@@ -71,8 +71,9 @@ export class SuppliersService {
     return this.http.get<any>(this.SUPPLIERS_URL_GET_BY_ID + id);
   }
 
-  updateSupplier(supplierUpdate: Supplier): Observable<any> {
-    return this.http.put<any>(this.SUPPLIERS_URL, supplierUpdate);
+  updateSupplier(supplierUpdate: Supplier, userId: number): Observable<any> {
+    const params = new HttpParams().set('idUser', userId.toString());
+    return this.http.put<any>(this.SUPPLIERS_URL, supplierUpdate,{ params });
   }
 
   deleteSupplier(id: number): Observable<any> {
