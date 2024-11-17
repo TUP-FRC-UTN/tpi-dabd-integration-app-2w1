@@ -3,13 +3,14 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ChargeResponse } from '../Models/charge-response';
 import { ChargeRequest } from '../Models/charge-request';
+import { environment } from '../../../common/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChargeService {
   
-  private readonly EMPLOYEE_BASE_URL: string = 'http://localhost:8080/';
+  private readonly EMPLOYEE_BASE_URL: string = environment.services.employees + "/";
   private readonly CHARGES_URL: string = `${this.EMPLOYEE_BASE_URL}charges`;
   
 

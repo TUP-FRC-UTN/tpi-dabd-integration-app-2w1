@@ -4,14 +4,14 @@ import { Observable, Subject } from 'rxjs';
 import { Provincia } from '../Models/emp-provincia';
 import { Charge, DocumentTypeEnum, PostEmployeeDto } from '../Models/emp-post-employee-dto';
 import { EmpPutEmployees } from '../Models/emp-put-employees';
-import { EmpPutEmployeeRequest } from '../Models/EmpPutEmployeeRequest';
+import { environment } from '../../../common/environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class EmpPostEmployeeService {
-  private readonly EMPLOYEE_BASE_URL: string = 'http://localhost:8080/';
-  private readonly INVENTORY_URL: string = 'http://localhost:8081/';
+  private readonly EMPLOYEE_BASE_URL: string = environment.services.employees + "/";
+  private readonly INVENTORY_URL: string = environment.services.inventory + "/";
 
   private SUPPLIER_URL: string = `${this.INVENTORY_URL}suppliers`;
 
@@ -87,14 +87,11 @@ export class EmpPostEmployeeService {
     return this.client.post<any>(url, json, { headers });
   }
 
-
-
-  updateEmployee(dto: EmpPutEmployeeRequest): Observable<any> {
+  updateEmployee(dto: EmpPutEmployees): Observable<any> {
     const url = `${this.EMPLOYEE_URL}/put/${dto.id}`;
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    //const json = JSON.stringify(dto);
+    const json = JSON.stringify(dto);
 
-    return this.client.put<any>(url, dto, { headers });
+    return this.client.put<any>(url, json, { headers });
   }
-
 }
