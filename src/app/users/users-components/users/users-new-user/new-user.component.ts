@@ -141,7 +141,14 @@ export class NewUserComponent implements OnInit {
           this.options = [];
           optionsFilter.forEach(o => this.options.push({value : o, name: o}))
                     
-        } else{
+        }
+        if(this.authService.getActualRole() == "SuperAdmin"){
+          let optionsFilter = this.options.filter(rol => this.options.includes(rol) && rol != "Propietario");
+          this.options = [];
+          optionsFilter.forEach(o => this.options.push({value : o, name: o}))
+                    
+        }
+        else{
           let optionsFilter = this.options.filter(rol => !this.optionsForOwner.includes(rol) && rol != "Propietario" && rol != "SuperAdmin");
           this.options = [];
           optionsFilter.forEach(o => this.options.push({value : o, name: o}))
