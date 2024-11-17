@@ -1,0 +1,325 @@
+<!-- Fila principal con controles -->
+<div class="row g-3 mb-3 align-items-center">
+    <!-- Búsqueda unificada con botones de filtro -->
+    <!-- Botones de filtro -->
+    <div class="col-auto">
+        <div class="d-flex gap-1">
+            <button class="btn btn-secondary action-btn" (click)="clearFilters()" title="Limpiar filtros">
+                <i class="bi bi-trash"></i>
+            </button>
+            <button class="btn btn-primary action-btn" data-bs-target="#advancedFiltersModal" data-bs-toggle="modal" title="Filtros avanzados">
+                <i class="bi bi-funnel-fill"></i>
+            </button>
+        </div>
+    </div>
+    
+<!-- Búsqueda unificada -->
+<div class="col-1 pe-0 pl-0">
+    <div class="input-group">
+        <input type="text" class="form-control" id="unifiedSearchFilter" placeholder="Buscar">
+    </div>
+</div>
+<div class="col-auto ps-2">
+    <div class="d-flex flex-column">
+        <div class="d-flex align-items-center">
+            <label class="form-label mb-0 me-1 small">Desde:</label>
+            <input 
+                type="date" 
+                class="form-control form-control-sm" 
+                [ngModel]="startDate | date:'yyyy-MM-dd'" 
+                (ngModelChange)="onStartDateChange($event)"
+                [max]="today | date:'yyyy-MM-dd'"
+                [class.is-invalid]="dateError">
+        </div>
+        <!-- Mensaje de error de fechas debajo del input "desde" -->
+        <div *ngIf="dateError" class="invalid-feedback d-block" style="font-size: 0.75rem; white-space: nowrap;">
+            {{ dateError }}
+        </div>
+    </div>
+</div>
+
+<div class="col-auto ps-2">
+    <div class="d-flex align-items-center">
+        <label class="form-label mb-0 me-1 small">Hasta:</label>
+        <input 
+            type="date" 
+            class="form-control form-control-sm" 
+            [ngModel]="endDate | date:'yyyy-MM-dd'" 
+            (ngModelChange)="onEndDateChange($event)"
+            [max]="today | date:'yyyy-MM-dd'">
+    </div>
+</div>
+    <!-- Botones de acción -->
+    <div class="col-auto ms-auto">
+        <div class="d-flex gap-1">
+            <!-- Botones de tipo de usuario -->
+            <button class="btn btn-primary action-btn" 
+                style="border: none"
+                title="Filtrar por visitantes" 
+                (click)="toggleUserTypeFilter('Visitante')"
+                [class.active]="isUserTypeFilterActive('Visitante')"
+                [style.backgroundColor]="getUserTypeColor('Visitante')">
+                <i [class]="getUserTypeIcon('Visitante')"></i>
+            </button>
+
+            <button class="btn btn-primary action-btn"
+                style="border: none"
+                (click)="toggleUserTypeFilter('Empleado')"
+                [class.active]="isUserTypeFilterActive('Empleado')"
+                title="Filtrar por empleados" 
+                [style.backgroundColor]="getUserTypeColor('Empleado')">
+                <i [class]="getUserTypeIcon('Empleado')"></i>
+            </button>
+
+            <button class="btn btn-primary action-btn"
+                style="border: none"
+                (click)="toggleUserTypeFilter('Vecino')"
+                [class.active]="isUserTypeFilterActive('Vecino')"
+                title="Filtrar por vecinos" 
+                [style.backgroundColor]="getUserTypeColor('Vecino')">
+                <i [class]="getUserTypeIcon('Vecino')"></i>
+            </button>
+
+            <button class="btn btn-primary action-btn"
+                style="border: none"
+                (click)="toggleUserTypeFilter('Proveedor')"
+                [class.active]="isUserTypeFilterActive('Proveedor')"
+                title="Filtrar por proveedores" 
+                [style.backgroundColor]="getUserTypeColor('Proveedor')">
+                <i [class]="getUserTypeIcon('Proveedor')"></i>
+            </button>
+
+            <!-- Separador con línea vertical más visible -->
+            <div class="border-right border-1 border-secondary mx-2" > |</div>
+  
+            <button class="btn text-light action-btn"
+            style="border:none"
+                title="Buscar"
+                style="background-color: #444444    ;"
+                data-bs-toggle="modal" 
+                data-bs-target="#visitorListModal">
+                <i class="bi bi-search"></i>
+            </button>
+            <button class="btn text-light action-btn"            
+            style="border: none"
+            title="Escanear QR"
+            style="background-color: #444444;"
+            data-bs-toggle="modal"
+            data-bs-target="#qrScannerModalAll">
+      <i class="bi bi-qr-code-scan"></i>
+    </button>
+            <!-- Separador con línea vertical -->
+            <div class="border-right border-muted mx-2">|</div>
+
+            <!-- Botones de exportación -->
+            <button class="btn btn-success action-btn" id="excelBtn" [disabled]="!exportButtonsEnabled" title="Exportar a Excel">
+                <i class="bi bi-file-earmark-excel"></i>
+            </button>
+            <button class="btn btn-danger action-btn" id="pdfBtn" [disabled]="!exportButtonsEnabled" title="Exportar a PDF">
+                <i class="bi bi-file-earmark-pdf"></i>
+            </button>
+            <div class="dt-buttons d-none"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Filtros Avanzados -->
+<div class="modal fade" id="advancedFiltersModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel">Filtros Avanzados</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="input-group-with-label">
+                            <div class="input-group">
+                                <ng-select
+                                    class="flex-grow-1"
+                                    [items]="entryExitOptions"
+                                    [multiple]="true"
+                                    [closeOnSelect]="false"
+                                    [searchable]="true"
+                                    bindLabel="label"
+                                    bindValue="value"
+                                    [clearable]="false"
+                                    [(ngModel)]="filterValues.entryOrExit"
+                                    (change)="applyFilters()"
+                                    [placeholder]="filterValues.entryOrExit.length ? '' : 'Seleccionar tipo de registro'">
+                                    <ng-template ng-multi-label-tmp let-items="items">
+                                        <div *ngIf="items.length > 0">({{items.length}}) Seleccionados</div>
+                                    </ng-template>
+                                    <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                        <input id="entry-modal-{{index}}" type="checkbox" [checked]="item$.selected"/> 
+                                        <span class="ms-2">{{item.label}}</span>
+                                    </ng-template>
+                                </ng-select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group-with-label">
+                            <div class="input-group">
+                                <ng-select 
+                                    [items]="tiposIngresante"
+                                    [multiple]="true"
+                                    [closeOnSelect]="false"
+                                    [searchable]="true"
+                                    bindLabel="label"
+                                    bindValue="value"
+                                    [clearable]="false"
+                                    [(ngModel)]="filterValues.tipoIngresante"
+                                    (change)="applyFilters()"
+                                    [placeholder]="filterValues.tipoIngresante.length ? '' : 'Seleccionar tipo de ingresante'">
+                                    <ng-template ng-multi-label-tmp let-items="items">
+                                        <div *ngIf="items.length > 0">({{items.length}}) Seleccionados</div>
+                                    </ng-template>
+                                    <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                        <input id="ingresante-{{index}}" type="checkbox" [checked]="item$.selected"/> 
+                                        <span class="ms-2">{{item.label}}</span>
+                                    </ng-template>
+                                </ng-select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group-with-label">
+                            <div class="input-group">
+                                <ng-select
+                                    class="w-100"
+                                    [items]="propietariosOptions"
+                                    [multiple]="true"
+                                    [closeOnSelect]="false"
+                                    [searchable]="true"
+                                    bindLabel="label"
+                                    bindValue="id"
+                                    [clearable]="false"
+                                    [(ngModel)]="filterValues.selectedPropietario"
+                                    (change)="applyFilters()"
+                                    [placeholder]="filterValues.selectedPropietario.length ? '' : 'Buscar propietario'">
+                                    <ng-template ng-multi-label-tmp let-items="items">
+                                        <div *ngIf="items.length > 0">({{items.length}}) Seleccionados</div>
+                                    </ng-template>
+                                    <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                        <input id="propietario-{{index}}" type="checkbox" [checked]="item$.selected"/> 
+                                        <span class="ms-2">{{item.label}}</span>
+                                    </ng-template>
+                                </ng-select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group-with-label">
+                            <div class="input-group">
+                                <ng-select 
+                                    [items]="tiposVehiculo"
+                                    [multiple]="true"
+                                    [closeOnSelect]="false"
+                                    [searchable]="true"
+                                    bindLabel="label"
+                                    bindValue="value"
+                                    [clearable]="false"
+                                    [(ngModel)]="filterValues.typeCar"
+                                    (change)="applyFilters()"
+                                    [placeholder]="filterValues.typeCar.length ? '' : 'Seleccionar tipo de vehículo'">
+                                    <ng-template ng-multi-label-tmp let-items="items">
+                                        <div *ngIf="items.length > 0">({{items.length}}) Seleccionados</div>
+                                    </ng-template>
+                                    <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                        <input id="vehiculo-{{index}}" type="checkbox" [checked]="item$.selected"/> 
+                                        <span class="ms-2">{{item.label}}</span>
+                                    </ng-template>
+                                </ng-select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group-with-label">
+                            <div class="input-group">
+                                <ng-select 
+                                    [items]="guardiasOptions"
+                                    [multiple]="true"
+                                    [closeOnSelect]="false"
+                                    [searchable]="true"
+                                    bindLabel="label"
+                                    bindValue="id"
+                                    [clearable]="false"
+                                    [(ngModel)]="filterValues.selectedGuardia"
+                                    (change)="applyFilters()"
+                                    [placeholder]="filterValues.selectedGuardia.length ? '' : 'Buscar guardia'">
+                                    <ng-template ng-multi-label-tmp let-items="items">
+                                        <div *ngIf="items.length > 0">({{items.length}}) Seleccionados</div>
+                                    </ng-template>
+                                    <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                        <input id="guardia-{{index}}" type="checkbox" [checked]="item$.selected"/> 
+                                        <span class="ms-2">{{item.label}}</span>
+                                    </ng-template>
+                                </ng-select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="applyFilters()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabla -->
+<div class="table-responsive">
+    <table id="myTable" class="table table-striped">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Tipo</th>
+                <th>Ingresante</th>
+                <th>Nombre</th>
+                <th>Documento</th>
+                <th>Vehículo</th>
+                <th>Placa</th>
+                <th>Propietario</th>
+                <th>Guardia</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<access-app-visitor-registry></access-app-visitor-registry>
+
+
+<!-- Modal del escáner QR -->
+<div class="modal fade" id="qrScannerModalAll" tabindex="-1" aria-labelledby="qrScannerModalLabel" aria-hidden="true" 
+     (shown.bs.modal)="onModalOpened()">
+  <div class="modal-dialog modal-dialog-centered custom-modal-size">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="qrScannerModalLabel">Escanear Código QR</h5>
+        <button type="button" class="btn-close" 
+                data-bs-toggle="modal"
+                data-bs-target="#allListModal" 
+                aria-label="Close" (click)="stopScanner()"></button>
+      </div>
+      <div class="modal-body">
+        <ngx-scanner-qrcode #scanner (event)="handleQrScan($event)"></ngx-scanner-qrcode>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" 
+                data-bs-toggle="modal"
+                data-bs-target="#allListModal" 
+                (click)="stopScanner()">
+          Cerrar
+        </button>
+        <button type="button" class="btn btn-secondary" (click)="startScanner()">
+          Escanear
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

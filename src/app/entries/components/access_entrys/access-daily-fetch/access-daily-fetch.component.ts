@@ -13,11 +13,11 @@ import Swal from 'sweetalert2';
 import { Movement, UserAllowed } from '../../../services/access_visitors/movement.interface';
 import { Router } from '@angular/router';
 import { AccessRegisterEmergencyComponent } from "../../access-register-emergency/access-register-emergency.component";
-
+export type VehicleType = 'Car' | 'Motorbike' | 'Truck' | 'Bike' | 'Van' | 'Walk';
 @Component({
   selector: 'access-app-daily-fetch',
   standalone: true,
-  imports: [FormsModule, CommonModule, HttpClientModule, AccessRegisterEmergencyComponent],
+  imports: [FormsModule],
   templateUrl: './access-daily-fetch.component.html',
   styleUrl: './access-daily-fetch.component.css',
   providers: [DatePipe],
@@ -32,7 +32,15 @@ export class AccessDailyFetchComponent implements OnInit,AfterViewInit {
   todayDate: string = '';
   private http = inject(HttpClient);
   popupAbierto = false;
-  searchTerm: string = ''; 
+  searchTerm: string = '';
+  private readonly vehicleTranslations: Record<VehicleType, string> = {
+    'Car': 'auto',
+    'Motorbike': 'moto',
+    'Truck': 'camión',
+    'Bike': 'bicicleta',
+    'Van': 'camioneta',
+    'Walk': 'sin vehículo'
+  };
   constructor(  private datePipe: DatePipe, private router: Router ) {}
   
   navigateToComponent(event: any) {
@@ -43,7 +51,7 @@ export class AccessDailyFetchComponent implements OnInit,AfterViewInit {
   ngAfterViewInit(): void {
     setTimeout(() => {
 
-      $('#tablaconsulta tbody').on('click', '.view-more-btn', (event: any) => {
+      $('#fetchTable tbody').on('click', '.view-more-btn', (event: any) => {
         const index = $(event.currentTarget).data('index');
         const selectedMovement = this.movements[index]
         ;
@@ -54,12 +62,12 @@ export class AccessDailyFetchComponent implements OnInit,AfterViewInit {
   }
   ngOnInit(): void {
     this.setTodayDate(); 
+    this.fetchMovements();
     
-     // Llamada a tu servicio que obtiene los movimientos
   }
   setTodayDate(): void {
     const currentDate = new Date();
-    this.todayDate = this.datePipe.transform(currentDate  , 'yyyy-MM-dd') || '';  // Formato compatible con el input de tipo date
+    this.todayDate = this.datePipe.transform(currentDate  , 'yyyy-MM-dd') || '';  
     this.selectedDate = this.todayDate ; 
   } 
   onDateFilterChange(event: Event): void {
@@ -67,19 +75,19 @@ export class AccessDailyFetchComponent implements OnInit,AfterViewInit {
     const selectedDate = input.value;
 
     if (selectedDate) {
-      this.selectedDate = selectedDate;  // Almacenar la fecha seleccionada
-      this.fetchMovements();  // Volver a obtener los movimientos con la nueva fecha
+      this.selectedDate = selectedDate;  
+      this.fetchMovements(); 
     }
   }
   fetchMovements(): void {
-    const fechaParam = this.selectedDate ? this.selectedDate : '2024-04-03';  // Default en caso de que no haya selección
+    const fechaParam = this.selectedDate ? this.selectedDate : this.todayDate;  
     this.http.get<any>(`http://localhost:8090/movements_entry/Movements/${fechaParam}`)
       .subscribe({
         next: (response) => {
           this.movements = response;
           console.log('Movimientos obtenidos:', response);
           console.log(this.movements);
-          this.updateDataTable();  // Cargar los datos en la tabla
+          this.updateDataTable();  
           
         },
         error: (error) => {
@@ -92,84 +100,87 @@ export class AccessDailyFetchComponent implements OnInit,AfterViewInit {
         }
       });
   }
-  initializeDataTable(): void {
-    this.table = ($('#tablaconsulta') as any).DataTable({
-        paging: true,
-        ordering: true,
-        pageLength: 10,
-        lengthChange: true,
-        searching: true,
-        info: true,
-        autoWidth: false,
-        language: {
-            lengthMenu: "Mostrar _MENU_ registros",
-            zeroRecords: "No se encontraron resultados",
-            search: "Buscar:",
-            info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-            infoEmpty: "Mostrando 0 a 0 de 0 registros",
-            infoFiltered: "(filtrado de _MAX_ registros en total)",
-            paginate: {
-                first: "Primero",
-                last: "Último",
-                next: ">",
-                previous: "<"
-            }
-        },
-        responsive: true,
-        dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
-            '<"row"<"col-sm-12"tr>>' +
-            '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
-        columnDefs: [
-            { targets: '_all', className: 'text-center' } // Alinear todo al centro
-        ],
-        createdRow: (row: Node, data: any, dataIndex: number) => {
-            // Aquí puedes aplicar estilos a las filas
-            if (data.typeMovement === 'INGRESO') {
-                $(row).addClass('table-success'); // Resaltar filas de ingreso
-            } else if (data.typeMovement === 'EGRESO') {
-                $(row).addClass('table-danger'); // Resaltar filas de egreso
-            }
-        }
-    });
-}
+  
 
   updateDataTable() {
-    if ($.fn.dataTable.isDataTable('#tablaconsulta')) {
-      $('#tablaconsulta').DataTable().destroy();
+    if ($.fn.dataTable.isDataTable('#fetchTable')) {
+      $('#fetchTable').DataTable().destroy();
     }
   
-    let table = this.table = $('#tablaconsulta').DataTable({
+    let table = this.table = ($('#fetchTable') as any).DataTable({
       paging: true,
-      searching: true,
       ordering: true,
+      pageLength: 5,
       lengthChange: true,
-      order: [6, 'asc'],
-      lengthMenu: [10, 25, 50],
-      pageLength: 10,
-      columnDefs: [
-        { targets: '_all', className: 'text-center' }
-      ],
+      searching: true,
+      info: true,
+      autoWidth: false,
+      order: [1, 'des'],
+      lengthMenu: [5, 10, 25, 50],
+      responsive: true,
+      dom: 'rt<"bottom d-flex justify-content-between align-items-center"<"d-flex align-items-center gap-3"l i> p><"clear">',
+      language: {
+        lengthMenu: " _MENU_ ",
+        zeroRecords: "No se encontraron registros",
+        info: "Mostrando de _START_ a _END_ de _TOTAL_ registros",
+        infoEmpty: "No se encontraron resultados",
+        infoFiltered: "(filtrado de *MAX* registros totales)",
+        search: "Buscar:",
+        emptyTable: "No se encontraron resultados",
+      },
       data: this.movements,
       columns: [
         { 
+          data: 'movementDatetime',
+          className: 'align-middle text-center',
+          render: (data: string): string => {
+            if (!data) return '';
+            const movementDate = new Date(Date.parse(data));
+            return movementDate.toLocaleDateString();
+          }
+        },
+        { 
+          data: 'movementDatetime',
+          className: 'align-middle text-center',
+          render: (data: string): string => {
+            if (!data) return '';
+            const movementDate = new Date(Date.parse(data));
+            return movementDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+          }
+        },
+        { 
           data: 'typeMovement',
           className: 'align-middle text-center',
-          render: (data: any) => {
-            let color;
+          render: (data: string | null): string => {
+            let color: string, text: string;
             switch (data) {
-              case "INGRESO": color = "#28a745"; break;
-              case "EGRESO": color = "#dc3545"; break;
-              default: color = "#6c757d"; break;
+              case "INGRESO": 
+                color = "#28a745"; 
+                text = "Ingreso";
+                break;
+              case "EGRESO": 
+                color = "#dc3545"; 
+                text = "Egreso";
+                break;
+              default: 
+                color = "#6c757d"; 
+                text = data || '';
+                break;
             }
-            return `<button class="btn border rounded-pill w-75" 
-              style="background-color: ${color}; color: white;">
-              ${data || 'Ingreso'}</button>`;
+            return `
+              <div class="d-flex justify-content-center">
+                <button type="button" class="btn rounded-pill w-75" 
+                  style="background-color: ${color}; color: white; border: none; text-transform: uppercase;">
+                  ${text}
+                </button>
+              </div>`;
           }
         },
         { 
           data: null,
           className: 'align-middle text-center',
-          render: (data) => `${data.visitorName || ''} ${data.visitorLastName || ''}`
+          render: (data: Movement): string => 
+            `${data.visitorName || ''} ${data.visitorLastName || ''}`
         },
         { 
           data: 'visitorDocument',
@@ -182,46 +193,20 @@ export class AccessDailyFetchComponent implements OnInit,AfterViewInit {
         { 
           data: null,
           className: 'align-middle text-center',
-          render: (data) => data.vehiclesDto ? data.vehiclesDto.vehicleType?.description : 'ingreso sin vehiculo'
-        },
-        { 
-          data: 'movementDatetime',
-          className: 'align-middle text-center',
-          render: (data) => {
-            if (!data) return '';
-            const movementDate = new Date(Date.parse(data));
-            return movementDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
-          }
-        },
-        { 
-          data: 'movementDatetime',
-          className: 'align-middle text-center',
-          render: (data) => {
-            if (!data) return '';
-            const movementDate = new Date(Date.parse(data));
-            return movementDate.toLocaleDateString();
-          }
+          render: (data: Movement): string => this.getVehicleTypeTranslation(data)
         },
         {
           data: null,
           className: 'align-middle text-center',
-          render: (data, type, row, meta) => 
+          render: (data: Movement, type: any, row: any, meta: { row: number }): string => 
             `<button class="btn btn-info btn-sm view-more-btn" data-index="${meta.row}">Ver más</button>`
         }
       ],
-      language: {
-        lengthMenu: "Mostrar _MENU_ registros",
-        search: "Buscar:",
-        zeroRecords: "No se encontraron resultados",
-        info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-        infoEmpty: "Mostrando 0 a 0 de 0 registros",
-        infoFiltered: "(filtrado de _MAX_ registros en total)",
-        paginate: {
-          first: "Primero",
-          last: "Último",
-          next: ">",
-          previous: "<"
-        }
+      drawCallback: function(settings: any): void {
+        const table = this;
+        setTimeout(function() {
+          // Si necesitas algún procesamiento adicional después de que se dibuje la tabla
+        }, 0);
       }
     });
   
@@ -258,7 +243,7 @@ export class AccessDailyFetchComponent implements OnInit,AfterViewInit {
     });
   }
   printTable(): void {
-    const tableElement = document.getElementById('tablaconsulta') as HTMLTableElement;
+    const tableElement = document.getElementById('fetchTable') as HTMLTableElement;
     const win = window.open('', '_blank');
 
     // Comprueba si 'win' es null
@@ -276,10 +261,11 @@ export class AccessDailyFetchComponent implements OnInit,AfterViewInit {
     
   if (selectedMovement) {
     let vehiculo = '';
+    const tipoVehiculo = this.getVehicleTypeTranslation(selectedMovement);
     console.log(selectedMovement.vehiclesDto);
     if (selectedMovement.vehiclesDto != null) {
         vehiculo = `
-      <strong>Tipo vehiculo:</strong>${selectedMovement.vehiclesDto.vehicleType?.description}<br> 
+      <strong>Tipo vehiculo:</strong>${tipoVehiculo}<br> 
       <strong>Patente:</strong> ${selectedMovement.vehiclesDto.plate} <br> 
       <strong>Seguro:</strong> ${selectedMovement.vehiclesDto.insurance}
       `;
@@ -309,5 +295,14 @@ export class AccessDailyFetchComponent implements OnInit,AfterViewInit {
   closePopup() {
     this.popupAbierto = false;}
     
+    
   
+    getVehicleTypeTranslation(data: Movement): string {
+      if (!data.vehiclesDto || !data.vehiclesDto.vehicleType?.description) {
+        return 'sin vehículo';
+      }
+      
+      const vehicleType = data.vehiclesDto.vehicleType.description as VehicleType;
+      return this.vehicleTranslations[vehicleType] || vehicleType;
+    }
 }

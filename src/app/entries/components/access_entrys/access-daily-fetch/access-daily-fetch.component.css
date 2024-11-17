@@ -1,15 +1,75 @@
-/* Sobreescribir estilos predeterminados de DataTables */
 
-
-/* Estilo para la cabecera de la tabla */
 .table thead {
   border-top: 2px solid black !important; /* Línea negra en la parte superior */
 }
 
 
-
-/* Opcional: mejorar el contraste de las cabeceras */
 .table thead th {
   background-color: #f8f9fa; /* Color de fondo suave */
-  color: #343a40; /* Color del texto */
+  color: #343a40;
+}
+#fetchTable {
+  width: auto !important; /* Cambiado de 100% a auto */
+  white-space: nowrap;
+  table-layout: fixed;
+  border-top: 1px solid black !important;
+  background-color: #f9f9f9;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#fetchTable th, #fetchTable td {
+  padding: 8px;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 120px !important; /* Ancho fijo para todas las columnas */
+}
+
+.table-responsive {
+  overflow-x: auto;
+  white-space: nowrap;
+}
+/* Estilos para los botones de estado en la tabla */
+#fetchTable td .btn.rounded-pill {
+  padding: 4px 15px;
+  font-size: 14px;
+  margin: 0 auto;
+  display: block;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+}
+
+#fetchTable td .btn.btn-success.rounded-pill {
+  background-color: #28a745;
+  border-color: #28a745;
+  color: white;
+}
+
+#fetchTable td .btn.btn-danger.rounded-pill {
+  background-color: #dc3545;
+  border-color: #dc3545;
+  color: white;
+}
+
+/* Ajuste de columnas automáticas */
+.col-auto {
+  flex: 0 0 auto;
+  width: auto;
+}
+
+.responsive-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.table_filter {
+  display: none;
 }

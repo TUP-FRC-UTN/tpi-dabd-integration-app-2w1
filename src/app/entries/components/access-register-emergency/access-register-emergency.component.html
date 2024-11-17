@@ -1,5 +1,9 @@
-<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#emergencyModal">
-    Registrar Emergencia
+<button 
+  type="button" 
+  class="btn btn-danger rounded-circle position-fixed d-flex align-items-center justify-content-center emergency-button"
+  data-bs-toggle="modal" 
+  data-bs-target="#emergencyModal">
+  <i class="bi bi-hospital fs-4"></i>
 </button>
 
 <div class="modal fade text-start" id="emergencyModal" tabindex="-1">
@@ -11,47 +15,91 @@
             </div>
             <div class="modal-body" id="emergencyModalBody">
                 <form class="mb-3" [formGroup]="form">
-                    <div class="form-check form-switch form-check-reverse">
-                        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" formControlName="onlyExit">
-                        <label class="form-check-label" for="flexSwitchCheckDefault">Solo egreso</label>
-                    </div>
                     <h5>Datos Compartidos</h5>
                     <hr>
                     <div [formGroup]="form.controls.vehicle" class="row mb-3">
                         <div class="col">
-                            <label for="vehicleTypeSelect" class="col-form-label">
-                                Tipo de Vehículo
-                            </label>
-                            <select id="vehicleTypeSelect"
-                                class="form-select"
-                                formControlName="type"
-                                (change)="vehicleTypeChanged()">
-                                <option value="">Ninguno</option>
-                                <option value="Car">Auto</option>
-                                <option value="Motorcycle">Motocicleta</option>
-                                <option value="Truck">Camioneta</option>
-                            </select>
+                            <div class="row">
+                                <div class="col-auto">
+                                    <label for="vehicleTypeSelect" class="col-form-label">
+                                        Tipo de Vehículo
+                                    </label>
+                                </div>
+                                <div class="col">
+                                    <select id="vehicleTypeSelect"
+                                        class="form-select"
+                                        formControlName="type"
+                                        (change)="vehicleTypeChanged()">
+                                        <option value="">Ninguno</option>
+                                        <option value="Car">Auto</option>
+                                        <option value="Motorcycle">Moto</option>
+                                        <option value="Truck">Camión</option>
+                                        <option value="Van">Camioneta</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                         @if (form.controls.vehicle.controls.type.value != "") {
                             <div class="col">
-                                <label for="plateInput" class="col-form-label">
-                                    Patente
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <input type="text" 
-                                [ngClass]="{'is-invalid': form.controls.vehicle.controls['plate'].touched && form.controls.vehicle.controls['plate'].invalid}"
-                                class="form-control" 
-                                id="plateInput" 
-                                formControlName="plate" 
-                                autocomplete="off">
-                                <div class="invalid-feedback">
-                                    Este campo es obligatorio.
+                                <div class="row">
+                                    <div class="col-auto">
+                                        <label for="plateInput" class="col-form-label">
+                                            Patente
+                                        </label>
+                                    </div>
+                                    <div class="col">
+                                        <input type="text" 
+                                        [ngClass]="{
+                                            'is-invalid': form.controls.vehicle.controls['plate'].touched && form.controls.vehicle.controls['plate'].invalid,
+                                            'is-valid': form.controls.vehicle.controls['plate'].touched && form.controls.vehicle.controls['plate'].valid
+                                            }"
+                                        class="form-control" 
+                                        id="plateInput" 
+                                        formControlName="plate" 
+                                        autocomplete="off"
+                                        (input)="onPlateInput($event)">
+                                        <div class="invalid-feedback">
+                                            @if (form.controls.vehicle.controls.plate; as vehiclePlate) {
+                                                <div *ngIf="vehiclePlate.errors?.['required']">La patente es requerida.</div>
+                                                <div *ngIf="vehiclePlate.errors?.['pattern']">Formato de patente inválido.</div>
+                                                <div *ngIf="vehiclePlate.errors?.['maxlength']">La patente no puede exceder 7 caracteres.</div>
+                                            }
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         }
                     </div>
                     <div class="mb-3">
-                        <label for="observations-text" class="col-form-label">Observaciones:</label>
+                        <div class="row">
+                            <div class="col-auto">
+                                <label for="ownersOptions" class="col-form-label">
+                                    Propietario
+                                </label>
+                            </div>
+                            @if (form.controls["neighborId"]; as owner) {
+                                <div class="col">
+                                    <ng-select
+                                        [items]="ownersOptions"
+                                        bindLabel="label"   
+                                        bindValue="id"
+                                        [clearable]="false"
+                                        formControlName="neighborId"
+                                        [ngClass]="{
+                                            'is-invalid': owner.touched && owner.invalid,
+                                            'is-valid': owner.valid
+                                            }"
+                                        id="ownersOptions">
+                                    </ng-select>
+                                    <div class="invalid-feedback">
+                                        <div *ngIf="owner.errors?.['required']">El propietario es requerido.</div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="observations-text" class="col-form-label">Observaciones</label>
                         <textarea class="form-control" id="observations-text" formControlName="observations"></textarea>
                     </div>
                     <div formArrayName="people">
@@ -61,84 +109,110 @@
                             <div [formGroupName]="$index">
                                 <div class="row mb-3">
                                     <div class="col">
-                                        <label for="dniInput" class="col-form-label-sm">
-                                            Tipo de Documento
-                                            <span class="text-danger">*</span>
-                                        </label>
-                                        <select id="vehicleTypeSelect"
-                                            class="form-select"
-                                            [ngClass]="{'is-invalid': person.controls['documentType'].touched && person.controls['documentType'].invalid}"
-                                            formControlName="documentType">
-                                            <option value="DNI">DNI</option>
-                                            <option value="Passport">Pasaporte</option>
-                                        </select>
-                                        <div class="invalid-feedback">
-                                            Este campo es obligatorio.
+                                        <div class="row">
+                                            <div class="col-3">
+                                                <label for="dniInput" class="col-form-label">
+                                                    Tipo de <br>Documento
+                                                </label>
+                                            </div>
+                                            <div class="col  align-self-center">
+                                                <select id="vehicleTypeSelect"
+                                                    class="form-select"
+                                                    [ngClass]="{
+                                                        'is-invalid': person.controls['documentType'].touched && person.controls['documentType'].invalid,
+                                                        'is-valid': person.controls['documentType'].touched && person.controls['documentType'].valid
+                                                        }"
+                                                    formControlName="documentType">
+                                                    <option value="DNI">DNI</option>
+                                                    <option value="PASSPORT">Pasaporte</option>
+                                                    <option value="CUIT">CUIT</option>
+                                                </select>
+                                                <div class="invalid-feedback">
+                                                    El tipo de documento es requerido.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col  align-self-center">
+                                        <div class="row">
+                                            <div class="col-3">
+                                                <label for="documentNumber" class="col-form-label">
+                                                    Documento
+                                                </label>
+                                            </div>
+                                            <div class="col">
+                                                <input type="text" 
+                                                class="form-control" 
+                                                [ngClass]="{
+                                                    'is-invalid': person.controls['documentNumber'].touched && person.controls['documentNumber'].invalid,
+                                                    'is-valid': person.controls['documentNumber'].touched && person.controls['documentNumber'].valid
+                                                    }" 
+                                                id="documentNumber" 
+                                                formControlName="documentNumber"
+                                                autocomplete="off">
+                                                @if (person.controls['documentNumber']; as documentNumber) {
+                                                    <div class="invalid-feedback">
+                                                        <div *ngIf="documentNumber.errors?.['unique']">El documento ingresado se encuentra repetido.</div>
+                                                        <div *ngIf="documentNumber.errors?.['minlength']">El documento debe tener al menos 8 caracteres.</div>
+                                                        <div *ngIf="documentNumber.errors?.['maxlength']">El documento no puede exceder 15 caracteres.</div>
+                                                        <div *ngIf="documentNumber.errors?.['pattern']">El documento debe contener solo letras y números.</div>
+                                                        <div *ngIf="documentNumber.errors?.['required']">El documento es requerido.</div>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col-auto col-3">
+                                                <label for="nameInput" class="col-form-label">
+                                                    Nombre
+                                                </label>
+                                            </div>
+                                            <div class="col">
+                                                <input type="text" 
+                                                class="form-control" 
+                                                [ngClass]="{
+                                                    'is-invalid': person.controls['name'].touched && person.controls['name'].invalid,
+                                                    'is-valid': person.controls['name'].touched && person.controls['name'].valid
+                                                    }" 
+                                                id="nameInput" 
+                                                formControlName="name"
+                                                autocomplete="off">
+                                                <div class="invalid-feedback">
+                                                    El nombre es requerido.
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col">
-                                        <label for="documentNumber" class="col-form-label-sm">
-                                            N° Documento
-                                            <span class="text-danger">*</span>
-                                        </label>
-                                        <input type="text" 
-                                        class="form-control" 
-                                        [ngClass]="{'is-invalid': person.controls['documentNumber'].touched && person.controls['documentNumber'].invalid}" 
-                                        id="documentNumber" 
-                                        formControlName="documentNumber"
-                                        autocomplete="off">
-                                        @if (person.controls['documentNumber']; as documentNumber) {
-                                            <div class="invalid-feedback">
-                                                @if (documentNumber.errors?.['unique']) {
-                                                    El documento ingresado se encuentra repetido.
-                                                }
-                                                @else {
-                                                    Este campo es obligatorio.
-                                                }
+                                        <div class="row">
+                                            <div class="col-3">
+                                                <label for="lastNameInput" class="col-form-label">
+                                                    Apellido
+                                                </label>
                                             </div>
-                                        }
+                                            <div class="col">
+                                                <input type="text" 
+                                                class="form-control" 
+                                                [ngClass]="{
+                                                    'is-invalid': person.controls['lastName'].touched && person.controls['lastName'].invalid,
+                                                    'is-valid': person.controls['lastName'].touched && person.controls['lastName'].valid
+                                                    }" 
+                                                id="lastNameInput" 
+                                                formControlName="lastName"
+                                                autocomplete="off">
+                                                <div class="invalid-feedback">
+                                                    El apellido es requerido.
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                @if (!form.controls.onlyExit.value) {
-                                    <div class="row mb-3">
-                                        <div class="col">
-                                            <label for="nameInput" class="col-form-label">
-                                                Nombre
-                                                <span class="text-danger">*</span>
-                                            </label>
-                                            <input type="text" 
-                                            class="form-control" 
-                                            [ngClass]="{'is-invalid': person.controls['name'].touched && person.controls['name'].invalid}" 
-                                            id="nameInput" 
-                                            formControlName="name"
-                                            autocomplete="off">
-                                            <div class="invalid-feedback">
-                                                Este campo es obligatorio.
-                                            </div>
-                                        </div>
-                                        <div class="col">
-                                            <label for="lastNameInput" class="col-form-label">
-                                                Apellido
-                                                <span class="text-danger">*</span>
-                                            </label>
-                                            <input type="text" 
-                                            class="form-control" 
-                                            [ngClass]="{'is-invalid': person.controls['lastName'].touched && person.controls['lastName'].invalid}" 
-                                            id="lastNameInput" 
-                                            formControlName="lastName"
-                                            autocomplete="off">
-                                            <div class="invalid-feedback">
-                                                Este campo es obligatorio.
-                                            </div>
-                                        </div>
-                                    </div>
-                                }
                                 @if (person.controls['state'].value.length > 0) {
-                                    <div class="alert alert-danger d-flex align-items-center" role="alert">
-                                        <div>
-                                            {{person.controls['state'].value}}
-                                        </div>
-                                    </div>
+                                    <div [innerHTML]="person.controls['state'].value"></div>
                                 }
                                 @if (form.controls.people.length > 1) {
                                     <div class="row text-end">
@@ -157,44 +231,10 @@
                         <button type="button" class="btn btn-primary" (click)="addPersonForm()">Agregar</button>
                     </div>
                 </form>
-                @switch (requestStatus) {
-                    @case (RequestStatus.Loading) {
-                        <div class="d-flex justify-content-center">
-                            <div class="spinner-border" role="status"></div>
-                        </div>
-                    }
-                    @case (RequestStatus.Success) {
-                        <div class="alert alert-success d-flex align-items-center" role="alert">
-                            <div>
-                                Éxito al registrar emergencia.
-                            </div>
-                        </div>
-                    }
-                    @case (RequestStatus.Error) {
-                        <div class="alert alert-danger d-flex align-items-center" role="alert">
-                            <div>
-                                Error al registrar emergencia. Intente de nuevo.
-                            </div>
-                        </div>
-                    }
-                }
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary me-auto" data-bs-dismiss="modal">Volver</button>
-                @if (form.controls.onlyExit.value) {
-                    <button class="btn btn-primary" type="button" data-bs-toggle="dropdown" [disabled]="form.invalid" (click)="registerExit()">Registrar Egreso</button>
-                }
-                @else {
-                    <div class="dropdown">
-                        <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" [disabled]="form.invalid">
-                            Registrar
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" role="button" (click)="registerEntry()">Ingreso</a></li>
-                            <li><a class="dropdown-item" role="button" (click)="registerExit()">Egreso</a></li>
-                        </ul>
-                    </div>
-                }
+                <button type="button" class="btn btn-secondary me-auto" data-bs-dismiss="modal">Cerrar</button>
+                <button class="btn btn-success" type="button" data-bs-toggle="dropdown" [disabled]="form.invalid" (click)="registerEntry()">Registrar</button>
             </div>
         </div>
     </div>
