@@ -8,14 +8,12 @@ import { AccessVisitorRegistryComponent } from "./components/access_visitors/acc
 import { AccessContainerVisitorsRegistrationComponent } from "./components/access_visitors/access_visitors_register/access-container-visitors-registration/access-container-visitors-registration.component";
 
 export const ENTRY_ROUTES: Routes = [
-    { path: '', component: EntryHomeComponent },
-    { path: '', redirectTo: 'reports', pathMatch: 'full' },
     { path: 'visitors', component: AccessVisitorRegistryComponent },
+    { path: 'register', component: AccessContainerVisitorsRegistrationComponent },
     { path: 'reports', component: AccessGlobalReportComponent },
-    //{ path: 'entry', component: EntryComponent },
-    { path: 'dashboards', component: AccessGeneralDashboardComponent },
     { path: 'entry', component: AccessDailyFetchComponent },
     { path: 'edit', component: AccessEditComponent },
-    { path: 'visitor/register', component: AccessContainerVisitorsRegistrationComponent }
-    
+    { path: 'dashboard', component: AccessGeneralDashboardComponent }, // Cambiar por el componente correspondiente
+
+    //{ path: 'entry', component: EntryComponent },
 ];

@@ -8,12 +8,11 @@ import { ExpensesViewCategoryComponent } from "./components/expenses-view-catego
 
 export const EXPENSES_ROUTES: Routes = [
     { path: '', component: ExpensesHomeComponent },
-    { path: 'viewExpenseAdmin', component: ViewGastosAdminComponent },
-    { path: 'registerExpense/:id', component: ExpensesRegisterExpenseComponent },
-    { path: 'registerExpense', component: ExpensesRegisterExpenseComponent },
-    { path: 'viewCategory', component: ExpensesViewCategoryComponent },
-    { path: 'viewExpenseOwner', component: ViewOwnerExpenseComponent },
-    { path: 'estadisticas', component: ReportExpenseComponent }
+    { path: 'view-expense-admin', component: ViewGastosAdminComponent },
+    { path: 'register-expense/:id', component: ExpensesRegisterExpenseComponent },
+    { path: 'register-expense', component: ExpensesRegisterExpenseComponent },
+    { path: 'view-category', component: ExpensesViewCategoryComponent },
+    { path: 'view-expense-owner', component: ViewOwnerExpenseComponent },
+    { path: 'dashboard', component: ReportExpenseComponent },
  
-    
 ];

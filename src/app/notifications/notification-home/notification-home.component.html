@@ -1,1 +1,134 @@
-<p>notification-home works!</p>
+  <!-- Fila superior: Filtros -->
+  <div class="container">
+    <div class="row sticky-section border-0 rounded-2 p-2 shadow mb-4" style="flex: 0 0 ; justify-content: center; align-items: center;margin-top: 0px;" [formGroup]="filterForm">
+      <div class="col-3 mt-3">
+        <!-- <label for="startDate" style="font-size: 1.1em;">Periodo Desde</label> -->
+        <input id="startDate" type="date" class="form-control form-control-sm rounded" formControlName="startDate" style="font-size:.9em;">
+      </div>
+      <div class="col-3 mt-3">
+        <!-- comentado porque no sigue estandar -->
+        <!-- <label for="endDate" style="font-size: 1.1em;">Periodo Hasta</label> -->
+        <input id="endDate" type="date" class="form-control form-control-sm rounded" formControlName="endDate" style="font-size:.9em; ">
+      </div>
+
+
+      <div class="col-6  justify-content-center align-items-center mt-4" style="gap: 10px;">
+        <label style="font-size: 1.3em; margin-right: 10px;">Estado de Lectura:</label>
+        <div class="form-check form-check-inline mt-1">
+          <input class="form-check-input" type="radio" name="readStatus" checked value="Todas" formControlName="readStatus">
+          <label class="form-check-label" style="font-size: 1em;">Todas</label>
+        </div>
+        <div class="form-check form-check-inline mt-1">
+          <input class="form-check-input" type="radio" name="readStatus" value="Leídas" formControlName="readStatus">
+          <label class="form-check-label" style="font-size: 1em;">Leídas</label>
+        </div>
+        <div class="form-check form-check-inline mt-1">
+          <input class="form-check-input" type="radio" name="readStatus" value="No Leídas" formControlName="readStatus">
+          <label class="form-check-label" style="font-size: 1em;">No Leídas</label>
+        </div>
+        <button type="button" class="btn btn-secondary bi bi-trash filterbutton" title="Limpiar Filtros"
+      (click)="clearFiltered()"></button>
+      </div>
+    </div> 
+    
+    <div class="row align-middle ">
+    <div class="col-2">
+      <div class="card shadow-sm flex-grow-1 card border-0 shadow-lg rounded-4 mb-3 hover-scale" >
+        <div class="card-body p-2 d-flex flex-column rounded-4" style="background-color: #e7f1ff">
+          <i class="bi bi-envelope-check-fill d-flex justify-content-end" style="margin-top: .5em;"></i>
+          <h6 class="card-title text-center ">Total</h6>
+          <h6 class="card-subtitle text-center text-secondary">Notificaciones Enviadas:</h6>
+          <h3 class="text-center " style="font-size: 20px;"> {{allNotificationsCounter}}</h3>
+        </div>
+        
+      </div>
+      <div class="card border-0 shadow-lg mb-3 hover-scale rounded-4">
+        <div class="card-body p-2 rounded-4" style="background-color: #e7f1ff">
+          <i class="bi bi-envelope-fill d-flex justify-content-end"></i>
+          <h6 class="card-title text-center ">Total</h6>
+          <h6 class="card-subtitle text-center text-secondary">Notificaciones Generales Enviadas:</h6>
+          <h3 class="text-center " style="font-size: 20px;">{{this.kpiGeneral}}</h3>
+        </div>
+        
+      </div>
+      <div class="card shadow-sm flex-grow-1 card border-0 rounded-4 shadow-lg mb-3 hover-scale">
+        <div class="card-body p-2 d-flex flex-column rounded-4" style="background-color: #d8ffedde">
+          <i class="bi bi bi-eye-fill d-flex justify-content-end"></i>
+          <h6 class="card-title text-center text-secondary">Notificaciones Leídas:</h6>
+          <h3 class="text-center" style="font-size: 20px;"> {{this.kpiTotalRead}}%</h3>
+        </div>
+        
+      </div>
+      <div class="card border-0 shadow-lg mb-3 hover-scale rounded-4">
+        <div class="card-body p-2 rounded-4" style="background-color: #ffccd4">
+          <i class="bi bi-eye-slash-fill d-flex justify-content-end"></i>
+          <h6 class="card-title text-center text-secondary">Notificaciones No Leídas:</h6>
+          <h3 class="text-center" style="font-size: 20px;"> {{this.kpiTotalUnread}}%</h3>
+        </div>
+        
+      </div>
+
+      
+    </div>
+    <div class="col-10 d-flex">
+      <!-- CHARTS -->
+    <div class="card shadow rounded-4 hover-scale col-6 " style="box-sizing: border-box; height:40.5em;">
+      <div class="">
+        <div class="">
+          <div class="card-body">
+            <h6 class="card-title text-center mt-1" style="font-size: 1.2em; margin-bottom: 8px;">Notificaciones Enviadas por Día</h6>
+            
+            <hr style="margin-top:2.1em">
+            <google-chart
+              [type]="columnChartType"
+              [data]="columnChartData"
+              [options]="columnChartOptions"
+              class="w-100"
+              style="height:55vh; width: 5vh">
+            </google-chart>
+          </div>
+        </div>
+    </div>
+   
+    </div>
+    
+    
+    <div class="col-6 d-flex flex-column" style="margin-left:1%;" >
+      <div class="card shadow rounded-4 hover-scale" style="height:40.5em">
+        <div class="card-body">
+          <h6 class="card-title text-center" style="font-size: 1.2em; margin-bottom: 5px;">Notificaciones Enviadas por Tipo</h6>
+          <h6 class="text-center card-subtitle">(Accesos, Pagos, Multas, Inventario)</h6>
+          <hr>
+          <google-chart
+            [type]="column2ChartType"
+            [data]="columnChartData2"
+            [options]="columnChartOptions2"
+            class=""
+            style="height:55vh">
+          </google-chart>
+        </div>
+      </div>
+      
+      </div>
+      <!-- FIN CHARTS -->
+    </div>
+    
+    </div>
+    
+    
+        <!-- GRAFICO TORTA -->
+        <!-- <div class="card shadow-sm ">
+          <div class="card-body p-2 d-flex flex-column">
+            <h6 class="card-title text-center mb-3" style="font-size: 1.2em; margin-bottom: 5px;">Leídas y No Leídas</h6>
+            
+            <google-chart
+              [type]="c3ChartType"
+              [data]="columnChartData5"
+              [options]="columnChartOptions5"
+              class="w-100"
+              style="height: 100%;">
+            </google-chart>
+          </div>
+        </div> -->
+
+</div>

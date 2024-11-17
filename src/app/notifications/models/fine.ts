@@ -1,10 +1,13 @@
 export interface Fine {
+    id:number;
     amount: number;
-    date: Date;
-    description: string;
+    created_datetime: Date;
+    message: string;
     subject: string;
     isWarning:boolean;
+    markedRead:boolean;
     nombre: string;
+    tableName:string;
     apellido: string;
     dni: number;
 }

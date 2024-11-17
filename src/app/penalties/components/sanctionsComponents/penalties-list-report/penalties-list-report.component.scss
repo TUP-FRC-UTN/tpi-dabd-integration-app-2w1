@@ -1,0 +1,13 @@
+.floating-btn {
+    position: fixed;             /* Fija el botón en una posición relativa a la ventana del navegador, manteniéndolo siempre visible en el mismo lugar */
+    bottom: 20px;                /* Coloca el botón a 20 píxeles desde la parte inferior de la pantalla */
+    right: 20px;                 /* Coloca el botón a 20 píxeles desde la parte derecha de la pantalla */
+    width: 50px !important;      /* Define el ancho del botón en 50 píxeles; el !important asegura que esta regla tenga prioridad */
+    height: 50px !important;     /* Define la altura del botón en 50 píxeles, también con !important para darle prioridad */
+    border-radius: 50% !important; /* Redondea el botón para hacerlo circular; el 50% crea un borde completamente redondeado */
+    border: none !important;     /* Elimina el borde del botón y usa !important para sobreescribir cualquier otro estilo de borde */
+    display: flex;               /* Utiliza Flexbox para facilitar el centrado del contenido dentro del botón */
+    align-items: center;         /* Centra verticalmente el contenido (icono o texto) dentro del botón */
+    justify-content: center;     /* Centra horizontalmente el contenido dentro del botón */
+    z-index: 15;                 /* Establece el nivel de superposición del botón sobre otros elementos; un valor más alto asegura que esté sobre otros contenidos */
+  }

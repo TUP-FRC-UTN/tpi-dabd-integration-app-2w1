@@ -36,7 +36,7 @@ export class ModalInfoUserComponent implements OnInit {
   }
 
   @Input() userModal: UserGet = new UserGet();
-  @Input() plotModal: GetPlotDto = new GetPlotDto();
+  @Input() plotModal: GetPlotDto[] = [];
   @Input() typeModal: string = '';
 
   //activeModal = inject(NgbActiveModal);
@@ -47,25 +47,36 @@ export class ModalInfoUserComponent implements OnInit {
 
   // Método para detectar cambios en el @Input
   ngOnInit() {
-      console.log('userModal:', this.userModal);
-      console.log('plotModal:', this.plotModal);
+
       // Actualiza los valores del formulario cuando cambian los datos del usuario
       if (this.userModal.datebirth) {
+        const formattedCreatedDate = DateService.parseDateString(this.userModal.create_date);
         const formattedDate = DateService.parseDateString(this.userModal.datebirth);
-        const formattedCreatedDate = DateService.parseDateString(this.userModal.create_date)
+
+        if (formattedDate) {
+          // Formatea la fecha a 'yyyy-MM-dd' para un input de tipo date
+          const formattedDateString = formattedDate.toISOString().split('T')[0];
+
+          this.editUser.patchValue({
+            datebirth: formattedDateString
+          });
+        } else {
+          this.editUser.patchValue({
+            datebirth: ''
+          });
+        }
+        
         this.editUser.patchValue({
           fullname: this.userModal.lastname + ', ' + this.userModal.name,
           email: this.userModal.email,
           dni: this.userModal.dni,
-          dni_type: this.userModal.dni_type+': ',
+          dni_type: this.userModal.dni_type,
           phoneNumber: this.userModal.phone_number,
           roles: this.rolesInput,
-          plot_number : this.plotModal?.plot_number || 'N/A'  ,
-          block_number: this.plotModal?.block_number || 'N/A',
           username: this.userModal.username,
           telegram_id: this.userModal?.telegram_id || 'N/A',
-          birthdate: formattedDate ? DateService.formatDate(formattedDate) : 'N/A',
-          create_date: formattedCreatedDate ? DateService.formatDate(formattedCreatedDate) : 'N/A'
+          birthdate: formattedDate || 'N/A',
+          create_date: formattedCreatedDate || 'N/A'
         });
       }
 
@@ -106,21 +117,23 @@ export class ModalInfoUserComponent implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         (window as any).Swal.fire({
-          position: "center-center",
           title: '¡Usuario borrado!',
           text: 'El usuario se ha borrado correctamente.',
           icon: 'success',
-          timer: 1000,
-          showConfirmButton: false
+          timer: undefined,
+          showConfirmButton: true,
+          confirmButtonText: 'Aceptar',
+          allowEscapeKey: false,
+          allowOutsideClick: false
+
         });
         this.confirmDesactivate();
       } else {
         (window as any).Swal.fire({
-          position: "center-center",
           title: '¡Usuario no se ha borrado!',
           text: 'La operación se ha cancelado exitosamente.',
           icon: 'info',
-          timer: 1000,
+          timer: undefined,
           showConfirmButton: false
         });
       }

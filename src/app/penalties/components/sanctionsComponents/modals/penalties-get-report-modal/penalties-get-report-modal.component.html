@@ -5,256 +5,65 @@
   </div>
   <div class="modal-body">
 
-    <div class="row">
-    <!--
-        Select Motivo 
-       <div class="col-lg-6 mb-3">
-        <div class="row">
-          <label class="col-2 col-form-label">Motivo</label>
-          <div class="col-10">
-            <select class="form-select" disabled>
-              <option value="" selected>{{complaint?.complaintType}}</option>
-            </select>
+    <h5>Información del Informe</h5>
+      <div class="row mb-3">
+          <div class="col-md-6">
+              <p><strong>Motivo</strong> {{ report?.reportReason.reportReason || 'N/A' }}</p>
+              <p><strong>Fecha</strong> {{ report?.createdDate | date:"dd/MM/yyyy" || 'N/A' }}</p>
           </div>
-        </div>
-      </div>
-
-
-       Input fecha 
-      <div class="col-lg-6 mb-3">
-        <div class="row">
-          <label class="col-2 col-form-label">Fecha</label>
-          <div class="col-10">
-            <input type="datetime-local" class="form-control" [value]="complaint?.createdDate" disabled>
+      
+          <div class="col-md-6">
+              <p><strong>Descripción</strong> {{ report?.description || 'N/A' }}</p>
           </div>
-        </div>
       </div>
+      <hr>
 
+        <h5>Denuncias</h5>
+        <div class="overflow-auto" style="max-height: 300px;">
+        <table class="table table-bordered">
 
-       Input Descripcion 
-      <div class="col-lg-12 mb-3">
-        <div class="row">
-          <label class="col-2 col-lg-1 col-form-label">Descripcion</label>
-          <div class="col-10 col-lg-11">
-            <textarea class="form-control" rows="8" style="resize: none;" [value]="complaint?.description"
-              disabled></textarea>
-          </div>
-        </div>
-      </div>
-
-
-
-       Select Estado 
-      <div class="col-lg-6 mb-3">
-        <div class="row">
-          <label class="col-2 col-form-label">Estado</label>
-          <div class="col-10">
-            <select class="form-select" disabled>
-              <option value="" disabled selected>{{complaint?.complaintState}}</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-
-       Input Motivo del estado 
-      <div class="col-lg-6 mb-3">
-        <div class="row">
-          <label class="col-2 col-form-label">Razon</label>
-          <div class="col-10">
-            <input type="text" class="form-control" [value]="complaint?.stateReason" disabled>
-          </div>
-        </div>
-      </div>
-
- Input del denunciante 
-      <div class="col-lg-6 mb-3">
-        <div class="row">
-          <label class="col-2 col-form-label">Denunciante</label>
-          <div class="col-10">
-            <input type="text" class="form-control" [value]="complaint?.userId" disabled>
-          </div>
-        </div>
-      </div>
-
-     Input adjuntos 
-      <div class="col-lg-6 mb-3">
-        <div class="row">
-          <label class="col-2 col-form-label">Pruebas</label>
-          <div class="col-10">
-             Listado de archivos 
-            <div class="list-group">
-              @for (file of this.files; track file) {
-              <div class="list-group-item d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center">
-                  <i class="bi-file-earmark-text me-3 text-primary fs-5"></i>
-                  <span>{{file.name.length > 40 ? file.name.slice(0, 40)+'...' :
-                    file.name}}</span>
-                </div>
-                <span>{{ (file.size / (1024 * 1024)).toFixed(2) }} MB</span>
-              </div>
+            <thead>
+                <tr>
+                  <th>Descripción</th>
+                  <th>Tipo de Denuncia</th>
+                  <th>Estado</th>
+                  <th>Fecha</th>
+                </tr>
+            </thead>
+            <tbody>  
+              @for(complaint of report?.complaints; track $index){
+                <tr>
+                    <td>{{ complaint.description }}</td>
+                    <td>
+                      @if (complaint?.complaintReason==="Otro"){
+                        <p> {{ complaint?.complaintReason + " - " + complaint?.anotherReason || 'N/A' }}</p>
+          
+                      }
+                      @else {
+                        <p> {{ complaint?.complaintReason || 'N/A' }}</p>
+                      }
+                     </td>
+                    <td>{{ complaint.complaintState }}</td>
+                    <td>{{ complaint.createdDate | date:"dd/MM/yyyy" }}</td>
+                </tr>
+              
               }
-            </div>
-          </div>
-        </div>
+            
+            </tbody>
+        </table>
       </div>
-
-    </div>
+        <hr>
+        <h5>Estado de la Multa</h5>
+      <div class="row mb-3">
+          <div class="col-md-6">
+              <p><strong>Estado</strong> {{ report?.reportState || 'N/A' }}</p>
+              <p><strong>Razón</strong> {{ report?.stateReason || 'N/A' }}</p>
+          </div>
+      </div>
 
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-secondary" (click)="close()">Cerrar</button>
   </div>
 </div>
--->
 
-
-<!-- ------------------------------------------------------------------------------------------ -->
-
-
-
-
-
-
-
-
-<!--
-
-<div class="modal-header verdeOscuro">
-  <div class="col-6">
-    <div class="mb-3">
-      <h4 class="modal-title fs-5" id="exampleModalLabel">Motivo</h4>
-      @if(data !=null){
-      <select class="form-select" aria-label="Default select example" disabled>
-        <option selected>{{ data.reportReason.reportReason }}</option>
-        <option value="1"></option>
-        <option value="2"></option>
-        <option value="3"></option>
-      </select>
-      }
-    </div>
-  </div>
-  <div class="col-2"></div>
-  <div class="col-3">
-    <div class="mb-3">
-      <h4 class="modal-title fs-5" id="exampleModalLabel">Fecha de alta</h4>
-      @if(data != null){
-      <input
-        value="{{ formattedDate | date : 'yyyy-MM-dd' }}"
-        type="date"
-        class="rounded-3 input-date form-control"
-        disabled
-      />
-      }
-    </div>
-  </div>
-  <button
-    type="button"
-    class="btn-close me-1"
-    data-bs-dismiss="modal"
-    aria-label="Close"
-  ></button>
-</div>
-<div class="modal-body">
-  <div class="conteiner-fluid">
-    ROW DEL TEXT AREA
-    <div class="row">
-      <div class="col-12">
-        <label class="fw-semibold" for="form-floating">Descripcion</label>
-        <div class="form-floating">
-          @if(data != null){
-          <textarea
-            class="form-control fondoGris"
-            placeholder="Leave a comment here"
-            id="floatingTextarea2"
-            style="height: 200px; resize: none"
-            disabled
-          >
-  {{ data.description }}</textarea
-          >}
-        </div>
-      </div>
-    </div>
-    ROW DE LOS INPUTS Y LAS FOTOS
-    <div class="row mt-4">
-      <div class="col-12">
-        <div class="row"></div>
-        <div class="row">
-          <div class="col-3">
-            <div class="mb-3">
-              <label for="exampleInputEmail1" class="form-label fw-semibold"
-                >Infractor</label
-              >
-              <input
-                type="text"
-                value="Lote 35B"
-                disabled
-                class="form-control"
-                id="exampleInputEmail1"
-                aria-describedby="emailHelp"
-              />
-            </div>
-          </div>
-          <div class="col-3">
-            <div class="p-2 mt-4">
-              <button style="width: 100px" type="button" class="btn verdeClaro">
-                Ver mas
-              </button> 
-            </div>
-          </div>
-          <div class="col-3">
-            <div class="mb-3">
-              <label for="exampleInputEmail1" class="form-label fw-semibold"
-                >Estado</label
-              >
-              <select
-                class="form-select"
-                aria-label="Default select example"
-                disabled
-              >
-                @if(data != null){
-                <option value="1">{{ data.reportState }}</option>
-                <option value="2">Two</option>
-                <option value="3">Three</option>
-                }
-              </select>
-            </div>
-          </div>
-          <div class="col-3">
-            <div class="mb-3">
-              <label for="exampleInputEmail1" class="form-label fw-semibold"
-                >Motivo de Cambio</label
-              >
-              @if(data != null){
-              <input
-                type="text"
-                value="{{ data.stateReason }}"
-                disabled
-                class="form-control"
-                id="exampleInputEmail1"
-                aria-describedby="emailHelp"
-              />}
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-5"></div>
-    </div>
-  </div>
-</div>
-<div class="modal-footer verdeOscuro">
-  <button
-    (click)="close()"
-    type="button"
-    class="btn btn-secondary btn-lg me-4"
-    data-bs-dismiss="modal"
-  >
-    Cancelar
-  </button>
-   <button type="button" class="btn verdeClaro btn-lg">Aceptar</button>
-</div>
-</div>
-    </div>
-  </div> -->
-
-     

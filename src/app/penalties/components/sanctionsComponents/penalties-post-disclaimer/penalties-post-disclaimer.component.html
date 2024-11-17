@@ -84,7 +84,7 @@
             <button
               type="button"
               class="btn btn-secondary me-3"
-              [routerLink]="'/home/sanctions/sanctionsList'"
+              (click)="cancel()"
             >
               Cancelar
             </button>
@@ -93,7 +93,7 @@
               class="btn btn-success"
               [disabled]="reactiveForm.invalid"
             >
-              Enviar
+              Registrar
             </button>
           </div>
         </div>
@@ -101,3 +101,30 @@
     </div>
   </div>
 </section>
+
+<!-- Modal de info -->
+<div class="modal fade" id="infoModal" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Descargo</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <!-- body con tus inputs -->
+        <p>
+          En este apartado podrá realizar el descargo relacionado con la multa seleccionada.
+        </p>
+        <p>
+          Recuerde que tiene 7 días hábiles para realizarlo.
+        </p>
+        <p>
+          El motivo de su descargo será valorado por el consejo; por favor, cuide su lenguaje y respete al prójimo.
+        </p>             
+        </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div>

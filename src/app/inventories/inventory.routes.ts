@@ -9,6 +9,7 @@ import { IepCategoriesListComponent } from "./iep-inventory/components/iep-categ
 import { IepChartsInventoryComponent } from "./iep-inventory/components/iep-charts-inventory/iep-charts-inventory.component";
 
 export const INVENTORY_ROUTES: Routes = [
+
  { path: '', component: InventoryEmployeeProviderHomeComponent }, //agregado para desarrollar
     
  { path: 'inventory', component: IepInventoryComponent },
