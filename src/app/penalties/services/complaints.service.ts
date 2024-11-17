@@ -5,6 +5,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { Complaint, ComplaintDto, PutStateComplaintDto } from '../models/complaint';
 import { ReportReasonDto } from '../models/ReportReasonDTO';
 import { AuthService } from '../../users/users-servicies/auth.service';
+import { environment } from '../../common/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -13,8 +14,8 @@ export class ComplaintService {
 
   private readonly http: HttpClient = inject(HttpClient);
   private readonly authService = inject(AuthService);
-  private readonly url = 'http://localhost:8040/api/complaint';
-  private readonly reportReasonUrl = 'http://localhost:8042/api/report-reason';
+  private readonly url = environment.services.complaints + '/api/complaint';
+  private readonly reportReasonUrl = environment.services.sanctions + '/api/report-reason';
 
 
 

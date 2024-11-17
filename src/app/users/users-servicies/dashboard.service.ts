@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { BlockData } from '../users-models/dashboard/BlockData';
 import { AgeDistributionResponse } from '../users-models/dashboard/age-distribution';
 import { ConstructionProgress, OwnersPlotsDistribution, PlotsByBlock, PlotsStats } from '../users-models/dashboard/plots-stats';
+import { environment } from '../../common/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -11,8 +12,8 @@ import { ConstructionProgress, OwnersPlotsDistribution, PlotsByBlock, PlotsStats
 export class DashboardService {
 
   private readonly http = inject(HttpClient);
-  private readonly urlOwners = 'http://localhost:9062/dashboard';
-  private readonly urlUsers = 'http://localhost:9060/dashboard';
+  private readonly urlOwners = environment.services.ownersAndPlots + '/dashboard';
+  private readonly urlUsers = environment.services.usersAndAddresses + '/dashboard';
 
 
   // Método para obtener los datos de los bloques

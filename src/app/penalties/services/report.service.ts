@@ -3,6 +3,8 @@ import { inject, Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { ReportReasonDto } from '../models/ReportReasonDTO';
 import { AuthService } from '../../users/users-servicies/auth.service';
+import { environment } from '../../common/environments/environment';
+
 
 @Injectable({
   providedIn: 'root'
@@ -10,8 +12,8 @@ import { AuthService } from '../../users/users-servicies/auth.service';
 export class ReportService {
   private readonly http: HttpClient = inject(HttpClient);
   private readonly authService = inject(AuthService);
-  private readonly reportUrl = 'http://localhost:8042/api/report';
-  private readonly reportReasonUrl = 'http://localhost:8042/api/report-reason';
+  private readonly reportUrl = environment.services.sanctions+'/api/report';
+  private readonly reportReasonUrl = environment.services.sanctions+'/api/report-reason';
 
   constructor(){};
 

@@ -12,6 +12,7 @@ import { UserDTO } from '../../models/DTOs/UserDTO';
 import Swal from 'sweetalert2';
 import { ReactiveFormsModule, FormsModule, NgForm } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { environment } from '../../../common/environments/environment';
 
 @Component({
   selector: 'app-post-notification-admin',
@@ -46,7 +47,7 @@ export class PostNotificationAdminComponent implements AfterViewInit, OnInit{
   ngOnInit(): void {
     
       const users = this.httpClient.get<UserApiDTO[]>
-      ("http://host.docker.internal:8080/general/getUsers")
+      (environment.services.notifications + "/general/getUsers")
       .subscribe(response =>
         {this.users = response;
           this.fillTable();

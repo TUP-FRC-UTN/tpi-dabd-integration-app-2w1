@@ -2,13 +2,14 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Supplier } from '../models/suppliers';
+import { environment } from '../../../common/environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SuppliersService {
   
-  private readonly INVENTORY_BASE_URL: string = 'http://localhost:8081/';
+  private readonly INVENTORY_BASE_URL: string = environment.services.inventory + "/";
 
   private readonly SUPPLIERS_URL: string = `${this.INVENTORY_BASE_URL}suppliers`;
   private readonly SUPPLIERS_URL_GET_BY_ID: string = `${this.SUPPLIERS_URL}/getbyId/`;
