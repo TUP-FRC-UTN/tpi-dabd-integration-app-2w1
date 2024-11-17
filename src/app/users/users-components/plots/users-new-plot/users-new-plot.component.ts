@@ -1,15 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, ViewChild } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { PlotService } from '../../../users-servicies/plot.service';
 import { PlotTypeModel } from '../../../users-models/plot/PlotType';
 import { PlotStateModel } from '../../../users-models/plot/PlotState';
 import { PlotModel } from '../../../users-models/plot/Plot';
-import { FormArray } from '@angular/forms';
 import { AuthService } from '../../../users-servicies/auth.service';
 import { Router } from '@angular/router';
 import { ValidatorsService } from '../../../users-servicies/validators.service';
+import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
 
 @Component({
   selector: 'app-users-new-plot',
@@ -18,39 +18,67 @@ import { ValidatorsService } from '../../../users-servicies/validators.service';
   templateUrl: './users-new-plot.component.html',
   styleUrl: './users-new-plot.component.css'
 })
-export class UsersNewPlotComponent {
+export class UsersNewPlotComponent implements OnInit, OnDestroy {
 
-  showOwners : boolean = false;
+  showOwners: boolean = false;
 
   toggleShowOwners(event: any): void {
     this.showOwners = event.target.checked;
   }
-  
+
   private readonly plotService = inject(PlotService);
   private readonly authService = inject(AuthService);
-  private readonly router : Router = inject(Router);
+  private readonly router: Router = inject(Router);
   private readonly validatorService = inject(ValidatorsService);
+  private readonly suscriptionService = inject(SuscriptionManagerService);
 
   types: PlotTypeModel[] = [];
   states: PlotStateModel[] = [];
   files: File[] = [];
+  formReactivo: FormGroup;
+
+  constructor(private fb: FormBuilder) {
+    this.formReactivo = this.fb.group({
+      plotNumber: new FormControl(1, [
+        Validators.required, Validators.min(1),
+      ],
+        this.validatorService.validateUniquePlotNumber()
+      ),
+      blockNumber: new FormControl(1, [
+        Validators.required,
+        Validators.min(1)
+      ]),
+      totalArea: new FormControl(0, [
+        Validators.required,
+        Validators.min(1)
+      ]),
+      totalBuild: new FormControl(0, [
+        Validators.required,
+        Validators.min(0)
+      ]),
+      state: new FormControl("", [
+        Validators.required
+      ]),
+      type: new FormControl("", [
+        Validators.required
+      ])
+    })
+  }
 
   ngOnInit(): void {
-
     this.formReactivo.get('type')?.setValue("");
+    this.loadAllStates();
+  }
 
-    this.plotService.getAllTypes().subscribe({
-      next: (data: PlotTypeModel[]) => {
-        
-        this.types = data;
-      },
-      error: (err) => {
-        console.error('Error al cargar los tipos de lote:', err);
-      }
-    });
+  ngOnDestroy(): void {
+    this.suscriptionService.unsubscribeAll();
+  }
 
+  //--------------------------------------------------Carga de datos--------------------------------------------------
 
-    this.plotService.getAllStates().subscribe({ 
+  //Cargar todos los estados de lote
+  loadAllStates() {
+    const sus = this.plotService.getAllStates().subscribe({
       next: (data: PlotStateModel[]) => {
         console.log(data);
         this.states = data;
@@ -59,98 +87,66 @@ export class UsersNewPlotComponent {
         console.error('Error al cargar los estados de lote:', err);
       }
     });
+
+    //Agregar suscripción
+    this.suscriptionService.addSuscription(sus);
   }
 
-  getFiles(files: File[]) {
-    this.files = files;
+  //--------------------------------------------------Formulario--------------------------------------------------
+
+  //Crear un lote
+  createPlot() {
+    if (this.formReactivo.valid) {
+      const plot: PlotModel = {
+        plot_number: this.formReactivo.get('plotNumber')?.value || 0,
+        block_number: this.formReactivo.get('blockNumber')?.value || 0,
+        total_area_in_m2: this.formReactivo.get('totalArea')?.value || 0,
+        built_area_in_m2: this.formReactivo.get('totalBuild')?.value || 0,
+        plot_state_id: Number(this.formReactivo.get('state')?.value || 0),
+        plot_type_id: Number(this.formReactivo.get('type')?.value || 0),
+        userCreateId: this.authService.getUser().id || 0,
+        files: this.files
+
+      }
+
+      const sus = this.plotService.postPlot(plot).subscribe({
+        next: () => {
+          Swal.fire({
+            icon: "success",
+            title: "Lote guardado",
+            showConfirmButton: true,
+            confirmButtonText: "Aceptar",
+            timer: undefined,
+            allowEscapeKey: false,
+            allowOutsideClick: false
+
+          });
+          this.resetForm();
+          this.ngOnInit();
+          this.router.navigate(['/home/plots/list']);
+        },
+        error: (error) => {
+          console.error('Error al crear el lote:', error);
+          alert("Error al crear el lote");
+        }
+      });
+
+      //Agregar suscripción
+      this.suscriptionService.addSuscription(sus);
+    }
   }
 
-   
-  formReactivo = new FormGroup({
-    plotNumber: new FormControl(1, [
-    Validators.required,Validators.min(1),
-    ],
-    this.validatorService.validateUniquePlotNumber()
-  ),
-    blockNumber: new FormControl(1, [
-      Validators.required,
-      Validators.min(1)
-    ]),
-    totalArea: new FormControl(0, [
-      Validators.required,
-      Validators.min(1)
-    ]),
-    totalBuild: new FormControl(0, [
-      Validators.required,
-      Validators.min(0)
-    ]),
-    state: new FormControl("", [
-      Validators.required
-    ]),
-    type: new FormControl("", [
-      Validators.required
-    ])
-  })
-
-
+  //Resetear formulario
   resetForm() {
     this.formReactivo.reset();
     this.states = [];
     this.types = [];
     this.clearFileInput();
   }
-  
-  clearFileInput() {
-    // Limpia el array de archivos
-    this.files = [];
-    // Limpia el input file
-    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
-    if (fileInput) {
-      fileInput.value = '';
-    }
-  }
-  
 
-  createPlot(){
-    const plot: PlotModel = {
-      plot_number: this.formReactivo.get('plotNumber')?.value || 0,
-      block_number: this.formReactivo.get('blockNumber')?.value || 0,
-      total_area_in_m2: this.formReactivo.get('totalArea')?.value || 0,
-      built_area_in_m2: this.formReactivo.get('totalBuild')?.value ||0,
-      plot_state_id: Number(this.formReactivo.get('state')?.value || 0),
-      plot_type_id: Number(this.formReactivo.get('type')?.value || 0),
-      userCreateId: this.authService.getUser().id || 0,
-      files: this.files
+  //--------------------------------------------------Validaciones------------------------------------------------
 
-    }  
-
-    this.plotService.postPlot(plot).subscribe({
-      next: (response) => {
-        Swal.fire({
-          icon: "success",
-          title: "Lote guardado",
-          showConfirmButton: true,
-          confirmButtonText: "Aceptar",
-          timer: undefined,
-          allowEscapeKey: false,
-          allowOutsideClick: false
-
-        });
-        this.resetForm();
-        this.ngOnInit();
-        this.router.navigate(['/main/plots/list']);
-      },
-      error: (error) => {
-        console.error('Error al crear el lote:', error);
-        alert("Error al crear el lote");
-      }
-    });
-  }
-
-  redirect(url : string){
-    this.router.navigate([url]);
-  }
-
+  //Validar el control
   onValidate(controlName: string) {
     const control = this.formReactivo.get(controlName);
     return {
@@ -159,14 +155,14 @@ export class UsersNewPlotComponent {
     }
   }
 
-
+  //Muestra el mensaje de error personalizado
   showError(controlName: string): string {
     const control = this.formReactivo.get(controlName);
     if (!control || !control.errors) return '';
-  
+
     const firstErrorKey = Object.keys(control.errors)[0];
     const errorDetails = control.errors[firstErrorKey];
-  
+
     switch (firstErrorKey) {
       case 'required':
         return 'Este campo no puede estar vacío.';
@@ -197,21 +193,48 @@ export class UsersNewPlotComponent {
       default:
         return 'Error no identificado en el campo.';
     }
-  }  
+  }
+
+  //--------------------------------------------------Archivos------------------------------------------------
+
+  //Obtener los archivos
+  getFiles(files: File[]) {
+    this.files = files;
+  }
+
+  //Limpia el array de archivos
+  clearFileInput() {
+    this.files = [];
+    // Limpia el input file
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
+  }
 
   //Evento para actualizar el listado de files a los seleccionados actualmente
   onFileChange(event: any) {
     this.files.push(...Array.from(event.target.files as FileList)); //Convertir FileList a Array
   }
 
+  //Eliminar un archivo
   deleteFile(index: number) {
-    // Elimina el archivo del array de archivos
+    //Elimina el archivo del array de archivos
     this.files.splice(index, 1);
-    
-    // Limpia el valor del input de archivo
+
+    //Limpia el valor del input de archivo
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     if (fileInput) {
       fileInput.value = '';
     }
   }
+
+  //--------------------------------------------------Redireccionar------------------------------------------------
+
+  //Redireccionar
+  redirect(url: string) {
+    this.router.navigate([url]);
+  }
+
+
 }

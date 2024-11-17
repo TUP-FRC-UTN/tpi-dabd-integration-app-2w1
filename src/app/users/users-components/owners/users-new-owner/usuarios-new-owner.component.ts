@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators, FormBuilder } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { OwnerService } from '../../../users-servicies/owner.service';
@@ -17,6 +17,7 @@ import { ValidatorsService } from '../../../users-servicies/validators.service';
 import { AuthService } from '../../../users-servicies/auth.service';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
+import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
 
 @Component({
   selector: 'app-usuarios-new-owner',
@@ -27,12 +28,13 @@ import { CustomSelectComponent } from '../../../../common/components/custom-sele
 })
 
 
-export class UsuariosNewOwnerComponent {
+export class UsuariosNewOwnerComponent implements OnInit, OnDestroy {
 
   private readonly ownerService = inject(OwnerService);
   private readonly apiService = inject(UserService);
   private readonly plotService = inject(PlotService);
   private readonly validatorService = inject(ValidatorsService);
+  private readonly suscriptionService = inject(SuscriptionManagerService);
 
   //Obtener el id del usuario logueado
   private readonly authService = inject(AuthService);
@@ -46,16 +48,21 @@ export class UsuariosNewOwnerComponent {
   //Lotes disponibles (cargan el select)
   availablePlots: any[] = [];
 
-
   //Roles seleccionados
   rolesSelected: string[] = [];
 
   passwordVisible: boolean = false;
   files: File[] = [];
 
-  formReactivo : FormGroup;
+  formReactivo: FormGroup;
 
-  constructor(private router: Router, private fb : FormBuilder) { 
+  roles: RolModel[] = [];
+  rolesInput: string[] = [];
+  select: string = "";
+  documentType: string = '';
+
+  //Inicializa el formulario
+  constructor(private router: Router, private fb: FormBuilder) {
     this.formReactivo = this.fb.group({
       name: new FormControl("", [
         Validators.required,
@@ -83,7 +90,7 @@ export class UsuariosNewOwnerComponent {
         Validators.email
       ],
         this.validatorService.validateUniqueEmail()
-    ),
+      ),
       type: new FormControl("", [
         Validators.required]),
       username: new FormControl("", [
@@ -112,6 +119,9 @@ export class UsuariosNewOwnerComponent {
 
   ngOnInit(): void {
     this.loadRoles();
+    this.loadOwnerTypes();
+    this.loadPlotStates();
+    this.loadPlotsAvailables();
 
     const typeControl = this.formReactivo.get('type');
     if (typeControl) {
@@ -120,16 +130,49 @@ export class UsuariosNewOwnerComponent {
       });
     }
 
-    this.ownerService.getAllTypes().subscribe({
+    this.formReactivo.get('type')?.setValue("");
+    // this.formReactivo.get('state')?.setValue(""); 
+  }
+
+  ngOnDestroy(): void {
+    this.suscriptionService.unsubscribeAll();
+  }
+
+  //--------------------------------------------------Carga de datos--------------------------------------------------
+
+  //Cargar los roles
+  loadRoles() {
+    const sus = this.apiService.getAllRoles().subscribe({
+      next: (data: RolModel[]) => {
+        this.roles = data;
+      },
+      error: (error) => {
+        console.error('Error al cargar los roles:', error);
+      }
+    });
+
+    //Agregar suscripcion
+    this.suscriptionService.addSuscription(sus);
+  }
+
+  //Cargar los tipos de propietario
+  loadOwnerTypes() {
+    const sus = this.ownerService.getAllTypes().subscribe({
       next: (data: OwnerTypeModel[]) => {
         this.types = data;
       },
-      error: (err) => { //ver
+      error: (err) => {
         console.error('Error al cargar los tipos de propietario:', err);
       }
     });
 
-    this.ownerService.getAllStates().subscribe({
+    //Agregar suscripcion
+    this.suscriptionService.addSuscription(sus);
+  }
+
+  //Cargar los estados de lote
+  loadPlotStates() {
+    const sus = this.ownerService.getAllStates().subscribe({
       next: (data: OwnerStateModel[]) => {
         this.states = data.map(d => ({ value: d.id, name: d.description }));
         console.log('Opciones procesadas para pasar al hijo:', this.states);
@@ -138,15 +181,19 @@ export class UsuariosNewOwnerComponent {
         console.error('Error al cargar los estados de lote:', err);
       }
     });
-    
 
-    //SOLO MUESTRA LOS LOTES DISPONIBLES
-    this.plotService.getAllPlotsAvailables().subscribe({
+    //Agregar suscripcion
+    this.suscriptionService.addSuscription(sus);
+  }
+
+  //Cargar los lotes disponibles
+  loadPlotsAvailables() {
+    const sus = this.plotService.getAllPlotsAvailables().subscribe({
       next: (data: GetPlotDto[]) => {
 
         //Se filtran los datos y se agregan como un objeto clave : valor para que puedan ser renderizados en el selectmultiple
-        let dataFiltered : any[] = [];
-        data.forEach(d => dataFiltered.push({value: d.id, name: `Numero de lote: ${d.plot_number} - Manzana:${d.block_number }`}))
+        let dataFiltered: any[] = [];
+        data.forEach(d => dataFiltered.push({ value: d.id, name: `Numero de lote: ${d.plot_number} - Manzana:${d.block_number}` }))
         this.availablePlots = dataFiltered;
       },
       error: (err) => {
@@ -154,86 +201,43 @@ export class UsuariosNewOwnerComponent {
       }
     });
 
-    this.formReactivo.get('type')?.setValue("");
-    // this.formReactivo.get('state')?.setValue(""); 
+    this.suscriptionService.addSuscription(sus);
   }
 
-  roles: RolModel[] = [];
-  rolesInput: string[] = [];
-  select: string = "";
+  //--------------------------------------------------Validaciones--------------------------------------------------
 
-  loadRoles() {
-    this.apiService.getAllRoles().subscribe({
-      next: (data: RolModel[]) => {
-        this.roles = data;
-      },
-      error: (error) => {
-        console.error('Error al cargar los roles:', error);
-      }
-    });
-  }
-
+  //Valida que el cuit sea correcto
   validarCuit(control: AbstractControl): ValidationErrors | null {
     const cuit = control.value;
-  
+
     if (this.documentType !== '3') {
       return null;
     }
-  
+
     if (!cuit || cuit.length !== 11 || !/^\d+$/.test(cuit)) {
       return { invalidCuit: 'El formato de CUIT es incorrecto' };
     }
-  
+
     const base = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
-  
+
     let aux = 0;
     for (let i = 0; i < 10; i++) {
       aux += parseInt(cuit[i], 10) * base[i];
     }
-  
+
     aux = 11 - (aux % 11);
-  
+
     if (aux === 11) {
       aux = 0;
     }
     if (aux === 10) {
       aux = 9;
     }
-  
+
     return aux === parseInt(cuit[10], 10) ? null : { invalidCuit: 'El CUIT es inválido' };
   }
 
-  documentType: string = '';
-  
-  documentTypeChange() {
-    this.documentType = this.formReactivo.get('documentType')?.value;
-  
-    const dniControl = this.formReactivo.get('dni');
-    
-    dniControl?.setErrors(null); 
-  
-    if (this.documentType === '3') {
-      const validationResult = this.validarCuit(dniControl!);
-      if (validationResult) {
-        dniControl?.setErrors(validationResult);
-      }
-    }
-  }
-
-  logFormErrors() {
-    // Recorremos todos los controles del formulario
-    Object.keys(this.formReactivo.controls).forEach(controlName => {
-      const control = this.formReactivo.get(controlName);
-  
-      // Verificamos si el control tiene errores
-      if (control && control.errors) {
-        // Si el control tiene errores, los mostramos en consola
-        console.log(`Errores en el control ${controlName}:`, control.errors);
-      }
-    });
-  }
-  
-  
+  //Valida que la fecha sea menor a la actual
   dateLessThanTodayValidator(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
       const inputDate = new Date(control.value);
@@ -243,44 +247,23 @@ export class UsuariosNewOwnerComponent {
     }
   }
 
-  private toggleCompanyField(ownerType: string) {
-    if (ownerType === this.juridicId.toString()) {
-      this.formReactivo.get('company')?.enable();
-    } else {
-      this.formReactivo.get('company')?.disable();
-      this.formReactivo.get('company')?.setValue(""); // Limpiar el campo si se deshabilita
+
+  documentTypeChange() {
+    this.documentType = this.formReactivo.get('documentType')?.value;
+
+    const dniControl = this.formReactivo.get('dni');
+
+    dniControl?.setErrors(null);
+
+    if (this.documentType === '3') {
+      const validationResult = this.validarCuit(dniControl!);
+      if (validationResult) {
+        dniControl?.setErrors(validationResult);
+      }
     }
   }
 
-  confirmExit() {
-      this.formReactivo.reset(); 
-      this.redirect('/main/owners/list'); 
-  }
-  
-  redirect(path: string) {
-    this.router.navigate([path]);
-  }
-  
-  addRole() {
-    const rolSeleccionado = this.formReactivo.get('rol')?.value;
-    if (rolSeleccionado && !this.rolesInput.includes(rolSeleccionado)) {
-      this.rolesInput.push(rolSeleccionado);
-    }
-    this.formReactivo.get('rol')?.setValue('');
-  }
-
-  //Cambiar visibilidad de la contraseña
-  togglePasswordVisibility(): void {
-    this.passwordVisible = !this.passwordVisible;
-  }
-
-  quitRole(rol: string) {
-    const index = this.rolesInput.indexOf(rol);
-    if (index > -1) {
-      this.rolesInput.splice(index, 1);
-    }
-  }
-
+  //Validar el control
   onValidate(controlName: string) {
     const control = this.formReactivo.get(controlName);
     return {
@@ -289,12 +272,13 @@ export class UsuariosNewOwnerComponent {
     }
   }
 
+  //Mostrar el error con mensaje personalizado
   showError(controlName: string): string {
     const control = this.formReactivo.get(controlName);
-  
+
     if (!control || !control.errors) return '';
-  
-    const errorKey = Object.keys(control.errors)[0]; 
+
+    const errorKey = Object.keys(control.errors)[0];
     const errorMessages: { [key: string]: string } = {
       required: 'Este campo no puede estar vacío.',
       email: 'Formato de correo electrónico inválido.',
@@ -313,14 +297,90 @@ export class UsuariosNewOwnerComponent {
       dniTaken: 'El DNI ya está en uso.',
       invalidCuit: 'El CUIT ingresado es inválido.'
     };
-  
+
     return errorMessages[errorKey] || 'Error no identificado en el campo.';
   }
 
+  //--------------------------------------------------Funciones--------------------------------------------------
+
+  //Alternar visibilidad del campo de empresa
+  private toggleCompanyField(ownerType: string) {
+    if (ownerType === this.juridicId.toString()) {
+      this.formReactivo.get('company')?.enable();
+    } else {
+      this.formReactivo.get('company')?.disable();
+      this.formReactivo.get('company')?.setValue(""); // Limpiar el campo si se deshabilita
+    }
+  }
+
+  //Confirmar salida
+  confirmExit() {
+    this.formReactivo.reset();
+    this.redirect('/home/owners/list');
+  }
+
+  //Redireccionar
+  redirect(path: string) {
+    this.router.navigate([path]);
+  }
+
+  //Cambiar visibilidad de la contraseña
+  togglePasswordVisibility(): void {
+    this.passwordVisible = !this.passwordVisible;
+  }
+  
+  //Agregar un rol
+  addRole() {
+    const rolSeleccionado = this.formReactivo.get('rol')?.value;
+    if (rolSeleccionado && !this.rolesInput.includes(rolSeleccionado)) {
+      this.rolesInput.push(rolSeleccionado);
+    }
+    this.formReactivo.get('rol')?.setValue('');
+  }
+
+  //Quitar un rol
+  quitRole(rol: string) {
+    const index = this.rolesInput.indexOf(rol);
+    if (index > -1) {
+      this.rolesInput.splice(index, 1);
+    }
+  }
+
+  //Obtener los archivos seleccionados
   getFiles(files: File[]) {
     this.files = files;
   }
 
+  //Evento para actualizar el listado de files a los seleccionados actualmente
+  onFileChange(event: any) {
+    this.files.push(...Array.from(event.target.files as FileList)); //Convertir FileList a Array
+  }
+
+  //Eliminar archivo
+  deleteFile(index: number) {
+    this.files.splice(index, 1);
+  }
+
+  //Limpiar los archivos
+  clearFileInput() {
+    this.files = [];
+
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
+  }
+
+  //--------------------------------------------------Acciones Formulario--------------------------------------------------
+
+  //Resetear el formulario
+  resetForm() {
+    this.formReactivo.reset();
+    this.clearFileInput();
+    this.ngOnInit();
+  }
+
+  //Crear el propietario
   createOwner() {
     const owner: OwnerModel = {
       name: this.formReactivo.get('name')?.value || '',
@@ -329,7 +389,7 @@ export class UsuariosNewOwnerComponent {
       dni_type_id: Number(this.formReactivo.get('documentType')?.value) || 0, //Tipo de documento
       dateBirth: this.formReactivo.get('birthdate')?.value || new Date(),
       ownerTypeId: Number(this.formReactivo.get('type')?.value || ""),
-      taxStatusId:  Number(this.formReactivo.get('state')?.value),
+      taxStatusId: Number(this.formReactivo.get('state')?.value),
       active: true,
       username: this.formReactivo.get('username')?.value || '',
       password: this.formReactivo.get('password')?.value || '',
@@ -340,7 +400,7 @@ export class UsuariosNewOwnerComponent {
       telegramId: 0,
 
       //--------------------------------------------------VER-----------------------------------------------------------------------------------------------------------------------
-     /* estos estan hardcodeado para que ande*/
+      /* estos estan hardcodeado para que ande*/
       roles: ["Propietario"],//this.rolesSelected,
 
       //Id del usuario logueado
@@ -355,7 +415,7 @@ export class UsuariosNewOwnerComponent {
 
 
     //Se intenta crear el propietario
-    this.ownerService.postOwner(owner).subscribe({
+    const sus = this.ownerService.postOwner(owner).subscribe({
       next: (response) => {
         Swal.fire({
           icon: "success",
@@ -364,9 +424,12 @@ export class UsuariosNewOwnerComponent {
           timer: 1460
         });
 
+        //Agregar suscripción
+        this.suscriptionService.addSuscription(sus);
+
         //Resetea el fomulario
-        this.resetForm() 
-        this.router.navigate(['/main/owners/list']);
+        this.resetForm()
+        this.router.navigate(['/home/owners/list']);
       },
 
       //Se intercepta el error, si sucede
@@ -377,41 +440,12 @@ export class UsuariosNewOwnerComponent {
           title: "Error al guardar los cambios",
           showConfirmButton: true,
           confirmButtonText: "Aceptar",
-          allowOutsideClick: false, 
-          allowEscapeKey: false, 
+          allowOutsideClick: false,
+          allowEscapeKey: false,
           timer: undefined,
 
         });
       }
     });
   }
-
-
-  //Evento para actualizar el listado de files a los seleccionados actualmente
-  onFileChange(event: any) {
-    this.files.push(...Array.from(event.target.files as FileList)); //Convertir FileList a Array
-  }
-
-  //Eliminar archivo
-  deleteFile(index: number) {
-    this.files.splice(index, 1);
-  }
-
-  //Resetear el formulario
-  resetForm(){
-    this.formReactivo.reset();
-    this.clearFileInput();
-    this.ngOnInit();
-  }
-
-  //Limpiar los archivos
-  clearFileInput() {
-    this.files = [];
-
-    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
-    if (fileInput) {
-      fileInput.value = '';
-    }
-  }
-
 }
