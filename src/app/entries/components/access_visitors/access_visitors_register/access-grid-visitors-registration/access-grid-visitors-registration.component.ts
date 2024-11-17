@@ -4,11 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { Output,EventEmitter } from '@angular/core';
 import { AccessVisitor } from '../../../../models/access-visitors/access-visitors-models';
-import { AccessVisitorsRegisterServiceService } from '../../../../services/access_visitors/access-visitors-register/access-visitors-register-service/access-visitors-register-service.service';
 
 import $ from 'jquery';
 import 'datatables.net'
 import 'datatables.net-bs5';
+import { AccessVisitorsRegisterServiceService } from '../../../../services/access_visitors/access-visitors-register/access-visitors-register-service/access-visitors-register-service.service';
 
 @Component({
   selector: 'app-access-grid-visitors-registration',
@@ -26,22 +26,21 @@ export class AccessGridVisitorsRegistrationComponent implements OnInit, OnDestro
   table: any = null;
 
   constructor(private visitorService: AccessVisitorsRegisterServiceService) {}
-
- updateDataTable(): void {
+  updateDataTable(): void {
     if(!this.table)
       return;
     this.table.clear();  
-    
+  
     this.visitors.forEach((visitor, index) => {
       this.table.row.add([
         visitor.document,
         visitor.firstName,
         visitor.lastName, 
         visitor.hasVehicle ? visitor.vehicle?.licensePlate : 'Sin vehículo', 
-        `<div class="dropdown">
-        <button class="btn btn-light dropdown-toggle" type="button" id="actionMenu${index}" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i class="fas fa-ellipsis-v" style="color: black;"></i>
-                </button>
+        `<div class="dropdown d-flex justify-content-center">
+          <button class="btn btn-light dropdown-toggle d-flex align-items-center justify-content-center" type="button" id="actionMenu${index}" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-ellipsis-v" style="color: black;"></i>
+          </button>
           <ul class="dropdown-menu" aria-labelledby="actionMenuButton-${visitor.document}">
             <li><a role="button" class="dropdown-item update-visitor-btn" data-index="${index}">Modificar</a></li>
             <li><a role="button" class="dropdown-item text-danger delete-visitor-btn" data-index="${index}">Eliminar</a></li>
@@ -51,7 +50,8 @@ export class AccessGridVisitorsRegistrationComponent implements OnInit, OnDestro
     });
     this.table.draw();
     this.addActionsEventListeners();
-}
+  }
+  
   addActionsEventListeners() {
     const updateButtons = document.querySelectorAll('.update-visitor-btn') as NodeListOf<HTMLButtonElement>;
     const deleteButtons = document.querySelectorAll('.delete-visitor-btn') as NodeListOf<HTMLButtonElement>;
@@ -80,7 +80,8 @@ export class AccessGridVisitorsRegistrationComponent implements OnInit, OnDestro
       ],
       paging: true,
       ordering: true,
-      pageLength: 10,
+      pageLength: 5,
+      lengthMenu: [5, 10, 25, 50],
       lengthChange: true,
       searching: true,
       info: true,
@@ -88,11 +89,12 @@ export class AccessGridVisitorsRegistrationComponent implements OnInit, OnDestro
       language: {
         lengthMenu: " _MENU_ ",
         zeroRecords: "No se encontraron invitaciones",
-        search: "Buscar:",
+        search: "", 
+        searchPlaceholder: "Buscar",
         emptyTable: "No hay invitaciones cargadas",
-        info: "Mostrando _START_ a _END_ de _TOTAL_ invitaciones",
-        infoEmpty: "Invitaciones no encontradas",
-        infoFiltered: "(filtrado de _MAX_ invitaciones totales)"
+        info: "",
+        infoEmpty: "",
+        infoFiltered: ""
       },
       responsive: true
     });
