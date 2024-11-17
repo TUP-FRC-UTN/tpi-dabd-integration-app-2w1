@@ -105,6 +105,10 @@ export class IepSupplierListComponent implements AfterViewInit {
       });
   }
 
+  goTo(path: string) {
+    this.router.navigate([path]);
+  }
+
   // Método para limpiar todos los filtros
   cleanFilters() {
     this.globalFilter = '';

@@ -9,7 +9,7 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root',
 })
 export class StockAumentoService {
-  private readonly INVENTORY_BASE_URL: string = 'http://localhost:8081/';
+  private readonly INVENTORY_BASE_URL: string = 'http://localhost:9011/';
 
   private readonly AMOUNT_MODIFICATION_URL: string = `${this.INVENTORY_BASE_URL}amountModification`;
   private readonly AMOUNT_MODIFICATION_URL_MODIFY_STOCK: string = `${this.AMOUNT_MODIFICATION_URL}/modify-stock`; // TOMAS

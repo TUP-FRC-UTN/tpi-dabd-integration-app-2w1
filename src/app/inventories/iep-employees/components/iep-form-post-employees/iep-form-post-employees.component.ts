@@ -11,7 +11,7 @@ import { EmpPostEmployeeService } from '../../services/emp-post-employee.service
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { UsersMockIdService } from '../../../common-services/users-mock-id.service';
+import { AuthService } from '../../../../users/users-servicies/auth.service';
 
 
 @Component({
@@ -24,7 +24,7 @@ import { UsersMockIdService } from '../../../common-services/users-mock-id.servi
 export class IEPFormPostEmployeesComponent implements OnInit {
  
   
-  constructor(private serviceCombos: EmpPostEmployeeService , private router : Router,private usermock: UsersMockIdService) {
+  constructor(private serviceCombos: EmpPostEmployeeService , private router : Router,private userService: AuthService) {
     
   }
 
@@ -55,7 +55,7 @@ export class IEPFormPostEmployeesComponent implements OnInit {
 
   documentTypeEnum=DocumentTypeEnum
 
-  userId: number=1;
+  userId: number=0;
   nombre: string = '';
   apellido: string = '';
   cuil: string = '';
@@ -251,7 +251,7 @@ export class IEPFormPostEmployeesComponent implements OnInit {
 
 
             this.postDto.charge=this.cargoSelected?.id
-            this.postDto.userId=this.usermock.getMockId()
+            this.postDto.userId=this.userService.getUser().id
 
             console.log("Antes del Post (formato JSON):", JSON.stringify(this.postDto, null, 2))
             this.createEmployee$ = this.serviceCombos.createProduct(this.postDto);

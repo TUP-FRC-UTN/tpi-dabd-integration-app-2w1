@@ -12,8 +12,8 @@ import { CreateProductDtoClass } from '../../models/create-product-dto-class';
 import { CategoriaService } from '../../services/categoria.service';
 import { CreateCategoryDto } from '../../models/create-category-dto';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { routes } from '../../../app.routes';
 import { UpdateProductDto } from '../../models/update-product-dto';
+import { AuthService } from '../../../../users/users-servicies/auth.service';
 @Component({
   selector: 'app-product',
   standalone: true,
@@ -48,7 +48,8 @@ export class IepProductComponent {
     providersService: SuppliersService,
     private categoryService:CategoriaService,
     private router: Router,
-    private activatedRoute: ActivatedRoute) {
+    private activatedRoute: ActivatedRoute,
+    private userService : AuthService) {
 
     this.idProductToEdit = this.activatedRoute.snapshot.params['id'];
     console.log(this.idProductToEdit);
@@ -176,7 +177,7 @@ export class IepProductComponent {
   }
 
   createProduct(form:NgForm){
-    this.createProduct$ = this.productService.createProduct(this.dto, 1);
+    this.createProduct$ = this.productService.createProduct(this.dto,this.userService.getUser().id);
       console.log(this.createProduct$);
       this.createProduct$.subscribe({
         next: response => {
@@ -225,7 +226,7 @@ export class IepProductComponent {
     };
 
     console.log(JSON.stringify(mappedDto));
-    this.productService.updateProduct(mappedDto).subscribe({
+    this.productService.updateProduct(mappedDto,this.userService.getUser().id).subscribe({
       next: response => {
         this.successMessage = response.message;
         this.showSuccessAlert();

@@ -9,9 +9,10 @@ import { Charge } from '../../Models/emp-post-employee-dto';
 import { EmpListadoEmpleadosService } from '../../services/emp-listado-empleados.service';
 import { EmpPostEmployeeService } from '../../services/emp-post-employee.service';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { EmpPutEmployeesResponse } from '../../../iep-inventory/models/EmpPutEmployeesResponse';
-import { EmpPutEmployeeRequest } from '../../../iep-inventory/models/EmpPutEmployeeRequest';
 import { UsersMockIdService } from '../../../common-services/users-mock-id.service';
+import { EmpPutEmployeeRequest } from '../../Models/EmpPutEmployeeRequest';
+import { EmpPutEmployeesResponse } from '../../Models/EmpPutEmployeesResponse';
+import { AuthService } from '../../../../users/users-servicies/auth.service';
 
 @Component({
   selector: 'app-iep-put-employees',
@@ -68,7 +69,7 @@ export class IepPutEmployeesComponent implements OnInit {
     private router: Router,
     private empleadoService: EmpListadoEmpleadosService,
     private postEmployeeService: EmpPostEmployeeService,
-    private mockid: UsersMockIdService
+    private userService: AuthService
   ) {}
   ngOnInit(): void {
     this.loadProvincias();
@@ -225,9 +226,10 @@ export class IepPutEmployeesComponent implements OnInit {
       addressDto ,                         
       telephoneValue: this.telefono || '', 
       emailValue: this.mail || '',         
-      userId: this.mockid.getMockId() || 0       
+      userId: this.userService.getUser().id || 0       
     };
   }
+
   private showAlert(type: 'success' | 'error', message: string): void {
     Swal.fire({
       icon: type,

@@ -12,6 +12,7 @@ import { Observable, map, catchError, of } from 'rxjs';
 import { IncreaseDecrementService } from '../../services/increase-decrement.service';
 import Swal from 'sweetalert2';
 import { UsersMockIdService } from '../../../common-services/users-mock-id.service';
+import { AuthService } from '../../../../users/users-servicies/auth.service';
 
 @Component({
   selector: 'app-iep-nuevo-ingreso-egreso',
@@ -23,7 +24,6 @@ import { UsersMockIdService } from '../../../common-services/users-mock-id.servi
 export class IepNuevoIngresoEgresoComponent implements OnInit {
 
 
-  idUser=0
   formulario:FormGroup = new FormGroup({});
   formularioEgreso:FormGroup = new FormGroup({});
   selectedType: string = 'I';
@@ -32,7 +32,7 @@ export class IepNuevoIngresoEgresoComponent implements OnInit {
       private serviceP : ProductService ,
       private serviceS :  SuppliersService,
       private serviceMovment : IncreaseDecrementService,
-      private serviceUsers : UsersMockIdService
+      private serviceUsers : AuthService
     ) 
   {  
     
@@ -63,7 +63,6 @@ export class IepNuevoIngresoEgresoComponent implements OnInit {
 
     this.loadSuppliers();
     this.loadProductos();
-    this.idUser= this.serviceUsers.getMockId()
   }
 
   
@@ -110,7 +109,7 @@ export class IepNuevoIngresoEgresoComponent implements OnInit {
       }
 
     }
-    this.serviceMovment.createMovement(dto,this.idUser).subscribe({
+    this.serviceMovment.createMovement(dto,this.serviceUsers.getUser().id).subscribe({
     next: response => {
       console.log(JSON.stringify(response))
       Swal.fire({
