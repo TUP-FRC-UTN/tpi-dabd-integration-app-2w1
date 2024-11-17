@@ -11,6 +11,7 @@ import { NotificationGeneralDTO } from '../../models/DTOs/NotificationGeneralDTO
 import { UserDTO } from '../../models/DTOs/UserDTO';
 import Swal from 'sweetalert2';
 import { ReactiveFormsModule, FormsModule, NgForm } from '@angular/forms';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-post-notification-admin',
@@ -34,13 +35,18 @@ export class PostNotificationAdminComponent implements AfterViewInit, OnInit{
 
   httpClient : HttpClient = inject(HttpClient);
   constructor(private notificationService: NotificationService) {}
+
   selectValue : string = "1";
   users : UserApiDTO[] = []
+  subscription = new Subscription()
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe()
+  }
   
   ngOnInit(): void {
     
       const users = this.httpClient.get<UserApiDTO[]>
-      ("https://my-json-server.typicode.com/405786MoroBenjamin/users-responses/users")
+      ("http://localhost:8080/general/getUsers")
       .subscribe(response =>
         {this.users = response;
           this.fillTable();
@@ -139,9 +145,10 @@ export class PostNotificationAdminComponent implements AfterViewInit, OnInit{
 
       this.newNotification.channel = this.selectValue;
       
-      this.notificationService.postNotification(this.newNotification).subscribe({
+      const postNotification =this.notificationService.postNotification(this.newNotification).subscribe({
         next: (response: any) => {
           console.log('Notificacion enviada: ', response);
+          console.log(this.newNotification.users[0].telegramChatId);
           Swal.fire({
             title: '¡Notificación enviada!',
             text: 'La notificacion ha sido enviada correctamente.',
@@ -149,11 +156,14 @@ export class PostNotificationAdminComponent implements AfterViewInit, OnInit{
             showConfirmButton: true,
             confirmButtonText: 'Aceptar'
           });
+          
         },
         error: (error) => {
           console.error('Error al enviar la notificacion: ', error);
         }
       });
+      this.subscription.add(postNotification)
+      
     }
     else {
       console.log("form invalid");
@@ -180,19 +190,18 @@ export class PostNotificationAdminComponent implements AfterViewInit, OnInit{
         const rowData = $("#myTable").DataTable().row(this).data();
         let user: UserDTO = {
           //encontrar el ID del user a travez del DNI
-          id: component.users.find(user => user.dni == rowData[2])?.id || 1,
-          nombre: rowData.name,
-          apellido: "pepitosadsdasda",
-          dni: 9999999,
-          email: "dasadsasdasd@dasdasdas",
-          telegramChatId: 5869258860
+          id: component.users.find(user => user.dni == rowData[2])?.id || 4,
+          nombre: component.users.find(user => user.dni == rowData[2])?.name || "test",
+          apellido: component.users.find(user => user.dni == rowData[2])?.lastname || "test",
+          dni: component.users.find(user => user.dni == rowData[2])?.dni || 9999999,
+          email: component.users.find(user => user.dni == rowData[2])?.email || "test@test.com",
+          telegramChatId: component.users.find(user => user.dni == rowData[2])?.telegram_id || 801000,
         };
+        console.log("mira bro" +user.telegramChatId + " " + user.dni + " " + user.id);
         users.push(user);
       }
     }); 
-    users[0].email = "solis.luna.ignacio@gmail.com"
     return users;
-    console.log(users)
   }
 
   mapUserApiDTOToUserDTO(userApiArr : UserApiDTO[]) : UserDTO[]{
@@ -221,8 +230,6 @@ export class PostNotificationAdminComponent implements AfterViewInit, OnInit{
     
     let filteredUserDTOArray = this.mapUserApiDTOToUserDTO(filteredUsers);
     
-    filteredUserDTOArray[0].telegramChatId = 5869258860;
-    filteredUserDTOArray[0].email = "solis.luna.ignacio@gmail.com"
     console.log(filteredUserDTOArray);
     return filteredUserDTOArray;
     
