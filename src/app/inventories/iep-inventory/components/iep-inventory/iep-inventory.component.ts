@@ -784,7 +784,4 @@ applyFilter(): void {
   cerrarModal() {
     this.modalVisible = false;
   }
-
-
-
 }
