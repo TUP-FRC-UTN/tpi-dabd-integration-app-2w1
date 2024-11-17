@@ -1,16 +1,18 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import {Category} from '../../models/category';
+import { Category } from '../../models/category';
+import { UserService } from '../userServices/user.service';
+import { environment } from '../../../common/environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CategoryService {
 
-  constructor(private http:HttpClient) {}
+  constructor(private http:HttpClient, private userService :UserService) {}
 
-  private url='http://localhost:8080/categories'
+  private url=environment.services.expensesManager
 
   getCategory(): Observable<Category[]> {
     return this.http.get<Category[]>(this.url+'/all');
@@ -18,24 +20,17 @@ export class CategoryService {
 
   add(expenseCategory: Category): Observable<Category> {
     console.log(expenseCategory);
-    return this.http.post<Category>(`${this.url}/postCategory?description=${expenseCategory.description}`, expenseCategory.description);
+    const url = `${this.url}/categories/postCategory?description=${expenseCategory.description}&userId=${this.userService.getUserId()}`;
+    return this.http.post<Category>(url, expenseCategory);
+  }
+updateCategory(category: Category): Observable<any> {
+
+  const url = `${this.url}/categories/putById?id=${category.id}&description=${category.description}&enabled=${category.state}&userId=${this.userService.getUserId()}`;
+  return this.http.put(url, null);
 }
 
-
-  deleteCategory(id: number): Observable<any> {
-    return this.http.delete(`${this.url}/deleteById?id=${id}`);
-
-  }
-  updateCategory(category: Category): Observable<any> {
-    return this.http.put(`${this.url}/putById?id=${category.id}&description=${category.description}`,null);
-  }
   getCategoryById(id: number): Observable<Category> {
-    return this.http.get<Category>(`${this.url}/${id}`);
+    return this.http.get<Category>(`${this.url}/categories/getById/${id}`);
   }
 
-  editCategory(id:number):Observable<void>{
-    const url=this.url+'/edit?id='+id;
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.put<void>(url, { headers });
-  }
 }
