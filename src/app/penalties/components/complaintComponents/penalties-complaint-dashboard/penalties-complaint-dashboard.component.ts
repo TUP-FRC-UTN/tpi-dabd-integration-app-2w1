@@ -7,14 +7,14 @@ import { CommonModule } from '@angular/common';
 import { State } from '@popperjs/core';
 import { ReportReason } from '../../../models/Dashboard-models';
 import { ReportReasonDto } from '../../../models/ReportReasonDTO';
-import { PenaltiesKpiComponent } from '../penalties-kpi/penalties-kpi.component';
 import { textShadow } from 'html2canvas/dist/types/css/property-descriptors/text-shadow';
+import { CustomKpiComponent } from '../../../../common/components/custom-kpi/custom-kpi.component';
 
 //declare let bootstrap: any;
 @Component({
   selector: 'app-penalties-complaint-dashboard',
   standalone: true,
-  imports: [GoogleChartsModule, FormsModule, CommonModule, PenaltiesKpiComponent],
+  imports: [GoogleChartsModule, FormsModule, CommonModule, CustomKpiComponent],
   templateUrl: './penalties-complaint-dashboard.component.html',
   styleUrl: './penalties-complaint-dashboard.component.scss',
 })

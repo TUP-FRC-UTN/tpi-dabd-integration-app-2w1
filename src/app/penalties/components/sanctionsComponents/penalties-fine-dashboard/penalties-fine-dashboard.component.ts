@@ -8,7 +8,7 @@ import { textShadow } from 'html2canvas/dist/types/css/property-descriptors/text
 import { ReportReasonDto } from '../../../models/ReportReasonDTO';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PenaltiesModalFineComponent } from '../modals/penalties-get-fine-modal/penalties-get-fine-modal.component';
-import { PenaltiesKpiComponent } from '../../complaintComponents/penalties-kpi/penalties-kpi.component';
+import { CustomKpiComponent} from '../../../../common/components/custom-kpi/custom-kpi.component';
 import { fontWeight } from 'html2canvas/dist/types/css/property-descriptors/font-weight';
 
 
@@ -16,7 +16,7 @@ import { fontWeight } from 'html2canvas/dist/types/css/property-descriptors/font
 @Component({
   selector: 'app-penalties-fine-dashboard',
   standalone: true,
-  imports: [GoogleChartsModule, CommonModule, FormsModule, PenaltiesKpiComponent],
+  imports: [GoogleChartsModule, CommonModule, FormsModule, CustomKpiComponent],
   templateUrl: './penalties-fine-dashboard.component.html',
   styleUrl: './penalties-fine-dashboard.component.scss',
 })
