@@ -1,61 +1,106 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { ExpenseGenerationHeaderComponent } from '../expense-generation-header/expense-generation-header.component';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import { ExpenseGenerationExpenseService } from '../expense-generation-services/expense-generation-expense.service';
 import { ExpenseGenerationExpenseInterface } from '../expense-generation-interfaces/expense-generation-expense-interface';
 import { Observable } from 'rxjs';
-import { CommonModule } from '@angular/common';
+import {CommonModule, DatePipe, registerLocaleData} from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ExpenseGenerationCardComponent } from '../expense-generation-card/expense-generation-card.component';
 import { ExpenseGenerationPaymentService } from '../expense-generation-services/expense-generation-payment.service';
-import { response, Router } from 'express';
-import { RouterOutlet } from '@angular/router';
-
+import {Router, RouterLink} from '@angular/router';
+import localeEsAr from '@angular/common/locales/es-AR';
+import { OwnerService } from '../expense-generation-services/expense-generation-owner-service';
+import { AuthService } from '../../users/users-servicies/auth.service';
+import { environment } from '../../common/environments/environment';
+registerLocaleData(localeEsAr, 'es-AR');
 @Component({
   selector: 'app-expense-generation-user-view',
   standalone: true,
   imports: [
-    ExpenseGenerationHeaderComponent,
+    RouterLink,
     CommonModule,
     FormsModule,
-    ExpenseGenerationCardComponent,
-    RouterOutlet,
-  ],
+    ExpenseGenerationCardComponent
+],
+  providers: [DatePipe],
   templateUrl: './expense-generation-user-view.component.html',
   styleUrl: './expense-generation-user-view.component.css',
 })
 export class ExpenseGenerationUserViewComponent implements OnInit {
+
+   Math = Math;
+
   constructor(
     private expenseService: ExpenseGenerationExpenseService,
-    private paymentService: ExpenseGenerationPaymentService
+    private paymentService: ExpenseGenerationPaymentService,
+    private router:Router,
+    private datePipe:DatePipe,
+    private ownerService: OwnerService,
+    private authService: AuthService,
   ) {}
+
 
   // Arreglos
   expenses$!: Observable<ExpenseGenerationExpenseInterface[]>;
   selectedExpenses: ExpenseGenerationExpenseInterface[] = [];
   paidExpenses: ExpenseGenerationExpenseInterface[] = [];
   unpaidExpenses: ExpenseGenerationExpenseInterface[] = [];
+  expenses: ExpenseGenerationExpenseInterface[] = [];
+
 
   // Filtros
   startDate: string = '';
   endDate: string = '';
+  minAmount: number | null = null;
+  maxAmount: number | null = null;
+  maxEndDate: string = '';
 
-  minStartDate: string = '';
   minEndDate: string = '';
-
-  filtroEstado: string = '';
+  modalState: boolean = false;
 
   // Variables
   total: number = 0;
-  ownerId: number = 3;
+  ownerId: number = 0;
+  itemsPerPage: number = 5;
+  currentPage: number = 1;
+  totalItems: number = 0;
+  totalPages: number = 0;
+  pagedExpenses: any[] = [];
+  visiblePages: number[] = [];
+  hasSelectedExpenses: boolean = false;
   @Output() status = new EventEmitter<number>();
 
   ngOnInit() {
-    const today = new Date();
+    // Obtener el ID del usuario logueado
+    const userId = this.authService.getUser().id;
+    
+    // Buscar el propietario correspondiente
+    this.ownerService.getOwnerByUserId(userId).subscribe({
+      next: (owner) => {
+        if (owner) {
+          this.ownerId = owner.id; 
+          this.getExpensesByOwner(); 
+          
+          const today = new Date();
+          const localDate = new Date(today.getTime() - today.getTimezoneOffset() * 60000);
+          this.endDate = localDate.toISOString().split('T')[0];
+          this.maxEndDate = localDate.toISOString().split('T')[0];
+          this.startDate = new Date(localDate.getFullYear(), 0, 1).toISOString().split('T')[0];
+          
+          this.selectedExpenses = this.expenseService.getSelectedExpenses();
+          this.calculateTotal();
+          this.updateButtonState();
+        } else {
+          console.error('No se encontró un propietario para el usuario logueado');
+        }
+      },
+      error: (error) => {
+        console.error('Error al obtener el propietario:', error);
+      }
+    });
+  }
 
-    this.getExpensesByOwner();
-    this.selectedExpenses = this.expenseService.getSelectedExpenses();
-    this.calculateTotal();
-    console.log(this.selectedExpenses);
+  goToPaymentForm(){
+    this.router.navigateByUrl("expense-generation-payment-form")
   }
 
   getExpensesByOwner() {
@@ -65,30 +110,36 @@ export class ExpenseGenerationUserViewComponent implements OnInit {
         (expense) => expense.status !== 'Pago'
       );
       this.paidExpenses = expenses.filter(
-        (expense) => expense.status === 'Pago'
+        (expense) => expense.status === 'Pago' || expense.status === 'Exceptuado'
       );
-      console.log(this.paidExpenses);
     });
   }
 
   calculateTotal() {
-    this.total = this.expenseService
-      .getSelectedExpenses()
-      .reduce((total, expense) => total + expense.actual_amount, 0);
+    const selectedExpenses = this.expenseService.getSelectedExpenses();
+    this.total = selectedExpenses.reduce((total, expense) => total + expense.actual_amount, 0);
+    this.hasSelectedExpenses = selectedExpenses.length > 0;
   }
 
   recibeAmount(amount: number) {
     this.total += amount;
+    this.updateButtonState();
   }
 
-  changeStatusPage(num: number) {
-    this.status.emit(num);
+  private updateButtonState() {
+    this.selectedExpenses = this.expenseService.getSelectedExpenses();
+    this.hasSelectedExpenses = this.selectedExpenses.length > 0;
   }
 
-  async openPdf(id: number) {
+  onExpenseSelectionChange() {
+    this.calculateTotal();
+    this.updateButtonState();
+  }
+
+  async openPdf(uuid: string) {
     try {
       const response = await fetch(
-        `http://localhost:8021/api/expenses/pdf/${id}`
+        environment.services.expenseGeneration + `/api/expenses/pdf/${uuid}`
       );
       if (!response.ok) {
         alert('No se pudo cargar el pdf');
@@ -107,7 +158,7 @@ export class ExpenseGenerationUserViewComponent implements OnInit {
         const hasLetters = /[a-zA-Z]/.test(expense.payment_id);
         if (hasLetters) {
           const response = await fetch(
-            `http://localhost:8020/generate-receipt/${expense.payment_id}`
+            environment.services.expenseGeneration + `/generate-receipt/${expense.payment_id}`
           );
           if (!response.ok) {
             alert('No se pudo cargar el pdf');
@@ -117,7 +168,7 @@ export class ExpenseGenerationUserViewComponent implements OnInit {
           window.open(url);
         } else {
           const response = await fetch(
-            `http://localhost:8022/api/receipts/${expense.payment_id}/pdf`
+            environment.services.expenseGeneration + `/api/receipts/${expense.payment_id}/pdf`
           );
           if (!response.ok) {
             alert('No se pudo cargar el pdf');
@@ -151,6 +202,19 @@ export class ExpenseGenerationUserViewComponent implements OnInit {
           );
         }
 
+         // Filtro por importe
+         if (this.minAmount !== null) {
+          filteredExpenses = filteredExpenses.filter(
+            (expense) => expense.amount_payed >= this.minAmount!
+          );
+        }
+
+        if (this.maxAmount !== null) {
+          filteredExpenses = filteredExpenses.filter(
+            (expense) => expense.amount_payed <= this.maxAmount!
+          );
+        }
+
         this.paidExpenses = filteredExpenses.filter(
           (expense) => expense.status === 'Pago'
         );
@@ -170,40 +234,52 @@ export class ExpenseGenerationUserViewComponent implements OnInit {
     }
   }
 
-  //--------------Pago de Mercado Pago-----------------
 
-  realizarPagoIndividual(expense: ExpenseGenerationExpenseInterface) {
-    if (!expense) {
-      alert('Error: No se proporcionó una boleta válida para pagar.');
-      return;
-    }
-
-    const amount =
-      typeof expense.actual_amount === 'string'
-        ? parseFloat(expense.actual_amount)
-        : expense.actual_amount;
-
-    const paymentData = {
-      description: `Pago de boleta ${expense.id}`,
-      amount: amount,
-      expenseId: expense.id,
-      period: expense.period,
-      ownerId: this.ownerId,
-    };
-
-    this.paymentService.createPaymentRequest(paymentData).subscribe({
-      next: (preferenceId: string) => {
-        const mercadoPagoUrl = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${preferenceId}`;
-        window.open(mercadoPagoUrl, '_blank');
-      },
-      error: (error: any) => {
-        console.error('Error al crear la solicitud de pago:', error);
-        alert('Hubo un error al procesar el pago. Inténtalo de nuevo.');
-      },
-    });
+  onItemsPerPageChange() {
+    this.currentPage = 1;
+    this.calculateTotalPages();
+    this.updateVisiblePages();
+    this.updatePagedExpenses();
   }
 
-  realizarPagoMultiple(expenses: ExpenseGenerationExpenseInterface[]) {
+  calculateTotalPages() {
+    this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
+  }
+
+  updateVisiblePages() {
+    const maxVisiblePages = 3;
+    let startPage = Math.max(1, this.currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(this.totalPages, startPage + maxVisiblePages - 1);
+
+    // Ajustar startPage si estamos cerca del final
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    this.visiblePages = Array.from(
+      { length: endPage - startPage + 1 },
+      (_, i) => startPage + i
+    );
+  }
+
+  updatePagedExpenses() {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = Math.min(startIndex + this.itemsPerPage, this.totalItems);
+    this.pagedExpenses = this.expenses.slice(startIndex, endIndex);
+  }
+
+  goToPage(page: number) {
+    if (page >= 1 && page <= this.totalPages && page !== this.currentPage) {
+      this.currentPage = page;
+      this.updateVisiblePages();
+      this.updatePagedExpenses();
+    }
+  }
+
+
+
+  //--------------Pago de Mercado Pago----------------
+  payWithMP(expenses: ExpenseGenerationExpenseInterface[]) {
     if (!expenses || expenses.length === 0) {
       alert('Error: No se proporcionaron boletas válidas para pagar.');
       return;
@@ -222,15 +298,16 @@ export class ExpenseGenerationUserViewComponent implements OnInit {
       (sum, detail) => sum + detail.amount,
       0
     );
+    const initialString:string = expenseDetails.length>1 ? "Pago de las boletas de los periodos:" : "Pago de la boleta del periodo:";
 
-    const description = `Pago de boletas: ${expenses
-      .map((exp) => exp.id)
+    const description = `${initialString} ${expenses
+      .map((exp) => this.datePipe.transform(exp.period,"MM-yyyy")  )
       .join(', ')}`;
 
     const paymentData = {
       description: description,
       amount: totalAmount,
-      details: expenseDetails, 
+      details: expenseDetails,
       ownerId: this.ownerId,
     };
 
