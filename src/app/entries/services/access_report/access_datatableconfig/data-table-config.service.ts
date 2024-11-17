@@ -11,8 +11,6 @@ export class DataTableConfigService {
   
   public readonly USER_TYPE_ICONS = USER_TYPE_MAPPINGS;
   public readonly STATUS_STYLES = STATUS_STYLES;
-
-  
   
     /**
      * Retorna la configuración base para la tabla DataTable
@@ -20,12 +18,11 @@ export class DataTableConfigService {
     getBaseConfig(): DataTableConfig {
       return {
         paging: true,
-        ordering: true,
+        ordering: true, 
         pageLength: 5,
-        lengthMenu: [[5, 10, 25, 50], [5, 10, 25, 50]],
-        scrollX: true,
+        lengthMenu: [5, 10, 25, 50],
         lengthChange: true,
-        orderCellsTop: true,
+        orderCellsTop: true,  
         order: [],
         columnDefs: this.getColumnDefs(),
         searching: true,

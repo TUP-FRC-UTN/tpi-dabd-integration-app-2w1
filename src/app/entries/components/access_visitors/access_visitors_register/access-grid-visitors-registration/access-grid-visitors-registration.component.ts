@@ -4,11 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { Output,EventEmitter } from '@angular/core';
 import { AccessVisitor } from '../../../../models/access-visitors/access-visitors-models';
-import { AccessVisitorsRegisterServiceService } from '../../../../services/access_visitors/access-visitors-register/access-visitors-register-service/access-visitors-register-service.service';
 
 import $ from 'jquery';
 import 'datatables.net'
 import 'datatables.net-bs5';
+import { AccessVisitorsRegisterServiceService } from '../../../../services/access_visitors/access-visitors-register/access-visitors-register-service/access-visitors-register-service.service';
 
 @Component({
   selector: 'app-access-grid-visitors-registration',

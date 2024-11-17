@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, AfterViewInit, inject, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 
 import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule } from '@angular/forms';
@@ -26,8 +26,7 @@ import $ from 'jquery';
 @Component({
   selector: 'app-access-table',
   standalone: true,
-  imports: [ CommonModule, HttpClientModule, NgSelectModule, FormsModule, AccessVisitorRegistryComponent,NgxScannerQrcodeModule,
-    NgSelectModule],
+  imports: [ CommonModule, NgSelectModule, FormsModule, AccessVisitorRegistryComponent,NgxScannerQrcodeModule, NgSelectModule ],
   templateUrl: './access-table.component.html',
   styleUrls: ['./access-table.component.css']
 })
@@ -89,7 +88,7 @@ export class AccessTableComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {
     this.initializeDates();
   }
- 
+
   @ViewChild('scanner') scanner!: NgxScannerQrcodeComponent; // Referencia al escáner QR
 
   isScanning: boolean = false; // Variable para controlar si el escáner está activo
@@ -107,6 +106,7 @@ export class AccessTableComponent implements OnInit, AfterViewInit, OnDestroy {
       this.scanner.start();
     }
   }
+
   onModalOpened(): void {
     this.startScanner(); 
   }
@@ -121,8 +121,6 @@ export class AccessTableComponent implements OnInit, AfterViewInit, OnDestroy {
 
   dataTable: any; 
   users: any[] = [];  
-
-
 
   handleQrScan(event: any): void {
     try {
@@ -217,9 +215,6 @@ export class AccessTableComponent implements OnInit, AfterViewInit, OnDestroy {
     
     this.table.draw();
   }
-
-
-  
   
   updateDataTable(filteredUsers: any[]): void {
     if (this.table) {
@@ -230,8 +225,6 @@ export class AccessTableComponent implements OnInit, AfterViewInit, OnDestroy {
       this.table.draw(); // Redibujar la tabla
     }
   }
-  
-  
 
   /**
    * Inicializa las fechas por defecto (último mes)
@@ -289,7 +282,7 @@ onEndDateChange(date: string): void {
   this.dateError = ''; // Limpiar error si todo está bien
   this.endDate = selectedDate;
   this.fetchData();
-  }
+}
 
 
   
@@ -338,17 +331,12 @@ onEndDateChange(date: string): void {
   private handleOpenModal = (event: Event) => {
     const customEvent = event as CustomEvent;
     const visitorDocument = customEvent.detail;
-    console.log("llamada")
     this.ownerService.openModal(visitorDocument);
   };
   private handleOpenMovement = (event: Event) => {
     const customEvent = event as CustomEvent;
     const { document, type,plate } = customEvent.detail;
-    console.log("llamada")
-    console.log(plate)
-    console.log(document)
     this.ownerService.onMOvement(document,type,plate);
-    
   };
 
   /**

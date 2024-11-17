@@ -48,8 +48,7 @@ export interface FilterValues {
     paging: boolean;
     ordering: boolean;
     pageLength: number;
-    lengthMenu: number[][];
-    scrollX: boolean;
+    lengthMenu: number[];
     lengthChange: boolean;
     orderCellsTop: boolean;
     order: any[];

@@ -19,7 +19,7 @@ export class ExportService {
     
     // Limpiar botones existentes si los hay
     if (table.buttons) {
-      $(table.buttons.container()).remove();
+
     }
 
     // Configurar nuevos botones
