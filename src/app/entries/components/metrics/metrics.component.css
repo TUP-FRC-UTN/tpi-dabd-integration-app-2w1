@@ -1,0 +1,158 @@
+.min-vh-75 {
+    min-height: 75vh;
+}
+.hover-scale{
+    transition: all 0.3s ease;
+}
+.hover-scale:hover{
+    transform: scale(1.01);
+    cursor: pointer;
+}
+
+.back-arrow {
+    cursor: pointer;
+}
+google-chart {
+    transition: all 0.4s ease;
+    height: 100%;
+}
+
+
+.bg-mp{
+    background-color: rgb(206, 248, 255);
+}
+
+.bg-stripe{
+    background-color: rgb(248, 204, 250);
+}
+
+.bg-efectivo{
+    background-color: #d8ffedde;
+}
+
+
+
+.sticky-section {
+    position: sticky;
+    top: 70px;
+    z-index: 10;
+    background-color: white; 
+  }
+  /* Asegurar que todos los inputs y ng-select tengan la misma altura y apariencia */
+.form-control,
+.input-group,
+.input-group .ng-select .ng-select-container,
+.action-buttons-container {
+    min-height: 38px;
+    height: 38px;
+}
+
+.input-group {
+    width: 100%;
+    display: flex;
+}
+
+.input-group > * {
+    flex: 1 1 auto;
+    width: auto;
+}
+
+.input-group .ng-select {
+    width: 100% !important;
+    flex: 1 1 auto !important;
+}
+
+
+  /* ESTILOS PARA CARDS DEL TIPO DE USUARIO KPI */
+  .bg-success {
+    background-color: #d4edda !important; /* Verde para ingresos */
+  }
+  
+  .bg-danger {
+    background-color: #f8d7da !important; /* Rojo para egresos */
+    opacity: 0.8
+
+  }
+
+/* Estilos para hacer que ng-select se parezca a los inputs de Bootstrap */
+::ng-deep .ng-select .ng-select-container {
+  min-height: 38px !important;
+  height: 38px !important;
+  background-color: white !important;
+  border: 1px solid #ced4da !important;
+  border-radius: 0.375rem !important;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 1rem !important;
+  line-height: 1.5 !important;
+  color: #212529 !important;
+}
+
+::ng-deep .ng-select.ng-select-focused .ng-select-container {
+  border-color: #86b7fe !important;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+}
+
+::ng-deep .ng-select .ng-dropdown-panel {
+  background-color: white !important;
+  border: 1px solid #ced4da !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+::ng-deep .ng-select .ng-dropdown-panel .ng-dropdown-panel-items {
+  background-color: white !important;
+  max-height: 200px;
+  padding: 0 !important;
+}
+
+::ng-deep .ng-select .ng-dropdown-panel .ng-option {
+  padding: 8px 10px !important;
+  background-color: white !important;
+  border-bottom: 1px solid #f8f9fa !important;
+  font-size: 1rem !important;
+  line-height: 1.5 !important;
+}
+
+::ng-deep .ng-select .ng-dropdown-panel .ng-option:hover {
+  background-color: #f8f9fa !important;
+}
+
+::ng-deep .ng-select .ng-dropdown-panel .ng-option.ng-option-selected {
+  background-color: #e9ecef !important;
+  color: #212529 !important;
+}
+
+::ng-deep .ng-select .ng-value-container {
+  padding-left: 0 !important;
+  padding-top: 0 !important;
+}
+::ng-deep .ng-select .ng-placeholder {
+  color: #6c757d !important;
+}
+
+/* Estilos específicos para ng-select múltiple */
+::ng-deep .ng-select.ng-select-multiple .ng-select-container {
+  height: 38px !important;
+  min-height: 38px !important;
+  overflow: hidden;
+}
+
+::ng-deep .ng-select.ng-select-multiple .ng-value-container {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  gap: 0.25rem !important;
+  align-items: center !important;
+}
+
+::ng-deep .ng-select.ng-select-multiple .ng-value {
+  background-color: #e9ecef !important;
+  border: 1px solid #ced4da !important;
+  border-radius: 4px !important;
+  padding: 2px 8px !important;
+  margin: 2px 4px 2px 0 !important;
+  font-size: 0.875rem !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+  
