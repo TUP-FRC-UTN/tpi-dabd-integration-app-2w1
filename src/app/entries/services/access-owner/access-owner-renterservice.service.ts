@@ -43,15 +43,11 @@ export class AccessOwnerRenterserviceService {
  }
  
  onMOvement(visitorDocument: string, movement: string, plate: string) {
-   console.log(visitorDocument)
-   console.log('Tipo de movimiento:', movement);
-   console.log('plaquita', plate)
    const cleanedDocument = visitorDocument
      .replace(/^[CDP]-/, "")  // Elimina "C-" o "D-" o "P-" al principio
      .replace(/-/g, "")       // Elimina todos los guiones
      .trim(); 
 
-   console.log(cleanedDocument); 
    this.movemenSubject.next({ document: cleanedDocument, movement: movement, plate: plate });
  }
 

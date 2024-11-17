@@ -531,9 +531,9 @@ loadUtilizationTotalData(year: number, startMonth: number, endMonth: number): vo
   redirect(metricUser: MetricUser, redirectType: string) {
     const fromDate = this.parseYearMonth(this.periodFrom);
     const toDate = this.parseYearMonth(this.periodTo);
-    this.router.navigate(['reports'], { state: {
+    this.router.navigate(['main', 'entries', 'reports'], { state: {
       data: metricUser,
-      type: redirectType,
+      type: redirectType, 
       startMonth: fromDate.month,
       startYear: fromDate.year,
       endMonth: toDate.month,

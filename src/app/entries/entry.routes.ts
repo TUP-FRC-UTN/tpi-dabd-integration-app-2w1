@@ -11,7 +11,7 @@ export const ENTRY_ROUTES: Routes = [
     { path: 'reports', component: AccessGlobalReportComponent },
     //{ path: 'entry', component: AccessEntryComponent }, BORRAR
     //{ path: 'entry', component: AccessDailyFetchComponent }, BORRAR
-    { path: 'dashboards', component: MetricsComponent },
+    { path: 'dashboard', component: MetricsComponent },
     { path: 'visitor/register', component: AccessContainerVisitorsRegistrationComponent },
     { path: 'vehicle/register', component: AccessVehiclesViewComponent }
 ];

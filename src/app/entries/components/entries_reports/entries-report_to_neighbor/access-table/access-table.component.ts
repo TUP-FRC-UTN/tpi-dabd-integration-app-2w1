@@ -335,7 +335,7 @@ onEndDateChange(date: string): void {
   };
   private handleOpenMovement = (event: Event) => {
     const customEvent = event as CustomEvent;
-    const { document, type,plate } = customEvent.detail;
+    const { document, type, plate } = customEvent.detail;
     this.ownerService.onMOvement(document,type,plate);
   };
 

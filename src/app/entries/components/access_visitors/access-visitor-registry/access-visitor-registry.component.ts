@@ -92,9 +92,10 @@ export class AccessVisitorRegistryComponent
 
   //carga TODOS los invitados al iniciar la pantalla
   ngOnInit(): void {
+
     const registryUpdated = this.registryUpdateService.getObservable().subscribe({
       next: v => {
-      //lo siguiente carga a TODOS en la lista "comun" (donde estan todos los userAllowed)
+        //lo siguiente carga a TODOS en la lista "comun" (donde estan todos los userAllowed)
         const sub = this.loadUsersAllowedData().subscribe({
           next: () => {
             this.filteredAllPeopleAllowed = this.allPeopleAllowed;
@@ -105,9 +106,9 @@ export class AccessVisitorRegistryComponent
           }
         }); 
         this.subscription.add(sub);          
-        }
-      });
-      this.userId = this.authService.getUser().id;
+      }
+    });
+    this.userId = this.authService.getUser().id;
 
     //DATOS
     //lo siguiente carga a TODOS en la lista "comun" (donde estan todos los userAllowed)
