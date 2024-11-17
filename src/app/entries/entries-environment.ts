@@ -1,11 +1,11 @@
 // src/environments/environment.ts
 export const environment = {
     production: false,
-    apiUrl: 'https://my-json-server.typicode.com/405786MoroBenjamin/users-responses',
+    apiUrl: 'http://localhost:9060',
     movementsApi: 'http://localhost:8090',
     endpoints: {
         // Endpoints existentes
-        users: '/users',
+        users: '/users/getall',
         movements: '/movements_entryToNeighbor',
         userByDni: '/userAllowedByDni',
         addVehicle: '/addVehicleToUser',
@@ -33,7 +33,26 @@ export const environment = {
         getSuppliesAndEmployers: '/GetSuppliesAndEmployeers',
         getAuthRangeByDoc: '/GetAuthRangeByDoc',
         registerEntryEmployeers: '/attendances/post',
-        registerExitEmployeers: '/attendances/putArrivalTime'
+        registerExitEmployeers: '/attendances/putArrivalTime',
+        //////// Endpoints de métricas
+        dailyAccess: '/daily-access-count',
+        dailyExit: '/daily-exit-count',
+        accessCountByUserTypeFilter: '/access-count-by-user-type-filter',
+        exitCountByUserTypeFilter: '/exit-count-by-user-type-filter',
+        totalAccessAndExitCounts: '/total-access-and-exit-counts',
+        accessExitCountByDayFilter: '/access-exit-count-by-day-filter',
+        dayWithMostAccesses: '/day-with-most-accesses',
+        dayWithMostExits: '/day-with-most-exits',
+        monthlyAccessCount: '/this-monthly-access-count',
+        monthlyExitCount: '/this-monthly-exit-count',
+        totalEntriesThisYear: '/total-entries-this-year',
+        monthWithMostEntries: '/month-with-most-entries',
+        totalExitsCurrentYear: '/total-exits-current-year',
+        monthWithMostExits: '/month-with-most-exits',
+        topUsersEntriesExits: '/top-users-entries-exits',
+        guardWithMostExits: '/guard-with-most-exits',
+        guardWithMostEntries: '/guard-with-most-entries',
+        neighborWithMostInvitations: '/neighbor-with-most-invitations'
     }
 };
 
@@ -69,5 +88,24 @@ export const API_ENDPOINTS = {
     GET_SUPPLIES_AND_EMPLOYERS: `${environment.movementsApi}${environment.endpoints.getSuppliesAndEmployers}`,
     GET_AUTH_RANGE_BY_DOC: `${environment.movementsApi}${environment.endpoints.getAuthRangeByDoc}`,
     REGISTER_ENTRY_EMPLOYEERS: `${environment.movementsApi}${environment.endpoints.registerEntryEmployeers}`,
-    REGISTER_EXIT_EMPLOYEERS: `${environment.movementsApi}${environment.endpoints.registerExitEmployeers}`
+    REGISTER_EXIT_EMPLOYEERS: `${environment.movementsApi}${environment.endpoints.registerExitEmployeers}`,
+    // Endpoints de métricas
+    DAILY_ACCESS: `${environment.movementsApi}${environment.endpoints.dailyAccess}`,
+    DAILY_EXIT: `${environment.movementsApi}${environment.endpoints.dailyExit}`,
+    ACCESS_COUNT_USER_TYPE_FILTER: `${environment.movementsApi}${environment.endpoints.accessCountByUserTypeFilter}`,
+    EXIT_COUNT_USER_TYPE_FILTER: `${environment.movementsApi}${environment.endpoints.exitCountByUserTypeFilter}`,
+    TOTAL_ACCESS_AND_EXIT_COUNTS: `${environment.movementsApi}${environment.endpoints.totalAccessAndExitCounts}`,
+    ACCESS_EXIT_COUNT_BY_DAY_FILTER: `${environment.movementsApi}${environment.endpoints.accessExitCountByDayFilter}`,
+    DAY_WITH_MOST_ACCESSES: `${environment.movementsApi}${environment.endpoints.dayWithMostAccesses}`,
+    DAY_WITH_MOST_EXITS: `${environment.movementsApi}${environment.endpoints.dayWithMostExits}`,
+    MONTHLY_ACCESS_COUNT: `${environment.movementsApi}${environment.endpoints.monthlyAccessCount}`,
+    MONTHLY_EXIT_COUNT: `${environment.movementsApi}${environment.endpoints.monthlyExitCount}`,
+    TOTAL_ENTRIES_THIS_YEAR: `${environment.movementsApi}${environment.endpoints.totalEntriesThisYear}`,
+    MONTH_WITH_MOST_ENTRIES: `${environment.movementsApi}${environment.endpoints.monthWithMostEntries}`,
+    TOTAL_EXITS_CURRENT_YEAR: `${environment.movementsApi}${environment.endpoints.totalExitsCurrentYear}`,
+    MONTH_WITH_MOST_EXITS: `${environment.movementsApi}${environment.endpoints.monthWithMostExits}`,
+    TOP_USERS_ENTRIES_EXITS: `${environment.movementsApi}${environment.endpoints.topUsersEntriesExits}`,
+    GUARD_WITH_MOST_EXITS: `${environment.movementsApi}${environment.endpoints.guardWithMostExits}`,
+    GUARD_WITH_MOST_ENTRIES: `${environment.movementsApi}${environment.endpoints.guardWithMostEntries}`,
+    NEIGHBOR_WITH_MOST_INVITATIONS: `${environment.movementsApi}${environment.endpoints.neighborWithMostInvitations}`
 };
