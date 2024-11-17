@@ -1,0 +1,20 @@
+.hover-shadow {
+    transition: all 0.3s ease;
+  }
+  
+  .hover-shadow:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+  }
+
+  .primary-gradient {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  }
+  
+  .success-gradient {
+    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+  }
+  
+  .info-gradient {
+    background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+  }

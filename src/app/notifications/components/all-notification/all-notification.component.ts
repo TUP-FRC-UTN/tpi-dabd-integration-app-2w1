@@ -150,7 +150,6 @@ export class AllNotificationComponent implements OnInit {
       ]),
     });
   }
-
   //metodos
   llenarData() {
     const getSubscription = this.service.getData().subscribe({

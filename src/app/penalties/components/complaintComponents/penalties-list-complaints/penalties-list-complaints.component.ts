@@ -1,8 +1,5 @@
-import { CommonModule } from '@angular/common';
-import { Component, input, OnInit, ViewChild } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
-import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { NgbModal, NgbModule, } from '@ng-bootstrap/ng-bootstrap';
 import * as XLSX from 'xlsx';
 
 // Imports de DataTable con soporte para Bootstrap 5
@@ -15,13 +12,17 @@ import 'datatables.net-buttons/js/buttons.print';
 //Imports propios de multas
 import { PenaltiesModalConsultComplaintComponent } from '../modals/penalties-get-complaint-modal/penalties-get-complaint.component';
 import { PenaltiesModalStateReasonComponent } from '../modals/penalties-update-stateReason-modal/penalties-update-stateReason-modal.component';
-import { ComplaintService } from '../../../services/complaintsService/complaints.service';
+import { ComplaintService } from '../../../services/complaints.service';
 import { ComplaintDto } from '../../../models/complaint';
 import { RoutingService } from '../../../../common/services/routing.service';
-import { CustomSelectComponent } from "../../../../common/components/custom-select/custom-select.component";
 import moment from 'moment';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
+
 
 @Component({
   selector: 'app-penalties-list-complaint',
@@ -41,6 +42,7 @@ export class PenaltiesListComplaintComponent implements OnInit {
   searchTerm: string = '';        //Valor de la barra de busqueda
   filterDateStart: string = '';   //Valor fecha inicio
   filterDateEnd: string = '';     //Valor fecha fin
+  minDateEnd: string = '';        //Valor mínimo para la fecha fin
   selectedStates: string[] = [];  //Valor select
 
   options: { value: string, name: string }[] = []
@@ -74,12 +76,14 @@ export class PenaltiesListComplaintComponent implements OnInit {
     previousMonthDate.setMonth(previousMonthDate.getMonth() - 1);
     this.filterDateStart = this.formatDateToString(previousMonthDate); // Fecha de inicio con hora 00:00:00
   }
-
+  get maxDate(): string {
+    return this.formatDateToString(new Date());
+  }
   //Función para convertir la fecha al formato `YYYY-MM-DD`
-  private formatDateToString(date: Date): string {
-    //Crea una fecha ajustada a UTC-3 y establecer la hora a 00:00:00 para evitar horas residuales
+  formatDateToString(date: Date): string {
+    // Crea una fecha ajustada a UTC-3 y establece la hora a 00:00:00 para evitar horas residuales
     const adjustedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0);
-    return adjustedDate.toLocaleDateString('en-CA'); // Formato estándar `YYYY-MM-DD`
+    return adjustedDate.toLocaleDateString('en-CA'); // Formato `YYYY-MM-DD`
   }
 
 
@@ -130,12 +134,12 @@ export class PenaltiesListComplaintComponent implements OnInit {
           searchable: false,
           render: (data) =>
             `<div class="text-center">
-               <div class="btn-group">
-                 <div class="dropdown">
-                   <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
-                   <ul class="dropdown-menu">
-                     <li><a class="dropdown-item" onclick="viewComplaint(${data.id})">Ver más</a></li>
-                      ${data.complaintState == "Pendiente" ? `
+                <div class="btn-group">
+                  <div class="dropdown">
+                    <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
+                    <ul class="dropdown-menu">
+                      <li><a class="dropdown-item" onclick="viewComplaint(${data.id})">Ver más</a></li>
+                        ${data.complaintState == "Pendiente" ? `
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" onclick="changeState('REJECTED', ${data.id}, ${data.userId})">Rechazar</a></li>` : ``}
                       </ul>
@@ -218,6 +222,20 @@ export class PenaltiesListComplaintComponent implements OnInit {
 
   //Método para manejar el cambio de fechas
   filterDate() {
+    const today = new Date();
+    const startDate = new Date(this.filterDateStart);
+    const endDate = new Date(this.filterDateEnd);
+
+    if (startDate > today) {
+      this.filterDateStart = this.formatDateToString(today);
+    }
+
+    if (endDate > today) {
+      this.filterDateEnd = this.formatDateToString(today);
+    }
+
+    this.minDateEnd = this.filterDateStart; // Establecer el valor mínimo para la fecha fin
+
     this.filterComplaintData();
   }
 
@@ -228,7 +246,9 @@ export class PenaltiesListComplaintComponent implements OnInit {
     this.selectedStates = [];
     this.searchTerm = '';
     this.resetDates();
-    this.customSelect.setData(this.selectedStates);
+    if (this.customSelect) {
+      this.customSelect.setData(this.selectedStates);
+    }
   }
 
 

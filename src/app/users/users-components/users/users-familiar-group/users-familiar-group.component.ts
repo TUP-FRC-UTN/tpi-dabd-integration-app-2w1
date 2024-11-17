@@ -9,6 +9,8 @@ import { UserGet } from '../../../users-models/users/UserGet';
 import { GetPlotDto } from '../../../users-models/plot/GetPlotDto';
 import { PlotService } from '../../../users-servicies/plot.service';
 import { AuthService } from '../../../users-servicies/auth.service';
+import { OwnerService } from '../../../users-servicies/owner.service';
+import { ModalEliminarUserComponent } from '../users-modal-eliminar-user/modal-eliminar-user/modal-eliminar-user.component';
 
 @Component({
   selector: 'app-users-familiar-group',
@@ -23,37 +25,36 @@ export class UsersFamiliarGroupComponent implements OnInit {
 
   private readonly apiService = inject(UserService);
   private readonly plotService = inject(PlotService);
+  private readonly ownerService = inject(OwnerService);
   private readonly authService = inject(AuthService);
 
   familyGroup: UserGet[] = [];
-  plot : GetPlotDto = new GetPlotDto();
+  plots : GetPlotDto[] = [];
   userModal: UserGet = new UserGet();
 
   ngOnInit() {
-    this.apiService.getUsersByPlotID(1).subscribe({
-      next: users => {
-        // traer a todos menos al que tenga un rol owner
-        console.log(users);
-        
-        this.familyGroup = users.filter(user => !user.roles.includes('Propietario'));        
-        
-      },
-      error: error => {
-        console.error(error);
-      }
-    })
 
-    this.plotService.getPlotById(this.authService.getUser().plotId).subscribe({
-      next: plot => {
-        // traer a todos menos al que tenga un rol owner
-        this.plot = plot;    
-      },
-      error: error => {
-        console.error(error);
-      }
-    })
+    //Limpia la lista de grupo familiar
+    this.familyGroup = [];
 
+    
+    for(let plot of this.authService.getUser().plotId){
+      this.apiService.getUsersByPlotID(plot).subscribe({
+        next: users => {
 
+        var users : UserGet[] = users.filter(user => !user.roles.includes('Propietario'));        
+
+        this.familyGroup = this.familyGroup.concat(users);
+
+        //Ordena alfabéticamente
+        this.familyGroup.sort((a, b) => a.name.localeCompare(b.name));
+          
+        },
+        error: error => {
+          console.error(error);
+        }
+      })
+    }
   }
   
   //Acorta el nombre completo
@@ -66,7 +67,7 @@ export class UsersFamiliarGroupComponent implements OnInit {
     if(name.length == 1){
       return name[0];
     }
-    return name[0] + "...." ;
+    return name[0] + "..." ;
   }
 
   //Mostrar el email
@@ -84,20 +85,43 @@ export class UsersFamiliarGroupComponent implements OnInit {
     this.router.navigate(['/home/users/add']); 
   }
 
+  async openModalEliminar(userId: number) {
+    const modalRef = this.modal.open(ModalEliminarUserComponent, { size: 'md', keyboard: false });
+    modalRef.componentInstance.userModal = { id: userId };
+
+    // Escuchar el evento de eliminación para recargar
+    modalRef.componentInstance.userDeleted.subscribe(() => {
+      this.ngOnInit()
+    });
+  }
+
   //Abre el modal con la información del usuario
   async abrirModal(type: string, userId: number) {
-    console.log("Esperando a que userModal se cargue...");
   
     //Espera a que se cargue el usuario seleccionado
     try {
+
       await this.selectUser(userId);
-      console.log("userModal cargado:", this.userModal);
+      this.plots = [];
+
+      this.plotService.getPlotById(this.userModal.plot_id).subscribe({
+        next: plot => {
+          // traer a todos menos al que tenga un rol owner
+          this.plots.push(plot);  
+        },
+        error: error => {
+          console.error(error);
+        }
+      })
+
+      console.log('Plots:', this.plots);
+      
   
       // Una vez cargado, abre el modal
       const modalRef = this.modal.open(ModalInfoUserComponent, { size: 'lg', keyboard: false });
       modalRef.componentInstance.typeModal = type; //Pasar el tipo de modal al componente hijo
       modalRef.componentInstance.userModal = this.userModal;
-      modalRef.componentInstance.plotModal = this.plot;
+      modalRef.componentInstance.plotModal = this.plots;
 
       modalRef.result.then((result) => {        
         this.ngOnInit();

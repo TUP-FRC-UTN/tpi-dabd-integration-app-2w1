@@ -21,9 +21,29 @@
         </div>
       </div>
 
+
       <div class="col-lg-6 mb-3">
         <div class="row">
-          <label class="col-2 col-form-label">Dni</label>
+          <label class="col-2 col-form-label">Tipo de Documento</label>
+          <div class="col-10">
+            <!-- FixMe: Usen el componente de select personalizado -->
+            <select id="selectOption" class="form-select" formControlName="documentType"
+              [ngClass]="onValidate('documentType')"
+              (ngModelChange)="documentTypeChange()">
+              <option value="" disabled selected>Seleccione una opción</option>
+              <option value="1">DNI</option>
+              <option value="2">Pasaporte</option>
+              <option value="3">CUIT/CUIL</option>
+            </select>
+            <div class="invalid-feedback">{{showError('documentType')}}</div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="col-lg-6 mb-3">
+        <div class="row">
+          <label class="col-2 col-form-label">Documento</label>
           <div class="col-10">
             <input type="text" class="form-control" formControlName="dni" [ngClass]="onValidate('dni')" />
             <div class="invalid-feedback">{{ showError("dni") }}</div>
@@ -31,26 +51,18 @@
         </div>
       </div>
 
-      <div class="col-lg-6 mb-3">
-        <div class="row">
-          <label class="col-2 col-form-label">Cuit-Cuil</label>
-          <div class="col-10">
-            <input type="text" class="form-control" formControlName="cuit_cuil" [ngClass]="onValidate('cuit_cuil')" />
-            <div class="invalid-feedback">{{ showError("cuit_cuil") }}</div>
-          </div>
-        </div>
-      </div>
 
       <div class="col-lg-6 mb-3">
         <div class="row">
-          <label class="col-2 col-form-label">Fecha de nacimiento</label>
+          <label class="col-2 col-form-label">Fecha de Nacimiento</label>
           <div class="col-10">
-            <input type="date" class="form-control" formControlName="birthdate" value="2000-01-01"
+            <input type="date" class="form-control" formControlName="birthdate" 
               [ngClass]="onValidate('birthdate')" />
             <div class="invalid-feedback">{{ showError("birthdate") }}</div>
           </div>
         </div>
       </div>
+
 
       <div class="col-lg-6 mb-3">
         <div class="row">
@@ -62,37 +74,42 @@
         </div>
       </div>
 
+
       <div class="col-lg-6 mb-3">
         <div class="row">
           <label class="col-2 col-form-label">Estado Fiscal</label>
           <div class="col-10">
-            <select id="selectOption" class="form-select" formControlName="state" [ngClass]="onValidate('state')">
-              @for (s of states; track $index) {
-              <option value="{{ s.id }}">{{ s.description }}</option>
-              }
-            </select>
-            <div class="invalid-feedback">{{ showError("state") }}</div>
+
+            <!-- =================================CheckMe============================= -->
+            <app-custom-select [options]="states" [selectedOptions]="formReactivo.get('state')?.value" (selectedOptionsChange)="formReactivo.get('state')?.setValue($event)" />
+            
+            @if(formReactivo.get('state')?.hasError('required')){
+            <div class="text-danger">Debe seleccionar un estado</div>
+            }
           </div>
         </div>
       </div>
 
+
       <div class="col-lg-6 mb-3">
         <div class="row">
-          <label class="col-2 col-form-label">Tipo de propietario</label>
+          <label class="col-2 col-form-label">Tipo de Propietario</label>
           <div class="col-10">
             <select id="selectOption" class="form-select" formControlName="type" [ngClass]="onValidate('type')">
               @for (t of types; track $index) {
               <option value="{{ t.id }}">{{ t.description }}</option>
               }
+              <option value="" disabled>Seleccione una opción</option>
             </select>
             <div class="invalid-feedback">{{ showError("type") }}</div>
           </div>
         </div>
       </div>
 
+
       <div class="col-lg-6 mb-3">
         <div class="row">
-          <label class="col-2 col-form-label">Nombre de usuario</label>
+          <label class="col-2 col-form-label">Nombre de Usuario</label>
           <div class="col-10">
             <input type="email" class="form-control" formControlName="username" [ngClass]="onValidate('username')" />
             <div class="invalid-feedback">{{ showError("username") }}</div>
@@ -100,24 +117,27 @@
         </div>
       </div>
 
+
       <div class="col-lg-6 mb-3">
         <div class="row">
           <label class="col-2 col-form-label">Contraseña</label>
-          <div class="col-10">
+          <div class="col-10 position: relative">
             <input [type]="passwordVisible ? 'text' : 'password'" class="form-control" formControlName="password"
               [ngClass]="onValidate('password')" />
-            <div class="invalid-feedback">{{ showError("password") }}</div>
+
             <i class="bi" [ngClass]="passwordVisible ? 'bi-eye-slash' : 'bi-eye'" (click)="togglePasswordVisibility()"
               style="
                 cursor: pointer;
                 position: absolute;
-                right: -35px;
-                top: 20px;
-                transform: translateY(-50%);
+                right: 150px;
+                top: auto;
+                transform: translateY(-125%);
               "></i>
+            <div class="invalid-feedback">{{ showError("password") }}</div>
           </div>
         </div>
       </div>
+
 
       <div class="col-lg-6 mb-3">
         <div class="row">
@@ -129,9 +149,10 @@
         </div>
       </div>
 
+
       <div class="col-lg-6 mb-3">
         <div class="row">
-          <label class="col-2 col-form-label">Razón social</label>
+          <label class="col-2 col-form-label">Razón Social</label>
           <div class="col-10">
             <input type="text" class="form-control" formControlName="company" [ngClass]="onValidate('company')" />
             <div class="invalid-feedback">{{ showError("company") }}</div>
@@ -139,31 +160,13 @@
         </div>
       </div>
 
-      <div class="col-lg-6 mb-3">
-        <div class="row">
-          <label class="col-2 col-form-label">Lote</label>
-          <div class="col-10">
-            <select id="selectOption" class="form-select" formControlName="plot" [ngClass]="onValidate('plot')">
-              <option value="" disabled selected>Seleccione un lote</option>
-              @for (s of lotes; track $index) {
-              <option value="{{ s.id }}">
-                Numero de lote: {{ s.plot_number }}, Manzana:
-                {{ s.block_number }}
-              </option>
-              }
-            </select>
-            <div class="invalid-feedback">{{ showError("plot") }}</div>
-          </div>
-        </div>
-      </div>
 
       <div class="col-lg-6 mb-3">
         <div class="row">
-          <label class="col-2 col-form-label">Telegram id</label>
+          <label class="col-2 col-form-label">Lotes</label>
           <div class="col-10">
-            <input type="text" class="form-control" formControlName="telegram_id"
-              [ngClass]="onValidate('telegram_id')" />
-            <div class="invalid-feedback">{{ showError("telegram_id") }}</div>
+            <!-- ============================CheckMe======================= -->
+            <app-custom-select [options]="availablePlots" [multiple]="true" [selectedOptions]="formReactivo.get('plots')?.value" (selectedOptionsChange)="formReactivo.get('plots')?.setValue($event)" />
           </div>
         </div>
       </div>
@@ -182,16 +185,17 @@
               <div class="list-group-item d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center">
                   <i class="bi-file-earmark-text me-3 text-primary fs-5"></i>
-                  <span>{{file.name.length > 40 ? file.name.slice(0, 40)+'...' :
-                    file.name}}</span>
+                  <span>{{file.name.length > 40 ? file.name.slice(0, 40)+'...' : file.name}}</span>
                 </div>
-                <span>{{ (file.size / (1024 * 1024)).toFixed(2) }} MB</span>
+                <button type="button" class="btn bi-x-lg" (click)="deleteFile($index)"></button>
+
               </div>
               }
             </div>
           </div>
         </div>
       </div>
+
 
       <div class="row mb-3 justify-content-end">
         <div class="col-auto">
@@ -200,11 +204,52 @@
           </button>
         </div>
         <div class="col-auto">
-          <button type="submit" class="btn btn-primary" [disabled]="!formReactivo.valid">
-            Guardar
+          <button type="submit" class="btn btn-success" [disabled]="formReactivo.invalid">
+            Registrar
           </button>
         </div>
       </div>
     </div>
   </form>
+
+  <!-- Modal de info -->
+<div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="infoModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="infoModalLabel">Información sobre la pantalla</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Esta pantalla permite la creación de un nuevo propietario mediante un formulario que contiene los siguientes campos:</p>
+        <ul>
+          <li><strong>Nombre y Apellido</strong>: Campo obligatorio para ingresar el nombre completo del propietario.</li>
+          <li><strong>Tipo de Documento</strong>: Selecciona el tipo de documento del propietario (DNI, Pasaporte, CUIT/CUIL).</li>
+          <li><strong>Documento</strong>: Número de identificación del propietario, este campo es obligatorio.</li>
+          <li><strong>Fecha de Nacimiento</strong>: Selecciona la fecha de nacimiento, o usa la fecha predeterminada del 1 de enero de 2000 si no se ingresa.</li>
+          <li><strong>Email</strong>: Correo electrónico del propietario. Asegúrate de que tenga un formato válido.</li>
+          <li><strong>Estado Fiscal</strong>: Permite seleccionar el estado fiscal entre las opciones disponibles.</li>
+          <li><strong>Tipo de Propietario</strong>: Selecciona el tipo de propietario (varía según el contexto del sistema).</li>
+          <li><strong>Nombre de Usuario</strong>: Nombre de usuario único para acceder al sistema.</li>
+          <li><strong>Contraseña</strong>: Contraseña segura para el propietario. Puedes ver el texto de la contraseña mientras la ingresas haciendo clic en el icono de "ojo".</li>
+          <li><strong>Teléfono</strong>: Número de teléfono de contacto del propietario.</li>
+          <li><strong>Razón Social</strong>: Nombre legal de la empresa si el propietario es una entidad jurídica.</li>
+          <li><strong>Lotes</strong>: Selecciona uno o más lotes asociados al propietario (se requiere al menos un lote).</li>
+          <li><strong>Telegram ID</strong>: ID de Telegram asociado al propietario (opcional).</li>
+          <li><strong>Subir Archivos</strong>: Permite cargar archivos relacionados con el propietario. Puedes ver una lista de archivos cargados.</li>
+        </ul>
+        <p>Al final del formulario encontrarás los siguientes botones:</p>
+        <ul>
+          <li><strong>Cancelar</strong>: Cierra el formulario sin guardar los cambios.</li>
+          <li><strong>Guardar</strong>: Guarda la información ingresada. Este botón se habilita solo si el formulario es válido.</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 </section>

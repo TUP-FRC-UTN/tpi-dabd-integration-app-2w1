@@ -46,7 +46,7 @@ export class PostNotificationAdminComponent implements AfterViewInit, OnInit{
   ngOnInit(): void {
     
       const users = this.httpClient.get<UserApiDTO[]>
-      ("http://localhost:8080/general/getUsers")
+      ("http://host.docker.internal:8080/general/getUsers")
       .subscribe(response =>
         {this.users = response;
           this.fillTable();
@@ -202,6 +202,7 @@ export class PostNotificationAdminComponent implements AfterViewInit, OnInit{
       }
     }); 
     return users;
+    console.log(users)
   }
 
   mapUserApiDTOToUserDTO(userApiArr : UserApiDTO[]) : UserDTO[]{

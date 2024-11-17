@@ -1,25 +1,17 @@
 <section class="fondo bg-dark min-vh-100 d-flex align-items-center justify-content-center">
     <div class="container d-flex flex-column align-items-center">
-        <form [formGroup]="loginForm" action="" (ngSubmit)="login()" autocomplete="on">
+        <form [formGroup]="reactiveForm" action="" (ngSubmit)="login()" autocomplete="on">
             <div class="row mb-3">
                 <h2>Inicio de sesión</h2>
             </div>
             <div class="d-flex flex-column align-items-end">
                 <div class="row mb-3">
                     <div class="col d-flex">
-                        <label for="inputCorreo" class="form-label m-0 me-3 mt-2">Email</label>
+                        <label for="inputCorreo" class="form-label m-0 me-3 mt-2">Email o Usuario</label>
                         <div class="d-flex flex-column justify-content-start">
-                            <input type="text" class="form-control custom-input" formControlName="email"
-                                autocomplete="email">
-                            @if(loginForm.get('email')?.dirty || loginForm.get('email')?.touched){
-                            @if(loginForm.controls['email'].errors?.["required"]){
-                            <span class="error d-block text-start">Ingrese su nombre</span>
-                            }
-                            @if(loginForm.controls['email'].errors?.["maxlength"]){
-                            <span class="error d-block form-error text-start">>El nombre no puede superar los 50
-                                caracteres</span>
-                            }
-                            }
+                            <input type="text" class="form-control custom-input" 
+                                formControlName="email" autocomplete="email" [ngClass]="onValidate('email')">
+                                <div class="invalid-feedback d-block mt-1 text-start">{{showError('email')}}</div>
                         </div>
                     </div>
                 </div>
@@ -27,40 +19,29 @@
                     <div class="col d-flex">
                         <label for="inputClave" class="form-label m-0 me-3 mt-2">Contraseña</label>
                         <div class="d-flex flex-column justify-content-start" style="position: relative;">
-                            <input [type]="passwordVisible ? 'text' : 'password'" class="form-control custom-input"
-                                formControlName="password" autocomplete="current-password">
-                            <i class="bi" [ngClass]="passwordVisible ? 'bi-eye-slash' : 'bi-eye'"
-                                (click)="togglePasswordVisibility()"
-                                style="cursor: pointer; position: absolute; right: 15px; top: 20px; transform: translateY(-50%);"></i>
-                            <div class="w-100">
-                                @if (loginForm.get('password')?.dirty || loginForm.get('password')?.touched &&
-                                loginForm.controls['password'].errors) {
-                                @if (loginForm.controls['password'].errors?.["required"]) {
-                                <span class="error d-block mt-1 text-start">Ingrese su contraseña</span>
-                                }
-                                @if (loginForm.controls['password'].errors?.["minlength"]) {
-                                <span class="error d-block mt-1 text-start">La contraseña debe ser mayor a 6
-                                    caracteres</span>
-                                }
-                                }
-                            </div>
+                            <input [type]="passwordVisible ? 'text' : 'password'" class="form-control custom-input" 
+                              formControlName="password" autocomplete="current-password" [ngClass]="onValidate('password')">
+                            <i class="bi" 
+                               [ngClass]="passwordVisible ? 'bi-eye-slash' : 'bi-eye'" 
+                               (click)="togglePasswordVisibility()" 
+                               style="cursor: pointer; position: absolute; right: 32px; top: 20px; transform: translateY(-50%);"></i>
+                               <div class="w-100">
+                                <div class="invalid-feedback d-block mt-1 text-start">{{showError('password')}}</div>
+                              </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>      
             <div class="row mb-3">
                 <div class="col">
-                    <button type="submit" class="btn btn-dark rounded-pill w-100"
-                        [disabled]="!loginForm.valid">Ingresar</button>
+                    <button type="submit" class="btn btn-dark rounded-pill w-25" [disabled]="!reactiveForm.valid" >Ingresar</button>
                 </div>
             </div>
 
             @if (errorLog) {
-            <div class="row mb-3">
-                <div class="col error">
-                    Usuario o contraseña no válidos. Por favor, intentelo de nuevo.
+                <div class="row mb-3">
+                    <div class="invalid-feedback d-block mt-1 text-center">Email o contraseña no válidos. Por favor, intentelo de nuevo.</div>
                 </div>
-            </div>
             }
             <div class="row">
                 <div class="col text-center">
@@ -68,8 +49,7 @@
                         ¿Olvidaste tu contraseña?
                     </a>
                 </div>
-                <button class="btn btn-link" (click)="force()">Ingresar sin usuario</button>
             </div>
         </form>
-    </div>
+    </div>    
 </section>

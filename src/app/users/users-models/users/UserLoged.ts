@@ -3,11 +3,11 @@ export class UserLoged{
     name: string;
     lastname: string;
     roles: string[];
-    plotId: number;
+    plotId: number[];
     constructor(){
         this.id = 0;
         this.roles = [];
-        this.plotId = 0;
+        this.plotId = [];
         this.name = '';
         this.lastname = '';
     }

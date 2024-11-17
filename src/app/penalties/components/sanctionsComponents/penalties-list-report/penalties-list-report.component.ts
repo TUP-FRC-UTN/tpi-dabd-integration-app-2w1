@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { PenaltiesSanctionsServicesService } from '../../../services/sanctionsService/sanctions.service';
+import { SanctionService } from '../../../services/sanctions.service';
 import { ReportDTO } from '../../../models/reportDTO';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
@@ -44,13 +44,14 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
 
   selectedState: string = '';
   selectedStates: string[] = [];   //Valor select
+  today: string = '';
 
   options: { value: string, name: string }[] = []
   @ViewChild(CustomSelectComponent) customSelect!: CustomSelectComponent;
 
   //Constructor
   constructor(
-    private reportServices: PenaltiesSanctionsServicesService,
+    private reportServices: SanctionService,
     private _modal: NgbModal,
     private router: Router,
     private routingService: RoutingService
@@ -89,6 +90,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
       }
     })
     this.resetDates()
+    this.today = new Date().toISOString().split('T')[0];
   }
 
   resetDates() {
@@ -99,6 +101,8 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
     previousMonthDate.setMonth(previousMonthDate.getMonth() - 1);
     this.filterDateStart = this.formatDateToString(previousMonthDate); // Fecha de inicio con hora 00:00:00
   }
+
+
 
   // Función para convertir la fecha al formato `YYYY-MM-DD`
   private formatDateToString(date: Date): string {

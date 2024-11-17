@@ -9,6 +9,9 @@ export interface Fine{
     dischargeDate: number[]; // [año, mes, día]
     amount: number;
     createdDate: string;
+    createdUser: number;
+    lastUpdatedDate: number; 
+    lastUpdatedUser: number;
 }
 export interface Report {
     id: number;

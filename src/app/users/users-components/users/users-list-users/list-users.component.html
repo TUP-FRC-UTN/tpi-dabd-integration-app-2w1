@@ -1,19 +1,14 @@
 <section class="container pt-5">
   <div class="d-flex justify-content-between align-items-center mb-2">
     <div class="d-flex align-items-center">
-      <div id="myTable_filter" class="dataTables_filter" style="text-align: left">
+      <div id="myTable_filter" class="dataTables_filter me-3" style="text-align: left">
         <input class="form-control" placeholder="Buscar" style="width: 300px" aria-controls="myTable"
           id="myTable_search" />
       </div>
 
-      <div id="myTable_filter" class="dataTables_filter" style="text-align: left">
-        <select class="form-select m-3" aria-controls="myTable" style="width: 300px" aria-controls="myTable"
-          (change)="updateFilterRol()" [formControl]="selectRol">
-          <option value disabled>Seleccionar rol</option>
-          @for (role of roles; track $index) {
-            <option [value]="role.description">{{ role.description }}</option>
-          }
-        </select>
+      <div id="myTable_filter" class="dataTables_filter me-3" style="text-align: left">
+        <!-- ========================================CheckMe=============================== -->
+        <app-custom-select [options]="rolesFilter" [multiple]="true" (selectedOptionsChange)="fillOptionsSelected($event)"/>
       </div>
       <div>
         <input type="date" class="form-control me-3" formControlName="datebirth" style="width: 200px" [formControl]="initialDate" (change)="filterByDate()"/>
@@ -22,7 +17,7 @@
         <input type="date" class="form-control me-3" formControlName="datebirth" style="width: 200px" [formControl]="endDate" (change)="filterByDate()"/>
       </div>
       <div>
-        <button class="btn btn-light" (click)="resetFilters()">
+        <button class="btn btn-secondary" (click)="resetFilters()">
           <i class="bi bi-trash"></i>
         </button>
       </div>
@@ -35,9 +30,69 @@
         <i class="bi bi-file-earmark-pdf"></i>
       </button>
     </div>
+    <button class="floating-btn btn btn-primary" (click)="addUser()">
+      <span class="bi-plus-lg"></span>
+    </button>
   </div>
+
+  <!-- Modal de info -->
+<div class="modal fade" id="infoModal" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Información de la pantalla</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
 
   <div class="mb-3">
     <table id="myTable" class="table table-striped table-hover border border-3 rounded"></table>
   </div>
+
+<!-- Modal de info -->
+<div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="infoModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="infoModalLabel">Información sobre la Lista de Usuarios</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>En esta pantalla puedes visualizar la lista completa de usuarios con sus detalles principales. A continuación, algunas características clave:</p>
+        <ul>
+          <li>La tabla está ordenada de manera predeterminada por <strong>fecha de creación en orden descendente</strong></li>
+          <li>Columnas visibles en la tabla:
+            <ul>
+              <li><strong>Fecha de creación:</strong> Muestra la fecha en la que se creó el usuario.</li>
+              <li><strong>Nombre:</strong> El nombre completo del usuario.</li>
+              <li><strong>Rol:</strong> El rol asignado al usuario, como administrador o usuario estándar.</li>
+              <li><strong>Lote:</strong> Número de lote asociado al usuario; es la numeración, no la cantidad de lotes que posee.</li>
+            </ul>
+          </li>
+          <li>Filtros disponibles para refinar los resultados:
+            <ul>
+              <li><strong>Buscar:</strong> Utiliza el campo de búsqueda para encontrar usuarios por nombre o información relevante.</li>
+              <li><strong>Rol:</strong> Filtra los usuarios por su rol asignado.</li>
+              <li><strong>Rango de fecha:</strong> Filtra usuarios dentro de un rango específico de fechas de creación.</li>
+            </ul>
+          </li>
+          <li>Puedes <strong>exportar</strong> la lista de usuarios en formato Excel o PDF usando los botones correspondientes.</li>
+          <li>Para restablecer todos los filtros, haz clic en el botón de reinicio de filtros (<i class="bi bi-trash"></i>).</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </section>

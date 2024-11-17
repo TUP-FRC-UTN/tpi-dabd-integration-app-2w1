@@ -13,7 +13,7 @@ import { PutPlot } from '../users-models/plot/PutPlot';
 export class PlotService {
 
   private readonly http: HttpClient = inject(HttpClient);
-  private readonly url = 'http://localhost:8081';
+  private readonly url = 'http://localhost:9062';
 
   constructor() { }
 
@@ -56,6 +56,10 @@ export class PlotService {
 
   getPlotById(plotId: number): Observable<GetPlotModel>{
     return this.http.get<GetPlotModel>(this.url + '/plots/' + plotId);
+  }
+
+  getPlotsByOwnerId(ownerId: number): Observable<GetPlotModel[]>{
+    return this.http.get<GetPlotModel[]>(this.url + '/plots/' + ownerId + '/owner' )
   }
   
   getAllStates(): Observable<PlotStateModel[]>{
