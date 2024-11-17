@@ -63,8 +63,8 @@ export class UsersHomeComponent implements OnInit {
     this.notificationService.getAll().subscribe(
       notifications => {
         notifications.sort((a, b) => new Date(b.created_datetime).getTime() - new Date(a.created_datetime).getTime());
-
-        this.notifications = notifications.slice(0, 3);
+        let notis = notifications.filter(n => n.userId === this.userLoged?.id);
+        this.notifications = notis.slice(0, 3);
       },
       error => {
         console.error('Error al obtener las notificaciones', error);

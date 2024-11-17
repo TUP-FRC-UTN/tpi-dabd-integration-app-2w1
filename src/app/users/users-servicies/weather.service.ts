@@ -47,7 +47,8 @@ export class WeatherService {
     'humid': 'Húmedo',
     'dry': 'Seco',
     'heatwave': 'Ola de calor',
-    'cold snap': 'Ola de frío'
+    'cold snap': 'Ola de frío',
+    'light intensity drizzle': 'Llovizna ligera',
   };
 
 
