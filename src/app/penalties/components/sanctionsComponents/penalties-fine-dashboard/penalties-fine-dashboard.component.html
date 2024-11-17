@@ -114,12 +114,12 @@
       <app-custom-kpi [amount]="averageFinesPerMonth" title="Promedio" subTitle="Período" tooltip="Total del Período"
         [customStyles]="{ 'background-color': '#FFE699' }" icon="bi bi-calendar-day" formatPipe=""></app-custom-kpi>
       <div class="lowestHighest" (click)="openModalPreview(5)">
-        <app-custom-kpi [amountundefined]="highestFine?.amount" title="Multa más alta" subTitle="Período"
+        <app-custom-kpi [amount]="highestFine?.amount" title="Multa más alta" subTitle="Período"
           tooltip="Total del Período" [customStyles]="{ 'background-color': '#B3F5BC' }" icon="bi bi-calendar-day"
           formatPipe="currency"></app-custom-kpi>
       </div>
       <div class="lowestHighest" (click)="openModalPreview(6)">
-        <app-custom-kpi [amountundefined]="lowestFine?.amount" title="Multa más baja" subTitle="Período"
+        <app-custom-kpi [amount]="lowestFine?.amount" title="Multa más baja" subTitle="Período"
           tooltip="Total del Período" [customStyles]="{ 'background-color': '#FCAE7C' }" icon="bi bi-calendar-day"
           formatPipe="currency"></app-custom-kpi>
       </div>
