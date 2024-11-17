@@ -5,12 +5,9 @@ import { AccessVisitorRegistryComponent } from "./components/access_visitors/acc
 import { AccessContainerVisitorsRegistrationComponent } from "./components/access_visitors/access_visitors_register/access-container-visitors-registration/access-container-visitors-registration.component";
 import { MetricsComponent } from "./components/metrics/metrics.component";
 
-
 export const ENTRY_ROUTES: Routes = [
     { path: 'visitors', component: AccessVisitorRegistryComponent },
     { path: 'reports', component: AccessGlobalReportComponent },
-    //{ path: 'entry', component: AccessEntryComponent }, BORRAR
-    //{ path: 'entry', component: AccessDailyFetchComponent }, BORRAR
     { path: 'dashboard', component: MetricsComponent },
     { path: 'visitor/register', component: AccessContainerVisitorsRegistrationComponent },
     { path: 'vehicle/register', component: AccessVehiclesViewComponent }
