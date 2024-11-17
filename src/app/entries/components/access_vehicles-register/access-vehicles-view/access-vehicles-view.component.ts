@@ -11,12 +11,13 @@ import { translateMessage } from '../../../models/access-visitors/interface/acce
 import Swal from 'sweetalert2';
 import { AuthService } from '../../../../users/users-servicies/auth.service';
 import { AccessVisitorsRegisterServiceHttpClientService } from '../../../services/access_visitors/access-visitors-register/access-visitors-register-service-http-client/access-visitors-register-service-http-client.service';
+import { AccessRegisterEmergencyComponent } from "../../access-register-emergency/access-register-emergency.component";
 
 declare var bootstrap: any;
 @Component({
   selector: 'app-access-vehicles-view',
   standalone: true,
-  imports: [ReactiveFormsModule,CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, AccessRegisterEmergencyComponent],
   templateUrl: './access-vehicles-view.component.html',
   styleUrl: './access-vehicles-view.component.css'
 })
