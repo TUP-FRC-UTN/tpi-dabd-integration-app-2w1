@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ExpenseGenerationCounter } from '../expense-generation-interfaces/expense-generation-counter';
+import { ExpenseGenerationCounter } from '../expense-generation-interfaces/expense-generation-accountant';
 import { HttpClient } from '@angular/common/http';
 import { Observable, catchError, throwError, tap } from 'rxjs';
 

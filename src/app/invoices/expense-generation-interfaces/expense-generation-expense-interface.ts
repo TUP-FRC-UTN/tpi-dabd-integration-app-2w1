@@ -17,8 +17,15 @@ export interface ExpenseGenerationExpenseInterface {
     payment_platform: string;
     payment_id: string;
     selected?: boolean;
-    paymentDate?: Date;
-    
+    paymentDate?: Date;   
+}
 
-
+export interface DebtorExpense {
+    owner_id: number;
+    ownerName: string;
+    period: string;
+    uuid: string;
+    second_expiration_date: string;
+    second_expiration_amount: number;
+    actual_amount: number;
 }
