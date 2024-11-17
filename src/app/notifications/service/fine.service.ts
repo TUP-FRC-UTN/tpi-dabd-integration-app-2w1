@@ -9,7 +9,7 @@ import { Fine } from '../models/fine';
 })
 export class FineService {
 
-  private urlApi = 'http://localhost:8080/fines/getNotifications';
+  private urlApi = 'http://host.docker.internal:8080/fines/getNotifications';
 
   constructor(private http: HttpClient) { }
 

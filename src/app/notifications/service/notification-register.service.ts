@@ -9,7 +9,7 @@ import { AllNotifications } from '../models/all-notifications';
 })
 export class NotificationRegisterService {
 
-  private url = "http://localhost:8080/NotificationsRegister";
+  private url = "http://host.docker.internal:8080/NotificationsRegister";
 
   constructor(private http: HttpClient) { }
   
