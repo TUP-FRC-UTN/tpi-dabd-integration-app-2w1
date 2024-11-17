@@ -3,6 +3,7 @@ import { ExpenseGenerationExpenseInterface } from '../expense-generation-interfa
 import { ExpenseGenerationExpenseService } from '../expense-generation-services/expense-generation-expense.service';
 import { CommonModule, registerLocaleData } from '@angular/common';
 import localeEsAr from '@angular/common/locales/es-AR';
+import { environment } from '../../common/environments/environment';
 registerLocaleData(localeEsAr, 'es-AR');
 
 @Component({
@@ -39,7 +40,7 @@ export class ExpenseGenerationCardComponent implements OnInit {
   async openPdf(uuid: string) {
     try {
       const response = await fetch(
-        `http://localhost:8021/api/expenses/pdf/${uuid}`
+        environment.services.expenseGeneration + `/api/expenses/pdf/${uuid}`
       );
       if (!response.ok) {
         alert('No se pudo cargar el pdf');

@@ -5,6 +5,7 @@ import { ExpenseGenerationExpenseInterface } from '../expense-generation-interfa
 import { Owner } from '../expense-generation-interfaces/expense-generation-owner';
 import { ExpenseUpdateDTO } from '../expense-generation-interfaces/expense-generation-update.interface';
 import { ExpensePaymentUpdateDTO } from '../expense-generation-interfaces/expense-generation-payment-interface';
+import { environment } from '../../common/environments/environment';
 @Injectable({
   providedIn: 'root'
 })
@@ -12,9 +13,9 @@ export class ExpenseGenerationExpenseService {
 
 
 
-  private ApiBaseUrl = "http://localhost:8021/api/expenses/";
-  private urlAllOwners =  "http://localhost:8021/api/v1/owners/active"
-  private urlOwnerId =  "http://localhost:8021/api/v1/owners/"
+  private ApiBaseUrl = environment.services.expenseGeneration + "/api/expenses/";
+  private urlAllOwners = environment.services.expenseGeneration + "/api/v1/owners/active"
+  private urlOwnerId =  environment.services.expenseGeneration + "/api/v1/owners/"
   constructor(private http: HttpClient) { }
 
   getAllExpenses(ownerId: number): Observable<ExpenseGenerationExpenseInterface[]> {

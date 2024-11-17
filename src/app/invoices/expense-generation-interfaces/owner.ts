@@ -6,7 +6,7 @@ export interface Owner {
   dni: number;
 
   active?: boolean;
-  plots?: Plot[];
+  plot?: Plot[];
   username?: string;
   email?: string;
   contactId?: number;

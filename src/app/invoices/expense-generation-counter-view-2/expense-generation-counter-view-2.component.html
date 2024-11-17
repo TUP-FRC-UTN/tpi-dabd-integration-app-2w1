@@ -41,9 +41,9 @@
     <!-- KPI LIMITE 5-->
     <div class="col-3 gap-2 d-flex flex-column justify-content-center">
       @for (kpi of principalKpis; track $index) {
-      <app-expense-generation-kpi [amount]="kpi.amount" [title]="kpi.title" [subTitle]="kpi.subTitle"
+      <app-custom-kpi [amount]="kpi.amount" [title]="kpi.title" [subTitle]="kpi.subTitle"
         [tooltip]="kpi.tooltip" [customStyles]="kpi.customStyles" [icon]="kpi.icon" [formatPipe]="kpi.formatPipe">
-      </app-expense-generation-kpi> }
+      </app-custom-kpi> }
 
     </div>
 
@@ -159,10 +159,10 @@
                   <div class="col-8 mb-1 w-100">
                     @for (kpi of pieKpis; track $index) {
                     <div class="mb-2">
-                      <app-expense-generation-kpi [amount]="kpi.amount" [title]="kpi.title" [subTitle]="kpi.subTitle"
+                      <app-custom-kpi  [amount]="kpi.amount" [title]="kpi.title" [subTitle]="kpi.subTitle"
                         [tooltip]="kpi.tooltip" [customStyles]="kpi.customStyles" [icon]="kpi.icon"
                         [formatPipe]="kpi.formatPipe">
-                      </app-expense-generation-kpi>
+                      </app-custom-kpi >
                     </div>
                     }
                   </div>
@@ -206,10 +206,10 @@
                   <div class="col-5 m-1  w-100">
                     @for (kpi of topFiveKpi; track $index) {
                     <div class="mb-2 w-100">
-                      <app-expense-generation-kpi [amount]="kpi.amount" [title]="kpi.title" [subTitle]="kpi.subTitle"
+                      <app-custom-kpi [amount]="kpi.amount" [title]="kpi.title" [subTitle]="kpi.subTitle"
                         [tooltip]="kpi.tooltip" [customStyles]="kpi.customStyles" [icon]="kpi.icon"
                         [formatPipe]="kpi.formatPipe">
-                      </app-expense-generation-kpi>
+                      </app-custom-kpi >
                     </div>
                     }
                   </div>
@@ -266,10 +266,10 @@
           <div class="col-3 gap-2 d-flex flex-column justify-content-center">
             @for (kpi of columnKpis; track $index) {
             <div class="mb-2 w-100">
-              <app-expense-generation-kpi [amount]="kpi.amount" [title]="kpi.title" [subTitle]="kpi.subTitle"
+              <app-custom-kpi [amount]="kpi.amount" [title]="kpi.title" [subTitle]="kpi.subTitle"
                 [tooltip]="kpi.tooltip" [customStyles]="kpi.customStyles" [icon]="kpi.icon"
                 [formatPipe]="kpi.formatPipe">
-              </app-expense-generation-kpi>
+              </app-custom-kpi>
             </div>
             }
           </div>

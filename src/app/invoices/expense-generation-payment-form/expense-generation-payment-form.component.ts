@@ -8,6 +8,7 @@ import { CurrencyPipe, DatePipe, NgClass, NgFor, NgIf, NgSwitch, NgSwitchCase, N
 import { loadStripe } from '@stripe/stripe-js';
 import {RouterLink, Router} from '@angular/router';
 import { ExpensePaymentUpdateDTO } from '../expense-generation-interfaces/expense-generation-payment-interface';
+import { environment } from '../../common/environments/environment';
 
 declare var Swal: any;
 
@@ -234,7 +235,7 @@ export class ExpenseGenerationPaymentFormComponent implements OnInit {
 
   async openPdf() {
     try {
-      const response = await fetch(`http://localhost:8020/generate-receipt/${this.paymentIntentId}`);
+      const response = await fetch(environment.services.stripeService + `/generate-receipt/${this.paymentIntentId}`);
       if (!response.ok) {
         alert("No se pudo cargar el pdf")
       }

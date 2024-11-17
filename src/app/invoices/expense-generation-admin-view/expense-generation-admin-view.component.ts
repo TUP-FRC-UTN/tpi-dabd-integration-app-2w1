@@ -14,6 +14,7 @@ import Swal from 'sweetalert2';
 import { Observable } from 'rxjs/internal/Observable';
 import { BehaviorSubject } from 'rxjs';
 import localeEsAr from '@angular/common/locales/es-AR';
+import { environment } from '../../common/environments/environment';
 registerLocaleData(localeEsAr, 'es-AR');
 
 declare var window: any;
@@ -1156,7 +1157,7 @@ applyPagination(data: any[]) {
   async openPdf(id: number) {
     try {
       const response = await fetch(
-        `http://localhost:8021/api/expenses/pdf/${id}`
+        environment.services.expenseGeneration + `/api/expenses/pdf/${id}`
       );
       if (!response.ok) {
         alert('No se pudo cargar el PDF');
@@ -1180,8 +1181,8 @@ applyPagination(data: any[]) {
 
       const hasLetters = /[a-zA-Z]/.test(expense.payment_id);
       const url = hasLetters
-        ? `http://localhost:8020/generate-receipt/${expense.payment_id}`
-        : `http://localhost:8022/api/receipts/${expense.payment_id}/pdf`;
+        ? environment.services.expenseGeneration + `/generate-receipt/${expense.payment_id}`
+        : environment.services.expenseGeneration + `/api/receipts/${expense.payment_id}/pdf`;
 
       const response = await fetch(url);
       if (!response.ok) {
@@ -1206,7 +1207,6 @@ applyPagination(data: any[]) {
     };
     return new Intl.DateTimeFormat('es-ES', options).format(date);
   }
-  //Genera pdf y excel, filtros correctos, nuevo modal, boton ver mas implementado no completo, html rehecho y nueva interfaz, ligero
 
   selectedExpirationDates = {
     first_expiration_date: '',
@@ -1311,8 +1311,8 @@ applyPagination(data: any[]) {
       theme: 'grid',
       margin: { top: 30, bottom: 20 },
       columnStyles: {
-        4: { halign: 'right' }, // Alinear "Monto Actual" a la derecha
-        5: { halign: 'right' }, // Alinear "Monto Pagado" a la derecha
+        4: { halign: 'right' }, 
+        5: { halign: 'right' }, 
       },
     });
 
@@ -1336,7 +1336,7 @@ applyPagination(data: any[]) {
         'Estado',
         'Monto Actual',
         'Monto Pagado',
-      ], // Cambié 'ID Propietario' a 'Nombre'
+      ], 
     ];
 
     const excelData = this.expenses.map(
@@ -1346,8 +1346,8 @@ applyPagination(data: any[]) {
           this.formatDate(new Date(expense.issueDate)),
           this.getOwnerName(expense.owner_id),
           expense.status,
-          `$${(expense.actual_amount || 0).toFixed(2)}`, // Aseguramos dos decimales y mostramos $0.00 si es null o 0
-          `$${(expense.amount_payed || 0).toFixed(2)}`, // Aseguramos dos decimales y mostramos $0.00 si es null o 0
+          `$${(expense.actual_amount || 0).toFixed(2)}`, 
+          `$${(expense.amount_payed || 0).toFixed(2)}`, 
         ];
       }
     );

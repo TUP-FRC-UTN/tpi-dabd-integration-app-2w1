@@ -10,6 +10,7 @@ import {Router, RouterLink} from '@angular/router';
 import localeEsAr from '@angular/common/locales/es-AR';
 import { OwnerService } from '../expense-generation-services/expense-generation-owner-service';
 import { AuthService } from '../../users/users-servicies/auth.service';
+import { environment } from '../../common/environments/environment';
 registerLocaleData(localeEsAr, 'es-AR');
 @Component({
   selector: 'app-expense-generation-user-view',
@@ -138,7 +139,7 @@ export class ExpenseGenerationUserViewComponent implements OnInit {
   async openPdf(uuid: string) {
     try {
       const response = await fetch(
-        `http://localhost:8021/api/expenses/pdf/${uuid}`
+        environment.services.expenseGeneration + `/api/expenses/pdf/${uuid}`
       );
       if (!response.ok) {
         alert('No se pudo cargar el pdf');
@@ -157,7 +158,7 @@ export class ExpenseGenerationUserViewComponent implements OnInit {
         const hasLetters = /[a-zA-Z]/.test(expense.payment_id);
         if (hasLetters) {
           const response = await fetch(
-            `http://localhost:8020/generate-receipt/${expense.payment_id}`
+            environment.services.expenseGeneration + `/generate-receipt/${expense.payment_id}`
           );
           if (!response.ok) {
             alert('No se pudo cargar el pdf');
@@ -167,7 +168,7 @@ export class ExpenseGenerationUserViewComponent implements OnInit {
           window.open(url);
         } else {
           const response = await fetch(
-            `http://localhost:8022/api/receipts/${expense.payment_id}/pdf`
+            environment.services.expenseGeneration + `/api/receipts/${expense.payment_id}/pdf`
           );
           if (!response.ok) {
             alert('No se pudo cargar el pdf');

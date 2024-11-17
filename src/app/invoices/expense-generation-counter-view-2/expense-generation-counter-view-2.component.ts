@@ -6,7 +6,6 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { DebtorInfo, ExpenseGenerationCounter, Kpi, PaymentMethod } from '../expense-generation-interfaces/expense-generation-accountant';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { ExpenseGenerationKpiComponent } from "../expense-generation-kpi/expense-generation-kpi.component";
 import { ExpenseGenerationExpenseService } from '../expense-generation-services/expense-generation-expense.service';
 import { Owner } from "../expense-generation-interfaces/expense-generation-owner" 
 import { CustomSelectComponent } from '../../common/components/custom-select/custom-select.component';
@@ -16,7 +15,7 @@ import { DebtorExpense } from '../expense-generation-interfaces/expense-generati
 @Component({
   selector: 'app-expense-generation-counter-view-2',
   standalone: true,
-  imports: [GoogleChartsModule, NgSelectModule, FormsModule, CommonModule, ExpenseGenerationKpiComponent, CustomSelectComponent],
+  imports: [GoogleChartsModule, NgSelectModule, FormsModule, CommonModule, CustomSelectComponent],
   templateUrl: './expense-generation-counter-view-2.component.html',
   styleUrl: './expense-generation-counter-view-2.component.css'
 })
