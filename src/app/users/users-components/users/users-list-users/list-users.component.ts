@@ -39,6 +39,7 @@ export class ListUsersComponent implements OnInit {
   constructor(private router: Router, private modal: NgbModal, private plotService: PlotService) { }
 
 
+  @ViewChild('customSelect') customSelect!: CustomSelectComponent;
   typeModal: string = '';
   user: number = 0;
   users: UserGet[] = [];
@@ -87,10 +88,7 @@ export class ListUsersComponent implements OnInit {
           create_date: user.create_date.replace(/-/g, '/'),
           
 
-        }));
-
-        console.log(this.users);
-        
+        }));        
 
         //Inicializar DataTables después de cargar los datos
         setTimeout(() => {
@@ -254,7 +252,7 @@ export class ListUsersComponent implements OnInit {
           allowOutsideClick: false,
           allowEscapeKey: false
         })
-        this.router.navigate(['/home']);
+        this.router.navigate(['/main']);
       }
     });
 
@@ -294,30 +292,41 @@ export class ListUsersComponent implements OnInit {
   }
 
   resetFilters() {
-    // Reiniciar el valor del control de rol
+    // Reiniciar los valores de rol y fechas
     this.selectRol.setValue('');
     this.initialDate.setValue(this.minDate);
     this.endDate.setValue(this.maxDate);
-    // Limpiar el campo de búsqueda
+  
+    // Limpiar el campo de búsqueda general
     const searchInput = document.getElementById("myTable_search") as HTMLInputElement;
     if (searchInput) {
       searchInput.value = ''; // Limpiar el valor del input
     }
-
+  
+    // Eliminar todos los filtros personalizados
+    $.fn.dataTable.ext.search.splice(0, $.fn.dataTable.ext.search.length);
+  
     // Obtener la instancia de DataTable
-    $.fn.dataTable.ext.search.pop();
     const table = $('#myTable').DataTable();
-
-    this.rolesFilter = [];
-    this.rolesFilter = this.roles.map(r => ({ 
-      value: r.description, 
-      name: r.description
+  
+    // Reiniciar roles y custom select
+    this.rolesFilter = this.roles.map(r => ({
+      value: r.description,
+      name: r.description,
     }));
-    
-
-    table.column(2).search('').draw();
-    table.search('').draw();
+  
+    if (this.customSelect) {
+      this.customSelect.setData([]); // Reiniciar datos del custom select
+    }
+  
+    // Limpiar filtros de columnas y búsqueda general
+    table.column(2).search(''); // Limpiar columna específica
+    table.search(''); // Limpiar búsqueda general
+  
+    // Redibujar la tabla
+    table.draw();
   }
+  
 
   fillOptionsSelected(options: any) {
     var optiones = options.map((option: any) => option).join(' ');
@@ -331,26 +340,32 @@ export class ListUsersComponent implements OnInit {
   //Metodo para filtrar la tabla en base a las 2 fechas
   filterByDate() {
     const table = $('#myTable').DataTable();
-
+  
     // Convertir las fechas seleccionadas a objetos Date para comparar
-    const start = this.initialDate.value ? new Date(this.initialDate.value) : null;
-    const end = this.endDate.value ? new Date(this.endDate.value) : null;
-
-    // Agregar función de filtro a DataTable
+    const start = this.initialDate.value ? (new Date(this.initialDate.value)).toISOString().split('T')[0] : null;
+    const end = this.endDate.value ? (new Date(this.endDate.value)).toISOString().split('T')[0]  : null;
+  
+    // Limpiar cualquier filtro previo relacionado con fechas
+    $.fn.dataTable.ext.search.splice(0, $.fn.dataTable.ext.search.length);
+  
+    // Agregar una nueva función de filtro
     $.fn.dataTable.ext.search.push((settings: any, data: any, dataIndex: any) => {
       // Convertir la fecha de la fila (data[0]) a un objeto Date
       const rowDateParts = data[0].split('/'); // Asumiendo que la fecha está en formato DD/MM/YYYY
-      const rowDate = new Date(`${rowDateParts[2]}-${rowDateParts[1]}-${rowDateParts[0]}`); // Convertir a formato YYYY-MM-DD
-
+      const rowDate = (new Date(`${rowDateParts[2]}-${rowDateParts[1]}-${rowDateParts[0]}`)).toISOString().split('T')[0] ; // Convertir a formato YYYY-MM-DD
+      
+      
+  
       // Realizar las comparaciones
       if (start && rowDate < start) return false;
       if (end && rowDate > end) return false;
       return true;
     });
-
-    // Redibujar la tabla después de aplicar el filtro
+  
+    // Redibujar la tabla con el filtro aplicado
     table.draw();
   }
+  
 
   estadoRoles: { [id: string]: boolean } = {};
 
@@ -497,9 +512,6 @@ export class ListUsersComponent implements OnInit {
         }
       });
 
-      console.log(userPlots);
-
-
       //Cuando se carga se abre el modal
       const modalRef = this.modal.open(ModalInfoUserComponent, { size: 'lg', keyboard: false });
       modalRef.componentInstance.typeModal = type;
@@ -537,12 +549,12 @@ export class ListUsersComponent implements OnInit {
   }
 
   addUser() {
-    this.router.navigate(['/home/users/add'])
+    this.router.navigate(['/main/users/add'])
   }
 
   //Redirige
   redirectEdit(id: number) {
-    this.router.navigate(['/home/users/edit', id]);
+    this.router.navigate(['/main/users/edit', id]);
   }
 
   //Busca el user y se lo pasa al modal

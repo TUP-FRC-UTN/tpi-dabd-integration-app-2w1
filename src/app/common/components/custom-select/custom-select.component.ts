@@ -93,7 +93,6 @@ export class CustomSelectComponent {
     this.selectControl.setValue(value);
   }
 
-
   //Alterna la seleccion sel item al tocar sobre la label (Por problemas en la seleccion multiple)
   toggleSelection(item: any): void {
     item.selected = !item.selected;

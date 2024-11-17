@@ -1,11 +1,10 @@
 import { Component, inject, Input, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Owner } from '../../../users-models/owner/Owner';
 import { FileService } from '../../../users-servicies/file.service';
 import { FileDto } from '../../../users-models/owner/FileDto';
 import { CommonModule } from '@angular/common';
-import { PlotService } from '../../../users-servicies/plot.service';
 import { GetPlotDto } from '../../../users-models/plot/GetPlotDto';
 import { OwnerService } from '../../../users-servicies/owner.service';
 
@@ -43,15 +42,10 @@ export class UsersModalInfoOwnerComponent implements OnInit{
     this.fullName = this.ownerModel.name + " " + this.ownerModel.lastname;
 
     this.ownerService.getByIdWithUser(this.ownerModel.id).subscribe({
-      next: (data: any) => {     
-        
-        this.plotsOwner = data.plot;
-        console.log(this.plotsOwner);
-        
+      next: (data: any) => {
+        this.plotsOwner = data.plot;    
       }
     });
-
-    
   }
 
   constructor(public activeModal: NgbActiveModal, private fb: FormBuilder) {
