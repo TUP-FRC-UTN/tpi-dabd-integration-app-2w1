@@ -1,18 +1,21 @@
+<button class="floating-btn btn btn-primary" (click)="addCategory()">
+  <span class="bi-plus-lg"></span>
+</button>
 <section class="py-5">
   <div class="container p-3 border border-2 rounded shadow-lg">
     <!-- Botón de agregar -->
-    <div class="row mb-3 text-end">
+    <!-- <div class="row mb-3 text-end">
       <div class="col">
         <button class="btn btn-primary" (click)="addCategory()">
           <span class="bi-plus-lg"></span>
         </button>
       </div>
-    </div>
+    </div> -->
 
     <!-- Fila de botones de filtro -->
-    <div class="row mb-3">
+    <div class="row mb-3" style="width: 100%;">
       <!-- Barra de busqueda -->
-      <div class="col">
+      <div class="col-3">
         <input
           type="text"
           placeholder="Buscar"
@@ -21,11 +24,15 @@
           (input)="onSearch($event)"
         >
       </div>
+      <div class="col-3">
+     <app-expenses-state-category-ng-select [(selectedStates)]="selectedStates" [multiple]="true" (selectedStatesChange)="onStateChange()" (selectedStateChange)="onStateChange()"></app-expenses-state-category-ng-select>
+      </div>
 
       <!-- Botones de exportar -->
-      <div class="col-auto d-flex gap-1 text-end">
-        <button (click)="exportToExcel()" id="exportExcelBtn" class="btn btn-success bi-file-earmark-excel"></button>
-        <button (click)="exportToPDF()" id="exportPdfBtn" class="btn btn-danger bi-file-earmark-pdf"></button>
+      <div class="col d-flex gap-1  justify-content-end"style="width: 100%;">
+        <button type="button" class="btn btn-secondary bi bi-trash filterbutton" title="Limpiar Filtros" (click)="clearFiltered()"></button>
+        <button (click)="exportToExcel()" id="exportExcelBtn" class="btn btn-success bi-file-earmark-excel filterbutton" title="Exportar Excel"></button>
+        <button (click)="exportToPDF()" id="exportPdfBtn" class="btn btn-danger bi-file-earmark-pdf filterbutton" title="Exportar PDF"></button>
       </div>
     </div>
 
@@ -36,9 +43,12 @@
   </div>
 </section>
 <app-expenses-view-category-details [category]="categorySelected" ></app-expenses-view-category-details>
-<app-expenses-edit-category [category]="categorySelected"
-(eventSucces)="loadAlertAndFilter('Se actualizo la categoria con exito')"
-(eventError)="showErrorAlert('La categoria no se pudo actualizar')"></app-expenses-edit-category>
+<app-expenses-edit-category
+  [category]="categorySelected"
+  (eventSuccess)="handleEditSuccess()"
+  (eventError)="handleEditError($event)"
+  >
+</app-expenses-edit-category>
 <app-expense-register-category 
 (eventSucces)="loadAlertAndFilter('Se registro la categoria con exito')"
-(eventError)="showErrorAlert('La categoria no puedo registrarse')"></app-expense-register-category>
+(eventError)="showErrorAlert($event)"></app-expense-register-category>
