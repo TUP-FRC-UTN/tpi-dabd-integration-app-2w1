@@ -104,12 +104,27 @@
         <div class="row">
           <div class="col">
             <div class="card border-0 shadow-lg rounded-4 mb-3 hover-scale" (click)="makeBig(1)">
-              <div class="card-body">
-                <h6 class="text-secondary b-2">
-                  Cantidad de Ingresos del Mes Actual
-                </h6>
-                <h5 class="mb-0">{{this.showCurrentMonth()}} | {{ currentMonthAccessCount }}</h5>
+
+              <div class="card-body position-relative p-0">
+                <!-- Ícono en la fila superior alineado a la derecha -->
+                <div class="d-flex justify-content-end mb-0 m-1 p-1">
+                  <i
+                    class="bi bi-star m-0 p-0"
+                    style="font-size: 1rem; opacity: 0.8"
+                  ></i>
+                </div>
+                
+                <!-- Título centrado en la fila del medio -->
+                <div class="text-center mt-0">
+                  <h6 class="mb-1 fw-medium text-secondary">Cantidad de Ingresos del Mes Actual</h6>
+                </div>
+        
+                <!-- Contador centrado en la fila inferior -->
+                <div class="text-center">
+                  <h6 class="mb-2">{{this.showCurrentMonth()}} | {{ currentMonthAccessCount }}</h6>
+                </div>
               </div>
+
             </div>
           </div>
         </div>
@@ -243,8 +258,8 @@
               [type]="columnChartType"
               [data]="columnChartData"
               [options]="columnChartOptions"
-              class="expanded-chart-content"
-              style="width: 100%; height: 287px"
+              class="expanded-chart-content p-1"
+              style="width: 100%; height: 295px"
             >
             </google-chart>
           </div>
@@ -255,15 +270,15 @@
       <div class="col-md-4" *ngIf="status === 2">
         <!-- Método más usado -->
         <div class="row">
-          <div class="col mb-3 me-0" *ngFor="let data of uniqueData">
+          <div class="col-6 mb-3 me-0" *ngFor="let data of uniqueData">
             <div class="card border-0 shadow-lg mb-2 rounded-4 h-100 w-100"
               [ngClass]="{
                 'bg-success': chartType === 'ingresos',
                 'bg-danger': chartType === 'egresos'
               }">
               <div class="card-body position-relative">
-                <div class="pe-5">
-                  <h6 class="mb-3 p-0">
+                <div class="text-center">
+                  <h6 class="mb-2 p-0">
                     {{ translateRole(data.userType) }}
                   </h6>
                   <h5 class="mb-1 fw-semibold">{{ data.percentage }}%</h5>
@@ -316,7 +331,7 @@
 
             <hr class="mt-1 mb-0">
             <div id="chartContainer mt-0">
-              <google-chart class="mt-0" style="width: 700px; height: 338px" [type]="barChartType" [data]="barChartData" [options]="barChartOptions">
+              <google-chart class="mt-0 ps-1 pb-1" style="width: 700px; height: 338px" [type]="barChartType" [data]="barChartData" [options]="barChartOptions">
               </google-chart>
             </div>
           </div>
@@ -466,7 +481,7 @@
               
               <!-- Título centrado en la fila del medio -->
               <div class="text-center">
-                <h6 class="mb-1 fw-medium text-secondary">Vecino con más personas autorizadas</h6>
+                <h6 class="mb-2 fw-medium text-secondary">Vecino con más personas autorizadas</h6>
               </div>
       
               <!-- Contador centrado en la fila inferior -->
@@ -524,7 +539,7 @@
                 </div>
                 <!-- Título centrado en la fila del medio -->
                 <div class="text-center">
-                  <h6 class="mb-1 fw-medium text-secondary">Guardia con mayor registro de Ingresos</h6>
+                  <h6 class="mb-2 fw-medium text-secondary">Guardia con mayor registro de Ingresos</h6>
                 </div>
                 <!-- Contador centrado en la fila inferior -->
                 <div class="text-center mb-2">
@@ -547,7 +562,7 @@
                 </div>
                 <!-- Título centrado en la fila del medio -->
                 <div class="text-center">
-                  <h6 class="mb-1 fw-medium text-secondary">Guardia con mayor registro de Egresos</h6>
+                  <h6 class="mb-2 fw-medium text-secondary">Guardia con mayor registro de Egresos</h6>
                 </div>
                 <!-- Contador centrado en la fila inferior -->
                 <div class="text-center mb-2">
