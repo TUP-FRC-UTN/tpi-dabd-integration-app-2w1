@@ -30,7 +30,8 @@ export class BillService {
     return this.http.delete<void>(url, { headers });
   }
   getBillsByDateRange(formattedDateFrom: string, formattedDateTo: string) :Observable<Bill[]> {
-    const urlWithFilters = `${this.apiUrl}?dateFrom=${formattedDateFrom}&dateTo=${formattedDateTo}`;
+    console.log(this.apiUrl);
+    const urlWithFilters = `${this.apiUrl}/expenses/getByFilters?dateFrom=${formattedDateFrom}&dateTo=${formattedDateTo}`;
     console.log(urlWithFilters)
     const response =  this.http.get<Bill[]>(urlWithFilters);
     return response

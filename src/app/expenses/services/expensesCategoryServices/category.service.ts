@@ -15,7 +15,7 @@ export class CategoryService {
   private url=environment.services.expensesManager
 
   getCategory(): Observable<Category[]> {
-    return this.http.get<Category[]>(this.url+'/all');
+    return this.http.get<Category[]>(this.url+'/categories/all');
   }
 
   add(expenseCategory: Category): Observable<Category> {
