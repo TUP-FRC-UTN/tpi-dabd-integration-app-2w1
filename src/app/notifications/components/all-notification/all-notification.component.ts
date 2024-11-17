@@ -25,6 +25,9 @@ import { MockUserService } from "../../service/mockUser.service";
 import { AllNotifications } from "../../models/all-notifications";
 import { Inventory } from "../../models/inventory";
 import { SelectMultipleComponent } from "../../select-multiple/select-multiple.component";
+import { Subscription } from "rxjs";
+
+declare var bootstrap: any;
 
 @Component({
   selector: "app-all-notification",
@@ -56,6 +59,7 @@ export class AllNotificationComponent implements OnInit {
     generals: [],
     inventories: [],
   };
+  subscription = new Subscription()
   notificationTypes: any[] = [
     { value: "Multas", name: "Multas" },
     { value: "Accesos", name: "Accesos" },
@@ -68,12 +72,16 @@ export class AllNotificationComponent implements OnInit {
 
   dropdownSeleccionadas: any[] = [];
 
+  allNotificationsArray: any[] = [];
+
   recibirSeleccionadas(node: any) {
     this.dropdownSeleccionadas = node;
     this.fillTable();
     console.log(node);
   }
-
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe()
+  }
   //onInit y onDestroy
   ngOnInit(): void {
     this.table = $("#myTable").DataTable({
@@ -91,6 +99,7 @@ export class AllNotificationComponent implements OnInit {
       ],
 
       paging: true,
+      select: { style: "single" },
       searching: true,
       ordering: true,
       lengthChange: true,
@@ -128,7 +137,6 @@ export class AllNotificationComponent implements OnInit {
   //injecciones
   constructor(
     private service: NotificationRegisterService,
-    private serviceUser: MockUserService,
     private datePipe: DatePipe
   ) {
     this.form = new FormGroup({
@@ -160,12 +168,30 @@ export class AllNotificationComponent implements OnInit {
         alert("error al cargar las notifications");
       },
     });
+    this.subscription.add(getSubscription)
   }
   formatDate(date: Date): string {
     return this.datePipe.transform(date, "dd/MM/yyyy hh:mm:ss") || "";
   }
 
   fillTable() {
+    const table = $("#myTable").DataTable();
+
+    table.on("select", (e, dt, type, indexes,$element) => {
+
+      if (type === "row") {
+        const rowData = table.row(indexes[0]).data();
+        let rowIndex = indexes[0];
+        let selectedNotificationObject = this.allNotificationsArray[rowIndex];
+        let status = "No leida";
+        if (selectedNotificationObject.markedRead == true) {
+          status = "Leida";
+        }
+        this.setNotification(rowData, status);
+        this.openModal(this.selectedNotification)
+      }
+    });
+
     this.table.clear().draw();
 
     const AddRow = (notification: any, tipo: string) => {
@@ -189,19 +215,8 @@ export class AllNotificationComponent implements OnInit {
 
       const badgeClass = getBadgeClass(tipo);
       const tipoPill = `<span class=" badge rounded-pill ${badgeClass}">${tipo}</span>`;
-      if (tipo === "Inventario") {
-        this.table.row
-          .add([
-            this.formatDate(notification.created_datetime),
-            "Alice Jhonson",
-            "12345678",
-            tipoPill,
-            notification.subject,
-            notification.message,
-          ])
-          .draw(false);
-      } else {
-        this.table.row
+      
+        const row = this.table.row
           .add([
             this.formatDate(notification.created_datetime),
             notification.nombre + " " + notification.apellido,
@@ -211,52 +226,90 @@ export class AllNotificationComponent implements OnInit {
             notification.message,
           ])
           .draw(false);
-      }
+
+          // $(row).on('click', () => this.openModal(this.selectedNotification));
+      
     };
 
     if (this.dropdownSeleccionadas.length === 0) {
       this.data.access.forEach((notification) => {
         AddRow(notification, "Accesos");
+        this.allNotificationsArray.push(notification);
       });
       this.data.fines.forEach((notification) => {
         AddRow(notification, "Multas");
+         this.allNotificationsArray.push(notification);
       });
       this.data.payments.forEach((notification) => {
         AddRow(notification, "Pagos");
+         this.allNotificationsArray.push(notification);
       });
       this.data.generals.forEach((notification) => {
         AddRow(notification, "Generales");
+         this.allNotificationsArray.push(notification);
       });
       this.data.inventories.forEach((notification) => {
         AddRow(notification, "Inventario");
+         this.allNotificationsArray.push(notification);
       });
     } else {
       this.dropdownSeleccionadas.forEach((e) => {
         if (e === "Accesos")
           this.data.access.forEach((notification) => {
             AddRow(notification, "Accesos");
+            this.allNotificationsArray.push(notification);
           });
         if (e === "Multas")
           this.data.fines.forEach((notification) => {
             AddRow(notification, "Multas");
+            this.allNotificationsArray.push(notification);
           });
         if (e === "Pagos")
           this.data.payments.forEach((notification) => {
             AddRow(notification, "Pagos");
+            this.allNotificationsArray.push(notification);
           });
         if (e === "Generales")
           this.data.generals.forEach((notification) => {
             AddRow(notification, "Generales");
+            this.allNotificationsArray.push(notification);
           });
         if (e === "Inventario")
           this.data.inventories.forEach((notification) => {
             AddRow(notification, "Inventario");
+            this.allNotificationsArray.push(notification);
           });
       });
     }
 
     console.log("filleando");
   }
+
+  selectedNotification: any = {
+    subject: "placeholder",
+    message: "placeholder",
+    date: "placeholder",
+    type: "placeholder",
+    status: "placeholder"
+  };
+
+  // Otros métodos y propiedades
+
+  openModal(notification: any) {
+    console.log(notification);
+    const modal = new bootstrap.Modal(document.getElementById('idMODAL')!);
+    modal.show();
+  }
+
+  setNotification(data: any, status: string) {
+    this.selectedNotification = {
+      subject: data[4],
+      message: data[5],
+      date: data[0],
+      type: data[3],
+      status: status
+    };
+  } 
 
   exportarAExcel() {
     const tabla = this.table;
@@ -496,5 +549,9 @@ export class AllNotificationComponent implements OnInit {
       return cellData.replace(/<[^>]*>?/gm, "");
     }
     return cellData;
+  }
+
+  closeModal() {
+    $(".modal-backdrop").remove();
   }
 }

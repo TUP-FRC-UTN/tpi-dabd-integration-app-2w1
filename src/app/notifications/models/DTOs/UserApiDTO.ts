@@ -4,4 +4,5 @@ export interface UserApiDTO{
     lastname : string,
     email: string,
     dni : number
+    telegram_id : number
 }

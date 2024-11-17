@@ -12,9 +12,9 @@ import { NReadDTO } from '../models/DTOs/nread-dto';
 })
 export class NotificationService {
 
-  private urlApi = 'http://localhost:8080/Notification/';
-  private urlPost = 'http://localhost:8080/general/postNotificationGeneral';
-  private urlput = 'http://localhost:8080/markNotificationRead'
+  private urlApi = 'http://host.docker.internal:8080/Notification/';
+  private urlPost = 'http://host.docker.internal:8080/general/postNotificationGeneral';
+  private urlput = 'http://host.docker.internal:8080/markNotificationRead'
 
   constructor(private http: HttpClient) { }
 
