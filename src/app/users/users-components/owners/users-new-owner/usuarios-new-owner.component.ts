@@ -294,7 +294,7 @@ export class UsuariosNewOwnerComponent implements OnInit, OnDestroy {
       customError: 'Error personalizado: verifique el dato ingresado.',
       usernameTaken: 'El nombre de usuario ya está en uso.',
       emailTaken: 'El correo electrónico ya está en uso.',
-      dniTaken: 'El DNI ya está en uso.',
+      dniTaken: 'El número de documento ya está en uso.',
       invalidCuit: 'El CUIT ingresado es inválido.'
     };
 

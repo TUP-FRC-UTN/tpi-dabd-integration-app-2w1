@@ -342,8 +342,8 @@ export class ListUsersComponent implements OnInit {
     const table = $('#myTable').DataTable();
   
     // Convertir las fechas seleccionadas a objetos Date para comparar
-    const start = this.initialDate.value ? new Date(this.initialDate.value) : null;
-    const end = this.endDate.value ? new Date(this.endDate.value) : null;
+    const start = this.initialDate.value ? (new Date(this.initialDate.value)).toISOString().split('T')[0] : null;
+    const end = this.endDate.value ? (new Date(this.endDate.value)).toISOString().split('T')[0]  : null;
   
     // Limpiar cualquier filtro previo relacionado con fechas
     $.fn.dataTable.ext.search.splice(0, $.fn.dataTable.ext.search.length);
@@ -352,7 +352,9 @@ export class ListUsersComponent implements OnInit {
     $.fn.dataTable.ext.search.push((settings: any, data: any, dataIndex: any) => {
       // Convertir la fecha de la fila (data[0]) a un objeto Date
       const rowDateParts = data[0].split('/'); // Asumiendo que la fecha está en formato DD/MM/YYYY
-      const rowDate = new Date(`${rowDateParts[2]}-${rowDateParts[1]}-${rowDateParts[0]}`); // Convertir a formato YYYY-MM-DD
+      const rowDate = (new Date(`${rowDateParts[2]}-${rowDateParts[1]}-${rowDateParts[0]}`)).toISOString().split('T')[0] ; // Convertir a formato YYYY-MM-DD
+      
+      
   
       // Realizar las comparaciones
       if (start && rowDate < start) return false;

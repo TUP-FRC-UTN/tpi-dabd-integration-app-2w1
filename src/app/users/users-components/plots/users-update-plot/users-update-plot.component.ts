@@ -53,30 +53,85 @@ export class UsersUpdatePlotComponent implements OnInit, OnDestroy {
     this.formReactivo.get('blockNumber')?.disable();
     
     // Después de cargar los tipos y estados, encontrar el ID correcto
-    const sus1 = this.plotService.getAllTypes().subscribe({
+    const loadTypesAndStates = new Promise<void>((resolve, reject) => {
+      const sus1 = this.plotService.getAllTypes().subscribe({
       next: (data: PlotTypeModel[]) => {
-        this.types = data.map(d => ({value: d.id, name: d.name}));
-        
+        this.types = data.map(d => ({ value: d.id, name: d.name }));
+      },
+      error: (err) => {
+        console.error('Error al cargar los tipos de lote:', err);
+        reject(err);
+      }
+      });
+
+      const sus2 = this.plotService.getAllStates().subscribe({
+      next: (data: PlotStateModel[]) => {
+        this.states = data.map(d => ({ value: d.id, name: d.name }));
+        resolve();
       },
       error: (err) => {
         console.error('Error al cargar los estados de lote:', err);
+        reject(err);
       }
+      });
+
+      //Agregar suscripción
+      this.suscriptionService.addSuscription(sus1);
+      this.suscriptionService.addSuscription(sus2);
     });
 
-    const sus2 = this.plotService.getAllStates().subscribe({
-      next: (data: PlotStateModel[]) => {            
-        this.states = data.map(d => ({value: d.id, name: d.name})); 
+    loadTypesAndStates.then(() => {
+      // Obtener el lote por su ID
+      const sus = this.plotService.getPlotById(id).subscribe({
+      next: (response) => {
+        this.formReactivo.get('plotNumber')?.setValue(response.plot_number);
+        this.formReactivo.get('blockNumber')?.setValue(response.block_number);
+        this.formReactivo.get('totalArea')?.setValue(response.total_area_in_m2);
+        this.formReactivo.get('totalBuild')?.setValue(response.built_area_in_m2);
+        this.states.forEach((state) => {
+        if (state.name === response.plot_state) {
+          this.formReactivo.get('state')?.setValue(state.value);
+          this.stateSelect.setData(state.value as any);
+        }
+        });
+
+        this.types.forEach((type) => {
+        if (type.name === response.plot_type) {
+          this.formReactivo.get('type')?.setValue(type.value);
+          this.typeSelect.setData(type.value as any);
+        }
+        });
+
+        // Guardar el valor del nombre del estado y tipo para luego asignar el ID
+        const plotStateName = response.plot_state;
+        const plotTypeName = response.plot_type;
+
+        if (response.files.length > 0) {
+        this.existingFilesDownload = response.files;
+        }
+
+        if (response.files && response.files.length > 0) {
+        for (const fileDto of response.files) {
+          this.fileService.getFile(fileDto.uuid).subscribe(({ blob, filename }) => {
+          // Crear un nuevo objeto File a partir del Blob
+          const newFile = new File([blob], filename, { type: blob.type });
+          this.existingFiles.push(newFile);
+          }, error => {
+          console.error(`Error al descargar el archivo ${fileDto.uuid}, error`);
+          });
+          console.log("Files list after loading: ", this.existingFiles);
+        }
+        }
       },
-      error: (err) => {
-        console.error('Error al cargar los estados de lote:', err);
+      error: (error) => {
+        console.error('Error al obtener el lote:', error);
       }
+      });
+      //Agregar suscripción
+      this.suscriptionService.addSuscription(sus);
+    }).catch((err) => {
+      console.error('Error al cargar tipos y estados:', err);
     });
-
-    //Agregar suscripción
-    this.suscriptionService.addSuscription(sus1);
-
-    //Agregar suscripción
-    this.suscriptionService.addSuscription(sus2);
 
     // Obtener el lote por su ID
     const sus = this.plotService.getPlotById(id).subscribe({
