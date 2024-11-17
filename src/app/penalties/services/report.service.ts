@@ -2,18 +2,21 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { ReportReasonDto } from '../models/ReportReasonDTO';
+import { AuthService } from '../../users/users-servicies/auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ReportService {
   private readonly http: HttpClient = inject(HttpClient);
+  private readonly authService = inject(AuthService);
   private readonly reportUrl = 'http://localhost:8042/api/report';
   private readonly reportReasonUrl = 'http://localhost:8042/api/report-reason';
 
   constructor(){};
 
   postReport(postReportDto: any): Observable<any> {
+    postReportDto.userId = this.authService.getUser().id;
     return this.http.post(this.reportUrl, postReportDto);
   }
 
@@ -22,6 +25,7 @@ export class ReportService {
   }
 
   putStateReport(data:any){
+    data.userId = this.authService.getUser().id;
     return this.http.put(this.reportUrl + '/state', data);
   }
 
