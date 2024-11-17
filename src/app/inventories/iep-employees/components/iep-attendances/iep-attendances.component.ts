@@ -11,6 +11,7 @@ import { IepAttendancesNgselectComponent } from "../iep-attendances-ngselect/iep
 import { EmpPostConfigurationResponse } from '../../Models/emp-post-configuration';
 import { PillowTimeLateArrivalService } from '../../services/pillow-time-late-arrival.service';
 import { UsersMockIdService } from '../../../common-services/users-mock-id.service';
+import { AuthService } from '../../../../users/users-servicies/auth.service';
 
 declare var $: any;
 declare var DataTable: any;
@@ -30,6 +31,7 @@ export class IepAttendancesComponent implements OnInit{
   private table: any;
   router = inject(Router);
   
+
   empleadoId: number = 0;
   empleadoName: string = "";
   startDate!: string;
@@ -51,7 +53,7 @@ export class IepAttendancesComponent implements OnInit{
     private empleadoService: EmpListadoEmpleadosService,
     private route: ActivatedRoute,
     private pillowTimeLateArrivalService: PillowTimeLateArrivalService,
-    private mockid: UsersMockIdService
+    private mockid: AuthService 
   ) {
     const hoy = new Date();
     this.fechaMaxima = hoy.toISOString().split('T')[0];
@@ -67,8 +69,11 @@ export class IepAttendancesComponent implements OnInit{
     this.loadAsistencias();
     this.initializeDates();
     this.setInitialDates();
+    this.loadIdUser();
   }
 
+
+  
   initializeDates(): void {
     const today = new Date();
     const firstDayOfLastMonth = new Date(today.getFullYear(), today.getMonth() - 0, 1);
@@ -396,7 +401,7 @@ export class IepAttendancesComponent implements OnInit{
 
   confirmarJustificacion(){
     if(this.justificationPutText){
-      this.empleadoService.putAttendances(this.id, this.nuevoEstado, this.justificationPutText, this.mockid.getMockId()).subscribe({
+      this.empleadoService.putAttendances(this.id, this.nuevoEstado, this.justificationPutText, this.mockid.getUser().id).subscribe({
         next: (response) => {
           console.log('Asistencia actualizada:', response);
           this.loadAsistencias();
