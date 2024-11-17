@@ -10,6 +10,7 @@ import { AccessTimeRangeVisitorsRegistrationComponent } from '../access-time-ran
 import { AccessGridVisitorsRegistrationComponent } from '../access-grid-visitors-registration/access-grid-visitors-registration.component';
 import Swal from 'sweetalert2';
 import { AccessVisitorsRegisterServiceService } from '../../../../services/access_visitors/access-visitors-register/access-visitors-register-service/access-visitors-register-service.service';
+import { AccessRegisterEmergencyComponent } from "../../../access-register-emergency/access-register-emergency.component";
 @Component({
   selector: 'app-access-container-visitors-registration',
   standalone: true,
@@ -19,8 +20,9 @@ import { AccessVisitorsRegisterServiceService } from '../../../../services/acces
     ReactiveFormsModule,
     AccessGridVisitorsRegistrationComponent,
     AccessTimeRangeVisitorsRegistrationComponent,
-    CommonModule
-  ],
+    CommonModule,
+    AccessRegisterEmergencyComponent
+],
 })
 export class AccessContainerVisitorsRegistrationComponent implements OnInit, OnDestroy {
   indexUserType?:number;
