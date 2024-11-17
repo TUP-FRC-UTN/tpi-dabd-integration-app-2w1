@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Fine } from '../models/fine';
+import { environment } from '../../common/environments/environment';
 
 
 @Injectable({
@@ -9,7 +10,7 @@ import { Fine } from '../models/fine';
 })
 export class FineService {
 
-  private urlApi = 'http://localhost:8080/fines/getNotifications';
+  private urlApi =environment.services.notifications +  '/fines/getNotifications';
 
   constructor(private http: HttpClient) { }
 

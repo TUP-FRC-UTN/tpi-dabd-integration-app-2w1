@@ -3,18 +3,18 @@
   <div class="modal-dialog ">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="expenseModalLabel">Detalle de la Categoria</h5>
+        <h5 class="modal-title" id="expenseModalLabel">Detalle de la Categoría</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div class="row">
           <div class="col">
-            <p><strong>Descripcion:</strong> {{ category?.description }}</p>
+            <p><strong>Descripción:</strong> {{ category?.description }}</p>
           </div>
         </div>
         <div class="row">
           <div class="col">
-            <p><strong>Fecha de modificacion:</strong> {{category?.lastUpdatedDatetime | date : 'dd/MM/yyyy'}}</p>
+            <p><strong>Fecha de modificación:</strong> {{category?.lastUpdatedDatetime | date : 'dd/MM/yyyy'}}</p>
           </div>
         </div>
         <div class="row">
@@ -25,6 +25,52 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal de info -->
+<div class="modal fade" id="infoModal" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Listado de categorías</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          En este listado podrá visualizar y buscar las categorías existentes.
+        </p>
+        <p>
+          Además, en las acciones, cuenta con la posibilidad de modificar el estado o editar el nombre de las mismas.
+        </p>
+        <p>
+          La tabla también incluye una barra de búsqueda y opciones de paginación y orden de los datos, lo que facilita la navegación y el filtrado de los datos disponibles.
+        </p>
+        <ul>
+          <li>
+            <strong>Tabla de Categorías</strong>: Muestra la información de las categorías, con columnas para la categoría, estado, fecha y opciones de acciones.
+          </li>
+          <li>
+            <strong>Botones</strong>:
+            <ul>
+              <li>
+                <button class="btn btn-success mt-2 bi-file-earmark-excel mb-2"></button> Exporta el contenido de la tabla a Excel.
+              </li>
+              <li>
+                <button class="btn btn-danger bi-file-earmark-pdf mb-2"></button> Exporta el contenido de la tabla a PDF.
+              </li>
+              <li>
+                <button class="rounded-circle mb-2 btn btn-primary">
+                  <span class="bi-plus-lg"></span>
+                </button> Abre el modal para registrar nueva categoría.
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
       </div>
     </div>
   </div>

@@ -1,0 +1,46 @@
+<div class="modal fade" id="filtrosAvanzados" tabindex="-1" aria-labelledby="filtrosAvanzadosLabel" 
+aria-hidden="true" data-bs-keyboard="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="filtrosAvanzadosLabel">Filtros Avanzados</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class=" row d-flex justify-content-start align-items-center mb-3">
+            <div class="col-4">
+              <label for="tipo" class="form-label Text Start">Tipo</label>
+            </div>
+            <div class="col">
+              <app-expenses-type-expense-ng-select [(selectedTypes)]="selectedTypes" [noteCredit]="true" (selectedTypesChange)="onTypeChange()"></app-expenses-type-expense-ng-select>
+            </div>
+          </div>
+          <div class="row d-flex justify-content-start align-items-center mb-3">
+            <div class="col-4">
+              <label for="categoria" class="form-label Text Start">Categoria</label>
+            </div>
+            <div class="col">
+              <app-expense-categories-ng-select 
+            [(selectedCategories)]="selectedCategories" (selectedCategoriesChange)="onCategoryChange()"  ></app-expense-categories-ng-select>
+            </div>
+          </div>
+          <div class="row d-flex justify-content-start align-items-center mb-3">
+            <div class="col-4">
+              <label for="periodo" class="form-label Text Start">Proveedor</label>
+            </div>
+            <div class="col">
+              <app-expense-providers-ng-select [(selectedProviders)]="selectedProviders"(selectedProvidersChange)="onProviderChange()"></app-expense-providers-ng-select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  

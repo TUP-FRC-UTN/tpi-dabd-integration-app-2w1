@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { AbstractControl, AsyncValidatorFn, ValidationErrors } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map, catchError, of } from 'rxjs';
+import { environment } from '../../common/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -10,8 +11,8 @@ import { map, catchError, of } from 'rxjs';
 export class ValidatorsService {
 
   private readonly http: HttpClient = inject(HttpClient);
-  private readonly urlUser = 'http://localhost:9060/verification';
-  private readonly urlPlot = 'http://localhost:9062/verification'
+  private readonly urlUser = environment.services.usersAndAddresses + '/verification';
+  private readonly urlPlot = environment.services.ownersAndPlots + '/verification'
 
   constructor() { }
 

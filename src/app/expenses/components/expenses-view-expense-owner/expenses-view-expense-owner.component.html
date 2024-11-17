@@ -1,0 +1,96 @@
+<section class="py-5">
+  <div class="container p-3 border border-2 rounded shadow-lg">
+
+    <!-- Fila de botones de filtro -->
+    <div class="row mb-3">
+
+      <!-- Barra de busqueda -->
+      <div class="col-3">
+        <input type="text" placeholder="Buscar" class="form-control" [(ngModel)]="searchTerm"
+          (input)="onSearch($event)">
+      </div>
+
+      <!-- Filtro de fechas -->
+      <div class="col d-flex gap-3">
+        <div class="col">
+          <input (change)="filterDataOnChange()" [(ngModel)]="fechaDesde" class="form-control" type="date" [max]="fechaHasta">
+        </div>
+        <div class="col">
+          <input (change)="filterDataOnChange()" [(ngModel)]="fechaHasta" class="form-control" type="date" [max]="maxDateTo" [min]="fechaDesde">
+        </div>
+
+      </div>
+
+      <!-- BOTON DE FILTRO PARA QUIENES LO NECESITEN -->
+      <!-- <div class="col-auto">
+        <button class="btn btn-primary bi-funnel-fill">Filtros</button>
+      </div> -->
+
+      <!-- Botones de exportar -->
+      <div class="col-auto d-flex gap-1 ms-auto">
+        <button  class="btn btn-primary filterbutton" data-bs-toggle="modal" title="Filtros Avanzados" data-bs-target="#filtrosAvanzados">
+          <i class="bi bi-funnel-fill"></i>
+    </button>
+    <button type="button" class="btn btn-secondary bi bi-trash filterbutton" title="Limpiar Filtros" (click)="clearFiltered()"></button>
+        <button (click)="exportToExcel()" id="exportExcelBtn" class="btn btn-success bi-file-earmark-excel filterbutton" title="Exportar Excel"></button>
+        <button  (click)="exportToPDF()" id="exportPdfBtn" class="btn btn-danger bi-file-earmark-pdf filterbutton" title="Exportar PDF"></button>
+      </div>
+    </div>
+
+    <table id="myTable" class="table table-striped border border-3 rounded">
+      <thead>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+</section>
+<app-expense-view [expense]="selectedExpense"></app-expense-view>
+<app-expenses-filters 
+[(selectedCategories)]="selectedCategories"
+[(selectedProviders)]="selectedProviders"
+[(selectedTypes)]="selectedType"
+ (selectedCategoriesChange)="loadBillsFiltered()" 
+ (selectedProvidersChange)="loadBillsFiltered()"
+ (selectedTypesChange)="loadBillsFiltered()"
+ ></app-expenses-filters>
+
+<!-- Modal de info -->
+<div class="modal fade" id="infoModal" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Listado de expensas</h5>        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          En este listado podrá visualizar, buscar y ordenar sus expensas existentes.
+        </p>
+        <p>
+          Además, en las acciones, cuenta con la posibilidad de ver más información de cada expensa.
+        </p>
+        <p>
+          La tabla también incluye una barra de búsqueda, filtros de fecha desde y hasta, y opciones de paginación, lo que facilita la navegación y el filtrado de los datos disponibles.
+        </p>
+        <ul>
+          <li>
+            <strong>Tabla de Expensas</strong>: Muestra la información de las expensas, con columnas para la categoría, proveedor, tipo de gasto, monto, fecha y opciones de acciones.
+          </li>
+          <li>
+            <strong>Botones</strong>:
+            <ul>
+              <li><button class="btn btn-success mt-2 bi-file-earmark-excel mb-2"></button> Exporta el contenido de la tabla a Excel.</li>
+              <li><button class="btn btn-danger bi-file-earmark-pdf mb-2"></button> Exporta el contenido de la tabla a PDF.</li>
+              <li><button  class="btn btn-primary bi bi-funnel-fill mb-2"></button> Permite aplicar filtros avanzados.</li>
+              <li><button class="btn btn-secondary bi bi-trash mb-2"></button> Elimina los filtros avanzados aplicados.</li>
+            </ul>
+          </li>
+        </ul>
+       
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div>

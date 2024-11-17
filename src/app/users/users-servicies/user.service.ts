@@ -9,57 +9,58 @@ import { UserPut } from '../users-models/users/UserPut';
 import { map } from 'rxjs/operators';
 import { DeleteUser } from '../users-models/owner/DeleteUser';
 import { GetuserDto } from '../users-models/users/GetUserDto';
+import { environment } from '../../common/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
   private readonly http: HttpClient = inject(HttpClient);
-  private readonly url = 'http://localhost:9060/users/';
+  private readonly url = environment.services.usersAndAddresses;
 
   constructor() { }
 
   putUser(user: UserPut, userId: number): Observable<UserPut> {
-    return this.http.put<UserPut>(this.url + "put/" + userId, user);
+    return this.http.put<UserPut>(this.url + "/put/" + userId, user);
   }
 
   postUser(user: UserPost): Observable<UserGet> {    
-    return this.http.post<UserGet>(this.url + "post", user);
+    return this.http.post<UserGet>(this.url + "/post", user);
   } 
 
   getAllUsers(): Observable<UserGet[]> {
-    return this.http.get<UserGet[]>(this.url + "getall");
+    return this.http.get<UserGet[]>(this.url + "/getall");
   }
 
   verifyLogin(user: LoginUser): Observable<LoginUser> {
-    return this.http.post<LoginUser>("http://localhost:9060/auth/login", user);
+    return this.http.post<LoginUser>(this.url + "/auth/login", user);
   }   
 
   getAllRoles(): Observable<RolModel[]> {
-    return this.http.get<RolModel[]>("http://localhost:9060/roles");
+    return this.http.get<RolModel[]>(this.url + "/roles");
   }
 
   getUserById(userId: number): Observable<UserGet> {
-    return this.http.get<UserGet>(this.url + "getById/" + userId);
+    return this.http.get<UserGet>(this.url + "/getById/" + userId);
   }
 
   getUserById2(userId: number): Observable<GetuserDto> {
-    return this.http.get<GetuserDto>(this.url + "getById/" + userId);
+    return this.http.get<GetuserDto>(this.url + "/getById/" + userId);
   }
 
   getUserByEmail(email: string): Observable<UserGet> {
-    return this.http.get<UserGet>(this.url + "getByEmail/" + email);
+    return this.http.get<UserGet>(this.url + "/getByEmail/" + email);
   }
 
   getUsersByPlotID(plotId: number): Observable<UserGet[]> {
-    return this.http.get<UserGet[]>(this.url + "getall/" + plotId);
+    return this.http.get<UserGet[]>(this.url + "/getall/" + plotId);
   }
 
   getUsersByOwner(ownerId: number): Observable<UserGet> {
-    return this.http.get<UserGet>(this.url + "byOwner/"+ ownerId + "/WithoutTheOwner");
+    return this.http.get<UserGet>(this.url + "/byOwner/"+ ownerId + "/WithoutTheOwner");
   }
 
   deleteUser( user: DeleteUser): Observable<any> {
-    return this.http.delete(this.url + 'delete/' + user.id + '/' + user.userIdUpdate); 
+    return this.http.delete(this.url + '/delete/' + user.id + '/' + user.userIdUpdate); 
   }
 }

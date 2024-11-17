@@ -1,9 +1,10 @@
 import { DatePipe } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
+import { booleanAttribute, inject, Injectable } from '@angular/core';
 import { AccessAllowedDaysDto, AuthRangeInfoDto, AccessNewAuthRangeDto, AccessNewMovementExitDto, AccessNewMovementsEntryDto, AccessNewUserAllowedDto, AccessNewVehicleDto, AccessUserAllowedInfoDto, VehicleTypeDto } from '../../models/access-visitors/access-VisitorsModels';
 import Swal from 'sweetalert2';
+import { AccessAuthRangeInfoDto } from '../../models/access-visitors/access-visitors-models';
 
 @Injectable({
   providedIn: 'root'
@@ -17,24 +18,7 @@ export class AccessVisitorHelperService {
   //MAPEOS
   //post del registro de un visitor
     // mapeo de User_AllowedInfoDto a NewUserAllowedDto:
-    mapUser_AllowedInfoDtoToNewUserAllowedDto(visitorInfoDto: AccessUserAllowedInfoDto): AccessNewUserAllowedDto {
-
-      //NewVehicleDto vacio
-      const emptyVehicleTypeDto: VehicleTypeDto = { description : "Car" };
-      const emptyVehicleDto: AccessNewVehicleDto = { plate: "", vehicle_Type: emptyVehicleTypeDto, insurance: ""}
-
-      let visitorVehicle: AccessNewVehicleDto | undefined ;
-
-      //MOMENTANEO (en el futuro, el guardia debe poder seleccionar el vehiculo con el q entra el Visitor)
-      //se verifica si el Visitor tiene un vehiculo
-      if(visitorInfoDto.vehicles.length > 0){
-        //si lo tiene se asigna
-        visitorVehicle = visitorInfoDto.vehicles.at(0);
-      } else {
-        //si no se le asigna uno vacio
-        visitorVehicle = emptyVehicleDto;
-      }
-      //MOMENTANEO 
+    mapUser_AllowedInfoDtoToNewUserAllowedDto(visitorInfoDto: AccessUserAllowedInfoDto, plate: string): AccessNewUserAllowedDto {
 
       //mapeo de los datos
       let newUserAllowedDto: AccessNewUserAllowedDto = {
@@ -43,21 +27,16 @@ export class AccessVisitorHelperService {
         last_name : visitorInfoDto.last_name,
         documentType: visitorInfoDto.documentTypeDto,
         user_allowed_Type: visitorInfoDto.userType,
-        vehicle: visitorVehicle,
+        vehicle: plate ? visitorInfoDto.vehicles.find(v => v.plate === plate) || undefined : undefined,
         email: visitorInfoDto.email
       }
-      //console.log("obj q entra -> User_AllowedInfoDto: ", visitorInfoDto);
-      //console.log("metodo mapUser_AllowedInfoDtoToNewUserAllowedDto: ", newUserAllowedDto);
+
       return newUserAllowedDto;
     }
     // FIN mapeo de User_AllowedInfoDto a NewUserAllowedDto:
 
     // mapeo de AuthRangeInfoDto[] a NewAuthRangeDto
     mapAuthRangeInfoDtoToNewAuthRangeDto(listAuthRangeInfoDto: AuthRangeInfoDto[], neighborId: number): AccessNewAuthRangeDto{
-
-      //console.log("mapAuthRangeInfoDtoToNewAuthRangeDto (en visitors.service)")
-      //console.log("list de AuthRangeInfoDto del Visitor", listAuthRangeInfoDto);
-
       //la idea es q nunca se usen (pq en el component ya se verifica si el Visitor puede entrar 
       // en base a sus AuthRanges, solo se llega a este metodo si el Visitor esta dentro del rango permitido)
       const allowedDaysEmpty: AccessAllowedDaysDto[] = [];
@@ -87,32 +66,31 @@ export class AccessVisitorHelperService {
           end_date: stringEnd_date  || "", 
           allowedDaysDtos: listAuthRangeInfoDto.at(index)?.allowedDays || allowedDaysEmpty
         };
-        //console.log("FUNCIONAAAAAAAAA")
-        //console.log("metodo mapAuthRangeInfoDtoToNewAuthRangeDto: ", newAuthRangedto);
         //devuelve un NewAuthRangeDto con los datos, de un AuthRange del Visitor, validos.
         return newAuthRangedto;
       }
 
-      //console.log("Algo malio sal...")
       //la idea es q nunca se use
       return emptyAuth;
     }
     // FIN mapeo de AuthRangeInfoDto a NewAuthRangeDto
 
     // creacion de NewMovements_EntryDto 
-    createNewMovements_EntryDto(visitorInfo :AccessUserAllowedInfoDto, 
+    createNewMovements_EntryDto(
+      visitorInfo :AccessUserAllowedInfoDto, 
       newUserAllowedDto: AccessNewUserAllowedDto, 
-      newAuthRangedto: AccessNewAuthRangeDto): AccessNewMovementsEntryDto{
+      newAuthRangedto: AccessNewAuthRangeDto,
+      userId: number): AccessNewMovementsEntryDto {
 
         let newMovements_EntryDto: AccessNewMovementsEntryDto = {
           movementDatetime: new Date, // LocalDateTime (EJ: "2024-10-11T04:58:43.536Z"
           observations: visitorInfo.observations || "",
           newUserAllowedDto: newUserAllowedDto, //interface declarada mas abajo
           authRangesDto: newAuthRangedto, //interface declarada mas abajo
-          vehiclesId: 0
+          vehiclesId: 0,
+          userId
         }
 
-        //console.log("createNewMovements_EntryDto (en visitors.service): ", newMovements_EntryDto);
         return newMovements_EntryDto;
     }
     // FIN creacion de NewMovements_EntryDto 
@@ -130,7 +108,6 @@ export class AccessVisitorHelperService {
           vehiclesId: 0
         }
 
-        //console.log("createNewMovements_EntryDto (en visitors.service): ", newMovements_EntryDto);
         return newMovement_ExitDto;
     }
     // FIN creacion de NewMovement_ExitDto 
@@ -144,24 +121,15 @@ export class AccessVisitorHelperService {
 
 
 
-
-
   // funciones para comparar FECHAS
   // verifica si la fecha actual esta dentro de alguno de los AuthRangeInfoDto del Visitor
   todayIsInDateRange(listAuthRangeInfoDto: AuthRangeInfoDto[]): number{
     for (var i = 0; i < listAuthRangeInfoDto.length; i++) {
 
-      //console.log("todayIsInDateRange (en visitors.service) | ciclo del for: ", i);
-      //console.log("fechas del AuthRange: ", listAuthRangeInfoDto.at(i)?.init_date, " | ", listAuthRangeInfoDto.at(i)?.end_date)
-
       let initDate: Date | undefined = listAuthRangeInfoDto.at(i)?.init_date;
       let endDate: Date | undefined  = listAuthRangeInfoDto.at(i)?.end_date;
-  
-      //console.log("fechas asignadas para comparar: ", initDate, " | ", endDate)
-
 
       if(this.isDateBeforeToday(initDate) && this.isDateAfterToday(endDate)){
-        //console.log("(Visitor dentro del rango!) index del AuthRange valido: ", i);
         return i; // devuelve el indice donde esta el AuthRangeInfoDto valido
       }
     }
@@ -178,27 +146,51 @@ export class AccessVisitorHelperService {
     //fecha actual, para poder comparar
     let todayDate = new Date();
     //fecha a comparar
-    let beforeDate = new Date(date);
-    //console.log(beforeDate, " | hoy -> ", todayDate)
+    let beforeDate = this.getFixedDate(date);
+    beforeDate.setHours(0, 0, 0, 0);
+/* 
+    console.log(date);
+    console.log(beforeDate, " | hoy -> ", todayDate) */
 
     return beforeDate <= todayDate;
   }
 
   isDateAfterToday(date: Date | undefined): boolean {
     if (date == undefined) {
-      // Si date es undefined, devolver false
+      // Si date es undefined, devolver false 
       return false;
     }
 
+    
     //fecha actual, para poder comparar
     let todayDate = new Date();
     //fecha a comparar
-    let afterDate = new Date(date);
-    //console.log(afterDate, " | hoy -> ", todayDate)
+    let afterDate = this.getFixedDate(date);
 
+    afterDate.setHours(23, 59, 59, 999);
+    
+/*     console.log(date);
+    console.log(afterDate, " | hoy -> ", todayDate)
+    console.log(afterDate >= todayDate)  */
+    
     return afterDate >= todayDate;
   }
 
+  private getFixedDate(date: Date): Date {
+    let fixedDate = new Date(date);
+
+    if (typeof(date) === 'string') {
+      const splitedDate = (date as string).split("-");
+      const splitedDateNumbers = splitedDate.map(v => Number.parseInt(v));
+      fixedDate.setFullYear(
+        splitedDateNumbers[0],
+        splitedDateNumbers[1] - 1,
+        splitedDateNumbers[2]
+      );
+    }
+
+    return fixedDate;
+  }
   // procesa un array de numeros (number[]) y devuelve un objeto Date
   processDate(movementDatetime: number[] | null): Date | null {
     if (!movementDatetime || movementDatetime.length < 6) {
@@ -209,10 +201,38 @@ export class AccessVisitorHelperService {
   
     // Restamos 1 al mes para ajustarlo al formato de Date
     let response = new Date(year, month - 1, day, hours, minutes, seconds);
-    console.log(response);
 
     return response;
   };
+
+  translateDay(day: string): string{
+    switch(day) { 
+      case "MONDAY": { 
+         return "Lunes"; 
+      } 
+      case "TUESDAY": { 
+         return "Martes";
+      }
+      case "WEDNESDAY": { 
+        return "Miércoles";
+      } 
+      case "THURSDAY": { 
+          return "Jueves";
+      }
+      case "FRIDAY": { 
+        return "Viernes";
+      } 
+      case "SATURDAY": { 
+          return "Sábado";
+      }
+      case "SUNDAY": { 
+        return "Domingo";
+      } 
+      default: { 
+          return day; 
+      } 
+   } 
+  }
 // FIN funciones para comparar FECHAS
 
 
@@ -233,11 +253,8 @@ export class AccessVisitorHelperService {
 
       if(authRangeInfoDto != undefined){
         for (var i = 0; i < authRangeInfoDto.allowedDays.length; i++) {
-    
-          //console.log("todayIsInHourRange (en visitors.service) | ciclo del for: ", i);
-    
+        
           if(this.isTodayAnAllowedDay(authRangeInfoDto.allowedDays.at(i))){
-            //console.log("(Visitor dentro del rango horario!) index del AllowedDayDto valido: ", i);
             return i; // devuelve el indice donde esta el allowedDayDto valido
           }
         }
@@ -248,33 +265,50 @@ export class AccessVisitorHelperService {
 
     // verifica si el Visitor esta dentro de un DIA permitido, y dentro del rango HORARIO permitido
     isTodayAnAllowedDay(allowedDayDto: AccessAllowedDaysDto | undefined): boolean {
-      //console.log("Metodo isTodayAnAllowedDay...");
     
       // Verifica si los datos estan definidos
       if (!allowedDayDto?.day || !allowedDayDto?.init_hour || !allowedDayDto?.end_hour) {
-        //console.log("AllowedDay es undefined");
+        console.log("AllowedDay es undefined");
         return false;
       }
 
       //verifica si uno de los dias permitidos es hoy
       if (allowedDayDto.day.toString().toLowerCase() != this.getTodayDayOfWeek().toLowerCase()){
+        //console.log("dia del AllowedDay NO es hoy: ", allowedDayDto.day.toString().toLowerCase(), " | ", this.getTodayDayOfWeek().toLowerCase());
         return false;
       }
     
       // fecha y hora actual para comparar
-      let todayDate = new Date();
-    
+      const todayDate = new Date();
+      const todayInitHour = this.getHourInit(allowedDayDto);
+      const todayEndHour = this.getHourEnd(allowedDayDto);
+
+      const result: boolean = todayInitHour <= todayDate && todayEndHour >= todayDate;
       // compara si la fecha actual esta dentro del rango horario permitido
-      return this.getHourInit(allowedDayDto) <= todayDate && this.getHourEnd(allowedDayDto) >= todayDate;
+      return result;
     }
     
     //devuelve la hora de inicio (de un Allowed_DaysDto) en formato Date 
     getHourInit(allowedDayDto: AccessAllowedDaysDto): Date{
 
+      let init_hour = allowedDayDto.init_hour;
+      console.log('allowedDayDto.init_hour =', allowedDayDto.init_hour);
+
+      if(init_hour.length < 7){
+        init_hour = this.stringToHour(allowedDayDto, true);
+      }
+
+      console.log('init_hour = ', init_hour);
+
       let response = new Date();
 
-      response.setHours(Number(allowedDayDto.init_hour.at(0)));
-      response.setMinutes(Number(allowedDayDto.init_hour.at(1)));
+      const hours: string = init_hour.substring(0, 2);
+      const minutes: string = init_hour.substring(3, 5);
+      const seconds: string = init_hour.substring(6, 8);
+
+      response.setHours(Number(hours));
+      response.setMinutes(Number(minutes));
+      response.setSeconds(Number(seconds));
 
       return response;
     }
@@ -282,44 +316,60 @@ export class AccessVisitorHelperService {
     //devuelve la hora de find (de un Allowed_DaysDto) en formato Date 
     getHourEnd(allowedDayDto: AccessAllowedDaysDto): Date{
 
+      let end_hour = allowedDayDto.end_hour;
+      console.log('allowedDayDto.end_hour = ', allowedDayDto.end_hour);
+
+      if(end_hour.length < 7){
+        end_hour = this.stringToHour(allowedDayDto, false);
+      }
+
+      console.log('end_hour = ', end_hour);
+
       let response = new Date();
 
-      response.setHours(Number(allowedDayDto.end_hour.at(0)));
-      response.setMinutes(Number(allowedDayDto.end_hour.at(1)));
-      response.setSeconds(0);
+      const hours: string = end_hour.substring(0, 2);
+      const minutes: string = end_hour.substring(3, 5);
+      const seconds: string = end_hour.substring(6, 8);
+
+      response.setHours(Number(hours));
+      response.setMinutes(Number(minutes));
+      response.setSeconds(Number(seconds));
 
       return response;
     }
 
 
     //metodo q devuelve la hora en formato string (para mostrarla en el front)
+    // true para init_hour o false para end_hour
     stringToHour(allowedDayDto: AccessAllowedDaysDto, x: boolean): string {
       
-      const hours = x ? allowedDayDto.init_hour : allowedDayDto.end_hour;      
+      let response = x ? allowedDayDto.init_hour : allowedDayDto.end_hour;      
     
-      // funcion auxiliar para formatear la hora
-      const formatHour = (hour: unknown): string => {
-        if (typeof hour === 'string') {
-          return hour.padStart(2, '0');
-        } else if (typeof hour === 'number') {
-          return hour.toString().padStart(2, '0');
-        }
-        return '00';
-      };
+      if(response.length < 7){
+        // funcion auxiliar para formatear la hora
+        const formatHour = (hour: unknown): string => {
+          if (typeof hour === 'string') {
+            return hour.padStart(2, '0');
+          } else if (typeof hour === 'number') {
+            return hour.toString().padStart(2, '0');
+          }
+          return '00';
+        };
+      
+        // formatea horas y minutos
+        const formattedHours = formatHour(response?.[0]);
+        const formattedMinutes = formatHour(response?.[1]);
+
+        response = `${formattedHours}:${formattedMinutes}:00`;
+      }
     
-      // formatea horas y minutos
-      const formattedHours = formatHour(hours?.[0]);
-      const formattedMinutes = formatHour(hours?.[1]);
-    
-      return `${formattedHours}:${formattedMinutes}:00`;
+      return response;
     }
 
     //devuelve el dia de hoy (en el mismo formato q devuelve el back, osea el tipo de dato DayOfWeek en java)
     getTodayDayOfWeek(): string {
       const daysOfWeek = [ 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
       const today = new Date().getDay(); // devuelve un numero entre 0 (Sunday) y 6 (Saturday)
-
-      //console.log("metodo getTodayDayOfWeek(): ", today);
 
       return daysOfWeek[today]; // devuelve el dia de hoy en formato string
     }
@@ -340,28 +390,70 @@ export class AccessVisitorHelperService {
 
   //Alerts para registerEntry()
   // muestra un modal avisando q el Visitor esta fuera de rango (dia y hora permitido)
-  entryOutOfAuthorizedHourRange(visitor: AccessUserAllowedInfoDto, indexAuthRange: number, indexDayAllowed: number){
-
-    let allowedDay = visitor.authRanges.at(indexAuthRange)?.allowedDays.at(indexDayAllowed);
+  entryOutOfAuthorizedHourRange(authRange: AccessAuthRangeInfoDto | undefined) {
     let rangesHtml = '';
-
-    if(allowedDay != undefined && allowedDay.day != undefined && allowedDay.init_hour != undefined && allowedDay.end_hour != undefined){
-          
-        rangesHtml = `
-          <p>
-            <strong>Rango horario permitido: </strong> <br>
-            <strong>Desde: </strong> ${this.stringToHour(allowedDay, true)} <br>
-            <strong>Hasta: </strong> ${this.stringToHour(allowedDay, false)}
-          </p>
-        `;
-      
+    
+    if (authRange?.allowedDays?.length) {
+      // Dividir los días en dos columnas
+      const midPoint = Math.ceil(authRange.allowedDays.length / 2);
+      const leftColumn = authRange.allowedDays.slice(0, midPoint);
+      const rightColumn = authRange.allowedDays.slice(midPoint);
+  
+      // Crear el HTML para una columna
+      const createColumnHtml = (days: any[]) => days.map(day => `
+        <div class="range-card">
+          <div class="day-title">${this.translateDay(day.day)}</div>
+          <div class="time-range">
+            <span>Desde: ${this.stringToHour(day, true)}</span>
+            <span>Hasta: ${this.stringToHour(day, false)}</span>
+          </div>
+        </div>
+      `).join('');
+  
+      rangesHtml = `
+        <style>
+          .ranges-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            text-align: left;
+          }
+          .range-card {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+          }
+          .day-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #2c3e50;
+          }
+          .time-range {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            font-size: 0.9em;
+          }
+        </style>
+        <div class="ranges-container">
+          <div class="column">
+            ${createColumnHtml(leftColumn)}
+          </div>
+          <div class="column">
+            ${createColumnHtml(rightColumn)}
+          </div>
+        </div>
+      `;
     }
-
+  
     Swal.fire({
       title: 'Denegar ingreso!',
       html: `
-        <strong>El Visitante está fuera del rango horario permitido!</strong> <br>
-        ${rangesHtml}
+        <div>
+          <strong>El Visitante está fuera del rango horario permitido!</strong>
+          <br><br>
+          ${rangesHtml}
+        </div>
       `,
       icon: 'error',
       confirmButtonText: 'Cerrar'
@@ -369,29 +461,89 @@ export class AccessVisitorHelperService {
   }
 
   // muestra un modal avisando q el Visitor esta fuera de rango (fechas permitidas)
-  entryOutOfAuthorizedDateRange(visitor: AccessUserAllowedInfoDto){
-
+  entryOutOfAuthorizedDateRange(visitor: AccessUserAllowedInfoDto) {
     let rangesHtml = '';
-    let rangeNumber = 1;
-
-    for (const range of visitor.authRanges) {
-
-      rangeNumber++;
-
-      rangesHtml += `
-        <p>
-          <strong>Rango permitido ${rangeNumber}:</strong>
-          <strong>Fecha de inicio: </strong> ${this.datePipe.transform(range.init_date,'dd/MM/yyyy')?.toString()}<br>
-          <strong>Fecha de fin: </strong> ${this.datePipe.transform(range.end_date,'dd/MM/yyyy')?.toString()}
-        </p>
+    
+    if (visitor.authRanges?.length) {
+      // Dividir los rangos en dos columnas
+      const midPoint = Math.ceil(visitor.authRanges.length / 2);
+      const leftColumn = visitor.authRanges.slice(0, midPoint);
+      const rightColumn = visitor.authRanges.slice(midPoint);
+  
+      // Crear el HTML para una columna
+      const createColumnHtml = (ranges: any[]) => ranges.map((range, index) => `
+        <div class="range-card">
+          <div class="day-title">Rango ${index + 1}</div>
+          <div class="date-range">
+            <div class="date-item">
+              <span class="date-label">Desde:</span>
+              <span class="date-value">${this.datePipe.transform(range.init_date, 'dd/MM/yyyy')?.toString()}</span>
+            </div>
+            <div class="date-item">
+              <span class="date-label">Hasta:</span>
+              <span class="date-value">${this.datePipe.transform(range.end_date, 'dd/MM/yyyy')?.toString()}</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+  
+      rangesHtml = `
+        <style>
+          .ranges-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            text-align: left;
+          }
+          .range-card {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+          }
+          .day-title {
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: #2c3e50;
+          }
+          .date-range {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+          }
+          .date-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+          }
+          .date-label {
+            font-weight: 600;
+            color: #666;
+            font-size: 0.9em;
+          }
+          .date-value {
+            color: #2c3e50;
+          }
+        </style>
+        <div class="ranges-container">
+          <div class="column">
+            ${createColumnHtml(leftColumn)}
+          </div>
+          <div class="column">
+            ${createColumnHtml(rightColumn)}
+          </div>
+        </div>
       `;
     }
-
+  
     Swal.fire({
       title: 'Denegar ingreso!',
       html: `
-        <strong>El Visitante está fuera del rango permitido!</strong>
-        ${rangesHtml}
+        <div>
+          <strong>El Visitante está fuera del rango permitido!</strong>
+          <br><br>
+          ${rangesHtml}
+        </div>
       `,
       icon: 'error',
       confirmButtonText: 'Cerrar'
@@ -401,29 +553,89 @@ export class AccessVisitorHelperService {
 
   //Alerts para registerExit()
   // muestra un modal avisando q el Visitor esta SALIENDO TARDE (fecha de egreso mayor q la fecha permitida)
-  exitLaterThanAuthorizedDateRange(visitor: AccessUserAllowedInfoDto){
-
+  dateLateExitRegistered(visitor: AccessUserAllowedInfoDto) {
     let rangesHtml = '';
-    let rangeNumber = 1;
-      
-    for (const range of visitor.authRanges) {
+    
+    if (visitor.authRanges?.length) {
+      // Dividir los rangos en dos columnas
+      const midPoint = Math.ceil(visitor.authRanges.length / 2);
+      const leftColumn = visitor.authRanges.slice(0, midPoint);
+      const rightColumn = visitor.authRanges.slice(midPoint);
   
-      rangeNumber++;
+      // Crear el HTML para una columna
+      const createColumnHtml = (ranges: any[]) => ranges.map((range, index) => `
+        <div class="range-card">
+          <div class="day-title">Rango ${index + 1}</div>
+          <div class="date-range">
+            <div class="date-item">
+              <span class="date-label">Desde:</span>
+              <span class="date-value">${this.datePipe.transform(range.init_date, 'dd/MM/yyyy')?.toString()}</span>
+            </div>
+            <div class="date-item">
+              <span class="date-label">Hasta:</span>
+              <span class="date-value">${this.datePipe.transform(range.end_date, 'dd/MM/yyyy')?.toString()}</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
   
-      rangesHtml += `
-        <p>
-          <strong>Rango permitido ${rangeNumber}:</strong>
-          <strong>Fecha de inicio: </strong> ${this.datePipe.transform(range.init_date,'dd/MM/yyyy')?.toString()}<br>
-          <strong>Fecha de fin: </strong> ${this.datePipe.transform(range.end_date,'dd/MM/yyyy')?.toString()}
-        </p>
+      rangesHtml = `
+        <style>
+          .ranges-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            text-align: left;
+          }
+          .range-card {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+          }
+          .day-title {
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: #2c3e50;
+          }
+          .date-range {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+          }
+          .date-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+          }
+          .date-label {
+            font-weight: 600;
+            color: #666;
+            font-size: 0.9em;
+          }
+          .date-value {
+            color: #2c3e50;
+          }
+        </style>
+        <div class="ranges-container">
+          <div class="column">
+            ${createColumnHtml(leftColumn)}
+          </div>
+          <div class="column">
+            ${createColumnHtml(rightColumn)}
+          </div>
+        </div>
       `;
     }
   
     Swal.fire({
-      title: 'El Visitante está saliendo muy tarde!',
+      title: 'Se registró el Egreso TARDÍO del Visitante!',
       html: `
-        <strong>El Visitante está fuera del rango permitido!</strong>
-        ${rangesHtml}
+        <div>
+          <strong>Notifíquelo sobre sus rangos de fecha autorizados</strong>
+          <br><br>
+          ${rangesHtml}
+        </div>
       `,
       icon: 'warning',
       confirmButtonText: 'Cerrar'
@@ -431,34 +643,75 @@ export class AccessVisitorHelperService {
   }
 
   // muestra un modal avisando q el Visitor esta SALIENDO TARDE (hora de egreso mayor q la hora permitida)
-  exitLaterThanAuthorizedHourRange(visitor: AccessUserAllowedInfoDto, indexAuthRange: number, indexDayAllowed: number){
-
-    let allowedDay = visitor.authRanges.at(indexAuthRange)?.allowedDays.at(indexDayAllowed);
+  hourLateExitRegistered(authRanges: AuthRangeInfoDto | undefined) {
     let rangesHtml = '';
-
-    if(allowedDay != undefined && allowedDay.day != undefined && allowedDay.init_hour != undefined && allowedDay.end_hour != undefined){
-          
-        rangesHtml = `
-          <p>
-            <strong>Rango horario permitido </strong> <br>
-            <strong>Desde: </strong> ${this.stringToHour(allowedDay, true)} <br>
-            <strong>Hasta: </strong> ${this.stringToHour(allowedDay, false)}
-          </p>
-        `;
-      
+    
+    if (authRanges?.allowedDays?.length) {
+      // Dividir los días en dos columnas
+      const midPoint = Math.ceil(authRanges.allowedDays.length / 2);
+      const leftColumn = authRanges.allowedDays.slice(0, midPoint);
+      const rightColumn = authRanges.allowedDays.slice(midPoint);
+  
+      // Crear el HTML para una columna
+      const createColumnHtml = (days: any[]) => days.map(day => `
+        <div class="range-card">
+          <div class="day-title">${this.translateDay(day.day)}</div>
+          <div class="time-range">
+            <span>Desde: ${this.stringToHour(day, true)}</span>
+            <span>Hasta: ${this.stringToHour(day, true)}</span>
+          </div>
+        </div>
+      `).join('');
+  
+      rangesHtml = `
+        <style>
+          .ranges-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            text-align: left;
+          }
+          .range-card {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+          }
+          .day-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #2c3e50;
+          }
+          .time-range {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            font-size: 0.9em;
+          }
+        </style>
+        <div class="ranges-container">
+          <div class="column">
+            ${createColumnHtml(leftColumn)}
+          </div>
+          <div class="column">
+            ${createColumnHtml(rightColumn)}
+          </div>
+        </div>
+      `;
     }
-
+  
     Swal.fire({
-      title: 'El Visitante está saliendo tarde!',
+      title: 'Se registró el Egreso TARDÍO del Visitante!',
       html: `
-        <strong>El Visitante está fuera del rango horario permitido!</strong> <br>
-        ${rangesHtml}
+        <div>
+          <strong>Notifíquelo sobre sus rangos horarios autorizados</strong>
+          <br><br>
+          ${rangesHtml}
+        </div>
       `,
       icon: 'warning',
       confirmButtonText: 'Cerrar'
     });
   }
-  
   registerExitSuccess(newMovement_ExitDto: AccessNewMovementExitDto){
     Swal.fire({
       icon: 'success',
@@ -483,6 +736,17 @@ export class AccessVisitorHelperService {
       title: 'Error',
       text: 'Error obteniendo el último Egreso de la Persona. Inténtelo de nuevo.',
       confirmButtonText: 'Cerrar'        
+    });
+  }
+
+  exitNotAllowed(){
+    Swal.fire({
+      title: 'El Visitante tiene un Egreso previo!',
+      html: `
+        El Visitante debe ingresar antes de poder volver a salir
+      `,
+      icon: 'error',
+      confirmButtonText: 'Cerrar'
     });
   }
   //FIN Alerts para registerExit()
@@ -529,17 +793,13 @@ export class AccessVisitorHelperService {
       confirmButtonText: 'Cerrar'
     });
   }
-  exitNotAllowed(){
-    Swal.fire({
-      title: 'El Visitante tiene un Egreso previo!',
-      html: `
-        El Visitante debe ingresar antes de poder volver a salir
-      `,
-      icon: 'error',
-      confirmButtonText: 'Cerrar'
-    });
-  }
   //FIN Alerts para registerEntry()
 // FIN ALERTS de SweetAlert
+
+
+//Metodo para invertir el orden de los elementos en un array
+reverseArray<T>(array: T[]): T[] {
+  return array.slice().reverse();
+}
 
 }
