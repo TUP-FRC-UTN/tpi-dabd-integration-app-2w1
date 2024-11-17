@@ -8,14 +8,16 @@ import { DebtorInfo, ExpenseGenerationCounter, Kpi, PaymentMethod } from '../exp
 import { NgSelectModule } from '@ng-select/ng-select';
 import { ExpenseGenerationExpenseService } from '../expense-generation-services/expense-generation-expense.service';
 import { Owner } from "../expense-generation-interfaces/expense-generation-owner" 
-import { CustomSelectComponent } from '../../common/components/custom-select/custom-select.component';
+
 import { DebtorExpense } from '../expense-generation-interfaces/expense-generation-expense-interface';
+import { CustomSelectComponent } from '../../common/components/custom-select/custom-select.component';
+import { CustomKpiComponent } from '../../common/components/custom-kpi/custom-kpi.component';
 
 
 @Component({
   selector: 'app-expense-generation-counter-view-2',
   standalone: true,
-  imports: [GoogleChartsModule, NgSelectModule, FormsModule, CommonModule, CustomSelectComponent],
+  imports: [GoogleChartsModule, NgSelectModule, FormsModule, CommonModule, CustomSelectComponent, CustomKpiComponent],
   templateUrl: './expense-generation-counter-view-2.component.html',
   styleUrl: './expense-generation-counter-view-2.component.css'
 })
