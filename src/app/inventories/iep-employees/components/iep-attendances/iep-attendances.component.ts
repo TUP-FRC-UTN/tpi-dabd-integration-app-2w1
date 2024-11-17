@@ -69,7 +69,6 @@ export class IepAttendancesComponent implements OnInit{
     this.loadAsistencias();
     this.initializeDates();
     this.setInitialDates();
-    this.loadIdUser();
   }
 
 
