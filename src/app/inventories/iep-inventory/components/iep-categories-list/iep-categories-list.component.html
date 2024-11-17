@@ -69,6 +69,61 @@
       </div>
     </div>
 
+    <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+            <h5 class="modal-title">Información sobre Gestión de Categorías</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>
+              Bienvenido al sistema de gestión de categorías. Esta sección te permite administrar
+              las diferentes categorías del sistema. A continuación, se detallan las funcionalidades principales:
+            </p>
+            <ul>
+              <li>
+                <strong>Búsqueda y Filtros:</strong>
+                <ul>
+                  <li><em>Barra de búsqueda:</em> Permite buscar categorías por nombre</li>
+                  <li><em>Filtro de Estado:</em> Permite filtrar categorías según su estado actual</li>
+                  <li><em>Selección múltiple:</em> Puedes seleccionar varios estados simultáneamente</li>
+                </ul>
+              </li>
+              <li>
+                <strong>Acciones Disponibles:</strong>
+                <ul>
+                  <li><em>Crear:</em> Agregar nuevas categorías mediante el botón flotante (+)</li>
+                  <li><em>Editar:</em> Modificar categorías existentes</li>
+                  <li><em>Eliminar:</em> Dar de baja categorías que ya no se utilicen</li>
+                </ul>
+              </li>
+              <li>
+                <strong>Exportación de Datos:</strong>
+                <ul>
+                  <li><em>Excel:</em> Exportar la lista de categorías a formato Excel</li>
+                  <li><em>PDF:</em> Generar un reporte en formato PDF</li>
+                </ul>
+              </li>
+            </ul>
+            <p><strong>Requisitos para Categorías:</strong></p>
+            <ul>
+              <li>El nombre de la categoría debe tener al menos 3 caracteres</li>
+              <li>El nombre es un campo obligatorio</li>
+              <li>No se permiten nombres duplicados en el sistema</li>
+            </ul>
+            <p><strong>Notas importantes:</strong></p>
+            <ul>
+              <li>Puedes limpiar todos los filtros aplicados usando el botón de papelera</li>
+              <li>La eliminación de categorías es permanente y no se puede deshacer</li>
+              <li>Antes de eliminar una categoría, asegúrate de que no esté en uso</li>
+              <li>Los cambios en las categorías pueden afectar a otros módulos del sistema</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Tabla con borde -->
     <table
       id="categoryTable"

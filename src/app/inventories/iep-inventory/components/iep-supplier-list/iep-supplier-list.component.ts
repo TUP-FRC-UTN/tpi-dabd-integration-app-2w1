@@ -26,30 +26,35 @@ interface SelectedStates {
 @Component({
   selector: 'app-iep-supplier-list',
   standalone: true,
-  imports: [iepBackButtonComponent, FormsModule, CommonModule, RouterModule, SupplierTypePipe, NgSelectModule],
+  imports: [
+    iepBackButtonComponent,
+    FormsModule,
+    CommonModule,
+    RouterModule,
+    SupplierTypePipe,
+    NgSelectModule,
+  ],
   templateUrl: './iep-supplier-list.component.html',
-  styleUrls: ['./iep-supplier-list.component.css']
+  styleUrls: ['./iep-supplier-list.component.css'],
 })
 export class IepSupplierListComponent implements AfterViewInit {
-
   stateOptions = [
     { label: 'Activo', value: 'ACTIVE' },
-    { label: 'Inactivo', value: 'INACTIVE' }
+    { label: 'Inactivo', value: 'INACTIVE' },
   ];
 
   providerTypeOptions = [
     { label: 'Servicio externo', value: 'OUTSOURCED_SERVICE' },
     { label: 'Proveedor de Inventario', value: 'INVENTORY_SUPPLIER' },
-    { label: 'Otro', value: 'OTHER' }
+    { label: 'Otro', value: 'OTHER' },
   ];
 
   selectedProviderTypesList: string[] = [];
   selectedStatesList: string[] = []; // Lista para almacenar los estados seleccionados
 
-
   selectedStates: SelectedStates = {
     ACTIVE: false,
-    INACTIVE: false
+    INACTIVE: false,
   };
 
   selectedStateCount: number = 0;
@@ -57,7 +62,7 @@ export class IepSupplierListComponent implements AfterViewInit {
   selectedTypes: SelectedTypes = {
     OUTSOURCED_SERVICE: false,
     INVENTORY_SUPPLIER: false,
-    OTHER: false
+    OTHER: false,
   };
 
   showFilters: boolean = false;
@@ -75,20 +80,42 @@ export class IepSupplierListComponent implements AfterViewInit {
     cuit: '',
     description: '',
     phoneNumber: '',
-    email: ''
+    email: '',
   };
+
+  // Nuevo método para cargar proveedores
+  loadSuppliers(): void {
+    this.supplierService.searchSuppliers(null, null, null, false)
+      .subscribe({
+        next: (data) => {
+          this.suppliers = data;
+          this.filteredSuppliers = data;
+          this.updateDataTable(data);
+          this.applyFilters(); // Reaplicar los filtros actuales
+        },
+        error: (error) => {
+          console.error('Error al cargar los proveedores:', error);
+          Swal.fire({
+            title: 'Error',
+            text: 'Error al cargar los proveedores',
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+          });
+        }
+      });
+  }
 
   // Método para limpiar todos los filtros
   cleanFilters() {
     this.globalFilter = '';
-    Object.keys(this.columnFilters).forEach(key => {
+    Object.keys(this.columnFilters).forEach((key) => {
       this.columnFilters[key as keyof typeof this.columnFilters] = '';
     });
     // Limpiar los tipos y estados seleccionados
-    Object.keys(this.selectedTypes).forEach(key => {
+    Object.keys(this.selectedTypes).forEach((key) => {
       this.selectedTypes[key as keyof SelectedTypes] = false;
     });
-    Object.keys(this.selectedStates).forEach(key => {
+    Object.keys(this.selectedStates).forEach((key) => {
       this.selectedStates[key as keyof SelectedStates] = false;
     });
     this.selectedTypeCount = 0;
@@ -108,9 +135,8 @@ export class IepSupplierListComponent implements AfterViewInit {
     // Aplicar filtro global
     if (this.globalFilter) {
       const searchTerm = this.globalFilter.toLowerCase();
-      filteredData = filteredData.filter(supplier => {
+      filteredData = filteredData.filter((supplier) => {
         return Object.entries(supplier).some(([key, value]) => {
-          if (key === 'supplierType' || key === 'discontinued') return false;
           return value && value.toString().toLowerCase().includes(searchTerm);
         });
       });
@@ -119,7 +145,7 @@ export class IepSupplierListComponent implements AfterViewInit {
     // Aplicar filtro de tipo de proveedor usando `selectedProviderTypesList`
     this.selectedTypeCount = this.selectedProviderTypesList.length;
     if (this.selectedTypeCount > 0) {
-      filteredData = filteredData.filter(supplier => {
+      filteredData = filteredData.filter((supplier) => {
         return this.selectedProviderTypesList.includes(supplier.supplierType);
       });
     }
@@ -127,22 +153,26 @@ export class IepSupplierListComponent implements AfterViewInit {
     // Aplicar filtro de estado usando la lista `selectedStatesList`
     this.selectedStateCount = this.selectedStatesList.length;
     if (this.selectedStateCount > 0) {
-      filteredData = filteredData.filter(supplier => {
+      filteredData = filteredData.filter((supplier) => {
         const state = supplier.discontinued ? 'INACTIVE' : 'ACTIVE';
         return this.selectedStatesList.includes(state);
       });
     }
 
     // Aplicar filtros por columna
-    Object.keys(this.columnFilters).forEach(key => {
-      const filterValue = this.columnFilters[key as keyof typeof this.columnFilters];
+    Object.keys(this.columnFilters).forEach((key) => {
+      const filterValue =
+        this.columnFilters[key as keyof typeof this.columnFilters];
       if (filterValue) {
-        filteredData = filteredData.filter(supplier => {
+        filteredData = filteredData.filter((supplier) => {
           const value = supplier[key as keyof Supplier];
           if (key === 'healthInsurance' && typeof filterValue === 'string') {
             return value?.toString().includes(filterValue);
           }
-          return value && value.toString().toLowerCase().includes(filterValue.toLowerCase());
+          return (
+            value &&
+            value.toString().toLowerCase().includes(filterValue.toLowerCase())
+          );
         });
       }
     });
@@ -161,17 +191,12 @@ export class IepSupplierListComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    // Cargar la lista inicial de proveedores
-    this.supplierService.searchSuppliers(null, null, null, false).subscribe(data => {
-      this.suppliers = data;
-      this.filteredSuppliers = data;
-      this.updateDataTable(data);
-    });
+    this.loadSuppliers(); // Usar el nuevo método
     this.initializeDataTable();
   }
 
-  name: string = "";
-  type: string = "";
+  name: string = '';
+  type: string = '';
   date: any = null;
   autorized: boolean = false;
   selectedSupplierId: number | null = null;
@@ -179,7 +204,10 @@ export class IepSupplierListComponent implements AfterViewInit {
   dataTableInstance: any;
   deleteModal: any;
 
-  constructor(private supplierService: SuppliersService, private router: Router) { }
+  constructor(
+    private supplierService: SuppliersService,
+    private router: Router
+  ) {}
 
   getFormattedDate(): string {
     const date = new Date();
@@ -215,11 +243,21 @@ export class IepSupplierListComponent implements AfterViewInit {
       supplier.address,
       supplier.phoneNumber,
       supplier.email,
-      supplier.discontinued ? 'Inactivo' : 'Activo'
+      supplier.discontinued ? 'Inactivo' : 'Activo',
     ]);
 
     (doc as any).autoTable({
-      head: [['Cuit', 'Nombre', 'Tipo Proveedor', 'Direccion', 'Teléfono', 'Email', 'Estado']],
+      head: [
+        [
+          'Cuit',
+          'Nombre',
+          'Tipo Proveedor',
+          'Direccion',
+          'Teléfono',
+          'Email',
+          'Estado',
+        ],
+      ],
       body: dataToExport,
       startY: 30,
       theme: 'grid',
@@ -230,44 +268,50 @@ export class IepSupplierListComponent implements AfterViewInit {
     doc.save(`${formattedDate}_Lista_Proveedores.pdf`);
   }
 
-
   exportToExcel(): void {
-    const dataToExport = this.suppliers.map((supplier) => ([
+    const dataToExport = this.suppliers.map((supplier) => [
       supplier.cuit,
       supplier.name,
       this.translateSupplierType(supplier.supplierType),
       supplier.address,
       supplier.phoneNumber,
       supplier.email,
-      supplier.discontinued ? 'Inactivo' : 'Activo'
-    ]));
-  
+      supplier.discontinued ? 'Inactivo' : 'Activo',
+    ]);
+
     const encabezado = [
       ['Listado de Proveedores'],
       [],
-      ['Cuit', 'Nombre', 'Tipo Proveedor', 'Dirección', 'Teléfono', 'Email', 'Estado']
+      [
+        'Cuit',
+        'Nombre',
+        'Tipo Proveedor',
+        'Dirección',
+        'Teléfono',
+        'Email',
+        'Estado',
+      ],
     ];
-  
+
     const worksheetData = [...encabezado, ...dataToExport];
     const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
-  
+
     worksheet['!cols'] = [
-      { wch: 15 }, 
-      { wch: 30 }, 
-      { wch: 25 }, 
-      { wch: 40 }, 
-      { wch: 20 }, 
+      { wch: 15 },
       { wch: 30 },
-      { wch: 15 } 
+      { wch: 25 },
+      { wch: 40 },
+      { wch: 20 },
+      { wch: 30 },
+      { wch: 15 },
     ];
-  
+
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Lista de Proveedores');
-  
+
     const formattedDate = this.getFormattedDate();
     XLSX.writeFile(workbook, `${formattedDate}_Lista_Proveedores.xlsx`);
   }
-  
 
   ngAfterViewChecked(): void {
     // Asegurarse de que la tabla solo se inicialice una vez
@@ -280,7 +324,7 @@ export class IepSupplierListComponent implements AfterViewInit {
     $(document).ready(() => {
       this.dataTableInstance = $('#suppliersTable').DataTable({
         dom:
-          '<"mb-3"t>' +                           //Tabla
+          '<"mb-3"t>' + //Tabla
           '<"d-flex justify-content-between"lp>', //Paginacion
         data: this.filteredSuppliers,
         //PONE PRIMERO LA COLUMNA QUE QUERES Q APAREZCA PRIMERO
@@ -296,7 +340,7 @@ export class IepSupplierListComponent implements AfterViewInit {
             render: function (data) {
               let colorClass;
               let text;
-                  
+
               if (data) {
                 colorClass = '#dc3545'; // Rojo para "Inactivo"
                 text = 'Inactivo';
@@ -304,9 +348,9 @@ export class IepSupplierListComponent implements AfterViewInit {
                 colorClass = '#198754'; // Verde para "Activo"
                 text = 'Activo';
               }
-                  
+
               return `<span class="badge border rounded-pill" style="background-color: ${colorClass};">${text}</span>`;
-            }
+            },
           },
           { data: 'cuit', title: 'Cuit' },
           { data: 'name', title: 'Nombre' },
@@ -324,7 +368,7 @@ export class IepSupplierListComponent implements AfterViewInit {
                 default:
                   return data;
               }
-            }
+            },
           },
           { data: 'address', title: 'Dirección' },
 
@@ -334,7 +378,11 @@ export class IepSupplierListComponent implements AfterViewInit {
             data: null,
             title: 'Acciones',
             className: 'text-center',
-            render: (data: any, type: any, row: any) => {
+            render: (data: any, type: any, row: any) => {    
+              let deleteButtonClass = '';
+              if (row.discontinued) {
+                deleteButtonClass = 'disabled'; // Agregar clase "disabled" al botón de eliminar
+              }
               return `
                 <div class="dropdown d-flex justify-content-center">
                   <a class="btn btn-light" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" 
@@ -344,11 +392,12 @@ export class IepSupplierListComponent implements AfterViewInit {
                   <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                     <li><a class="dropdown-item edit-btn" href="#" data-id="${data.id}">Editar</a></li>
                     <li class="dropdown-divider"></li>
-                    <li><a class="dropdown-item delete-btn" href="#" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="${data.id}">Eliminar</a></li>
+
+          <li><a class="dropdown-item delete-btn ${deleteButtonClass}" href="#" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="${data.id}">Eliminar</a></li>
                   </ul>
               </div>`;
-            }
-          }
+            },
+          },
         ],
         pageLength: 5,
         lengthChange: true, // Permitir que el usuario cambie el número de filas mostradas
@@ -357,13 +406,12 @@ export class IepSupplierListComponent implements AfterViewInit {
         destroy: true,
         language: {
           lengthMenu: '_MENU_', // Esto eliminará el texto "entries per page"
-          search: "Buscar:",
-          info: "Mostrando _START_ a _END_ de _TOTAL_ proveedores",
+          search: 'Buscar:',
+          info: 'Mostrando _START_ a _END_ de _TOTAL_ proveedores',
 
-          emptyTable: "No hay datos disponibles en la tabla",
-        }
+          emptyTable: 'No hay datos disponibles en la tabla',
+        },
       });
-
 
       // Actualizar los event listeners
       $('#suppliersTable tbody').on('click', '.delete-btn', (event) => {
@@ -383,8 +431,6 @@ export class IepSupplierListComponent implements AfterViewInit {
     });
   }
 
-
-
   updateDataTable(newSuppliers: any[]): void {
     if (this.dataTableInstance) {
       this.dataTableInstance.clear();
@@ -402,34 +448,37 @@ export class IepSupplierListComponent implements AfterViewInit {
       this.supplierService.deleteSupplier(this.selectedSupplierId).subscribe({
         next: (response) => {
           console.log('Proveedor eliminado:', response);
-          this.suppliers = this.suppliers.filter(supplier => supplier.id !== this.selectedSupplierId);
+          
+          // Mostrar mensaje de éxito
           Swal.fire({
-            title: '!Exito!',
-            text: "El proveedor ha sido eliminado",
+            title: '¡Éxito!',
+            text: 'El proveedor ha sido eliminado',
             icon: 'success',
             confirmButtonText: 'Aceptar',
             showCancelButton: false,
-            confirmButtonColor: '#3085d6'
+            confirmButtonColor: '#3085d6',
           }).then(() => {
-            this.updateDataTable(this.suppliers);
-          this.selectedSupplierId = null;
-          this.deleteModal.hide();
+            // Recargar los datos desde el servidor
+            this.loadSuppliers();
+            this.selectedSupplierId = null;
+            this.deleteModal.hide();
           });
-          // Ocultar el modal después de eliminar
-          // Refrescar la tabla después de eliminar mediante suscripción
-          
         },
         error: (error) => {
           console.error('Error al eliminar el proveedor', error);
-          alert('Ocurrió un error al intentar dar de baja al proveedor.');
+          Swal.fire({
+            title: 'Error',
+            text: 'Ocurrió un error al intentar dar de baja al proveedor.',
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+          });
           this.deleteModal.hide();
-        }
+        },
       });
     }
   }
 
   updateSupplier(id: number) {
-
     //const confirmUpdate = window.confirm('¿Está seguro de que desea modificar este proveedor?');
     //if (confirmUpdate) {
     this.router.navigate(['/home/supplier-update', id]);
@@ -456,23 +505,20 @@ export class IepSupplierListComponent implements AfterViewInit {
         //alert('¡Proveedor dado de baja correctamente!');
         console.log(response);
         // Actualizar la lista de proveedores después de eliminar
-        this.suppliers = this.suppliers.filter(supplier => supplier.id !== id);
+        this.suppliers = this.suppliers.filter(
+          (supplier) => supplier.id !== id
+        );
         this.updateDataTable(this.suppliers);
       },
       error: (error) => {
         console.error('Error al eliminar el proveedor', error);
         alert('Ocurrió un error al intentar dar de baja al proveedor.');
-      }
-    }
-    );
+      },
+    });
     //}
   }
 
   goBack() {
     window.history.back();
   }
-
-
-
-
 }

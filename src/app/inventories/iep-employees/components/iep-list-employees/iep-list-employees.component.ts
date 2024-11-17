@@ -227,7 +227,7 @@ this.table.rows.add(filteredData).draw();
   ngOnInit(): void {
     this.loadEmpleados();
     this.initializeDates();
-    this.bindEditButtons();
+    //this.bindEditButtons();
   }
 
   getFormattedDate(): string {
@@ -593,7 +593,9 @@ this.table.rows.add(filteredData).draw();
                   <li><button class="dropdown-item consultar-desempeño" data-empleado-id="${
                     data.id
                   }">Ver desempeño</button></li>
-                  
+
+                  <li><a class="dropdown-item modificar-btn" data-empleado-id="${data.id}" href="#">Actualizar</a></li>
+
                   ${
                     puedeEliminar
                       ? `
@@ -628,11 +630,16 @@ this.table.rows.add(filteredData).draw();
       this.router.navigate([`home/employee/performance/${empleadoId}`]); // Redirige al componente de desempeño con el ID del empleado
     });
 
+    
+
     $('#empleadosTable').on('click', '.modificar-btn', (event: any) => {
       event.preventDefault();
       const id = $(event.currentTarget).data('empleado-id');
       this.editarEmpleado(id);
     });
+
+
+  
 
       // Manejador de clics para los botones de eliminar
   $('#empleadosTable').on('click', '.eliminar-btn', (event: any) => {
@@ -707,16 +714,20 @@ this.table.rows.add(filteredData).draw();
   
 
   editarEmpleado(id: any): void {
-    this.router.navigate(['/empleados/modificar', id]);
+    //this.router.navigate(['employee/update/', id]);
+    if (id) {
+      this.router.navigate(['/home/employee/update', id]);
+    }
   }
 
-  bindEditButtons(): void {
-    const self = this; // Guardamos el contexto del componente
-    $('#empleadosTable').on('click', '.edit-button', () => {
-      const id = $(this).data('id'); // Obtenemos el ID del atributo data-id
-      self.editarEmpleado(id); // Llama al método editarEmpleado
-    });
-  }
+
+  // bindEditButtons(): void {
+  //   const self = this; // Guardamos el contexto del componente
+  //   $('#empleadosTable').on('click', '.edit-button', () => {
+  //     const id = $(this).data('id'); // Obtenemos el ID del atributo data-id
+  //     self.editarEmpleado(id); // Llama al método editarEmpleado
+  //   });
+  // }
 
   consultarEmpleado(id: number): void {
     const empByIdSubscription = this.empleadoService

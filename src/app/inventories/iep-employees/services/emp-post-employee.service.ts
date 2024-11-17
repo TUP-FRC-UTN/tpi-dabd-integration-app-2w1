@@ -1,96 +1,72 @@
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
-import { Provincia } from '../Models/emp-provincia';
-import { Charge, DocumentTypeEnum, PostEmployeeDto } from '../Models/emp-post-employee-dto';
-import { EmpPutEmployees } from '../Models/emp-put-employees';
+import { HttpClient } from '@angular/common/http';
+import { Observable, forkJoin, map, BehaviorSubject, tap } from 'rxjs';
+import {
+  Employee,
+  EmployeePerformance,
+  Performance,
+  WakeUpCallDetail,
+} from '../Models/listado-desempeño';
 
 @Injectable({
   providedIn: 'root',
 })
-export class EmpPostEmployeeService {
-  private readonly EMPLOYEE_BASE_URL: string = 'http://localhost:8080/';
-  private readonly INVENTORY_URL: string = 'http://localhost:8081/';
+export class ListadoDesempeñoService {
+  // Base URL
+  private readonly BASE_URL: string = 'http://localhost:8080/';
 
-  private SUPPLIER_URL: string = `${this.INVENTORY_URL}suppliers`;
+  // Employees endpoints
+  private readonly EMPLOYEES_URL: string = `${this.BASE_URL}employees`;
+  private readonly EMPLOYEES_GET_ALL: string = `${this.EMPLOYEES_URL}/allEmployees`;
 
-  private readonly CHARGES_URL: string = `${this.EMPLOYEE_BASE_URL}charges/active`;
-  private readonly EMPLOYEE_URL: string = `${this.EMPLOYEE_BASE_URL}employees`;
-  private readonly EMPLOYEE_POST_URL: string = `${this.EMPLOYEE_URL}/post`;
+  // Wake Up Calls endpoints
+  private readonly WAKE_UP_CALLS_URL: string = `${this.BASE_URL}wakeUpCalls`;
+  private readonly WAKE_UP_CALLS_GET_ALL: string = `${this.WAKE_UP_CALLS_URL}/todas`;
+  private readonly WAKE_UP_CALLS_DETAILS: string = `${this.WAKE_UP_CALLS_URL}/AllWakeUpCalls`;
 
-  private baseUrlProvinces: string =
-    'https://mocki.io/v1/555e5ed8-37c8-480b-8452-7affe6f6f833';
+  // Subject para manejar el estado de los datos
+  private performancesSubject = new BehaviorSubject<EmployeePerformance[]>([]);
+  performances$ = this.performancesSubject.asObservable();
 
-  constructor(private client: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  private _refresh$ = new Subject<void>();
-
-  get refresh$(): Observable<void> {
-    return this._refresh$;
-  }
-  // getProviders():Observable<any[]>{
-  //   return this.client.get<any[]>(this.baseUrl).pipe(delay(2000));
-  // }
-
-  getProviders(): Observable<any[]> {
-    return this.client.get<any[]>(this.SUPPLIER_URL);
+  getEmployees(): Observable<Employee[]> {
+    return this.http.get<Employee[]>(this.EMPLOYEES_GET_ALL);
   }
 
-  getProvinces(): Observable<Provincia[]> {
-    return this.client.get<Provincia[]>(this.baseUrlProvinces);
+  getPerformances(): Observable<Performance[]> {
+    return this.http.get<Performance[]>(this.WAKE_UP_CALLS_GET_ALL);
   }
 
-  getCharges(): Observable<Charge[]> {
-    return this.client.get<Charge[]>(this.CHARGES_URL);
+  getWakeUpCallDetails(): Observable<WakeUpCallDetail[]> {
+    return this.http.get<WakeUpCallDetail[]>(this.WAKE_UP_CALLS_DETAILS);
   }
-
-  validateDni(dni:string,documentType:DocumentTypeEnum):Observable<boolean>{
-    const params = new HttpParams()
-    .set('documentType', documentType)
-    .set('dni', dni);
-
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json', // Cambia esto según tus necesidades
-      'Accept': 'application/json', // Aceptar respuesta en formato JSON
-      // Puedes añadir más encabezados aquí si es necesario
-  });
-  // Realiza la petición GET
-  return this.client.get<boolean>(`${this.EMPLOYEE_URL}/validate/dni`, { params});
-
-  }
-  validateCuil(cuil:string):Observable<boolean>{
-
-    const params = new HttpParams()
-    .set('cuil', cuil);
-
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json', // Cambia esto según tus necesidades
-      'Accept': 'application/json', // Aceptar respuesta en formato JSON
-      // Puedes añadir más encabezados aquí si es necesario
-  });
-  // Realiza la petición GET
-  return this.client.get<boolean>(`${this.EMPLOYEE_URL}/validate/cuil`, { params});
-
-  
-  }
-
   
 
-  createProduct(dto: PostEmployeeDto): Observable<any> {
-    const url = `${this.EMPLOYEE_POST_URL}`;
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    const json = JSON.stringify(dto);
-
-    console.log(json);
-
-    return this.client.post<any>(url, json, { headers });
+  getCombinedData(): Observable<EmployeePerformance[]> {
+    return forkJoin({
+      employees: this.getEmployees(),
+      performances: this.getPerformances()
+    }).pipe(
+      map(({ employees, performances }) => {
+        return performances.map(performance => {
+          const employee = employees.find(emp => emp.id === performance.employeeId);
+          return {
+            id: performance.employeeId,
+            fullName: employee ? employee.fullName : 'Unknown',
+            year: performance.year,
+            month: performance.month,
+            totalObservations: performance.totalWakeUpCalls,
+            performanceType: performance.performanceType
+          };
+        });
+      }),
+      tap(data => this.performancesSubject.next(data))
+    );
   }
 
-  updateEmployee(dto: EmpPutEmployees): Observable<any> {
-    const url = `${this.EMPLOYEE_URL}/put/${dto.id}`;
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    const json = JSON.stringify(dto);
-
-    return this.client.put<any>(url, json, { headers });
+  refreshData(): void {
+    console.log('Refrescando datos de desempeño...');
+    this.getCombinedData().subscribe();
   }
 }

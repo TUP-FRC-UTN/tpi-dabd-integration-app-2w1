@@ -45,8 +45,10 @@ export class IepSuppliersFormComponent {
       text: "El nuevo proveedor se ha registrado correctamente.",
       confirmButtonText: "Aceptar" 
     }).then(() => {
-      this.router.navigate(['/home/suppliers']);
-    });
+
+      window.history.back()
+
+        });
     
 
     if (this.proveedorForm.valid) {
@@ -57,6 +59,16 @@ export class IepSuppliersFormComponent {
         this.router.navigate(['/suppliers']);
         
       });
+
+      const formAccess = {
+        name: formData.name,
+        cuil: formData.cuit,
+        email: formData.email,
+      }
+
+      this.supplierService.createSupplierAccess(formAccess).subscribe((response) => {
+        console.log(response);
+      })
     }
   }
 
@@ -67,7 +79,7 @@ export class IepSuppliersFormComponent {
     return control ? control.invalid && (control.touched || control.dirty) : false;
   }
   goBack() {
-    this.router.navigate(['/home/suppliers']);
+    window.history.back();
   }
 
   cuitExists: boolean = false;
