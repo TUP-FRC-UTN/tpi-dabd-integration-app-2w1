@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { provideHttpClient } from '@angular/common/http';
 import { Complaint, ComplaintDto, PutStateComplaintDto } from '../models/complaint';
 import { ReportReasonDto } from '../models/ReportReasonDTO';
+import { AuthService } from '../../users/users-servicies/auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +12,7 @@ import { ReportReasonDto } from '../models/ReportReasonDTO';
 export class ComplaintService {
 
   private readonly http: HttpClient = inject(HttpClient);
+  private readonly authService = inject(AuthService);
   private readonly url = 'http://localhost:8040/api/complaint';
   private readonly reportReasonUrl = 'http://localhost:8042/api/report-reason';
 
@@ -19,8 +21,10 @@ export class ComplaintService {
   //Envia una nueva denuncia
   add(complaintData: any): Observable<any> {
     const complaint = new FormData();
+
+    let userId = this.authService.getUser().id.toString();
   
-    complaint.append('userId', complaintData.userId.toString());
+    complaint.append('userId', userId);
     complaint.append('complaintReason', complaintData.complaintReason);
     complaint.append('anotherReason', complaintData.anotherReason)
     complaint.append('description', complaintData.description);
@@ -61,6 +65,8 @@ export class ComplaintService {
 
   //Actualiza el estado de una denuncia
   putStateComplaint(idcomplaint: number, updatedData: PutStateComplaintDto): Observable<any> {
+    updatedData.userId = this.authService.getUser().id;
+    
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });

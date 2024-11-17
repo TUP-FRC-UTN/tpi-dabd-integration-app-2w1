@@ -12,11 +12,10 @@ export class CustomKpiComponent{
 
   constructor() { }
 
-  @Input() amount : number =0
-  @Input() amountundefined : number| undefined =0
-  @Input() title : string =''
-  @Input() subTitle: string=''
-  @Input() tooltip: string=''
+  @Input() amount : number | null | undefined = 0;
+  @Input() title : string ='';
+  @Input() subTitle: string='';
+  @Input() tooltip: string='';
   @Input() customStyles: { [key: string]: string } = {};
   @Input() icon: string='';
   @Input() formatPipe: string='';

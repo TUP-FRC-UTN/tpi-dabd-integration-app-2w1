@@ -1,208 +1,350 @@
-<div class="container-fluid p-1 mt-2 mb-2">
-
-
-  <div class="container-fluid m-1 p-2">
-    <div class="container-fluid col-10 shadow p-3 mb-5 bg-body rounded"> <!-- Contenedor con sombra -->
-      <div class>
-        <h4 class="text-left">Registro de Ingreso/Egreso</h4>
+<!-- Modal de Visitantes -->
+<div class="modal fade" id="visitorListModal" tabindex="-1" aria-labelledby="visitorListModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable" style="max-width: 95vw; margin: 10px;">
+    <div class="modal-content h-100">
+      <div class="modal-header">
+        <h5 class="modal-title" id="visitorListModalLabel">Lista de Personas Autorizadas</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <!-- Contenedor para los botones alineados a la derecha -->
-      <div class="d-flex justify-content-end botones">
-        <label>
-          <button 
-            class="btn btn-primary me-2" 
-            (click)="toggleAllVisitors()"
-            [ngClass]="{'active': allVisitorsChecked}">
-            <i class="bi bi-person-raised-hand"></i> 
-          </button>
-        </label>
-        <label>
-          <button 
-            class="btn btn-warning me-2" 
-            (click)="toggleAllEmployers()"
-            [ngClass]="{'active': allEmployersChecked}">
-            <i class="bi bi-tools"></i> 
-          </button>
-        </label>
-        <label>
-          <button 
-            class="btn btn-success me-2" 
-            (click)="toggleAllOwner()"
-            [ngClass]="{'active': allOwnersChecked}">
-            <i class="bi bi-house-fill"></i> 
-          </button>
-        </label>
-
-        <button
-          class="btn btn-primary me-2"
-          data-bs-toggle="modal"
-          data-bs-target="#qrScannerModal"
-        >
-          <i class="bi bi-qr-code-scan"></i>
-        </button>
-        <!-- Botón para cargar imagen de QR -->
-        <button class="btn btn-primary me-2" (click)="uploadQrImage()">
-          <i class="bi bi-file-earmark-arrow-up"></i>
-        </button>
-        <input
-          type="file"
-          accept="image/*"
-          #qrInput
-          hidden
-          (change)="onFileSelected($event)"
-        />
+      <div class="modal-body">
+            <div class="container-fluid shadow bg-body rounded"> <!-- Removida la clase col-10 -->
+              <div class="mb-3">
+              </div>
+              <!-- Contenedor para todos los controles -->
+              <div class="row g-3 mb-3 align-items-center">
+                <!-- Campo de búsqueda -->
+                <div class="col-md-2 pe-0">
+                  <div class="search-box">
+                    <input type="search" 
+                           class="form-control" 
+                           placeholder="Buscar"
+                           id="customSearch">
+                  </div>
+                </div>
+ 
+                <!-- Selector de Tipo de Ingresante -->
+                <!-- <div class="col-4 pe-0">
+                  <div class="d-flex align-items-center flex-nowrap">
+                    <label class="form-label mb-0 me-2 text-nowrap">Tipo de ingresante:</label>
+                    <ng-select
+                     class="flex-grow-1"
+                      [items]="userTypeOptions"
+                      [multiple]="true"
+                      [closeOnSelect]="false"
+                      [searchable]="true"
+                      bindLabel="label"
+                      bindValue="value"
+                      [clearable]="false"
+                      placeholder=""
+                      [(ngModel)]="selectedUserTypes"
+                      (change)="onFilterSelectionChange()">
+                      
+                      <ng-template ng-multi-label-tmp let-items="items" let-clear="clear">
+                        <span>({{items.length}}) Seleccionados </span>
+                      </ng-template>
+                      
+                      <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                        <input id="type-{{item.value}}" 
+                              type="checkbox" 
+                              [checked]="item$.selected"
+                              class="form-check-input me-2"/>
+                        <span>{{item.label}}</span>
+                      </ng-template>
+                    </ng-select>
+                  </div>
+                </div> -->
+ 
+                <!-- Espacio flexible -->
+                <div class="col">
+                </div>
+ 
+                <!-- Botones de acción -->
+                <div class="col-4 d-flex justify-content-end">
+                  <button class="btn btn-secondary action-btn me-2" (click)="clearFilters()" title="Limpiar filtros">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                  
+                  <button class="btn text-light action-btn me-2"
+                          style="border:none"
+                          title="Buscar"
+                          style="background-color: #0d6efd;"
+                          data-bs-toggle="modal" 
+                          data-bs-target="#visitorModal">
+                          <i class="bi bi-plus-lg"></i>
+                  </button>
+                  
+                  <button
+                    class="btn btn-primary"
+                    style="background-color: #444444; border: none;"
+                    data-bs-toggle="modal"
+                    data-bs-target="#qrScannerModal">
+                    <i class="bi bi-qr-code-scan"></i>
+                  </button>
+                </div>
+              </div>
+ 
+              <!-- Tabla -->
+              <table id="visitorsTable" class="table table-hover table-striped">
+                <thead>
+                  <tr>
+                    <!-- <th scope="col">Estado</th> -->
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Tipo Ingresante</th>
+                    <th scope="col">Documento</th>
+                    <th scope="col">Vehículos</th>
+                    <!-- <th scope="col">Observaciones</th> -->
+                    <th scope="col">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Aquí iría la lógica para mostrar los visitantes -->
+                </tbody>
+              </table>
+            </div>
       </div>
-
-      <table
-        id="visitorsTable"
-        class="table table-bordered table-striped"
-      >
-        <thead>
-          <tr>
-            <th scope="col">Nombre</th>
-            <th scope="col">Tipo Doc.</th>
-            <th scope="col">Documento</th>
-            <th scope="col">Acción</th>
-            <th scope="col">Observaciones</th>
-            <th scope="col">Estado</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Aquí iría la lógica para mostrar los visitantes -->
-        </tbody>
-      </table>
-
-      <div class="row align-items-center">
-        <!-- Aquí puedes incluir el botón para agregar visitantes si es necesario -->
-      </div>
+   
     </div>
   </div>
-</div>
-
-<!-- Modal del escáner QR -->
-<div
-  class="modal fade"
-  id="qrScannerModal"
-  tabindex="-1"
-  aria-labelledby="qrScannerModalLabel"
-  aria-hidden="true"
->
-  <div class="modal-dialog modal-lg">
+ </div>
+ 
+ <!-- Modal del escáner QR -->
+ <div class="modal fade" id="qrScannerModal" tabindex="-1" aria-labelledby="qrScannerModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="qrScannerModalLabel">Escanear Código QR</h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-          (click)="stopScanner()"
-        ></button>
+        <button type="button" class="btn-close" 
+        data-bs-toggle="modal"
+        data-bs-target="#visitorListModal" 
+        aria-label="Close" (click)="stopScanner()"></button>
       </div>
       <div class="modal-body">
-        <ngx-scanner-qrcode
-          #scanner
-          (event)="handleQrScan($event)"
-        ></ngx-scanner-qrcode>
+        <ngx-scanner-qrcode #scanner (event)="handleQrScan($event)"></ngx-scanner-qrcode>
       </div>
       <div class="modal-footer">
-        <button
-          type="button"
-          class="btn btn-secondary"
-          data-bs-dismiss="modal"
-          (click)="stopScanner()"
-        >
+        <button type="button" class="btn btn-secondary" 
+        data-bs-toggle="modal"
+        data-bs-target="#visitorListModal" 
+        (click)="stopScanner()">
           Cerrar
         </button>
-        <button
-          type="button"
-          class="btn btn-secondary"
-          (click)="startScanner()"
-        >
+        <button type="button" class="btn btn-secondary" (click)="startScanner()">
           Escanear
         </button>
       </div>
     </div>
   </div>
-</div>
-
-<!-- Modal de Información del Visitante -->
-<div
-  class="modal"
-  id="visitorInfoModal"
-  tabindex="-1"
-  aria-labelledby="visitorInfoModalLabel"
-  aria-hidden="true"
-  [class.show]="isModalOpen"
->
-  <div class="modal-dialog">
+ </div>
+ 
+ <!-- Modal de Información del Visitante -->
+ <div class="modal fade" id="visitorInfoModal" tabindex="-1" aria-labelledby="visitorInfoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="visitorInfoModalLabel">
-          Información de la Persona
-        </h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-          (click)="closeModal()"
-        ></button>
+        <h5 class="modal-title" id="visitorInfoModalLabel">Más Información</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div *ngIf="selectedVisitor">
-          <p>
-            <strong>Nombre:</strong> {{ selectedVisitor.name }} {{ selectedVisitor.last_name }}
-          </p>
-          <p><strong>Tipo de Persona:</strong> 
-            {{ 
-              selectedVisitor.userType.description === 'Emplooyed' ? 'Empleado' : 
-              selectedVisitor.userType.description === 'Visitor' ? 'Visitante' : 
-              selectedVisitor.userType.description === 'Owner' ? 'Propietario' : 
-              selectedVisitor.userType.description === 'Tenant' ? 'Inquilino' : 
-              selectedVisitor.userType.description 
-            }}
-          </p>
-          <p>
-            <strong>Tipo de documento:</strong> {{ getDocumentType(selectedVisitor) }}
-          </p>
-          <p><strong>Documento:</strong> {{ selectedVisitor.document }}</p>
-          <p><strong>Email:</strong> {{ selectedVisitor.email }}</p>
-
-          <p><strong>Información del vehículo:</strong></p>
-          <div *ngIf="hasVehicles(selectedVisitor); else noVehicle">
-            <ul *ngFor="let vehicle of getVehicles(selectedVisitor)">
-              <li><strong>Patente:</strong> {{ vehicle.plate }}</li>
-              <li><strong>Tipo:</strong> 
+          <!-- Información del visitante en 2 columnas -->
+          <div class="row mb-2">
+            <div class="col-md-6">
+              <p class="mb-1"><strong>Nombre:</strong> {{ selectedVisitor.name }} {{ selectedVisitor.last_name }}</p>
+              <p class="mb-1"><strong>Tipo:</strong> 
                 {{ 
-                  vehicle.vehicle_Type.description === 'Car' ? 'Coche' : 
-                  vehicle.vehicle_Type.description === 'MotorBike' ? 'Motocicleta' : 
-                  vehicle.vehicle_Type.description === 'Truck' ? 'Camión' : 
-                  vehicle.vehicle_Type.description 
+                  selectedVisitor.userType.description === 'Employeed' ? 'Empleado' : 
+                  selectedVisitor.userType.description === 'Visitor' ? 'Visitante' : 
+                  selectedVisitor.userType.description === 'Owner' ? 'Propietario' : 
+                  selectedVisitor.userType.description === 'Tenant' ? 'Inquilino' : 
+                  selectedVisitor.userType.description === 'Supplier' ? 'Proveedor':
+                  selectedVisitor.userType.description === 'Emergency' ? 'Emergencia':
+                  selectedVisitor.userType.description === 'Worker' ? 'Obrero' : 
+                  selectedVisitor.userType.description === 'Delivery' ? 'Delivery' : 
+                  selectedVisitor.userType.description === 'Taxi' ? 'Taxi' : 
+                  selectedVisitor.userType.description === 'Cleaning' ? 'P. de Limpieza' : 
+                  selectedVisitor.userType.description === 'Gardener' ? 'Jardinero' : 
+                  selectedVisitor.userType.description
                 }}
-              </li>
-            </ul>
-          </div>
-          <ng-template #noVehicle>
-            <p>No tiene registro</p>
-          </ng-template>
+              </p>
+              <p class="mb-1"><strong>Tipo de Documento:</strong> {{ getDocumentType(selectedVisitor) }}</p>
+              <p class="mb-1"><strong>Documento:</strong> {{ selectedVisitor.document }}</p>
+              @if (selectedVisitor.userType.description !== 'Emergency') {
+                <p class="mb-1"><strong>Email:</strong> {{ selectedVisitor.email }}</p>
+              }
+            </div>
+            
+            <div class="col-md-6">
+              <p class="mb-1"><strong>Información del vehículo:</strong></p>
+              <div *ngIf="hasVehicles(selectedVisitor); else noVehicle">
+                <div *ngFor="let vehicle of getVehicles(selectedVisitor)" class="form-check">
+                  <input 
+                  class="form-check-input" 
+                  type="radio" 
+                  [id]="'vehicle-' + vehicle.plate"
+                  [value]="vehicle.plate" 
+                  [(ngModel)]="selectedVehiclePlate"
+                  (change)="onVehicleChange(vehicle.plate)">
+                  <label class="form-check-label" [for]="'vehicle-' + vehicle.plate">
+                    <strong>Patente:</strong> {{ vehicle.plate }}  
+                  </label>
+                  <br>
 
-          <p><strong>Rango de fechas:</strong></p>
-          <div *ngIf="selectedVisitor.authRanges.length > 0; else noDays">
-            <ul *ngFor="let auth of selectedVisitor.authRanges">
-              <li>
-                <strong>Desde:</strong> {{ auth.init_date | date : "dd/MM/yyyy" }}<br />
-              </li>
-              <li>
-                <strong>Hasta:</strong> {{ auth.end_date | date : "dd/MM/yyyy" }}
-              </li>
-            </ul>
+                  <strong>Tipo:</strong> 
+                    {{ 
+                      vehicle.vehicle_Type.description === 'Car' ? 'Coche' : 
+                      vehicle.vehicle_Type.description === 'Motorbike' ? 'Motocicleta' : 
+                      vehicle.vehicle_Type.description === 'Truck' ? 'Camión' : 
+                      vehicle.vehicle_Type.description 
+                    }}
+                </div>
+              </div>
+              <ng-template #noVehicle>
+                <p class="mb-1">No tiene registro</p>
+              </ng-template>
+              <ng-template #noVehicle>
+                <p class="mb-1">No tiene registro</p>
+              </ng-template>
+              <br>
+
+              <!-- Rango de fechas autorizado -->
+              <p class="fw-bold mb-1">Rango de Fechas Autorizado:</p>
+              <div *ngIf="selectedVisitor.authRanges.length > 0; else noDays">
+                <ul class="list-unstyled">
+                  <li><strong>Desde:</strong> {{ selectedVisitor.authRanges.at(selectedVisitor.authRanges.length-1)?.init_date| date : "dd/MM/yyyy" }}</li>
+                  <li><strong>Hasta:</strong> {{ selectedVisitor.authRanges.at(selectedVisitor.authRanges.length-1)?.end_date | date : "dd/MM/yyyy" }}</li>
+                </ul>
+              </div>
+              <ng-template #noDays>
+                <p class="mb-1">No hay rango de fechas cargado.</p>
+              </ng-template>
+            </div>
           </div>
-          <ng-template #noDays>
-            <p>No hay fecha cargada.</p>
-          </ng-template>
-        </div>
+
+          <hr>
+
+          <!-- Rango horario autorizado en 3 columnas -->
+          <div class="col-12">
+            <div class="row">
+              @if (selectedVisitor.authRanges.length > 0 &&
+                   selectedVisitor.authRanges.at(selectedVisitor.authRanges.length-1)?.allowedDays &&
+                   selectedVisitor.authRanges.at(selectedVisitor.authRanges.length-1)!.allowedDays.length > 0) {
+                <p class="fw-bold">Rango Horario Autorizado:</p>
+                @for (aDay of selectedVisitor.authRanges.at(selectedVisitor.authRanges.length-1)!.allowedDays;track $index) {
+                  <div class="col-md-4 mb-2">
+                    <p class="fw-bold mb-1">{{this.helperService.translateDay(aDay.day)}}</p>
+                    <ul class="list-unstyled">
+                      <li><strong>Desde:</strong> {{helperService.stringToHour(aDay, true)}}</li>
+                      <li><strong>Hasta:</strong>  {{helperService.stringToHour(aDay, false)}}</li>
+                    </ul>
+                  </div>
+                }
+              } @else {
+                <div class="col-12">
+                  <p>No hay rango horario cargado.</p>
+                </div>
+              }
+            </div>
+          </div>
+          
       </div>
     </div>
   </div>
 </div>
+</div>
+ 
+ <!-- Modal de Confirmación de Ingreso vecino -->
+ <div class="modal fade" id="confirmIngresoModal" tabindex="-1" aria-labelledby="confirmIngresoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmIngresoModalLabel">Confirmar Ingreso</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p id="modalMessage">¿Está seguro que desea registrar el ingreso?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="cancelButton" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="confirmButton">Aceptar</button>
+      </div>
+    </div>
+  </div>
+ </div>
+ 
+ <!-- Modal de Confirmación de Egreso -->
+ <div class="modal fade" id="confirmEgresoModal" tabindex="-1" aria-labelledby="confirmEgresoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmEgresoModalLabel">Confirmar Egreso</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p id="modalMessageEgreso">¿Está seguro que desea registrar el egreso?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="cancelEgresoButton" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="confirmEgresoButton">Confirmar</button>
+      </div>
+    </div>
+  </div>
+ </div>
+ 
+ <!-- Modal de Confirmación de Ingreso Empleado -->
+ <div class="modal fade" id="confirmIngresoEmpModal" tabindex="-1" aria-labelledby="confirmIngresoEmpModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmIngresoEmpModalLabel">Confirmar Ingreso</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p id="modalMessageIngresoEmp">¿Está seguro que desea registrar el ingreso?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="cancelIngresoEmpButton" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="confirmIngresoEmpButton">Confirmar</button>
+      </div>
+    </div>
+  </div>
+ </div>
+ 
+ <!-- Modal de Confirmación de Egreso Empleado -->
+ <div class="modal fade" id="confirmEgresoEmpModal" tabindex="-1" aria-labelledby="confirmEgresoEmpModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmEgresoEmpModalLabel">Confirmar Egreso</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p id="modalMessageEgresoEmp">¿Está seguro que desea registrar el egreso?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="cancelEgresoEmpButton" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="confirmEgresoEmpButton">Confirmar</button>
+      </div>
+    </div>
+  </div>
+ </div>
+ 
+ <!-- Modal de confirmación -->
+ <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmationModalLabel"></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary">Sí</button>
+      </div>
+    </div>
+  </div>
+ </div>
+
+ 
+ <app-acceses-visitors-temp></app-acceses-visitors-temp>  
