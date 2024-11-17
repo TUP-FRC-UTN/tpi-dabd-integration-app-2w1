@@ -18,10 +18,10 @@ export class UsersNavbarComponent implements OnInit {
   private readonly authService = inject(AuthService);
 
   pageTitle: string = ''
-  username: string = this.authService.getUser().name!;
-  userLastname: string = this.authService.getUser().lastname!;
-  // username: string = "Jhon";     //Hardcodeado para no levantar el micro para login
-  // userLastname: string = "Doe";  //Hardcodeado para no levantar el micro para login
+  // username: string = this.authService.getUser().name!;
+  // userLastname: string = this.authService.getUser().lastname!;
+  username: string = "Jhon";     //Hardcodeado para no levantar el micro para login
+  userLastname: string = "Doe";  //Hardcodeado para no levantar el micro para login
 
   //Expande el side
   expand: boolean = false;
@@ -30,17 +30,17 @@ export class UsersNavbarComponent implements OnInit {
   sideButtons: SideButton[] = this.routingService.getButtons();
 
   //Roles del usuario
-  userRoles: string[] = [];
-  // userRoles: string[] = ["SuperAdmin", "Gerente general"]; //Hardcodeado para no levantar el micro para login
+  // userRoles: string[] = [];
+  userRoles: string[] = ["SuperAdmin", "Gerente general"]; //Hardcodeado para no levantar el micro para login
 
   //Rol seleccionado
-  actualRole: string = '';
-  // actualRole: string = 'SuperAdmin';
+  // actualRole: string = '';
+  actualRole: string = 'SuperAdmin';
 
   ngOnInit(): void {
     this.pageTitle = this.routingService.getTitle();
-    this.userRoles = this.authService.getUser().roles!;
-    this.actualRole = this.authService.getActualRole()!;
+    // this.userRoles = this.authService.getUser().roles!;    //Descomentar cuando se quiera usar el login real
+    // this.actualRole = this.authService.getActualRole()!;
   }
 
   //Expandir y contraer el sidebar
@@ -63,7 +63,7 @@ export class UsersNavbarComponent implements OnInit {
 
   //Seleccionar un rol
   selectRole(role: string) {
-    this.authService.saveActualRole(role);
+    // this.authService.saveActualRole(role);
     this.actualRole = role;
     this.routingService.redirect('/main/home')
   }
