@@ -32,7 +32,6 @@ export class NotificationHomeComponent implements OnInit{
       { value: "Multas", name: "Multas" },
       { value: "Accesos", name: "Accesos" },
       { value: "Pagos", name: "Pagos" },
-      { value: "Generales", name: "Generales" },
       {value: "Inventario",name: "Inventario"}
     ];
   
