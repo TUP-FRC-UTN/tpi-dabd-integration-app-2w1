@@ -5,11 +5,12 @@ import { WarehouseMovement } from '../models/getWarehouseMovementResponse';
 import { Observable } from 'rxjs';
 import { IepCreateWarehouseMovementDTO } from '../models/iep-create-warehouse-movement-dto';
 import { WarehouseMovementByProduct } from '../models/WarehouseMovementByProduct';
+import { environment } from '../../../common/environments/environment';
 @Injectable({
   providedIn: 'root',
 })
 export class WarehouseMovementService {
-  private readonly INVENTORY_BASE_URL: string = 'http://localhost:9011/';
+  private readonly INVENTORY_BASE_URL: string = environment.services.inventory + "/";
   private readonly WAREHOUSE_MOVEMENT_URL: string = `${this.INVENTORY_BASE_URL}warehouseMovement`;
   private readonly WAREHOUSE_MOVEMENT_URL_SEARCH: string = `${this.WAREHOUSE_MOVEMENT_URL}/search`;
   constructor(private http: HttpClient) { }
