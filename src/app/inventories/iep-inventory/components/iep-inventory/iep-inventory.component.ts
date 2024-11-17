@@ -32,6 +32,7 @@ import { EstadoService } from '../../services/estado.service';
 import { Row } from 'jspdf-autotable';
 import Swal from 'sweetalert2';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { AuthService } from '../../../../users/users-servicies/auth.service';
 declare var bootstrap: any; // Añadir esta declaración al principio
 // Interfaces existentes actualizadas
 interface Filters {
@@ -210,6 +211,7 @@ applyFilter(): void {
     }
   }
 
+  private userService = inject(AuthService); 
   private categoriaService = inject(CategoriaService);
   private estadoService = inject(EstadoService);
   private productoService = inject(ProductService);
@@ -574,7 +576,7 @@ applyFilter(): void {
     console.log('Eliminando producto');
     if (this.selectedProductId !== null) {
       const logicalLow$ = this.productoService.giveLogicalLow(
-        this.selectedProductId
+        this.selectedProductId, this.userService.getUser().id
       );
       logicalLow$.subscribe({
         next: (response) => {

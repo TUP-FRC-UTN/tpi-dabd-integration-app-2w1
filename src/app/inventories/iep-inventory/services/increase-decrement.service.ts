@@ -12,7 +12,7 @@ import { movementDto } from '../models/movementDto';
 export class IncreaseDecrementService {
 
   constructor(private http: HttpClient,) { }
-  private readonly INVENTORY_BASE_URL: string = 'http://localhost:8081/';
+  private readonly INVENTORY_BASE_URL: string = 'http://localhost:9011/';
   private readonly AMOUNT_MODIFICATION_URL: string = `${this.INVENTORY_BASE_URL}amountModification`;
 
   

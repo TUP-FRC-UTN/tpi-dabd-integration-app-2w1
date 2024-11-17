@@ -14,7 +14,7 @@ import { AuthService } from '../../../users/users-servicies/auth.service';
   providedIn: 'root',
 })
 export class ProductService {
-  private readonly INVENTORY_BASE_URL: string = 'http://localhost:8081/';
+  private readonly INVENTORY_BASE_URL: string = 'http://localhost:9011/';
 
   private readonly CATEGORY_URL_GET_ALL: string = `${this.INVENTORY_BASE_URL}category`; // Tomas C
 

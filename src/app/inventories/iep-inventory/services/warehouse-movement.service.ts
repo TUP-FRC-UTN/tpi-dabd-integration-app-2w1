@@ -9,7 +9,7 @@ import { WarehouseMovementByProduct } from '../models/WarehouseMovementByProduct
   providedIn: 'root',
 })
 export class WarehouseMovementService {
-  private readonly INVENTORY_BASE_URL: string = 'http://localhost:8081/';
+  private readonly INVENTORY_BASE_URL: string = 'http://localhost:9011/';
   private readonly WAREHOUSE_MOVEMENT_URL: string = `${this.INVENTORY_BASE_URL}warehouseMovement`;
   private readonly WAREHOUSE_MOVEMENT_URL_SEARCH: string = `${this.WAREHOUSE_MOVEMENT_URL}/search`;
   constructor(private http: HttpClient) { }

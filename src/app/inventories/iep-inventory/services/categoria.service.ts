@@ -9,7 +9,7 @@ import { PutCategoryDTO } from '../models/putCategoryDTO';
 })
 export class CategoriaService {
 
-  private readonly INVENTORY_BASE_URL: string = 'http://localhost:8081/';
+  private readonly INVENTORY_BASE_URL: string = 'http://localhost:9011/';
 
   private readonly CATEGORY_URL: string = `${this.INVENTORY_BASE_URL}category`;
   
