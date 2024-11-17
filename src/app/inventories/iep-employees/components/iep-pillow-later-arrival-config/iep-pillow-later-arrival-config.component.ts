@@ -5,6 +5,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { EmpPostConfiguration } from '../../Models/emp-post-configuration';
 import { PillowTimeLateArrivalService } from '../../services/pillow-time-late-arrival.service';
 import Swal from 'sweetalert2';
+import { AuthService } from '../../../../users/users-servicies/auth.service';
 @Component({
   selector: 'app-iep-pillow-later-arrival-config',
   standalone: true,
@@ -22,7 +23,8 @@ export class IepPillowLaterArrivalConfigComponent implements OnInit{
 
   constructor(
     private fb: FormBuilder,
-    private pillowTimeLateArrivalService: PillowTimeLateArrivalService
+    private pillowTimeLateArrivalService: PillowTimeLateArrivalService,
+    private userService : AuthService
   )
   {
     this.initForm();
@@ -107,7 +109,7 @@ export class IepPillowLaterArrivalConfigComponent implements OnInit{
     if (this.configForm.valid) {
       let empPostConfiguration: EmpPostConfiguration ={
         pillowLastArrival: this.configForm.get('minutes')?.value,
-        userId: 1,
+        userId: this.userService.getUser().id,
         pillowJustify: this.configForm.get('days')?.value
 
       }
