@@ -11,7 +11,6 @@ import 'jspdf-autotable';
 import { Producto } from '../../models/producto';
 import { FormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { routes } from '../../../app.routes';
 import { Router } from '@angular/router';
 
 @Component({
