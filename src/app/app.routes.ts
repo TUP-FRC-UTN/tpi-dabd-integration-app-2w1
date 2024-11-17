@@ -19,6 +19,10 @@ export const routes: Routes = [
         component: LoginComponent
     },
     {
+        path: 'recovery',
+        component: UsersRecoveryPasswordComponent
+    },
+    {
         path: 'home',
         component: LandingPageComponent
     },
@@ -83,10 +87,6 @@ export const routes: Routes = [
     {
         path: '**',
         component: NotFoundComponent
-    },
-    {
-        path: 'recovery',
-        component: UsersRecoveryPasswordComponent
     },
     {
         path: 'unauthorized',
