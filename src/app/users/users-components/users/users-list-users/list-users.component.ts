@@ -39,6 +39,7 @@ export class ListUsersComponent implements OnInit {
   constructor(private router: Router, private modal: NgbModal, private plotService: PlotService) { }
 
 
+  @ViewChild('customSelect') customSelect!: CustomSelectComponent;
   typeModal: string = '';
   user: number = 0;
   users: UserGet[] = [];
@@ -87,10 +88,7 @@ export class ListUsersComponent implements OnInit {
           create_date: user.create_date.replace(/-/g, '/'),
           
 
-        }));
-
-        console.log(this.users);
-        
+        }));        
 
         //Inicializar DataTables después de cargar los datos
         setTimeout(() => {
@@ -254,7 +252,7 @@ export class ListUsersComponent implements OnInit {
           allowOutsideClick: false,
           allowEscapeKey: false
         })
-        this.router.navigate(['/home']);
+        this.router.navigate(['/main']);
       }
     });
 
@@ -313,7 +311,10 @@ export class ListUsersComponent implements OnInit {
       value: r.description, 
       name: r.description
     }));
-    
+
+    if(this.customSelect){
+      this.customSelect.setData([]);
+    }
 
     table.column(2).search('').draw();
     table.search('').draw();
@@ -329,13 +330,13 @@ export class ListUsersComponent implements OnInit {
   }
 
   //Metodo para filtrar la tabla en base a las 2 fechas
-  filterByDate() {
+  filterByDate() {    
     const table = $('#myTable').DataTable();
 
     // Convertir las fechas seleccionadas a objetos Date para comparar
     const start = this.initialDate.value ? new Date(this.initialDate.value) : null;
     const end = this.endDate.value ? new Date(this.endDate.value) : null;
-
+    
     // Agregar función de filtro a DataTable
     $.fn.dataTable.ext.search.push((settings: any, data: any, dataIndex: any) => {
       // Convertir la fecha de la fila (data[0]) a un objeto Date
@@ -497,9 +498,6 @@ export class ListUsersComponent implements OnInit {
         }
       });
 
-      console.log(userPlots);
-
-
       //Cuando se carga se abre el modal
       const modalRef = this.modal.open(ModalInfoUserComponent, { size: 'lg', keyboard: false });
       modalRef.componentInstance.typeModal = type;
@@ -537,12 +535,12 @@ export class ListUsersComponent implements OnInit {
   }
 
   addUser() {
-    this.router.navigate(['/home/users/add'])
+    this.router.navigate(['/main/users/add'])
   }
 
   //Redirige
   redirectEdit(id: number) {
-    this.router.navigate(['/home/users/edit', id]);
+    this.router.navigate(['/main/users/edit', id]);
   }
 
   //Busca el user y se lo pasa al modal

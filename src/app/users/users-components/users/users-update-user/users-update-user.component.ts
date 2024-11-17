@@ -183,9 +183,9 @@ throw new Error('Method not implemented.');
 
   confirmExit() {
     if (this.authService.getActualRole() === 'Propietario') {
-      this.router.navigate(['home/family']);
+      this.router.navigate(['main/family']);
     } else if (this.authService.getActualRole() === 'Gerente') {
-      this.router.navigate(['home/users/list']);
+      this.router.navigate(['main/users/list']);
     }
   }
 
@@ -250,10 +250,10 @@ throw new Error('Method not implemented.');
   //Redirige a la lista
   redirectList() {
     if (this.authService.getActualRole() == 'Propietario') {
-      this.router.navigate(['home/family']);
+      this.router.navigate(['main/family']);
     }
     else if (this.authService.getActualRole() == 'Gerente') {
-      this.router.navigate(['home/users/list']);
+      this.router.navigate(['main/users/list']);
     }
   }
 

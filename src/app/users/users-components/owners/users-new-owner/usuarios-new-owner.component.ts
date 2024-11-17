@@ -254,7 +254,7 @@ export class UsuariosNewOwnerComponent {
 
   confirmExit() {
       this.formReactivo.reset(); 
-      this.redirect('/home/owners/list'); 
+      this.redirect('/main/owners/list'); 
   }
   
   redirect(path: string) {
@@ -366,7 +366,7 @@ export class UsuariosNewOwnerComponent {
 
         //Resetea el fomulario
         this.resetForm() 
-        this.router.navigate(['/home/owners/list']);
+        this.router.navigate(['/main/owners/list']);
       },
 
       //Se intercepta el error, si sucede

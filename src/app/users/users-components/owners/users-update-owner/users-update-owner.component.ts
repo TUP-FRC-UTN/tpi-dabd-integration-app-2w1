@@ -285,7 +285,7 @@ export class UsersUpdateOwnerComponent implements OnInit {
           });
 
           //redirigir a la lista
-          this.redirect('home/owners/list');
+          this.redirect('main/owners/list');
         },
         error: (error) => {
           console.log(error);
@@ -306,7 +306,7 @@ export class UsersUpdateOwnerComponent implements OnInit {
 
   confirmExit() {
     this.editOwner.reset();
-    this.redirect('/home/owners/list');
+    this.redirect('/main/owners/list');
   }
 
   private parseDateString(dateString: string): Date | null {

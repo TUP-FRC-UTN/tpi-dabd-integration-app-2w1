@@ -174,9 +174,9 @@ export class NewUserComponent implements OnInit {
   //Redirige a la ruta especificada 
   redirect(){
     if(this.authService.getActualRole() == "Propietario"){
-      this.router.navigate(['/home/family']);
+      this.router.navigate(['/main/family']);
     }else{
-      this.router.navigate(['/home/users/list']);
+      this.router.navigate(['/main/users/list']);
     }
   }
 
@@ -239,11 +239,11 @@ verifyOptions() {
         });
         alert(this.authService.getActualRole());
         if(this.authService.getActualRole() == "Propietario"){
-          this.router.navigate(['/home/family']);
+          this.router.navigate(['/main/family']);
         }
         //Reseteamos el formulario
         if(this.authService.getActualRole() == "Gerente"){
-          this.router.navigate(['/home/users/list']);
+          this.router.navigate(['/main/users/list']);
         }
         this.reactiveForm.reset();
         

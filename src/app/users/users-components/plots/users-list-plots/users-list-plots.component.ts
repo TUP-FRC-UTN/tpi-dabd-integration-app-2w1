@@ -409,11 +409,11 @@ export class UsersListPlotsComponent {
   }
 
   addPlot() {
-    this.router.navigate(['/home/plots/add'])
+    this.router.navigate(['/main/plots/add'])
   }
 
   redirectEdit(id: number) {
-    this.router.navigate(['/home/plots/edit', id])
+    this.router.navigate(['/main/plots/edit', id])
   }
 
   // Busca el user y se lo pasa al modal

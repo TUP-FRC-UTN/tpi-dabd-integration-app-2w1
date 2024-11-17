@@ -77,12 +77,12 @@ export class UsersFamiliarGroupComponent implements OnInit {
   
   //Redirecciona a editar un usuario
   redirectEdit(id: number) {
-    this.router.navigate(['/home/users/edit', id]); 
+    this.router.navigate(['/main/users/edit', id]); 
   }
 
   //Redirecciona  a agregar usuario
   redirectAdd() {
-    this.router.navigate(['/home/users/add']); 
+    this.router.navigate(['/main/users/add']); 
   }
 
   async openModalEliminar(userId: number) {

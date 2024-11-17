@@ -246,12 +246,12 @@ export class UsersListOwnersComponent {
   }
 
   addOwner(){
-    this.router.navigate(['home/owners/add'])
+    this.router.navigate(['main/owners/add'])
   }
 
   
   redirectEdit(id: number) {
-    this.router.navigate(['/home/owners/edit', id])
+    this.router.navigate(['/main/owners/edit', id])
   }
 
   loadTypes() {

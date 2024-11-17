@@ -131,7 +131,7 @@ export class UsersUpdatePlotComponent implements OnInit {
   }
 
   confirmExit() {
-    this.redirect('/home/plots/list');
+    this.redirect('/main/plots/list');
   }
 
   
@@ -163,7 +163,7 @@ export class UsersUpdatePlotComponent implements OnInit {
 
         });
         
-        this.redirect('home/plots/list');
+        this.redirect('main/plots/list');
       },
       error: (error) => {
         console.log("Error al actualizar el lote" + error);
