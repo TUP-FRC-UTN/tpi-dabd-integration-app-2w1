@@ -8,13 +8,13 @@
       </div>
 
       <!-- Filtro por tipo de lote -->
-      <div id="myTable_filterPlot" class="dataTables_filter" style="text-align: left;">
+      <div id="myTable_filterPlot" class="dataTables_filter me-3" style="text-align: left;; max-width: 250px; min-width: 250px;">
         <app-custom-select #customSelectType [options]="typesForFilter" [multiple]="true" [selectedOptions]="selectType.value || []"
           (selectedOptionsChange)="updateFilterType($event)" />
       </div>
 
       <!-- Filtro por estado de lote -->
-      <div id="myTable_filterPlot" class="dataTables_filter" style="text-align: left;">
+      <div id="myTable_filterPlot" class="dataTables_filter me-3" style="text-align: left;; max-width: 250px; min-width: 250px;">
         <app-custom-select #customSelectState [options]="statusForFilter" [multiple]="true"
          [selectedOptions]="selectState.value || []"
           (selectedOptionsChange)="updateFilterState($event)" />

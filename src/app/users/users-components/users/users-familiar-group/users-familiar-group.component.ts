@@ -28,6 +28,19 @@ export class UsersFamiliarGroupComponent implements OnInit {
   private readonly ownerService = inject(OwnerService);
   private readonly authService = inject(AuthService);
 
+  icons = [
+    {name: 'Icono 1', url:'https://i.ibb.co/DpxXd6C/icono1.png'},
+    {name: 'Icono 2', url:'https://i.ibb.co/Vp515Fc/icono2.png'},
+    {name: 'Icono 3', url:'https://i.ibb.co/rvWz6Sh/icono3.png'},
+    {name: 'Icono 4', url:'https://i.ibb.co/1snjZn2/icono4.png'},
+    {name: 'Icono 5', url:'https://i.ibb.co/HNRqv7m/icono5.png'},
+    {name: 'Icono 6', url:'https://i.ibb.co/23B7tMh/icono6.png'},
+    {name: 'Icono 7', url:'https://i.ibb.co/FHR80gq/icono7.png'},
+    {name: 'Icono 8', url:'https://i.ibb.co/fMcysX4/icono8.png'},
+    {name: 'Icono 9', url:'https://i.ibb.co/k23ngcS/icono9.png'},
+    {name: 'Icono 10', url:'https://i.ibb.co/2gJgvFt/icono10.png'},
+  ]
+
   familyGroup: UserGet[] = [];
   plots : GetPlotDto[] = [];
   userModal: UserGet = new UserGet();
@@ -93,6 +106,16 @@ export class UsersFamiliarGroupComponent implements OnInit {
     modalRef.componentInstance.userDeleted.subscribe(() => {
       this.ngOnInit()
     });
+  }
+
+
+  haveIcon(url: string): boolean {
+    for (const icon of this.icons) {
+      if (icon.url === url) {
+        return true;
+      }
+    }
+    return false;
   }
 
   //Abre el modal con la información del usuario
