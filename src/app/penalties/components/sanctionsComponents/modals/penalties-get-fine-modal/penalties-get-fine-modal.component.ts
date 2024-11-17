@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { NgbActiveModal, NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { PenaltiesSanctionsServicesService } from '../../../../services/sanctionsService/sanctions.service';
+import { SanctionService } from '../../../../services/sanctions.service';
 import { PenaltiesUpdateStateReasonModalComponent } from '../penalties-update-state-reason-modal/penalties-update-state-reason-modal.component';
 import { CommonModule } from '@angular/common';
 
@@ -24,7 +24,7 @@ export class PenaltiesModalFineComponent implements OnInit {
   constructor(
     public activeModal: NgbActiveModal,
     private _modal: NgbModal,
-    public sanctionsService: PenaltiesSanctionsServicesService,
+    public sanctionsService: SanctionService,
   ) { }
 
 

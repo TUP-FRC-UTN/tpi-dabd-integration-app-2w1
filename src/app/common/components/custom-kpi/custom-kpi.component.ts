@@ -2,13 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'app-penalties-kpi',
+  selector: 'app-custom-kpi',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './penalties-kpi.component.html',
-  styleUrls: ['./penalties-kpi.component.css']
+  templateUrl: './custom-kpi.component.html',
+  styleUrls: ['./custom-kpi.component.css']
 })
-export class PenaltiesKpiComponent{
+export class CustomKpiComponent{
 
   constructor() { }
 

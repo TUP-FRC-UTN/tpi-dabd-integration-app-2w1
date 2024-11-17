@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { PenaltiesSanctionsServicesService } from '../../../services/sanctionsService/sanctions.service';
+import { SanctionService } from '../../../services/sanctions.service';
 import { ReportDTO } from '../../../models/reportDTO';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
@@ -51,7 +51,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
 
   //Constructor
   constructor(
-    private reportServices: PenaltiesSanctionsServicesService,
+    private reportServices: SanctionService,
     private _modal: NgbModal,
     private router: Router,
     private routingService: RoutingService

@@ -8,7 +8,7 @@ import { Observable, Subject } from 'rxjs';
 })
 export class RoutingService {
 
-  private readonly router : Router = inject(Router)
+  private readonly router: Router = inject(Router)
   private redirectEvent = new Subject<string>();
 
   private readonly buttonsList: SideButton[] = [
@@ -310,19 +310,26 @@ export class RoutingService {
         }
       ]
     }
-  ]
+  ];
 
-  getButtonList(){
+  private titleSubject = new Subject<string>();
+  private title: string = localStorage.getItem('title') || "Página principal";
+
+  constructor() {
+    this.titleSubject.next(this.title);
+  }
+
+  getButtons() {
     return [...this.buttonsList];
   }
-  
+
   //Redirige y setea el titulo(si es que viene)
-  redirect(url : string, title? : string){
-    if(title){
+  redirect(url: string, title?: string) {
+    if (title) {
       this.setTitle(title);
     }
     this.router.navigate([url]);
-    this.redirectEvent.next(this.getTitle()); 
+    this.redirectEvent.next(this.getTitle());
   }
 
   getRedirectObservable(): Observable<string> {
@@ -330,13 +337,19 @@ export class RoutingService {
   }
 
   //Setear el titulo
-  setTitle(title : string){
-    localStorage.setItem('title', title)
+  setTitle(title: string) {
+    this.title = title;
+    localStorage.setItem('title', title);
+    this.titleSubject.next(title);
   }
 
   //Obtener el titulo
-  getTitle() : string{
-    return localStorage.getItem('title') || "Página principal";
+  getTitle(): string {
+    return this.title;
+  }
+
+  getTitleObservable(): Observable<string> {
+    return this.titleSubject.asObservable();
   }
 
   //Obtiene la ruta en forma de lista
@@ -346,16 +359,18 @@ export class RoutingService {
   }
 
   //Obtiene la ruta para cada dashboard
-  getDashboardRoute(){
-    const url : string[] = this.getRouteSegments();
-    if(url.length > 1){
-      return `main/${url[1]}/dashboard`
+  getDashboardRoute() {
+    const url: string[] = this.getRouteSegments();
+    if (url.length > 1) {
+      return `main/${url[1]}/dashboard`;
     }
     return '';
   }
 
-  cleanStorage(){
+  cleanStorage() {
     localStorage.removeItem('title');
+    this.title = "Página principal";
+    this.titleSubject.next(this.title);
   }
-  
+
 }

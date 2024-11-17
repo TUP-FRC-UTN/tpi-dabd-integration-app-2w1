@@ -3,7 +3,7 @@ import { Component, inject, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ReportDTO, plotOwner } from '../../../models/reportDTO';
-import { PenaltiesSanctionsServicesService } from '../../../services/sanctionsService/sanctions.service';
+import { SanctionService } from '../../../services/sanctions.service';
 import Swal from 'sweetalert2';
 import { RoutingService } from '../../../../common/services/routing.service';
 import { PlotService } from '../../../../users/users-servicies/plot.service';
@@ -38,7 +38,7 @@ export class PenaltiesPostFineComponent implements OnInit {
   //Constructor
   constructor(
     private fb: FormBuilder,
-    private penaltiesService: PenaltiesSanctionsServicesService,
+    private penaltiesService: SanctionService,
     private route: ActivatedRoute,
     private routingService: RoutingService,
     private reportService: ReportService
