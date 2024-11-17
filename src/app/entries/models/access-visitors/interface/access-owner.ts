@@ -21,6 +21,7 @@ export interface AccessNewMovementsEntryDtoOwner {
   newUserAllowedDto: AccessNewUserAllowedDtoOwner; 
   authRangesDto: AccessNewAuthRangeDtoOwner; 
   vehiclesId?: number;
+  userId: number;
 }
 export interface AccessNewAuthRangeDtoOwner {
   neighbor_id: number;
@@ -66,4 +67,15 @@ export interface AccessNewUserAllowedDtoOwner {
   user_allowed_Type: AccessUserallowedTypeDtoOwner;
   vehicle?: AccessVehicleOwner;
   email: string;
+}
+export interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  data: T;
+}
+export interface MovementBodyEmployee{
+  movementType: string;
+  movementDatetime: string;
+  document: string;
+  typeUser: string;
 }

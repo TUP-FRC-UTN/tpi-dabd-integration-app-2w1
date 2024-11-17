@@ -1,6 +1,6 @@
 import { Component, inject, Input, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { PenaltiesSanctionsServicesService } from '../../../../services/sanctionsService/sanctions.service';
+import { SanctionService } from '../../../../services/sanctions.service';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 
@@ -15,7 +15,7 @@ export class PenaltiesModalReportComponent implements OnInit{
 
 
   formattedDate:any;
-  public service = inject(PenaltiesSanctionsServicesService)
+  public service = inject(SanctionService)
   @Input() id:number = 0
   report: any;
   constructor(public activeModal: NgbActiveModal){

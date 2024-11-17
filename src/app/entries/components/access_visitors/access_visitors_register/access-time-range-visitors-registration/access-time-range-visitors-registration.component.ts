@@ -1,12 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { AccessAllowedDay, AccessDay, AccessAuthRange,AccessUser } from '../../../../models/access-visitors/access-visitors-models';
-import { AccessVisitorsRegisterServiceService } from '../../../../services/access_visitors/access-visitors-register/access-visitors-register-service/access-visitors-register-service.service';
 import Swal from 'sweetalert2';
 import { Subject } from 'rxjs';
-import { AccessVisitorsRegisterServiceHttpClientService } from '../../../../services/access_visitors/access-visitors-register/access-visitors-register-service-http-client/access-visitors-register-service-http-client.service';
 import { takeUntil } from 'rxjs';
+import { EventEmitter } from '@angular/core';
+import { AuthService } from '../../../../../users/users-servicies/auth.service';
+import { AccessVisitorsRegisterServiceService } from '../../../../services/access_visitors/access-visitors-register/access-visitors-register-service/access-visitors-register-service.service';
+
 @Component({
   selector: 'app-access-time-range-visitors-registration',
   standalone: true,
@@ -16,9 +18,16 @@ import { takeUntil } from 'rxjs';
 })
 export class AccessTimeRangeVisitorsRegistrationComponent implements OnInit {
   private unsubscribe$ = new Subject<void>();
-  users: AccessUser[] = [];
+  private userId = 0;
 
-
+  @Output() selectedUser = new EventEmitter<AccessUser>();
+  ngOnInit(): void {
+    this.visitorService.getAllowedDays().subscribe(days => {
+      this._allowedDays = days;
+      this.updateDaysSelected();
+    });
+    this.updateDateFieldsState();
+  }
 
   days: AccessDay[] = [
     { name: 'Lun', value: false },
@@ -36,10 +45,20 @@ export class AccessTimeRangeVisitorsRegistrationComponent implements OnInit {
 
   orderDays: string[] = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
-  constructor(private visitorService: AccessVisitorsRegisterServiceService, private fb: FormBuilder,private httpService:AccessVisitorsRegisterServiceHttpClientService) {
-      this.form = this.fb.group({
-      startDate: ['', Validators.required],
-      endDate: ['', Validators.required],
+  constructor(
+    private visitorService: AccessVisitorsRegisterServiceService, 
+    private fb: FormBuilder,
+    private authService: AuthService
+  ) {
+    const today = new Date();
+    // Ajustar al formato YYYY-MM-DD considerando la zona horaria local
+    const localDate = new Date(today.getTime() - (today.getTimezoneOffset() * 60000))
+                        .toISOString()
+                        .split('T')[0];
+  
+    this.form = this.fb.group({
+      startDate: [localDate, Validators.required],
+      endDate: [localDate, Validators.required],
       initHour: ['', Validators.required],
       endHour: ['', Validators.required],
       Lun: [{ value: false, disabled: true }],
@@ -50,12 +69,66 @@ export class AccessTimeRangeVisitorsRegistrationComponent implements OnInit {
       Sáb: [{ value: false, disabled: true }],
       Dom: [{ value: false, disabled: true }],
     });
-
-
+  
     this.form.get('startDate')?.valueChanges.subscribe(() => this.updateAvailableDays());
     this.form.get('endDate')?.valueChanges.subscribe(() => this.updateAvailableDays());
-  }
+    this.form.get('initHour')?.valueChanges.subscribe(() => this.validateTimeRange());
+    this.form.get('endHour')?.valueChanges.subscribe(() => this.validateTimeRange());
 
+    this.userId = authService.getUser().id;
+  }
+  
+
+private validateTimeRange(): void {
+  const initHour = this.form.get('initHour')?.value;
+  const endHour = this.form.get('endHour')?.value;
+
+  if (initHour && endHour) {
+
+    const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
+    
+    if (!timeRegex.test(initHour) || !timeRegex.test(endHour)) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'El formato de hora debe ser HH:mm y estar entre 00:00 y 23:59',
+      });
+      this.form.get('initHour')?.setErrors({ invalidFormat: true });
+      this.form.get('endHour')?.setErrors({ invalidFormat: true });
+      return;
+    }
+
+    const start = new Date(`1970-01-01T${initHour}`);
+    const end = new Date(`1970-01-01T${endHour}`);
+
+    // Convertir a minutos para comparar
+    const startMinutes = start.getHours() * 60 + start.getMinutes();
+    const endMinutes = end.getHours() * 60 + end.getMinutes();
+
+    // Validar rango de horas
+    if (startMinutes < 0 || startMinutes > 1439 || endMinutes < 0 || endMinutes > 1439) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Las horas deben estar entre 00:00 y 23:59',
+      });
+      return;
+    }
+
+    // Validar que la hora final sea mayor que la inicial
+    if (end <= start) {
+      this.form.get('endHour')?.setErrors({ invalidTimeRange: true });
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'La hora de fin debe ser posterior a la hora de inicio',
+      });
+    } else {
+      this.form.get('endHour')?.setErrors(null);
+      this.form.get('initHour')?.setErrors(null);
+    }
+  }
+}
   updateAvailableDays(): void {
     const startDate = this.form.get('startDate')?.value;
     const endDate = this.form.get('endDate')?.value;
@@ -120,49 +193,15 @@ export class AccessTimeRangeVisitorsRegistrationComponent implements OnInit {
   
 
 
- get areDatesDisabled(): boolean {
+get areDatesDisabled(): boolean {
   return this._allowedDays.length === 0; 
 }
 
 get areDatesReadonly(): boolean {
   return this._allowedDays.length > 0; 
 }
- disableDateInputs: boolean = false;
+disableDateInputs: boolean = false;
 
-
-  ngOnInit(): void {
-    this.visitorService.getAllowedDays().subscribe(days => {
-      this._allowedDays = days;
-      this.updateDaysSelected();
-    });
-    this.updateDateFieldsState();
-    this.loadUsers();
-  }
-  loadUsers():void{
-    this.httpService.getUsers()
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe({
-        next: (users) => {
-          console.log('Users loaded:', this.users.length);
-          this.users=users;
-        },
-        error: (error) => {
-          console.error('Error loading users:', error);
-        },
-      
-      });
-  }
-
-  handleUsers(): number {
-    for (const user of this.users) {
-      for (const role of user.roles) {
-        if (role === "Familiar Mayor") {
-          return user.id; 
-        }
-      }
-    }
-    return 0; 
-  }
   agregarAuthRange(): void {
     console.log('Iniciando agregarAuthRange');
     console.log('Valores del formulario:', this.form.value);
@@ -196,7 +235,7 @@ get areDatesReadonly(): boolean {
       initDate: startDate,
       endDate: endDate,
       allowedDays: this._allowedDays,
-      neighbourId:this.handleUsers(),
+      neighbourId: this.userId,
     };
 
     try {
@@ -251,14 +290,15 @@ get areDatesReadonly(): boolean {
     }
   }
   agregarDiasPermitidos(): void {
+   
     if (!this.validateHours()) return;
     if (!this.validateDates()) return;
-
+  
     const initHour = new Date(`1970-01-01T${this.form.value.initHour}:00`);
     const endHour = new Date(`1970-01-01T${this.form.value.endHour}:00`);
-
+  
     const crossesMidnight = endHour <= initHour;
-
+  
     const newDaysAlloweds: AccessAllowedDay[] = this.days
       .filter(day => this.form.controls[day.name].value && !this._allowedDays.some(dp => dp.day.name === day.name))
       .map(day => ({
@@ -267,7 +307,7 @@ get areDatesReadonly(): boolean {
         endTime: endHour,
         crossesMidnight: crossesMidnight,
       }));
-
+  
     if (newDaysAlloweds.length === 0) {
       Swal.fire({
         icon: 'warning',
@@ -276,11 +316,22 @@ get areDatesReadonly(): boolean {
       });
       return;
     }
+    
     this._allowedDays = [...this._allowedDays, ...newDaysAlloweds];
     this.visitorService.updateAllowedDays(this._allowedDays);
-    this.form.controls['initHour'].setValue('');
-    this.form.controls['endHour'].setValue('');
+    
+    // Resetear los valores
+    this.form.get('initHour')?.reset();
+    this.form.get('endHour')?.reset();
+    
+    // Marcar como no tocados y actualizar validación
+    this.form.get('initHour')?.markAsUntouched();
+    this.form.get('endHour')?.markAsUntouched();
+    this.form.get('initHour')?.updateValueAndValidity();
+    this.form.get('endHour')?.updateValueAndValidity();
+    
     this.updateDaysSelected();
+    this.agregarAuthRange();
   }
   isAllowedDay(day: AccessDay): boolean {
   
@@ -288,10 +339,13 @@ get areDatesReadonly(): boolean {
   }
 
   deleteAllowedDay(allowedDay: AccessAllowedDay): void {
-    this._allowedDays = this._allowedDays.filter(dp => dp.day.name !== allowedDay.day.name);
+    const index = this._allowedDays.findIndex(dp => dp.day.name === allowedDay.day.name);
+    if (index !== -1) {
+        this._allowedDays.splice(index, 1);
+    }
     this.visitorService.updateAllowedDays(this._allowedDays);
     this.updateDaysSelected();
-  }
+}
 
   formatHour(schedule: AccessAllowedDay): string {
     const formatHour = (date: Date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });

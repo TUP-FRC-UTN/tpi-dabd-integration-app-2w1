@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { PenaltiesSanctionsServicesService } from '../../../../services/sanctionsService/sanctions.service';
+import { SanctionService } from '../../../../services/sanctions.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -19,7 +19,7 @@ export class PenaltiesUpdateStateReasonModalComponent {
   
 
   constructor(public activeModal: NgbActiveModal, 
-    public sanctionService: PenaltiesSanctionsServicesService) {}
+    public sanctionService: SanctionService) {}
 
 
   ngOnInit(): void {

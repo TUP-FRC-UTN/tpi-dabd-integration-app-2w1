@@ -1,25 +1,20 @@
-import { Component, inject } from '@angular/core';
-import { ComplaintService } from '../../../services/complaintsService/complaints.service';
-import {
-  ComplaintDto,
-  EstadoDenuncia,
-  TipoDenuncia,
-} from '../../../models/complaint';
-import 'bootstrap';
+import { Component, ElementRef, inject, Renderer2, ViewChild } from '@angular/core';
+import { ComplaintService } from '../../../services/complaints.service';
+import { ComplaintDto, EstadoDenuncia, TipoDenuncia, } from '../../../models/complaint';
 import { ChartType, GoogleChartsModule } from 'angular-google-charts';
 import { FormControl, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { State } from '@popperjs/core';
 import { ReportReason } from '../../../models/Dashboard-models';
 import { ReportReasonDto } from '../../../models/ReportReasonDTO';
-import { PenaltiesKpiComponent } from '../penalties-kpi/penalties-kpi.component';
 import { textShadow } from 'html2canvas/dist/types/css/property-descriptors/text-shadow';
+import { CustomKpiComponent } from '../../../../common/components/custom-kpi/custom-kpi.component';
 
-declare let bootstrap: any;
+//declare let bootstrap: any;
 @Component({
   selector: 'app-penalties-complaint-dashboard',
   standalone: true,
-  imports: [GoogleChartsModule, FormsModule, CommonModule, PenaltiesKpiComponent],
+  imports: [GoogleChartsModule, FormsModule, CommonModule, CustomKpiComponent],
   templateUrl: './penalties-complaint-dashboard.component.html',
   styleUrl: './penalties-complaint-dashboard.component.scss',
 })
@@ -41,7 +36,7 @@ export class PenaltiesComplaintDashboardComponent {
   complaintsByState?: { [key: string]: number };
   complaintsByReason?: { [key: string]: number };
   complaintsByUser?: { [key: number]: number };
-  differenceInDaysResolution : number=0;
+  differenceInDaysResolution: number = 0;
   complaintsByStatePercentage: { state: string; percentage: number }[] = [];
   stateWithHighestPercentage: { state: string; percentage: number } = { state: '', percentage: 0 };
   stateWithLowestPercentage: { state: string; percentage: number } = { state: '', percentage: 0 };
@@ -83,12 +78,12 @@ export class PenaltiesComplaintDashboardComponent {
   lineChartType = ChartType.ColumnChart;
   columnChartType = ChartType.ColumnChart;
 
-    //MODIFICADO OPTIONS
+  //MODIFICADO OPTIONS
   pieChartOptions = {
     pieHole: 0.4,
     chartArea: { width: '100%', height: '100%' },
     sliceVisibilityThreshold: 0.01,
-    textStyle: { fontSize:11 },
+    textStyle: { fontSize: 11 },
   };
 
   //MODIFICADO OPTIONS
@@ -108,7 +103,7 @@ export class PenaltiesComplaintDashboardComponent {
     //tooltip: { isHtml: true }
   };
 
-    //MODIFICADO OPTIONS
+  //MODIFICADO OPTIONS
   columnChartOptions = {
     hAxis: {
       title: 'Estado',
@@ -118,7 +113,7 @@ export class PenaltiesComplaintDashboardComponent {
       textStyle: { fontSize: 12 },
       minValue: 0,
     },
-    vAxis: { title: 'Cantidad', minValue: 0},
+    vAxis: { title: 'Cantidad', minValue: 0 },
     chartArea: { width: '70%', height: '55%' },
     legend: { position: 'right' },
     colors: ['#4285F4', '#EA4335', '#34A853', '#FBBC05'],
@@ -138,8 +133,8 @@ export class PenaltiesComplaintDashboardComponent {
       this.updateLineChart();
     }
   }
-  
-  //constructor(private sanctionsService: SanctionsService) {}
+
+  constructor(private renderer: Renderer2) { }
 
   getCurrentYearMonth(): string {
     const now = new Date();
@@ -160,8 +155,8 @@ export class PenaltiesComplaintDashboardComponent {
   }
 
   checkChartData(): boolean {
-    return this.lineChartData && this.lineChartData.length > 0 && 
-                        this.lineChartData.some(row => row.length > 0);
+    return this.lineChartData && this.lineChartData.length > 0 &&
+      this.lineChartData.some(row => row.length > 0);
   }
   //Limpia los filtros
   eraseFilters() {
@@ -360,7 +355,7 @@ export class PenaltiesComplaintDashboardComponent {
 
   private calculateKPIs() {
     // Filtrar datos según los filtros seleccionados
-    
+
     var filteredComplaints;
     if (this.status == 3) {
       filteredComplaints = this.complaintsData.filter(complaint => {
@@ -375,9 +370,9 @@ export class PenaltiesComplaintDashboardComponent {
         return matchesState && matchesReason;
       });
     }
-    
-console.log('Filtro por state:', this.state, 'Filtro por reason:', this.reportReason);
-console.log('Denuncias filtradas:', filteredComplaints.length, filteredComplaints);
+
+    console.log('Filtro por state:', this.state, 'Filtro por reason:', this.reportReason);
+    console.log('Denuncias filtradas:', filteredComplaints.length, filteredComplaints);
     // Total de denuncias realizadas
     this.totalComplaints = filteredComplaints.length;
 
@@ -454,10 +449,10 @@ console.log('Denuncias filtradas:', filteredComplaints.length, filteredComplaint
 
         // Calcular la diferencia en días
         const differenceInDays = (lastUpdatedDate.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24);
-        
+
         // Depurar los valores
         console.log('Días de diferencia:', differenceInDays, createdDateFormatted, lastUpdatedDateFormatted);
-        
+
         return totalDays + differenceInDays;
       } else {
         // Si alguna de las fechas es nula o indefinida, no calculamos la diferencia
@@ -511,7 +506,7 @@ console.log('Denuncias filtradas:', filteredComplaints.length, filteredComplaint
 
     const [month, week] = maxWeek.week.split(' - Semana ');
     this.weekWithMostComplaints = { week: Number(week), month, count: maxWeek.count };
-    
+
   }
 
   private getWeekNumber(date: Date): number {
@@ -532,9 +527,26 @@ console.log('Denuncias filtradas:', filteredComplaints.length, filteredComplaint
   //     .reduce((a, b) => a[1] > b[1] ? a : b)[0] as unknown as number;
   // }
 
+  @ViewChild('filterModal') filterModal!: ElementRef;
+
   openFilterModal() {
-    const filterModal = new bootstrap.Modal(document.getElementById('filterModal'));
-    filterModal.show();
+    const modalElement = this.filterModal.nativeElement;
+    this.renderer.setStyle(modalElement, 'display', 'block');
+    setTimeout(() => {
+      this.renderer.addClass(modalElement, 'show');
+      this.renderer.setStyle(document.body, 'overflow', 'hidden');
+      this.renderer.setStyle(document.body, 'padding-right', '0px');
+    }, 10);
+  }
+
+  closeFilterModal() {
+    const modalElement = this.filterModal.nativeElement;
+    this.renderer.removeClass(modalElement, 'show');
+    this.renderer.removeStyle(document.body, 'overflow');
+    this.renderer.removeStyle(document.body, 'padding-right');
+    setTimeout(() => {
+      this.renderer.setStyle(modalElement, 'display', 'none');
+    }, 150);
   }
 }
 
