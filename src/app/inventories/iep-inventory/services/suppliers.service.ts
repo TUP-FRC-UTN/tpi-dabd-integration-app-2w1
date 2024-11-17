@@ -9,6 +9,7 @@ import { Supplier } from '../models/suppliers';
 export class SuppliersService {
   
   private readonly INVENTORY_BASE_URL: string = 'http://localhost:8081/';
+  private readonly ACCESSES_URL: string = 'http://localhost:8090/PostNewSupplier';
 
   private readonly SUPPLIERS_URL: string = `${this.INVENTORY_BASE_URL}suppliers`;
   private readonly SUPPLIERS_URL_GET_BY_ID: string = `${this.SUPPLIERS_URL}/getbyId/`;
@@ -17,6 +18,11 @@ export class SuppliersService {
   createSupplier(formData: any) {
     return this.http.post(this.SUPPLIERS_URL, formData);
   }
+
+  createSupplierAccess(formData: any){
+    return this.http.post(this.ACCESSES_URL, formData, { responseType: 'text' });
+  }
+
   searchSuppliers(
     name: string | null,
     supplierType: string | null,

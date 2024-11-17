@@ -1,0 +1,63 @@
+
+  
+  .m-icon {
+    /* Color del icono */
+ }
+
+
+
+.floating-btn {
+   font-size: 24px;
+   position: fixed;  /* O usa 'absolute' si quieres que esté en relación con el contenedor */
+   bottom: 30px;  /* Ajusta la distancia desde el borde inferior */
+   right: 30px;   /* Ajusta la distancia desde el borde derecho */
+   z-index: 1050;  /* Asegúrate de que esté por encima de otros elementos */
+   border-radius: 50%;  /* Hace que el botón sea redondo */
+   padding: 15px;  /* Ajusta el tamaño del botón */
+  
+   width: 60px;
+   height: 60px;
+   border-radius: 50%;
+  
+   overflow: hidden;
+   color: #fff;
+   background-color: #007bff;
+   border: none;
+}
+
+/* Estilo y animación de brillo pulsante */
+.m-icon {
+  
+   font-size: 24px;  /* Tamaño del icono */
+   color: white;   
+}
+
+/* Pulsación del brillo */
+.m-icon::after {
+   content: '';
+   position: absolute;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 10%, rgba(255, 255, 255, 0) 40%);
+   transform: scale(1);
+   animation: pulse 1.5s infinite;
+   z-index: 0;
+}
+
+/* Animación pulsante */
+@keyframes pulse {
+   0% {
+       transform: scale(1);
+       opacity: 0.5;
+   }
+   50% {
+       transform: scale(1.2);
+       opacity: 1;
+   }
+   100% {
+       transform: scale(1);
+       opacity: 0.5;
+   }
+}
