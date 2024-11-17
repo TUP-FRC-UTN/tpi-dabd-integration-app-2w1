@@ -10,7 +10,7 @@ import Swal from 'sweetalert2';
 
 import { FilterValues, Movement } from '../../../../models/access-report/Types';
 import { DataTableConfigService } from '../../../../services/access_report/access_datatableconfig/data-table-config.service';
-import { ExportService } from '../../../../services/access_report/access-export/export.service';
+
 import { ENTRY_EXIT_OPTIONS, TIPOS_INGRESANTE, TIPOS_VEHICULO, USER_TYPE_MAPPINGS, VALUE_MAPPINGS } from '../../../../models/access-report/constants';
 import { AccessRegistryUpdateService } from '../../../../services/access-registry-update/access-registry-update.service';
 import { AccessVisitorRegistryComponent } from '../../../access_visitors/access-visitor-registry/access-visitor-registry.component';
@@ -22,6 +22,9 @@ import { Router } from '@angular/router';
 import { RedirectInfo } from '../../../../models/access-metric/metris';
 
 import $ from 'jquery'; 
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-access-table',
@@ -83,7 +86,7 @@ export class AccessTableComponent implements OnInit, AfterViewInit, OnDestroy {
     private http: HttpClient,
     private userService: AccessUserReportService,
     private dataTableConfig: DataTableConfigService,
-    private exportService: ExportService,
+
     private movementsService: MovementsService,
   ) {
     this.initializeDates();
@@ -513,29 +516,9 @@ onEndDateChange(date: string): void {
     
     this.table = ($('#myTable') as any).DataTable(config);
     
-    // Primero configurar los botones
-    this.exportService.setupExportButtons(this.table, this.startDate, this.endDate);
-    
-    // Luego configurar los listeners
-    this.setupExportButtonListeners();
+
   }
 
-    /**
-   * Configura los listeners para los botones de exportación
-   */
-  private setupExportButtonListeners(): void {
-    $('#excelBtn').on('click', () => {
-      if (this.exportButtonsEnabled && this.table.buttons) {
-        $(this.table.buttons.container()).find('.dt-button-excel').click();
-      }
-    });
-
-    $('#pdfBtn').on('click', () => {
-      if (this.exportButtonsEnabled && this.table.buttons) {
-        $(this.table.buttons.container()).find('.dt-button-pdf').click();
-      }
-    });
-  }
 
   getUserTypeColor(type: string): string {
     const typeConfig = this.dataTableConfig.USER_TYPE_ICONS[type as keyof typeof this.dataTableConfig.USER_TYPE_ICONS];
@@ -683,7 +666,6 @@ onEndDateChange(date: string): void {
       if (!matchesTipo) return false;
     }
  
-    // Verificar filtro de tipo de vehículo
     if (this.filterValues.typeCar.length > 0) {
       if (!this.filterValues.typeCar.some(value => 
         tipoVehiculo.toLowerCase() === VALUE_MAPPINGS[value].toLowerCase())) {
@@ -722,6 +704,170 @@ onEndDateChange(date: string): void {
   
     }
   }
+  /**
+   * Exporta los datos de la tabla a PDF usando jsPDF
+   */
+  exportToPDF(): void {
+    // Crear nueva instancia de jsPDF
+    const doc = new jsPDF({
+      orientation: 'landscape',
+      unit: 'mm',
+      format: 'a4'
+    });
+    
+    // Configurar el título
+    const title = 'Reporte de Accesos';
+    const subtitle = `Período: ${this.formatDate(this.startDate)} - ${this.formatDate(this.endDate)}`;
+    
+    doc.setFontSize(18);
+    doc.text(title, 15, 15);
+    doc.setFontSize(12);
+    doc.text(subtitle, 15, 25);
+
+    // Obtener los datos filtrados de la tabla
+    const filteredData = this.table
+      .rows({ search: 'applied' })
+      .data()
+      .toArray()
+      .map((row: any[]) => {
+        return [
+          row[0], // Fecha
+          row[1], // Hora
+          row[2].split('!-')[0], // Tipo
+          row[3], // Ingresante
+          row[4], // Nombre
+          row[5], // Documento
+          row[6], // Vehículo
+          row[7], // Placa
+          row[8], // Propietario
+          row[9]  // Guardia
+        ];
+      });
+
+   
+    autoTable(doc, {
+      head: [['Fecha', 'Hora', 'Tipo', 'Ingresante', 'Nombre', 'Documento', 'Vehículo', 'Placa', 'Propietario', 'Guardia']],
+      body: filteredData,
+      startY: 35,
+      theme: 'grid',
+      styles: {
+        fontSize: 8,
+        cellPadding: 2,
+        overflow: 'linebreak',
+        cellWidth: 'wrap'
+      },
+      headStyles: {
+        fillColor: [0, 196, 166], 
+        textColor: 255,
+        fontSize: 9,
+        fontStyle: 'bold',
+        halign: 'center',
+        overflow: 'linebreak'
+      },
+      margin: { top: 35, bottom: 20, left: 15, right: 15 },
+      didDrawCell: (data) => {
+        // Asegurarse de que las columnas de nombre y propietario no tengan saltos de línea
+        if (data.column.index === 4 || data.column.index === 8) {
+          data.cell.styles.overflow = 'hidden';
+          data.cell.styles.cellWidth = 'auto';
+        }
+      }
+    });
+
+
+    // Agregar pie de página
+    const pageCount = doc.getNumberOfPages();
+    for(let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.text(
+        `Página ${i} de ${pageCount} - Generado el ${new Date().toLocaleString()}`,
+        doc.internal.pageSize.width / 2, 
+        doc.internal.pageSize.height - 10,
+        { align: 'center' }
+      );
+    }
+
+    // Guardar el PDF
+    doc.save(`Reporte_Accesos_${this.formatDate(this.startDate)}_${this.formatDate(this.endDate)}.pdf`);
+  }
+    /**
+   * Exporta los datos de la tabla a Excel de forma simplificada
+   */
+    exportToExcel(): void {
+      // Crear el encabezado
+      const encabezado = [
+        ['Reporte de Accesos'],
+        [`Fechas: Desde ${this.formatDate(this.startDate)} hasta ${this.formatDate(this.endDate)}`],
+        [],
+        ['Fecha', 'Hora', 'Tipo', 'Ingresante', 'Nombre', 'Documento', 'Vehículo', 'Placa', 'Propietario', 'Guardia']
+      ];
+  
+      // Obtener datos filtrados de la tabla
+      const datos = this.table
+        .rows({ search: 'applied' })
+        .data()
+        .toArray()
+        .map((row: any[]) => {
+          return [
+            row[0], // Fecha
+            row[1], // Hora
+            row[2].split('!-')[0], // Tipo
+            row[3], // Ingresante
+            row[4], // Nombre
+            row[5], // Documento
+            row[6], // Vehículo
+            row[7], // Placa
+            row[8], // Propietario
+            row[9]  // Guardia
+          ];
+        });
+      
+      // Combinar encabezado y datos
+      const worksheetData = [...encabezado, ...datos];
+  
+      // Crear la hoja de cálculo
+      const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+  
+      // Configurar anchos de columna
+      worksheet['!cols'] = [
+        { wch: 12 }, // Fecha
+        { wch: 10 }, // Hora
+        { wch: 10 }, // Tipo
+        { wch: 15 }, // Ingresante
+        { wch: 25 }, // Nombre
+        { wch: 15 }, // Documento
+        { wch: 12 }, // Vehículo
+        { wch: 12 }, // Placa
+        { wch: 25 }, // Propietario
+        { wch: 25 }  // Guardia
+      ];
+  
+      // Crear y guardar el libro
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Reporte de Accesos');
+  
+      // Guardar archivo
+      XLSX.writeFile(workbook, 
+        `reporte_accesos_${this.formatDate(this.startDate)}_${this.formatDate(this.endDate)}.xlsx`
+      );
+    }
+  
+
+
+  
+  private formatDate(date: Date | null): string {
+    if (!date) return '';
+    return date.toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+  }
+
+
+
+
 
   /**
    * Limpia todos los filtros aplicados

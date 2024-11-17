@@ -7,11 +7,8 @@ import { MetricsComponent } from "./components/metrics/metrics.component";
 
 
 export const ENTRY_ROUTES: Routes = [
-    { path: 'visitors', component: AccessVisitorRegistryComponent },
     { path: 'reports', component: AccessGlobalReportComponent },
-    //{ path: 'entry', component: AccessEntryComponent }, BORRAR
-    //{ path: 'entry', component: AccessDailyFetchComponent }, BORRAR
+    { path: 'visitor', component: AccessContainerVisitorsRegistrationComponent }, 
+    { path: 'vehicles', component: AccessVehiclesViewComponent },
     { path: 'dashboard', component: MetricsComponent },
-    { path: 'visitor/register', component: AccessContainerVisitorsRegistrationComponent },
-    { path: 'vehicle/register', component: AccessVehiclesViewComponent }
 ];

@@ -112,10 +112,10 @@
             <div class="border-right border-muted mx-2">|</div>
 
             <!-- Botones de exportación -->
-            <button class="btn btn-success action-btn" id="excelBtn" [disabled]="!exportButtonsEnabled" title="Exportar a Excel">
+            <button class="btn btn-success action-btn" (click)="exportToExcel()" [disabled]="!exportButtonsEnabled" title="Exportar a Excel">
                 <i class="bi bi-file-earmark-excel"></i>
             </button>
-            <button class="btn btn-danger action-btn" id="pdfBtn" [disabled]="!exportButtonsEnabled" title="Exportar a PDF">
+            <button class="btn btn-danger action-btn" (click)="exportToPDF()" [disabled]="!exportButtonsEnabled" title="Exportar a PDF">
                 <i class="bi bi-file-earmark-pdf"></i>
             </button>
             <div class="dt-buttons d-none"></div>
