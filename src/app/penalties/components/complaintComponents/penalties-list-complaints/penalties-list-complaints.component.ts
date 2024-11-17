@@ -1,8 +1,5 @@
-import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
-import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModule, } from '@ng-bootstrap/ng-bootstrap';
 import * as XLSX from 'xlsx';
 
 // Imports de DataTable con soporte para Bootstrap 5
@@ -18,10 +15,14 @@ import { PenaltiesModalStateReasonComponent } from '../modals/penalties-update-s
 import { ComplaintService } from '../../../services/complaints.service';
 import { ComplaintDto } from '../../../models/complaint';
 import { RoutingService } from '../../../../common/services/routing.service';
-import { CustomSelectComponent } from "../../../../common/components/custom-select/custom-select.component";
 import moment from 'moment';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
+
 
 @Component({
   selector: 'app-penalties-list-complaint',

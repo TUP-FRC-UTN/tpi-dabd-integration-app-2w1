@@ -11,7 +11,7 @@ import { ReportReasonDto } from '../models/ReportReasonDTO';
 @Injectable({
   providedIn: 'root'
 })
-export class PenaltiesSanctionsServicesService {
+export class SanctionService {
 
   private readonly http: HttpClient = inject(HttpClient);
   private readonly url = 'http://localhost:8042/api/';

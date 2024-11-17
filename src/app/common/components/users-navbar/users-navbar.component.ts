@@ -27,7 +27,7 @@ export class UsersNavbarComponent implements OnInit {
   expand: boolean = false;
 
   //Trae la lista de botones
-  sideButtons: SideButton[] = this.routingService.getButtonList();
+  sideButtons: SideButton[] = this.routingService.getButtons();
 
   //Roles del usuario
   // userRoles: string[] = [];
