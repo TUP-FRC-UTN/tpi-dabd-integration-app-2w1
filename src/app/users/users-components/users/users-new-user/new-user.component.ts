@@ -175,7 +175,7 @@ export class NewUserComponent implements OnInit {
   //Redirige a la ruta especificada 
   redirect(){
     if(this.authService.getActualRole() == "Propietario"){
-      this.router.navigate(['/main/family']);
+      this.router.navigate(['/main/users/family']);
     }else{
       this.router.navigate(['/main/users/list']);
     }

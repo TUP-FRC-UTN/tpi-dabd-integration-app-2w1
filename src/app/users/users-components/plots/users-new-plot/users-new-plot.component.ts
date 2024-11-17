@@ -99,7 +99,6 @@ export class UsersNewPlotComponent implements OnInit, OnDestroy {
       next: (data: PlotTypeModel[]) => {
         console.log(data);
         this.types = data.map(d => ({value: d.id, name: d.name}));
-        console.log("aaaaaaaaaaaaa");
         console.log(this.types);
         
       },

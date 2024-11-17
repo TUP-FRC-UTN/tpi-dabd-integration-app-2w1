@@ -5,14 +5,16 @@
         <input class="form-control" placeholder="Buscar" style="width: 300px;" aria-controls="myTable">
       </div>
       <div id="myTable_filter_Owners" class="dataTables_filter" style="text-align: left;" >
-        <select class="form-select m-3" aria-controls="myTableOwners" style="width: 300px;" aria-controls="myTableOwners" (change)="updateFilterType()" [formControl]="selectType">
+        <!-- <select class="form-select m-3" aria-controls="myTableOwners" style="width: 300px;" aria-controls="myTableOwners" (change)="updateFilterType()" [formControl]="selectType">
           <option value="" disabled selected>Seleccionar tipo</option> 
           @for (type of types; track $index) {
             <option [value]="type.description">{{ type.description }}</option>
           }
-      </select>
+      </select> -->
       <!-- ============================================CheckMe====================================== -->
-       <app-custom-select [options]="types" [multiple]="true" [selectedOptions]="selectType.value" (selectedOptionsChange)="selectType.setValue($event)"/>
+       <app-custom-select [options]="types" [multiple]="true"
+         [selectedOptions]="selectType.value || []"
+         (selectedOptionsChange)="updateFilterType($event)"/>
     </div>
     <div>
       <input type="date" class="form-control me-3" formControlName="datebirth" style="width: 200px" [formControl]="initialDate" (change)="filterByDate()"/>

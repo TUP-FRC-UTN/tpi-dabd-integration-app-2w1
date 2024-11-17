@@ -61,12 +61,16 @@
                     <div class="row">
                         <label class="col-2 col-form-label">Tipo Propietario</label>
                         <div class="col-10">
-                            <select id="selectOption" class="form-select" formControlName="ownerType"
+                            <!-- <select id="selectOption" class="form-select" formControlName="ownerType"
                                 [ngClass]="onValidate('ownerType')">
                                 @for (type of types; track $index) {
                                 <option [value]="type.id">{{type.description}}</option>
                                 }
-                            </select>
+                            </select> -->
+                            <app-custom-select [options]="types" #typeSelect
+                            (selectedOptionsChange)="editOwner.get('ownerType')?.setValue($event)"
+                             [selectedOptions]="editOwner.get('ownerType')?.value" 
+                             [validations]="editOwner.get('ownerType')?.validator" />
                             <div class="invalid-feedback">{{showError('ownerType')}}</div>
                         </div>
                     </div>
@@ -90,7 +94,12 @@
                         <label class="col-2 col-form-label">Estado Fiscal</label>
                         <div class="col-10">
                             <!-- ===================================CheckMe========================== -->
-                            <app-custom-select [options]="stateOptions" [selectedOptions]="editOwner.get('state')?.value" (selectedOptionsChange)="editOwner.get('state')?.setValue($event)" />
+                            <app-custom-select [options]="stateOptions" #stateSelect
+                            (selectedOptionsChange)="editOwner.get('state')?.setValue($event)"
+                             [selectedOptions]="editOwner.get('state')?.value" 
+                             [validations]="editOwner.get('state')?.validator" />
+
+                            <div class="invalid-feedback">{{showError('state')}}</div>
                         </div>
                     </div>
                 </div>
@@ -162,7 +171,11 @@
                         <label class="col-2 col-form-label">Lotes</label>
                         <div class="col-10">
                             <!-- ==============================CheckMe========================== -->
-                            <app-custom-select [options]="plotsOptions" [selectedOptions]="editOwner.get('plots')?.value" (selectedOptionsChange)="editOwner.get('plots')?.setValue($event)" />
+                            <app-custom-select [options]="plotsOptions" #plotsSelect
+                             [multiple]="true"
+                             [selectedOptions]="editOwner.get('plots')?.value"
+                             (selectedOptionsChange)="editOwner.get('plots')?.setValue($event)" 
+                             [validations]="editOwner.get('plots')?.validator"/>
                             <div class="invalid-feedback">{{showError('state')}}</div>
                         </div>
                     </div>
@@ -171,11 +184,29 @@
                 <!-- Botones de Enviar / Cancelar -->
                 <div class="row">
                     <div class="col d-flex justify-content-end gap-3">
-                        <button type="button" class="btn btn-secondary" (click)="confirmExit()">Cancelar</button>
+                        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#cancelarConfirmacion">Cancelar</button>
                         <button type="submit" class="btn btn-primary" [disabled]="editOwner.invalid">Guardar</button>
                     </div>
                 </div>
             </div>
         </form>
     </div>
+            <!-- Modal -->
+  <div class="modal fade" id="cancelarConfirmacion" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">Cancelar operación</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="mb-4">¿Está seguro? Los datos no guardados se perderán</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Volver</button>
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="confirmExit()">Aceptar</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>

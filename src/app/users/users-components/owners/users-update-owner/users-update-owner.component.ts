@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule, formatDate } from '@angular/common';
 import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators, FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -17,6 +17,7 @@ import { CustomSelectComponent } from '../../../../common/components/custom-sele
 import { PlotService } from '../../../users-servicies/plot.service';
 import { GetPlotModel } from '../../../users-models/plot/GetPlot';
 import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
+import { PlotTypeModel } from '../../../users-models/plot/PlotType';
 
 @Component({
   selector: 'app-users-update-owner',
@@ -32,7 +33,7 @@ export class UsersUpdateOwnerComponent implements OnInit, OnDestroy {
   files: File[] = [];
   existingFilesDownload: FileDto[] = [];
   id: string = "";
-  types: OwnerTypeModel[] = [];
+  types: any[] = [];
   dniTypes: DniTypeModel[] = [];
   states: any[] = [];
   stateOptions: any[] = [];
@@ -41,6 +42,10 @@ export class UsersUpdateOwnerComponent implements OnInit, OnDestroy {
   plotsOptions: any[] = [];
   plots: String[] = [];
   editOwner: FormGroup;
+  selectedPlots: number[] = [];
+  @ViewChild('typeSelect') typeSelect!: CustomSelectComponent; 
+  @ViewChild('stateSelect') stateSelect!: CustomSelectComponent; 
+  @ViewChild('plotsSelect') plotsSelect!: CustomSelectComponent; 
 
   private readonly ownerService = inject(OwnerService)
   private readonly plotService = inject(PlotService)
@@ -54,7 +59,6 @@ export class UsersUpdateOwnerComponent implements OnInit, OnDestroy {
       dni: new FormControl("", [Validators.required, Validators.minLength(8), Validators.pattern(/^\d+$/)]),
       dniType: new FormControl("", [Validators.required]),
       ownerType: new FormControl("", [Validators.required]),
-      taxStatus: new FormControl("", [Validators.required]),
       bussinesName: new FormControl(""),
       birthdate: new FormControl("", [Validators.required, this.dateLessThanTodayValidator()]),
       phoneNumber: new FormControl("", [Validators.required, Validators.minLength(10), Validators.maxLength(20), Validators.pattern(/^\d+$/)]),
@@ -62,6 +66,23 @@ export class UsersUpdateOwnerComponent implements OnInit, OnDestroy {
       state: new FormControl(0, [Validators.required]),
       plots: new FormControl([])
     })
+  }
+
+  showFormErrors() {
+    // Verificar si el formulario tiene errores generales
+    if (this.editOwner.errors) {
+      console.log('Errores del formulario:', this.editOwner.errors);
+    }
+  
+    // Recorrer todos los controles del formulario
+    Object.keys(this.editOwner.controls).forEach((controlName) => {
+      const control = this.editOwner.get(controlName);
+  
+      // Verificar si el control tiene errores
+      if (control?.errors) {
+        console.log(`Errores en el control "${controlName}":`, control.errors);
+      }
+    });
   }
 
   async ngOnInit(): Promise<void> {
@@ -77,8 +98,33 @@ export class UsersUpdateOwnerComponent implements OnInit, OnDestroy {
     try {
       //Esperar a que se cargue el propietario
       const data: OwnerPlotUserDto = await lastValueFrom(this.ownerService.getByIdWithUser(Number(this.id)));
+      this.types = await this.loadAllTypesOwner();
+      this.states = await this.loadAllStates();
       this.owner = data.owner;
       this.plotsForOwner = data.plot;
+      this.plotsOptions = await this.loadAllPlots();
+
+      this.editOwner.get('state')?.valueChanges.subscribe((value) => {
+        console.log( value);
+        
+      });
+
+      this.types.forEach((type) => {
+        if (type.name === this.owner.ownerType) {          
+          this.editOwner.get('ownerType')?.setValue(type.value);
+          this.typeSelect.setData(type.value as any);
+        }
+      });
+
+      this.states.forEach((state) => {
+        if (state.name === this.owner.taxStatus) {          
+          this.editOwner.get('state')?.setValue(state.value);
+          this.stateSelect.setData(state.value as any);
+        }
+      });
+
+      this.editOwner.get('plots')?.setValue(this.selectedPlots);
+      this.plotsSelect.setData(this.selectedPlots);
 
 
       //Rellenar los campos del formulario con los datos del propietario
@@ -86,13 +132,10 @@ export class UsersUpdateOwnerComponent implements OnInit, OnDestroy {
         name: this.owner.name,
         lastname: this.owner.lastname,
         dni: this.owner.dni,
-        dniType: this.owner.dni_type,
-        ownerType: this.owner.ownerType, //Valor inicial para ownerType
-        taxStatus: this.owner.taxStatus, //Valor inicial para taxStatus
+        dniType: this.owner.dni_type,//Valor inicial para taxStatus
         bussinesName: this.owner.businessName,
         phoneNumber: data.user.phone_number,
         email: data.user.email,
-        state: data.owner.taxStatus, //?????????????????????????????????????????????????
         plots: data.user.plot_id
       });
 
@@ -122,11 +165,7 @@ export class UsersUpdateOwnerComponent implements OnInit, OnDestroy {
     }
 
     this.getPlotsByOwnerId(Number(this.id));
-
-    this.loadAllPlots();
-    await this.loadAllTypesOwner();
     this.loadAllDniTypes();
-    this.loadAllStates();
 
     this.editOwner.get('dni')?.disable();
     this.editOwner.get('dniType')?.disable();
@@ -156,27 +195,40 @@ export class UsersUpdateOwnerComponent implements OnInit, OnDestroy {
     this.suscriptionService.addSuscription(sus);
   }
 
-  //Cargar todos los tipos de propietario
-  loadAllTypesOwner() {
-    const sus = this.ownerService.getAllTypes().subscribe({
-      next: (data: OwnerTypeModel[]) => {
-        this.types = data;
+  //Cargar todos los estados fiscales
+  async loadAllStates(): Promise<{ value: number, name: string }[]> {
+    return new Promise((resolve, reject) => {
+      const sus = this.ownerService.getAllStates().subscribe({
+        next: (data: OwnerStateModel[]) => {
+          const states = data.map(d => ({ value: d.id, name: d.description }));
+          this.stateOptions = states;
+          resolve(states);
+        },
+        error: (err) => {
+          console.error('Error al cargar los estados fiscales:', err);
+          reject(err);
+        },
+      });
 
-        this.types.forEach((type) => {
-          if (type.description === this.owner.ownerType) {
-            this.editOwner.patchValue({
-              ownerType: type.id.toString(),
-            });
-          }
-        });
-      },
-      error: (err) => {
-        console.error('Error al cargar los tipos de propietario:', err);
-      },
+      //Agregar suscripcion
+      this.suscriptionService.addSuscription(sus);
     });
+  }
 
-    //Agregar suscripcion
-    this.suscriptionService.addSuscription(sus);
+  //Cargar todos los tipos de propietario
+  async loadAllTypesOwner(): Promise<{ value: number, name: string }[]> {
+    return new Promise((resolve, reject) => {
+      this.ownerService.getAllTypes().subscribe({
+        next: (data: OwnerTypeModel[]) => {
+          const types = data.map(d => ({ value: d.id, name: d.description }));
+          resolve(types);
+        },
+        error: (err) => {
+          console.error('Error al cargar los tipos de propietario:', err);
+          reject(err);
+        }
+      });
+    });
   }
 
   //Cargar todos los tipos de dni
@@ -202,59 +254,38 @@ export class UsersUpdateOwnerComponent implements OnInit, OnDestroy {
   }
 
   //Cargar todos los lotes
-  loadAllPlots() {
-    const sus = this.plotService.getAllPlots().subscribe({
-      next: (data: GetPlotModel[]) => {
+  async loadAllPlots(): Promise<{ value: number, name: string }[]> {
+    return new Promise((resolve, reject) => {
+      const sus = this.plotService.getAllPlots().subscribe({
+        next: (data: GetPlotModel[]) => {
+          // Crear las opciones del select
+          let plotsAvailables: GetPlotModel[] = data.filter(plot => plot.plot_state === 'Disponible' || this.plotsForOwner.some(p => p.id === plot.id));
 
-        // Crear las opciones del select
-        let plotsAvailables: GetPlotModel[] = data.filter(plot => plot.plot_state === 'Disponible' || this.plotsForOwner.some(p => p.id === plot.id));
+          this.plotsOptions = plotsAvailables.map(d => ({
+            value: d.id,
+            name: `Lote: ${d.plot_number}, Manzana: ${d.block_number}`
+          }));
 
-        this.plotsOptions = plotsAvailables.map(d => ({
-          value: d.id,
-          name: `Lote: ${d.plot_number}, Manzana: ${d.block_number}`
-        }));
+          this.selectedPlots = data
+            .filter(plot => this.plotsForOwner?.some(p => p.id === plot.id))
+            .map(plot => plot.id);
+          
 
-        const selectedPlots = data
-          .filter(plot => this.plotsForOwner?.some(p => p.id === plot.id))
-          .map(plot => plot.id);
 
-        this.editOwner.get('plots')!.setValue(selectedPlots);
-      },
-      error: (err) => {
-        console.error('Error al cargar los terrenos:', err);
-      }
+          //this.editOwner.get('plots')!.setValue(selectedPlots);
+          resolve(this.plotsOptions);
+        },
+        error: (err) => {
+          console.error('Error al cargar los terrenos:', err);
+          reject(err);
+        }
+      });
+
+      //Agregar suscripcion
+      this.suscriptionService.addSuscription(sus);
     });
-
-    //Agregar suscripcion
-    this.suscriptionService.addSuscription(sus);
   }
 
-  //Cargar todos los estados fiscales
-  loadAllStates() {
-    const sus = this.ownerService.getAllStates().subscribe({
-      next: (data: OwnerStateModel[]) => {
-        this.states = data;
-        this.states.forEach((state) => {
-          if (state.description === this.owner.taxStatus) {
-            this.editOwner.get('state')!.setValue(state.id);
-          }
-        });
-
-        this.editOwner.get('state')!.valueChanges.subscribe(value => {
-          this.stateSelected = value!.toString();
-        });
-
-        this.stateOptions = data.map(d => ({ value: d.id, name: d.description }));
-
-      },
-      error: (err) => {
-        console.error('Error al cargar los estados fiscales:', err);
-      },
-    });
-
-    //Agregar suscripcion
-    this.suscriptionService.addSuscription(sus);
-  }
 
   //--------------------------------------------------Funciones------------------------------------------------
 
@@ -361,6 +392,9 @@ export class UsersUpdateOwnerComponent implements OnInit, OnDestroy {
     if (form.valid) {
       //se crea el objeto
       let ownerPut = this.createObject(form);
+
+      console.log(ownerPut);
+      
 
       //llama al service
       const sus = this.ownerService.putOwner(ownerPut, Number(this.id)).subscribe({

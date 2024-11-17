@@ -53,10 +53,7 @@ throw new Error('Method not implemented.');
   filteredUserRoles : string[] = [];                  //Listado de roles del usuario a mostrar    
   optionRoles : {name: string, value: any}[] = [];    //Listado de objetos para el select
   blockedRoles: string[] = [];                        //Listado de roles del usuario sin mostrar
-
   rolesSelected: any[] = [];
-
-  
   opt: any[] = [];
   checkedOpt: string[] = [];
 
@@ -72,10 +69,7 @@ throw new Error('Method not implemented.');
     this.updateForm.get('email')?.disable();
     this.updateForm.get('avatar_url')?.disable();
     this.updateForm.get('datebirth')?.disable();
-  
-
   }
-
 
   getAllRoles(){
     this.userService.getAllRoles().subscribe({
@@ -184,7 +178,7 @@ throw new Error('Method not implemented.');
 
   confirmExit() {
     if (this.authService.getActualRole() === 'Propietario') {
-      this.router.navigate(['main/family']);
+      this.router.navigate(['main/users/family']);
     } else {
 
       this.router.navigate(['main/users/list']);
@@ -252,7 +246,7 @@ throw new Error('Method not implemented.');
   //Redirige a la lista
   redirectList() {
     if (this.authService.getActualRole() == 'Propietario') {
-      this.router.navigate(['main/family']);
+      this.router.navigate(['main/users/family']);
     }
     else {
       this.router.navigate(['main/users/list']);

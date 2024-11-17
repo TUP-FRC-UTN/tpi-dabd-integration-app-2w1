@@ -44,6 +44,7 @@ export class UsersListOwnersComponent implements OnDestroy {
   selectType: FormControl = new FormControl([]);
   initialDate: FormControl = new FormControl(this.minDate);
   endDate: FormControl = new FormControl(this.maxDate);
+
   plots: GetPlotDto[] = [];
   ownersWithPlots: any[] = [];
 
@@ -268,7 +269,7 @@ export class UsersListOwnersComponent implements OnDestroy {
     const sus3 = this.apiService.getAllTypes().subscribe({
       next: (data: OwnerTypeModel[]) => {
 
-        this.types = data.map(type => ({ value: type.id, name: type.description }));
+        this.types = data.map(type => ({ value: type.description, name: type.description }));
       },
       error: (error) => {
         console.error('Error al cargar los roles:', error);
@@ -323,12 +324,19 @@ export class UsersListOwnersComponent implements OnDestroy {
     // Redibujar la tabla sin filtros
     table.draw();
   }
+
   
 
-  updateFilterType() {
+  updateFilterType(options: any[]) {
+    // Asignamos directamente los roles emitidos
+    var optionsFilter = options.map((option: any) => option).join('|'); // Usar '|' para permitir múltiples filtros
     const table = $('#myTableOwners').DataTable();
 
-    table.column(3).search(this.selectType.value).draw();
+    console.log(optionsFilter);
+    
+
+    // Filtrar por el contenido de la columna de tipo de lote, teniendo en cuenta que puede tener unicamente 1 valor, pero se tiene que filtrar x varios
+    table.column(3).search(optionsFilter, true, false).draw(); // Usar expresión regular para permitir múltiples filtros
   }
 
   getContentBetweenArrows(input: string): string[] {

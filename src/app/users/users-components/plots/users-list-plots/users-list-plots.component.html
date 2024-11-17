@@ -15,7 +15,8 @@
 
       <!-- Filtro por estado de lote -->
       <div id="myTable_filterPlot" class="dataTables_filter" style="text-align: left;">
-        <app-custom-select #customSelectState [options]="statusForFilter" [multiple]="true" [selectedOptions]="selectState.value || []"
+        <app-custom-select #customSelectState [options]="statusForFilter" [multiple]="true"
+         [selectedOptions]="selectState.value || []"
           (selectedOptionsChange)="updateFilterState($event)" />
       </div>
 

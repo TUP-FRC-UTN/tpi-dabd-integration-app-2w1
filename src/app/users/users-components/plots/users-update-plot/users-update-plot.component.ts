@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { PlotService } from '../../../users-servicies/plot.service';
 import { PlotTypeModel } from '../../../users-models/plot/PlotType';
@@ -10,11 +10,12 @@ import { PutPlot } from '../../../users-models/plot/PutPlot';
 import { FileDto } from '../../../users-models/owner/FileDto';
 import { FileService } from '../../../users-servicies/file.service';
 import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
+import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
 
 @Component({
   selector: 'app-users-update-plot',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, CustomSelectComponent],
   templateUrl: './users-update-plot.component.html',
   styleUrl: './users-update-plot.component.css'
 })
@@ -23,23 +24,26 @@ export class UsersUpdatePlotComponent implements OnInit, OnDestroy {
   private readonly plotService = inject(PlotService);
   private readonly fileService = inject(FileService);
   private readonly suscriptionService = inject(SuscriptionManagerService);
+  @ViewChild('stateSelect') stateSelect!: CustomSelectComponent; 
+  @ViewChild('typeSelect') typeSelect!: CustomSelectComponent; 
 
-  types: PlotTypeModel[] = [];
-  states: PlotStateModel[] = [];
+  types: any[] = [];
+  states: any[] = [];
   existingFiles: File[] = [];
   existingFilesDownload: FileDto[] = [];
   files: File[] = this.existingFiles;
+  formReactivo: FormGroup;
 
-  constructor(private router: Router, private route: ActivatedRoute) { }
-
-  formReactivo = new FormGroup({
-    plotNumber: new FormControl(0, [Validators.required, Validators.min(1)]),
-    blockNumber: new FormControl(0, [Validators.required, Validators.min(1)]),
-    totalArea: new FormControl(0, [Validators.required, Validators.min(1)]),
-    totalBuild: new FormControl(0, [Validators.required, Validators.min(0)]),
-    state: new FormControl("", [Validators.required]),
-    type: new FormControl("", [Validators.required])
-  })
+  constructor(private fb: FormBuilder, private router: Router, private route: ActivatedRoute) {
+    this.formReactivo = this.fb.group({
+      plotNumber: new FormControl(0, [Validators.required, Validators.min(1)]),
+      blockNumber: new FormControl(0, [Validators.required, Validators.min(1)]),
+      totalArea: new FormControl(0, [Validators.required, Validators.min(1)]),
+      totalBuild: new FormControl(0, [Validators.required, Validators.min(0)]),
+      state: new FormControl("", [Validators.required]),
+      type: new FormControl("", [Validators.required])
+    });
+  }
 
   ngOnInit(): void {
 
@@ -47,18 +51,57 @@ export class UsersUpdatePlotComponent implements OnInit, OnDestroy {
 
     this.formReactivo.get('plotNumber')?.disable();
     this.formReactivo.get('blockNumber')?.disable();
+    
+    // Después de cargar los tipos y estados, encontrar el ID correcto
+    const sus1 = this.plotService.getAllTypes().subscribe({
+      next: (data: PlotTypeModel[]) => {
+        this.types = data.map(d => ({value: d.id, name: d.name}));
+        
+      },
+      error: (err) => {
+        console.error('Error al cargar los estados de lote:', err);
+      }
+    });
+
+    const sus2 = this.plotService.getAllStates().subscribe({
+      next: (data: PlotStateModel[]) => {            
+        this.states = data.map(d => ({value: d.id, name: d.name})); 
+      },
+      error: (err) => {
+        console.error('Error al cargar los estados de lote:', err);
+      }
+    });
+
+    //Agregar suscripción
+    this.suscriptionService.addSuscription(sus1);
+
+    //Agregar suscripción
+    this.suscriptionService.addSuscription(sus2);
 
     // Obtener el lote por su ID
     const sus = this.plotService.getPlotById(id).subscribe({
       next: (response) => {
-        console.log(response);
-
-        // Cargar los valores en el formulario
         this.formReactivo.get('plotNumber')?.setValue(response.plot_number);
         this.formReactivo.get('blockNumber')?.setValue(response.block_number);
         this.formReactivo.get('totalArea')?.setValue(response.total_area_in_m2);
         this.formReactivo.get('totalBuild')?.setValue(response.built_area_in_m2);
+        this.states.forEach((state) => {
+          if (state.name === response.plot_state) {
+            this.formReactivo.get('state')?.setValue(state.value);
+            this.stateSelect.setData(state.value as any);
+          }
+        });
 
+        this.types.forEach((type) => {
+          if (type.name === response.plot_type) {
+            this.formReactivo.get('type')?.setValue(type.value);
+            this.typeSelect.setData(type.value as any);
+          }
+        });
+
+        // subscribirse a los cambios del form reactivo state changes
+
+        
         // Guardar el valor del nombre del estado y tipo para luego asignar el ID
         const plotStateName = response.plot_state;
         const plotTypeName = response.plot_type;
@@ -81,23 +124,6 @@ export class UsersUpdatePlotComponent implements OnInit, OnDestroy {
             console.log("Files list after loading: ", this.existingFiles);
           }
         }
-
-        // Después de cargar los tipos y estados, encontrar el ID correcto
-        const sus2 = this.plotService.getAllTypes().subscribe({
-          next: (data) => {
-            this.types = data;
-            // Encontrar el ID del tipo por el nombre
-            const plotType = this.types.find(t => t.name === plotTypeName);
-            if (plotType) {
-              this.formReactivo.get('type')?.setValue(plotType.id.toString());
-            }
-          },
-          error: (error) => {
-            console.error('Error al obtener los tipos de lote:', error);
-          }
-        });
-        //Agregar suscripción
-        this.suscriptionService.addSuscription(sus2);
       },
       error: (error) => {
         console.error('Error al obtener el lote:', error);
@@ -124,6 +150,11 @@ export class UsersUpdatePlotComponent implements OnInit, OnDestroy {
       files: this.files
     }
 
+    console.log(plot);
+    console.log(id);
+    
+    
+
     const sus = this.plotService.putPlot(id, plot).subscribe({
       next: () => {
         Swal.fire({
@@ -134,7 +165,6 @@ export class UsersUpdatePlotComponent implements OnInit, OnDestroy {
           allowOutsideClick: false,
           allowEscapeKey: false,
           timer: undefined,
-
         });
 
         //Redirigir a la lista de lotes

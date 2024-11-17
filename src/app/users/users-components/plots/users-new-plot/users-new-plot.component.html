@@ -55,7 +55,10 @@
                 <div class="row">
                     <label class="col-2 col-form-label">Estado</label>
                     <div class="col-10">
-                        <app-custom-select [options]="states" (selectedOptionsChange)="formReactivo.get('state')?.setValue($event)" [selectedOptions]="formReactivo.get('state')?.value" [validations]="formReactivo.get('state')?.validator" />
+                        <app-custom-select [options]="states"
+                         (selectedOptionsChange)="formReactivo.get('state')?.setValue($event)"
+                          [selectedOptions]="formReactivo.get('state')?.value"
+                          [validations]="formReactivo.get('state')?.validator" />
                         <div class="invalid-feedback">{{showError('state')}}</div>
                     </div>
                 </div>
@@ -66,7 +69,10 @@
                 <div class="row">
                     <label class="col-2 col-form-label">Tipo</label>
                     <div class="col-10">
-                        <app-custom-select [options]="types" (selectedOptionsChange)="formReactivo.get('type')?.setValue($event)" [selectedOptions]="formReactivo.get('type')?.value" [validations]="formReactivo.get('type')?.validator" />
+                        <app-custom-select [options]="types"
+                         (selectedOptionsChange)="formReactivo.get('type')?.setValue($event)"
+                          [selectedOptions]="formReactivo.get('type')?.value"
+                          [validations]="formReactivo.get('type')?.validator" />
                         <div class="invalid-feedback">{{showError('type')}}</div>
                     </div>
                 </div>
