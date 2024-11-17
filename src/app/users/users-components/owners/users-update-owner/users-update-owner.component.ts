@@ -353,7 +353,7 @@ export class UsersUpdateOwnerComponent implements OnInit, OnDestroy {
   //Confirmar salida
   confirmExit() {
     this.editOwner.reset();
-    this.redirect('/home/owners/list');
+    this.redirect('/main/owners/list');
   }
 
   //Actualizar propietario

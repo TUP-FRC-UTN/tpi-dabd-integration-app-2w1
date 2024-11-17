@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -42,6 +42,9 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
   typesForFilter: any[] = [];
   statusForFilter: any[] = [];
 
+  @ViewChild('customSelectType') customSelectType!: CustomSelectComponent;
+  @ViewChild('customSelectState') customSelectState!: CustomSelectComponent;
+
   private readonly suscriptionService = inject(SuscriptionManagerService);
 
   constructor(private router: Router, private modal: NgbModal) { }
@@ -68,7 +71,7 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
 
         // Inicializar DataTables después de cargar todos los datos
         setTimeout(() => {
-          const table = $('#myTable').DataTable({
+          const table = $('#myTablePlot').DataTable({
             paging: true,
             searching: true,
             ordering: true,
@@ -130,12 +133,12 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
           });
 
           // Alinear la caja de búsqueda a la derecha
-          const searchInputWrapper = $('#myTable_filter');
+          const searchInputWrapper = $('#myTable_filterPlot');
           searchInputWrapper.addClass('d-flex justify-content-start');
 
           // Desvincular el comportamiento predeterminado de búsqueda
-          $('#myTable_filter input').unbind();
-          $('#myTable_filter input').bind('input', (event) => {
+          $('#myTable_filterPlot input').unbind();
+          $('#myTable_filterPlot input').bind('input', (event) => {
             const searchValue = (event.target as HTMLInputElement).value;
             if (searchValue.length >= 2) {
               table.search(searchValue).draw();
@@ -145,12 +148,12 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
           });
 
           // Asignar eventos a los botones "Ver más" y "Editar"
-          $('#myTable').on('click', '.view-plot', (event) => {
+          $('#myTablePlot').on('click', '.view-plot', (event) => {
             const plotId = $(event.currentTarget).data('id');
             this.openModal(plotId);
           });
 
-          $('#myTable').on('click', '.edit-plot', (event) => {
+          $('#myTablePlot').on('click', '.edit-plot', (event) => {
             const plotId = $(event.currentTarget).data('id');
             this.redirectEdit(plotId);
           });
@@ -165,8 +168,6 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
     //Agregar servicio
     this.suscriptionService.addSuscription(sus);
 
-    this.selectType.setValue('');
-    this.selectState.setValue('');
   }
   //--------------------------------------------------Carga de datos--------------------------------------------------
 
@@ -235,56 +236,61 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
 
   //--------------------------------------------------Filtros------------------------------------------------
 
-  //Filtrat por tipo
+  //Filtrar por tipo
   updateFilterType(options: any[]) {
     // Asignamos directamente los roles emitidos
-    var optionsFilter = options.map((option: any) => option).join(' ');
-    console.log(optionsFilter);
+    var optionsFilter = options.map((option: any) => option).join('|'); // Usar '|' para permitir múltiples filtros
+    const table = $('#myTablePlot').DataTable();
 
-    const table = $('#myTable').DataTable();
-
-    table.column(4).search(optionsFilter ?? '').draw();
+    // Filtrar por el contenido de la columna de tipo de lote, teniendo en cuenta que puede tener unicamente 1 valor, pero se tiene que filtrar x varios
+    table.column(4).search(optionsFilter, true, false).draw(); // Usar expresión regular para permitir múltiples filtros
   }
 
-  //Filtrat por tipo
-  updateFilterTypeSimple() {
-    const table = $('#myTable').DataTable();
-    table.column(4).search(this.selectType.value ?? '').draw();
+  //Filtrar por tipo
+  updateFilterTypeSimple(filter : any[]) {
+    const table = $('#myTablePlot').DataTable();
+    table.column(4).search((this.selectType.value as string[]).join(' ') ?? '').draw();
   }
 
   //Filtrar por estado
   updateFilterStateSimple() {
-    const table = $('#myTable').DataTable();
-    table.column(5).search(this.selectState.value ?? '').draw();
+    const table = $('#myTablePlot').DataTable();
+    table.column(5).search((this.selectState.value as string[]).join(' ') ?? '').draw();
   }
 
   //Filtrar por estado
   updateFilterState(options: any[]) {
-    var optionsFilter = options.map((option: any) => option).join(' ');
-    console.log(optionsFilter);
+    // Asignamos directamente los roles emitidos
+    var optionsFilter = options.map((option: any) => option).join('|'); // Usar '|' para permitir múltiples filtros
+    const table = $('#myTablePlot').DataTable();
 
-    const table = $('#myTable').DataTable();
-
-    table.column(5).search(optionsFilter ?? '').draw();
+    // Filtrar por el contenido de la columna de tipo de lote, teniendo en cuenta que puede tener unicamente 1 valor, pero se tiene que filtrar x varios
+    table.column(5).search(optionsFilter, true, false).draw(); // Usar expresión regular para permitir múltiples filtros
   }
 
   //Limpiar filtros
   resetFilters() {
-    //Reiniciar el valor del control de rol
-    this.selectType.setValue('');
-    this.selectState.setValue('');
+    // Reiniciar el valor de los controles de filtro
+    this.selectType.setValue([]);
+    this.selectState.setValue([]);
 
-    //Limpiar el campo de búsqueda general y el filtro de la columna de tipo
-    const searchInput = document.querySelector('#myTable_filter input') as HTMLInputElement;
+    // Limpiar el campo de búsqueda general y los filtros de las columnas
+    const searchInput = document.querySelector('#myTable_filterPlot input') as HTMLInputElement;
     if (searchInput) {
       searchInput.value = ''; 
     }
-    const table = $('#myTable').DataTable();
+    const table = $('#myTablePlot').DataTable();
+
+    if (this.customSelectState) {
+      this.customSelectState.setData([]); // Reiniciar datos del custom select
+    }
+    if(this.customSelectType){
+      this.customSelectType.setData([]); // Reiniciar datos del custom select
+    }
 
     // Limpiar búsqueda y filtros
     table.search('').draw();
-    table.column(4).search('').draw(); 
-    table.column(5).search('').draw(); 
+    table.columns().search('').draw();
   }
 
   //--------------------------------------------------Exportar------------------------------------------------
@@ -314,7 +320,7 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
     const columns = ['Lote', 'Manzana', 'M2 Totales', 'M2 Construidos', 'Tipo', 'Estado', 'Propietario'];
 
     //Obtener los datos filtrados en la tabla HTML
-    const table = $('#myTable').DataTable();
+    const table = $('#myTablePlot').DataTable();
     const visibleRows = table.rows({ search: 'applied' }).data().toArray();
 
     //Mapear los datos visibles para el PDF
@@ -354,7 +360,7 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
   //Exporta a excel la tabla
   exportExcel() {
     //Obtenemos los datos visibles de la tabla (basados en los filtros aplicados)
-    const table = $('#myTable').DataTable();
+    const table = $('#myTablePlot').DataTable();
     const visibleRows = table.rows({ search: 'applied' }).data().toArray();
 
     const today = new Date();
@@ -397,19 +403,13 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
 
     // Espera a que se cargue el usuario seleccionado
     try {
-      console.log("Cargando lote...");
-
       await this.selectUser(plotId);
-      console.log("lote cargado:", this.plotModel);
-      console.log("Abriendo modal...");
-
-
       // Una vez cargado, abre el modal
       const modalRef = this.modal.open(UsersModaInfoPlotComponent, { size: 'lg', keyboard: false });
       modalRef.componentInstance.plotModel = this.plotModel;
 
       modalRef.result.then((result) => {
-        $('#myTable').DataTable().ajax.reload();
+        $('#myTablePlot').DataTable().ajax.reload();
       });
 
     } catch (error) {
@@ -495,11 +495,11 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
 
     // Redirige a la vista de agregar lote
     addPlot() {
-      this.router.navigate(['/home/plots/add'])
+      this.router.navigate(['/main/plots/add'])
     }
   
     // Redirige a la vista para editar l
     redirectEdit(id: number) {
-      this.router.navigate(['/home/plots/edit', id])
+      this.router.navigate(['/main/plots/edit', id])
     }
 }

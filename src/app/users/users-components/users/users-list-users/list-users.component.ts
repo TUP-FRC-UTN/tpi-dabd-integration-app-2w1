@@ -292,33 +292,41 @@ export class ListUsersComponent implements OnInit {
   }
 
   resetFilters() {
-    // Reiniciar el valor del control de rol
+    // Reiniciar los valores de rol y fechas
     this.selectRol.setValue('');
     this.initialDate.setValue(this.minDate);
     this.endDate.setValue(this.maxDate);
-    // Limpiar el campo de búsqueda
+  
+    // Limpiar el campo de búsqueda general
     const searchInput = document.getElementById("myTable_search") as HTMLInputElement;
     if (searchInput) {
       searchInput.value = ''; // Limpiar el valor del input
     }
-
+  
+    // Eliminar todos los filtros personalizados
+    $.fn.dataTable.ext.search.splice(0, $.fn.dataTable.ext.search.length);
+  
     // Obtener la instancia de DataTable
-    $.fn.dataTable.ext.search.pop();
     const table = $('#myTable').DataTable();
-
-    this.rolesFilter = [];
-    this.rolesFilter = this.roles.map(r => ({ 
-      value: r.description, 
-      name: r.description
+  
+    // Reiniciar roles y custom select
+    this.rolesFilter = this.roles.map(r => ({
+      value: r.description,
+      name: r.description,
     }));
-
-    if(this.customSelect){
-      this.customSelect.setData([]);
+  
+    if (this.customSelect) {
+      this.customSelect.setData([]); // Reiniciar datos del custom select
     }
-
-    table.column(2).search('').draw();
-    table.search('').draw();
+  
+    // Limpiar filtros de columnas y búsqueda general
+    table.column(2).search(''); // Limpiar columna específica
+    table.search(''); // Limpiar búsqueda general
+  
+    // Redibujar la tabla
+    table.draw();
   }
+  
 
   fillOptionsSelected(options: any) {
     var optiones = options.map((option: any) => option).join(' ');
@@ -330,28 +338,32 @@ export class ListUsersComponent implements OnInit {
   }
 
   //Metodo para filtrar la tabla en base a las 2 fechas
-  filterByDate() {    
+  filterByDate() {
     const table = $('#myTable').DataTable();
-
+  
     // Convertir las fechas seleccionadas a objetos Date para comparar
     const start = this.initialDate.value ? new Date(this.initialDate.value) : null;
     const end = this.endDate.value ? new Date(this.endDate.value) : null;
-    
-    // Agregar función de filtro a DataTable
+  
+    // Limpiar cualquier filtro previo relacionado con fechas
+    $.fn.dataTable.ext.search.splice(0, $.fn.dataTable.ext.search.length);
+  
+    // Agregar una nueva función de filtro
     $.fn.dataTable.ext.search.push((settings: any, data: any, dataIndex: any) => {
       // Convertir la fecha de la fila (data[0]) a un objeto Date
       const rowDateParts = data[0].split('/'); // Asumiendo que la fecha está en formato DD/MM/YYYY
       const rowDate = new Date(`${rowDateParts[2]}-${rowDateParts[1]}-${rowDateParts[0]}`); // Convertir a formato YYYY-MM-DD
-
+  
       // Realizar las comparaciones
       if (start && rowDate < start) return false;
       if (end && rowDate > end) return false;
       return true;
     });
-
-    // Redibujar la tabla después de aplicar el filtro
+  
+    // Redibujar la tabla con el filtro aplicado
     table.draw();
   }
+  
 
   estadoRoles: { [id: string]: boolean } = {};
 

@@ -316,7 +316,7 @@ export class UsuariosNewOwnerComponent implements OnInit, OnDestroy {
   //Confirmar salida
   confirmExit() {
     this.formReactivo.reset();
-    this.redirect('/home/owners/list');
+    this.redirect('/main/owners/list');
   }
 
   //Redireccionar
@@ -429,7 +429,7 @@ export class UsuariosNewOwnerComponent implements OnInit, OnDestroy {
 
         //Resetea el fomulario
         this.resetForm()
-        this.router.navigate(['/home/owners/list']);
+        this.router.navigate(['/main/owners/list']);
       },
 
       //Se intercepta el error, si sucede

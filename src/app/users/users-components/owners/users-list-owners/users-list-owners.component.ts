@@ -96,7 +96,7 @@ export class UsersListOwnersComponent implements OnDestroy {
 
         // Inicializar DataTables después de cargar los datos
         setTimeout(() => {
-          const table = $('#myTable').DataTable({
+          const table = $('#myTableOwners').DataTable({
             paging: true,
             searching: true,
             ordering: true,
@@ -162,14 +162,14 @@ export class UsersListOwnersComponent implements OnDestroy {
           });
 
           // Alinear la caja de búsqueda a la derecha
-          const searchInputWrapper = $('#myTable_filter');
+          const searchInputWrapper = $('#myTable_filter_Owners');
           searchInputWrapper.addClass('d-flex justify-content-start');
 
           table.order([0, 'desc']).draw(); // Ordenar por fecha de creación de forma descendente
 
           // Desvincular el comportamiento predeterminado de búsqueda
-          $('#myTable_filter input').unbind();
-          $('#myTable_filter input').bind('input', (event) => {
+          $('#myTable_filter_Owners input').unbind();
+          $('#myTable_filter_Owners input').bind('input', (event) => {
             const searchValue = (event.target as HTMLInputElement).value;
 
             // Comienza a buscar solo si hay 3 o más caracteres
@@ -181,18 +181,18 @@ export class UsersListOwnersComponent implements OnDestroy {
           });
 
           // Asignar el evento click a los botones "Ver más"
-          $('#myTable').on('click', '.view-owner', (event) => {
+          $('#myTableOwners').on('click', '.view-owner', (event) => {
             const ownerId = $(event.currentTarget).data('id');
             this.abrirModal(ownerId);
           });
 
           // Asignar el evento click a los botones "Editar"
-          $('#myTable').on('click', '.edit-owner', (event) => {
+          $('#myTableOwners').on('click', '.edit-owner', (event) => {
             const userId = $(event.currentTarget).data('id');
             this.redirectEdit(userId);
           });
 
-          $('#myTable').on('click', '.delete-owner', (event) => {
+          $('#myTableOwners').on('click', '.delete-owner', (event) => {
             const id = $(event.currentTarget).data('id');
             const userId = this.owners[id].id; //Obtén el ID real del usuario
             this.openModalEliminar(userId); //Pasa el ID del usuario al abrir el modal 
@@ -228,16 +228,10 @@ export class UsersListOwnersComponent implements OnDestroy {
     let response = '';
 
     for (let i = 0; i < plots.plot.length; i++) {
-      console.log(this.plots.find(plot => plot.id == plots.plot[i])?.plot_number);
-
       response += this.plots.find(plot => plot.id == plots.plot[i])?.plot_number + ", " || '';
     }
 
     response = response.substring(0, response.length - 2);
-
-    console.log(response);
-
-
     return response;
   }
 
@@ -254,7 +248,7 @@ export class UsersListOwnersComponent implements OnDestroy {
       modalRef.componentInstance.ownerModel = this.ownerModel;
 
       modalRef.result.then((result) => {
-        $('#myTable').DataTable().ajax.reload();
+        $('#myTableOwners').DataTable().ajax.reload();
       });
 
     } catch (error) {
@@ -263,11 +257,11 @@ export class UsersListOwnersComponent implements OnDestroy {
   }
 
   addOwner() {
-    this.router.navigate(['home/owners/add'])
+    this.router.navigate(['main/owners/add'])
   }
 
   redirectEdit(id: number) {
-    this.router.navigate(['/home/owners/edit', id])
+    this.router.navigate(['/main/owners/edit', id])
   }
 
   loadTypes() {
@@ -297,35 +291,42 @@ export class UsersListOwnersComponent implements OnDestroy {
 
   cargarTabla() {
     // Destruir la instancia de DataTable si ya existe
-    if ($.fn.dataTable.isDataTable('#myTable')) {
-      $('#myTable').DataTable().clear().destroy();
+    if ($.fn.dataTable.isDataTable('#myTableOwners')) {
+      $('#myTableOwners').DataTable().clear().destroy();
     }
     this.ngOnInit();
   }
 
   resetFilters() {
-    // Reiniciar el valor del control de rol
+    // Reiniciar el valor del control de tipo y fechas
     this.selectType.setValue('');
-    this.initialDate.setValue(this.minDate);
-    this.endDate.setValue(this.maxDate);
-
-    // Limpiar el campo de búsqueda general y el filtro de la columna de tipo
-    const searchInput = document.querySelector('#myTable_filter input') as HTMLInputElement;
+    this.initialDate.setValue(this.minDate); // Restablecer fecha inicial
+    this.endDate.setValue(this.maxDate);    // Restablecer fecha final
+  
+    // Limpiar el campo de búsqueda general
+    const searchInput = document.querySelector('#myTable_filter_Owners input') as HTMLInputElement;
     if (searchInput) {
       searchInput.value = ''; // Limpiar el valor del input de búsqueda general
     }
-
+  
     // Obtener la instancia de DataTable
-    const table = $('#myTable').DataTable();
-
-    // Limpiar búsqueda y filtros
-    table.search('').draw(); // Limpiar búsqueda general
+    const table = $('#myTableOwners').DataTable();
+  
+    // Limpiar búsqueda general y filtros de columnas
+    table.search('').draw();          // Limpiar búsqueda general
     table.column(3).search('').draw(); // Limpiar filtro de tipo
     table.column(0).search('').draw(); // Limpiar filtro de fecha
+  
+    // Eliminar la función de filtro personalizada de fechas
+    $.fn.dataTable.ext.search.splice(0, $.fn.dataTable.ext.search.length);
+  
+    // Redibujar la tabla sin filtros
+    table.draw();
   }
+  
 
   updateFilterType() {
-    const table = $('#myTable').DataTable();
+    const table = $('#myTableOwners').DataTable();
 
     table.column(3).search(this.selectType.value).draw();
   }
@@ -337,27 +338,31 @@ export class UsersListOwnersComponent implements OnDestroy {
 
   //Metodo para filtrar la tabla en base a las 2 fechas
   filterByDate() {
-    const table = $('#myTable').DataTable();
-
+    const table = $('#myTableOwners').DataTable();
+  
     // Convertir las fechas seleccionadas a objetos Date para comparar
     const start = this.initialDate.value ? new Date(this.initialDate.value) : null;
     const end = this.endDate.value ? new Date(this.endDate.value) : null;
-
-    // Agregar función de filtro a DataTable
+  
+    // Limpiar cualquier filtro previo relacionado con fechas
+    $.fn.dataTable.ext.search.splice(0, $.fn.dataTable.ext.search.length);
+  
+    // Agregar una nueva función de filtro
     $.fn.dataTable.ext.search.push((settings: any, data: any, dataIndex: any) => {
       // Convertir la fecha de la fila (data[0]) a un objeto Date
       const rowDateParts = data[0].split('/'); // Asumiendo que la fecha está en formato DD/MM/YYYY
       const rowDate = new Date(`${rowDateParts[2]}-${rowDateParts[1]}-${rowDateParts[0]}`); // Convertir a formato YYYY-MM-DD
-
+  
       // Realizar las comparaciones
       if (start && rowDate < start) return false;
       if (end && rowDate > end) return false;
       return true;
     });
-
-    // Redibujar la tabla después de aplicar el filtro
+  
+    // Redibujar la tabla con el filtro aplicado
     table.draw();
   }
+  
 
   // Busca el user y se lo pasa al modal
   ownerModel: Owner = new Owner();
@@ -421,7 +426,7 @@ export class UsersListOwnersComponent implements OnDestroy {
     const columns = ['Fecha de Creación', 'Nombre', 'Documento', 'Tipo', 'Lotes'];
 
     // Filtrar datos visibles en la tabla
-    const table = $('#myTable').DataTable();
+    const table = $('#myTableOwners').DataTable();
 
     // Obtener las filas visibles de la tabla
     const visibleRows = table.rows({ search: 'applied' }).data().toArray();
@@ -456,7 +461,7 @@ export class UsersListOwnersComponent implements OnDestroy {
   }
 
   async exportExcel() {
-    const table = $('#myTable').DataTable(); // Inicializa DataTable una vez
+    const table = $('#myTableOwners').DataTable(); // Inicializa DataTable una vez
 
     // Cambiar la forma de obtener las filas visibles usando 'search' en lugar de 'filter'
     const visibleRows = table.rows({ search: 'applied' }).data().toArray(); // Usar 'search: applied'

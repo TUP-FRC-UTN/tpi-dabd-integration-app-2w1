@@ -33,7 +33,7 @@
               <option value="2">Pasaporte</option>
             </select> -->
             <!-- CheckMe -->
-            <app-custom-select [options]="[{id: 1, name: 'DNI'}, {id: 2, name: 'Pasaporte'}]"
+            <app-custom-select [options]="[{value: 1, name: 'DNI'}, {value: 2, name: 'Pasaporte'}]"
               [selectedOptions]="reactiveForm.get('dniType')?.value"
               (selectedOptionsChange)="reactiveForm.get('dniType')?.setValue($event)"
               [validations]="reactiveForm.get('dniType')?.validator" />
@@ -154,7 +154,7 @@
           <button type="button" class="btn btn-secondary" (click)="redirect()">Cancelar</button>
         </div>
         <div class="col-auto">
-          <button type="submit" class="btn btn-success" [disabled]="!reactiveForm.valid">
+          <button type="submit" class="btn btn-success" (click)="showFormErrors()" [disabled]="reactiveForm.invalid">
             Registrar
           </button>
         </div>

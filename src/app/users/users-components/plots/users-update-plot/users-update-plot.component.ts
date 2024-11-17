@@ -138,7 +138,7 @@ export class UsersUpdatePlotComponent implements OnInit, OnDestroy {
         });
 
         //Redirigir a la lista de lotes
-        this.redirect('home/plots/list');
+        this.redirect('main/plots/list');
       },
       error: (error) => {
         console.log("Error al actualizar el lote" + error);
@@ -244,6 +244,6 @@ export class UsersUpdatePlotComponent implements OnInit, OnDestroy {
 
   //Confirmar salida
   confirmExit() {
-    this.redirect('/home/plots/list');
+    this.redirect('/main/plots/list');
   }
 }

@@ -105,6 +105,10 @@ throw new Error('Method not implemented.');
 
           this.userRoles = data.roles;
           this.filteredUserRoles = this.filterUserRoles(this.userRoles);
+          console.log("Roles del usuario", this.filteredUserRoles);
+          
+          this.updateForm.get('roles')?.setValue(this.filteredUserRoles);
+          this.rolesComponent.setData(this.filteredUserRoles);
 
           if (formattedDate) {
             // Formatea la fecha a 'yyyy-MM-dd' para un input de tipo date
@@ -154,7 +158,6 @@ throw new Error('Method not implemented.');
         
         return true;
     });
-
     return filteredList;
   }
 
@@ -174,17 +177,16 @@ throw new Error('Method not implemented.');
             this.blockedRoles.push(opt);
             return false;
         }
-        
         return true;
     });
-
     return filteredList;
   }
 
   confirmExit() {
     if (this.authService.getActualRole() === 'Propietario') {
       this.router.navigate(['main/family']);
-    } else if (this.authService.getActualRole() === 'Gerente') {
+    } else {
+
       this.router.navigate(['main/users/list']);
     }
   }
@@ -252,7 +254,7 @@ throw new Error('Method not implemented.');
     if (this.authService.getActualRole() == 'Propietario') {
       this.router.navigate(['main/family']);
     }
-    else if (this.authService.getActualRole() == 'Gerente') {
+    else {
       this.router.navigate(['main/users/list']);
     }
   }

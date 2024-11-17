@@ -10,11 +10,12 @@ import { AuthService } from '../../../users-servicies/auth.service';
 import { Router } from '@angular/router';
 import { ValidatorsService } from '../../../users-servicies/validators.service';
 import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
+import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
 
 @Component({
   selector: 'app-users-new-plot',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, CustomSelectComponent],
   templateUrl: './users-new-plot.component.html',
   styleUrl: './users-new-plot.component.css'
 })
@@ -32,8 +33,8 @@ export class UsersNewPlotComponent implements OnInit, OnDestroy {
   private readonly validatorService = inject(ValidatorsService);
   private readonly suscriptionService = inject(SuscriptionManagerService);
 
-  types: PlotTypeModel[] = [];
-  states: PlotStateModel[] = [];
+  types: any[] = [];
+  states: any[] = [];
   files: File[] = [];
   formReactivo: FormGroup;
 
@@ -66,8 +67,8 @@ export class UsersNewPlotComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.formReactivo.get('type')?.setValue("");
     this.loadAllStates();
+    this.loadAllTypes();
   }
 
   ngOnDestroy(): void {
@@ -81,7 +82,8 @@ export class UsersNewPlotComponent implements OnInit, OnDestroy {
     const sus = this.plotService.getAllStates().subscribe({
       next: (data: PlotStateModel[]) => {
         console.log(data);
-        this.states = data;
+        
+        this.states = data.map(d => ({value: d.id, name: d.name}));
       },
       error: (err) => {
         console.error('Error al cargar los estados de lote:', err);
@@ -92,6 +94,23 @@ export class UsersNewPlotComponent implements OnInit, OnDestroy {
     this.suscriptionService.addSuscription(sus);
   }
 
+  loadAllTypes() {
+    const sus = this.plotService.getAllTypes().subscribe({
+      next: (data: PlotTypeModel[]) => {
+        console.log(data);
+        this.types = data.map(d => ({value: d.id, name: d.name}));
+        console.log("aaaaaaaaaaaaa");
+        console.log(this.types);
+        
+      },
+      error: (err) => {
+        console.error('Error al cargar los estados de lote:', err);
+      }
+    });
+
+    //Agregar suscripción
+    this.suscriptionService.addSuscription(sus);
+  }
   //--------------------------------------------------Formulario--------------------------------------------------
 
   //Crear un lote
@@ -106,7 +125,6 @@ export class UsersNewPlotComponent implements OnInit, OnDestroy {
         plot_type_id: Number(this.formReactivo.get('type')?.value || 0),
         userCreateId: this.authService.getUser().id || 0,
         files: this.files
-
       }
 
       const sus = this.plotService.postPlot(plot).subscribe({
@@ -123,11 +141,10 @@ export class UsersNewPlotComponent implements OnInit, OnDestroy {
           });
           this.resetForm();
           this.ngOnInit();
-          this.router.navigate(['/home/plots/list']);
+          this.router.navigate(['/main/plots/list']);
         },
         error: (error) => {
           console.error('Error al crear el lote:', error);
-          alert("Error al crear el lote");
         }
       });
 

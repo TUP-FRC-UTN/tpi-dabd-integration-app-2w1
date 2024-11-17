@@ -59,7 +59,7 @@ export class NewUserComponent implements OnInit {
         Validators.minLength(10),
         Validators.maxLength(20)
     ]),
-    dniType: new FormControl('', [
+    dniType: new FormControl(0, [
       Validators.required
       
     ]),
@@ -88,7 +88,7 @@ export class NewUserComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly plotService = inject(PlotService);
   private readonly validatorService = inject(ValidatorsService);
-  @ViewChild(CustomSelectComponent) rolesComponent!: CustomSelectComponent;
+  
 
   reactiveForm : FormGroup;
   rolesSelected : string[] = [];
@@ -120,6 +120,7 @@ export class NewUserComponent implements OnInit {
               this.reactiveForm.get('plot')?.disable();
           }else{
             this.lotes = data;
+            this.reactiveForm.get('plot')?.setValue(0);
           }
       },
       error: (err) => {
@@ -209,7 +210,7 @@ verifyOptions() {
       dni_type_id: Number(this.reactiveForm.get('dniType')?.value) || 0,
       dni: this.reactiveForm.get('dni')?.value?.toString() || "",
       active: true,
-      avatar_url: "asd",
+      avatar_url: "",
       datebirth: fechaValue ? new Date(fechaValue).toISOString().split('T')[0] : '',
       roles: this.reactiveForm.get('roles')?.value || [],
       phone_number: this.reactiveForm.get('phone_number')?.value?.toString() || '',
@@ -229,7 +230,7 @@ verifyOptions() {
     this.userService.postUser(userData).subscribe({
       next: (response) => {
         //Mostramos que la operación fue exitosa
-        (window as any).Swal.fire({
+        Swal.fire({
           title: 'Usuario creado',
           text: 'El usuario se ha creado correctamente',
           icon: 'success',
@@ -237,20 +238,13 @@ verifyOptions() {
           showConfirmButton: true,
           confirmButtonText: 'Aceptar',
         });
-        alert(this.authService.getActualRole());
-        if(this.authService.getActualRole() == "Propietario"){
-          this.router.navigate(['/main/family']);
-        }
-        //Reseteamos el formulario
-        if(this.authService.getActualRole() == "Gerente"){
-          this.router.navigate(['/main/users/list']);
-        }
+        this.redirect();
         this.reactiveForm.reset();
         
       },
       error: (error) => {
         //Mostramos que hubo un error
-        (window as any).Swal.fire({
+        Swal.fire({
           title: 'Error',
           text: 'El usuario no se pudo crear',
           icon: 'error',
@@ -312,4 +306,22 @@ verifyOptions() {
   togglePasswordVisibility(): void {
     this.passwordVisible = !this.passwordVisible;
   }
+
+  showFormErrors() {
+    // Verificar si el formulario tiene errores generales
+    if (this.reactiveForm.errors) {
+      console.log('Errores del formulario:', this.reactiveForm.errors);
+    }
+  
+    // Recorrer todos los controles del formulario
+    Object.keys(this.reactiveForm.controls).forEach((controlName) => {
+      const control = this.reactiveForm.get(controlName);
+  
+      // Verificar si el control tiene errores
+      if (control?.errors) {
+        console.log(`Errores en el control "${controlName}":`, control.errors);
+      }
+    });
+  }
+  
 }
