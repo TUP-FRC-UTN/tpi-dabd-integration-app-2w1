@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { EmpListadoEmpleados, Employee } from '../Models/emp-listado-empleados';
 import { EmpListadoAsistencias } from '../Models/emp-listado-asistencias';
-import { EmpPutEmployees } from '../Models/emp-put-employees';
+import { EmpPutEmployeesResponse } from '../Models/EmpPutEmployeesResponse';
 
 @Injectable({
   providedIn: 'root',
@@ -31,11 +31,18 @@ export class EmpListadoEmpleadosService {
       `${this.EMPLOYEE_BASE_URL}/employees/employeeById?id=${id}`
     );
   }
-  getEmployeeById2(id: number): Observable<EmpPutEmployees> {
-    return this.http.get<EmpPutEmployees>(
+
+
+  getEmployeeById2(id: number): Observable<EmpPutEmployeesResponse> {
+    return this.http.get<EmpPutEmployeesResponse>(
       `${this.EMPLOYEE_BASE_URL}/employees/employeeById?id=${id}`
     );
   }
+
+
+
+
+
 
   getAttendances(): Observable<EmpListadoAsistencias[]> {
     return this.http.get<EmpListadoAsistencias[]>(
@@ -50,7 +57,7 @@ export class EmpListadoEmpleadosService {
     );
   }
 
-  putAttendances(id: number, state: string, justification: string): Observable<any> {
+  putAttendances(id: number, state: string, justification: string, userid:number): Observable<any> {
     // Inicializa nuevos parámetros en cada ejecución
     let params = new HttpParams()
         .set('id', id.toString())

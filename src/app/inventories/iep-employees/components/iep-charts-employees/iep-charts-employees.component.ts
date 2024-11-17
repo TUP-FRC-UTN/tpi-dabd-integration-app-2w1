@@ -7,212 +7,375 @@ import { FormsModule } from '@angular/forms';
 import { EmpListadoEmpleados } from '../../Models/emp-listado-empleados';
 import { ListadoDesempeñoService } from '../../services/listado-desempeño.service';
 import { WakeUpCallDetail } from '../../Models/listado-desempeño';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { IepKpiComponent } from "../../../common-components/iep-kpi/iep-kpi.component";
 
 @Component({
   selector: 'app-iep-charts-employees',
   standalone: true,
-  imports: [GoogleChartsModule, CommonModule, FormsModule],
+  imports: [GoogleChartsModule, CommonModule, FormsModule, NgSelectModule, IepKpiComponent],
   templateUrl: './iep-charts-employees.component.html',
   styleUrl: './iep-charts-employees.component.css'
 })
 export class IepChartsEmployeesComponent implements OnInit{
-  empleadosService = inject(EmpListadoEmpleadosService);
-  llamadosService = inject(ListadoDesempeñoService);
+// Boolean para verificar que se carguen los datos en los graficos por primera vez
+
+// Servicios para hacer GET de los datos
+empleadosService = inject(EmpListadoEmpleadosService);
+llamadosService = inject(ListadoDesempeñoService);
+
+// Listas para guardar todos los datos
+asistencias: EmpListadoAsistencias[] = [];
+empleados: EmpListadoEmpleados[] = [];
+llamados: WakeUpCallDetail[] = [];
+
+// Listas para guardar los datos filtrados
+asistenciasFiltradas: EmpListadoAsistencias[] = [];
+llamadosFiltrados: WakeUpCallDetail[] = [];
+
+optionsEmpleados: any[] = [];
+empleadosFiltrados: any[] = [];
+
+// Variables para guardar los datos de filtros
+fechaInicio!: string;
+fechaFin!: string;
+
+// Variables para definir los tipos de graficos a protectar
+chartTypeCirculo: ChartType = ChartType.PieChart;
+chartTypeColumnas: ChartType = ChartType.ColumnChart;
+
+// Listas con los datos a proyectar en los graficos
+dataAsistencias: any[] = [];
+dataLlamados: any[] = [];
+dataCargos: any[] = [];
+
+//Kpis
+kpiPresente: number = 0;
+kpiTarde: number = 0;
+kpiAusente: number = 0;
+kpiJustificado: number = 0;
+
+// Configuraciones para los graficos
+chartOptionsAsistencias = {
+  colors: ['#28a745', '#dc3545', '#ffc107', '#6f42c1'] ,
+  animation: { duration: 1000, easing: 'out', startup: true },
+};
+
+columnsLlamados = ['Periodo','Leve','Moderado','Severo']
+chartOptionsLlamados = {
+  colors: ['#28a745', '#ffc107','#dc3545'],
+  vAxis:{ minValue: 0 },
+  isStacked: true,
+};
+
+ngOnInit(): void {
+  this.loadData();
+  this.initializeDates();
+  this.setInitialDates();
+}
+
+initializeDates(): void {
+  const today = new Date();
+  const thirtyDaysAgo = new Date(today);
+  thirtyDaysAgo.setDate(today.getDate() - 30);
+  this.fechaInicio = this.formatInitialFilterDates(thirtyDaysAgo);
+  this.fechaFin = this.formatInitialFilterDates(today);
+}
+
+private formatInitialFilterDates(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+setInitialDates(): void {
+  const today = new Date();
+  const thirtyDaysAgo = new Date(today);
+  thirtyDaysAgo.setDate(today.getDate() - 30);
+
+  const startDateInput: HTMLInputElement = document.getElementById('fechaInicio') as HTMLInputElement;
+  const endDateInput: HTMLInputElement = document.getElementById('fechaFin') as HTMLInputElement;
+
+  startDateInput.value = thirtyDaysAgo.toISOString().split('T')[0];
+  endDateInput.value = today.toISOString().split('T')[0];
+
+  // Establecer los límites de las fechas
+  endDateInput.max = today.toISOString().split('T')[0];
+  startDateInput.max = endDateInput.value;
+  endDateInput.min = startDateInput.value;
+}
+
+loadData(){
+  this.loadEmpleados();
+  this.loadAsistencias();
+  this.loadLlamados();
+}
+
+loadEmpleados(): void {
+   const empSubscription = this.empleadosService.getEmployees().subscribe({
+   next: (Empleados) =>{
+      this.empleados = [];
+      this.empleados = Empleados;
+      this.cargarSelectEmpleados();
+      //this.cargarTiposEmpleados();
+     }
+   })
+ }
+
+// Metodo para llavar al servicio y conseguir todas las asistencias
+loadAsistencias(): void {
+  this.asistencias = [];
+  const empSubscription = this.empleadosService.getAttendances().subscribe({
+    next: (Asistencias) => {
+      this.asistencias = [];
+      this.asistencias = Asistencias;
+      this.asistenciasFiltradas = Asistencias;
+      this.filtrarAsistencias();
+      this.cargarAsistencias();
+    }
+  })
+}
+
+// Metodo para llavar al servicio y conseguir todos los llamados de atencion
+loadLlamados(): void{
+  this.llamados = []
+  const empSubscription = this.llamadosService.getWakeUpCallDetails().subscribe({
+    next: (Llamados) => {
+      this.llamados = [];
+      this.llamados = Llamados;
+      this.llamadosFiltrados = Llamados;
+      this.filtrarLlamados();
+      this.cargarLlamados();
+    }
+  })
+}
+
+// Metodo para cargar en el grafico los datos de asistencias
+cargarAsistencias(){
+  var p = 0; var au = 0; 
+  var t = 0; var j = 0;
+  var total = 0
+  this.dataAsistencias = [];
+
+  total = this.asistenciasFiltradas.length;
+
+  this.asistenciasFiltradas.forEach(a => {
+    switch(a.state){
+      case "PRESENTE": p++; break;
+      case "AUSENTE": au++; break;
+      case "TARDE": t++; break;
+      case "JUSTIFICADO": j++; break;
+    }
+  });
   
-  asistencias: EmpListadoAsistencias[] = [];
-  empleados: EmpListadoEmpleados[] = [];
-  llamados: WakeUpCallDetail[]= [];
+  this.kpiPresente = p;
+  this.kpiTarde = t;
+  this.kpiAusente = au;
+  this.kpiJustificado = j;
 
-  empleado: string = "";
-  fechaInicio: Date | null = null;
-  fechaFin: Date | null = null;
+  this.dataAsistencias.push(["Presente", p / total * 100],["Ausente", au / total * 100],
+  ["Tarde", t / total * 100],["Justificado", j / total * 100]);
+}
 
-  chartTypeAsistencias: ChartType = ChartType.PieChart;
-  dataAsistencias: any[] = [];
-  columnNamesAsistencias = ['Estado', 'Porcentaje'];
-  chartOptionsAsistencias = {
-    title: 'Total asistencias',
-    colors: ['#28a745', '#dc3545', '#ffc107', '#6f42c1']
-  };
+// Metodo para cargar en el grafico los datos de llamados de atencion
+cargarLlamados(){
+  const meses: Set<number> = new Set();
+  const anos: Set<number> = new Set();
+  this.dataLlamados = [];
 
-  chartTypeLlamados: ChartType = ChartType.ColumnChart;
-  dataLlamados: any[] = [];
-  columnNamesLlamados = ['Año', 'Leve','Moderado','Severo'];
-  chartOptionsLlamados = {
-    title: 'Llamados de atencion',
-    colors: ['#28a745', '#ffc107','#dc3545'],
-    isStacked: true
-  };
+  this.llamadosFiltrados.forEach(llamado => {
+    meses.add(llamado.dateReal[1])
+    anos.add(llamado.dateReal[0])
+    console.log("Meses: "+Array.from(meses));
+    console.log("Años: "+Array.from(anos))
+  });
 
-  chartTypeCargos: ChartType = ChartType.PieChart;
-  dataCargos: any[] = [];
-  columnNamesCargos = ['Tipo', 'Porcentaje'];
-  chartOptionsCargos = {
-    title: 'Tipos empleados',
-    colors: [
-      '#0000FF', '#FF0000', '#00FF00', '#FFFF00', '#FF00FF', '#00FFFF',
-      '#FFA500', '#800080', '#008000', '#FFC0CB', '#FFD700', '#A52A2A',
-      '#F08080', '#C0C0C0', '#808080', '#000080', '#800000', '#808000',
-      '#FF4500', '#2E8B57', '#8A2BE2', '#5F9EA0', '#D2691E', '#CD5C5C',
-      '#4B0082', '#FF6347', '#7FFF00', '#FFDAB9', '#B0E0E6', '#98FB98',
-      '#FF69B4', '#F0E68C', '#ADFF2F', '#4682B4', '#D8BFD8', '#DDA0DD',
-      '#F5DEB3', '#FFE4E1', '#FFB6C1', '#20B2AA', '#FF8C00', '#B22222',
-      '#5F9EA0', '#6A5ACD', '#7CFC00', '#FF1493', '#8B4513', '#B8860B',
-      '#A9A9A9', '#00FA9A', '#F0E68C', '#FFD700', '#1E90FF', '#FF7F50',
-      '#DC143C', '#00BFFF', '#4682B4', '#32CD32', '#ADFF2F', '#FF4500'
-    ]
-  };
 
-  width = 800;
-  height = 800;
+  const mesesLlamados: number[] = Array.from(meses);
+  mesesLlamados.sort((a, b) => a - b);
 
-  ngOnInit(): void {
-    this.loadAsistencias();
-    this.loadEmpleados();
-    this.loadLlamados();
-  }
+  const anosLlamados: number[] = Array.from(anos);
+  anosLlamados.sort((a, b) => a - b);
 
-  loadEmpleados(): void {
-     const empSubscription = this.empleadosService.getEmployees().subscribe({
-     next: (Empleados) =>{
-        this.empleados = [];
-        this.empleados = Empleados;
-        this.cargarTiposEmpleados();
-       }
-     })
-   }
-
-  loadAsistencias(): void {
-    this.asistencias = [];
-    const empSubscription = this.empleadosService.getAttendances().subscribe({
-      next: (Asistencias) => {
-        this.asistencias = []
-        this.asistencias = Asistencias;
-        this.filtrar();
-        this.cargarAsistencias();
-      }
-    })
-  }
-
-  loadLlamados(): void{
-    this.llamados = []
-    const empSubscription = this.llamadosService.getWakeUpCallDetails().subscribe({
-      next: (Llamados) => {
-        this.llamados = [];
-        this.llamados = Llamados;
-        this.cargarLlamados();
-      }
-    })
-  }
-   
-  cargarAsistencias(){
-    var p = 0;
-    var au = 0;
-    var t = 0;
-    var j = 0;
-    const total = this.asistencias.length;
-    console.log("Total:"+total);
-
-    this.asistencias.forEach(a => {
-      switch(a.state){
-        case "PRESENTE": p++; break;
-        case "AUSENTE": au++; break;
-        case "TARDE": t++; break;
-        case "JUSTIFICADO": j++; break;
-      }
-    });
-
-    this.dataAsistencias = [];
-
-    this.dataAsistencias.push(["Presente", p / total * 100],["Ausente", au / total * 100],
-    ["Tarde", t / total * 100],["Justificado", j / total * 100]);
-  }
+  anosLlamados.forEach(ano => {
+    mesesLlamados.forEach(mes => {
   
-  cargarTiposEmpleados(){
-    const tipos: Set<string> = new Set();
-
-    console.log(this.empleados)
-    this.empleados.forEach(empleado => {
-      tipos.add(empleado.position);
-    });
-
-    const tiposSinDuplicados: string[] = Array.from(tipos);
-    this.dataCargos = [];
-    tiposSinDuplicados.forEach(tipo => {
-      const empleadosConTipo = this.empleados.filter(empleado => empleado.position === tipo);
-
-      this.dataCargos.push([tipo, empleadosConTipo.length / this.empleados.length * 100])
-    });
-  }
-  
-  cargarLlamados(){
-    const tipos: Set<number> = new Set();
-
-    this.llamados.forEach(llamado => {
-      tipos.add(llamado.dateReal[0])
-    });
-
-    const añosLlamados: number[] = Array.from(tipos);
-    añosLlamados.sort((a, b) => a - b);
-
-    this.dataLlamados = [];
-    añosLlamados.forEach(año => {
-
       var l = 0;
       var m = 0;
       var s = 0;
-
-      this.llamados.forEach(llamado => {
-        if(llamado.dateReal[0] === año){
+  
+      this.llamadosFiltrados.forEach(llamado => {
+        if(llamado.dateReal[1] === mes && llamado.dateReal[0] === ano){
           switch (llamado.wackeUpTypeEnum){
-            case "LEVE": l++; break;
-            case "MODERADO": m++; break;
-            case "SEVERO": s++; break;
+            case "Leve": l++; break;
+            case "Moderado": m++; break;
+            case "Severo": s++; break;
           }
         }
       });
-
-      this.dataLlamados.push([año.toString(),l,m,s])
+  
+      if (l !== 0 || m !== 0 || s !== 0){
+        this.dataLlamados.push([this.convertirNumeroAMes(mes) + " - " +ano,l,m,s])
+      }
     });
+  });
+}
+
+cargarSelectEmpleados(){
+  this.optionsEmpleados = [];
+  this.empleados.forEach(empleado => {
+    this.optionsEmpleados.push({label: `${empleado.fullName}`, value: `${empleado.id}`})
+  });
+}
+
+// cargarTiposEmpleados(){
+//   const tipos: Set<string> = new Set();
+
+//   this.empleados.forEach(empleado => {
+//     tipos.add(empleado.position);
+//   });
+// }
+
+onStartDateChange(): void {
+  const startDateInput: HTMLInputElement = document.getElementById('fechaInicio') as HTMLInputElement;
+  const endDateInput: HTMLInputElement = document.getElementById('fechaFin') as HTMLInputElement;
+
+  // Establecer límites de fechas
+  const today = new Date();
+  const formattedToday = today.toISOString().split('T')[0];
+  endDateInput.max = formattedToday;
+
+  if (startDateInput.value) { endDateInput.min = startDateInput.value; } 
+  else { endDateInput.min = ''; }
+
+  this.loadData();
+}
+
+onEndDateChange(): void {
+  const startDateInput: HTMLInputElement = document.getElementById('fechaInicio') as HTMLInputElement;
+  const endDateInput: HTMLInputElement = document.getElementById('fechaFin') as HTMLInputElement;
+
+  // Establecer límites de fechas
+  const today = new Date();
+  const formattedToday = today.toISOString().split('T')[0];
+  endDateInput.max = formattedToday;
+
+  if (endDateInput.value) { startDateInput.max = endDateInput.value; } 
+  else { startDateInput.max = ''; }
+
+  this.loadData();
+}
+
+// Filtra las asistencias en funcion de los valores de los filtros
+filtrarAsistencias() {
+  this.asistenciasFiltradas = [];
+ 
+  const startDateInput: HTMLInputElement = document.getElementById('fechaInicio') as HTMLInputElement;
+  const endDateInput: HTMLInputElement = document.getElementById('fechaFin') as HTMLInputElement;
+
+ // Filtrar por fecha si al menos una de las dos esta definida
+  const startDate = startDateInput ? new Date(startDateInput.value) : null;
+  const endDate = endDateInput ? new Date(endDateInput.value) : null;
+
+  if (startDate && endDate && startDate > endDate) {
+    //alert('La fecha de inicio no puede ser mayor que la fecha de fin.');
+
+    startDateInput.value = '';
+    endDateInput.value = '';
+    return;
   }
 
-  filtrar(){
-    var asistenciasFiltradas: EmpListadoAsistencias[] = this.asistencias;
+  this.asistenciasFiltradas = this.asistencias.filter( (asistencia) => {
 
-    if (this.empleado){
-      asistenciasFiltradas = asistenciasFiltradas.filter(asistencia => {
-        return asistencia.employeeName === this.empleado;
-      })
-    }
-    
-    if (this.fechaInicio || this.fechaFin){
-      const inicioDate = this.fechaInicio ? new Date(this.fechaInicio) : null;
-      const finDate = this.fechaFin ? new Date(this.fechaFin) : null; 
+    const asistenciaDateParts = asistencia.date.split('/'); // Si es DD/MM/YYYY
+    const asistenciaDate = new Date(
+      Number(asistenciaDateParts[2]), // Año
+      Number(asistenciaDateParts[1]) - 1, // Mes (0-indexado)
+      Number(asistenciaDateParts[0]) // Día
+    );
+    return (
+      (!startDate || asistenciaDate >= startDate) &&
+      (!endDate || asistenciaDate <= endDate)
+    );
+  })
 
-      asistenciasFiltradas = asistenciasFiltradas.filter(asistencia => {
+ if(this.empleadosFiltrados.length !== 0){
+    this.asistenciasFiltradas = this.asistenciasFiltradas.filter(asistencia =>{
+      console.log(asistencia)
+      return this.empleadosFiltrados.includes(asistencia.employeeId.toString())
+   })
 
-      const asistenciaDateParts = asistencia.date.split('/'); // Si es DD/MM/YYYY
-      const asistenciaDate = new Date(
-        Number(asistenciaDateParts[2]), // Año
-        Number(asistenciaDateParts[1]) - 1, // Mes (0-indexado)
-        Number(asistenciaDateParts[0]) // Día
+  // this.empleadosFiltrados.forEach(element => {
+  //   console.log(element);
+  // });
+  }
+}
+
+
+// Filtra los llamados en funcion de los valores de los filtros
+filtrarLlamados() {
+  this.llamadosFiltrados = [];
+
+  const startDateInput: HTMLInputElement = document.getElementById('fechaInicio') as HTMLInputElement;
+  const endDateInput: HTMLInputElement = document.getElementById('fechaFin') as HTMLInputElement;
+
+  const startDate = startDateInput.value ? new Date(startDateInput.value) : null;
+  const endDate = endDateInput.value ? new Date(endDateInput.value) : null;
+
+ // Filtrar por fecha si al menos una de las dos esta definida
+ if (this.fechaInicio || this.fechaFin) {
+  if (startDate && endDate && startDate > endDate) {
+    //alert('La fecha de inicio no puede ser mayor que la fecha de fin.');
+
+    startDateInput.value = '';
+    endDateInput.value = '';
+    return;
+  }
+
+  this.llamadosFiltrados = this.llamados.filter( llamado => {
+    const llamadoDate = new Date(
+      Number(llamado.dateReal[0]), // Año
+      Number(llamado.dateReal[1]) - 1, // Mes (0-indexado)
+      Number(llamado.dateReal[2]) // Día
       );
+      return (
+        (!startDate || llamadoDate >= startDate) &&
+        (!endDate || llamadoDate <= endDate)
+      ); 
+    });
 
-      if(inicioDate && finDate) {return inicioDate <= asistenciaDate && asistenciaDate <= finDate}
-      else if (finDate) { return asistenciaDate <= finDate }
-      else if (inicioDate) { return asistenciaDate >= inicioDate; }
-
-      return true;
-      })
+    if(this.empleadosFiltrados.length !== 0){
+      console.log(this.empleadosFiltrados.length)  
+      this.llamadosFiltrados = this.llamadosFiltrados.filter(llamado =>{
+        return this.empleadosFiltrados.includes(llamado.employeeId.toString())
+     })
     }
-
-    this.asistencias = asistenciasFiltradas;
   }
+}
 
-  limpiarFiltro(){
-    this.empleado = "";
-    this.fechaInicio = null;
-    this.fechaFin = null;
-    this.loadAsistencias();
-  }
+formatDateyyyyMMdd(dateString: string): string {
+  const [day, month, year] = dateString.split('/');
+  return `${year}-${month}-${day}`;
+}
+
+ limpiarFiltro(){
+   this.empleadosFiltrados = [];
+   this.setInitialDates();
+   this.loadData();
+ }
+
+ // Devuelve el nombre del mes en base al numero dado en el parametro
+ convertirNumeroAMes(numero: number): string {
+   const meses: string[] = [
+     "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+     "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+   ];
+
+   if (numero < 1 || numero > 12) {
+     throw new Error("Número de mes no válido. Debe ser un valor entre 1 y 12.");
+   }
+
+   return meses[numero - 1];
+ }
 }
