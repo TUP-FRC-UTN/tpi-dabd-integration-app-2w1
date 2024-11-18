@@ -179,8 +179,9 @@
                       [class.is-valid]="vehicleGroup.get('insurance')?.valid && vehicleGroup.get('insurance')?.touched"
                       [class.is-invalid]="vehicleGroup.get('insurance')?.invalid && vehicleGroup.get('insurance')?.touched">
                       <option value="">Seleccione el seguro de vehículo</option>
-                      <option value="San Cristobal">San Cristobal</option>
-                      <option value="La Nueva">La Nueva</option>
+                      @for (insurance of insurances; track $index) {
+                        <option [value]="insurance">{{insurance}}</option>
+                      }
                     </select>
   
                     <div class="invalid-feedback ms-[120px] position-absolute">

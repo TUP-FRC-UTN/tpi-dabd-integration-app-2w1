@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AbstractControl, AsyncValidatorFn, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Observable, Subject, combineLatest, of } from 'rxjs';
+import { Observable, Subject, combineLatest, of, pipe } from 'rxjs';
 import { catchError, map, takeUntil } from 'rxjs/operators';
 import { AccessVisitorsRegisterServiceHttpClientService } from '../../../../services/access_visitors/access-visitors-register/access-visitors-register-service-http-client/access-visitors-register-service-http-client.service';
 import { AccessVisitor, AccessVisitorRecord, AccessAuthRange, AccessVehicle,AccessUser, UserType } from '../../../../models/access-visitors/access-visitors-models';
@@ -12,6 +12,8 @@ import Swal from 'sweetalert2';
 import { AccessVisitorsRegisterServiceService } from '../../../../services/access_visitors/access-visitors-register/access-visitors-register-service/access-visitors-register-service.service';
 import { AccessUserServiceService } from '../../../../services/access-user/access-user-service.service';
 import { AccessUserReportService } from '../../../../services/access_report/access_httpclient/access_usersApi/access-user-report.service';
+import { AccessInsurancesService } from '../../../../services/access-insurances/access-insurances.service';
+import { error } from 'jquery';
 
 
 @Component({
@@ -65,6 +67,7 @@ export class AccessContainerVisitorsRegistrationComponent implements OnInit, OnD
   private unsubscribe$ = new Subject<void>();
   visitorRecord?:AccessVisitorRecord;
   vehicleTypes: string[] = ['Car', 'Motorbike', 'Truck', 'Van']; 
+  insurances: string[] = [];
   usersType:UserType[]=[];
   isRegisterButtonVisible: boolean = true;
 
@@ -84,6 +87,7 @@ export class AccessContainerVisitorsRegistrationComponent implements OnInit, OnD
     private visitorService: AccessVisitorsRegisterServiceService,
     private visitorHttpService: AccessVisitorsRegisterServiceHttpClientService,
     private userApi: AccessUserReportService,
+    private insuranceService: AccessInsurancesService
   ) { 
     this.vehicleOptions = this.vehicleTypes.map(type => ({
       value: type,
@@ -256,6 +260,7 @@ sendVisitorRecord(): void {
   ngOnInit(): void {
     this.initForm();
     this.loadVehicleTypes();
+    this.loadInsurances();
     this.listenToHasVehicleChanges();
     this.initVisitorRecord();
     this.loadUsersType();  
@@ -317,6 +322,20 @@ loadVehicleTypes(): void {
     }
   });
 }
+
+loadInsurances(): void {
+  this.insuranceService.getAll().pipe(
+    takeUntil(this.unsubscribe$)
+  ).subscribe({
+    next: (insurances) => {
+      this.insurances = insurances;
+    },
+    error: (error) => {
+      console.error('Error al cargar los seguros:', error)
+    }
+  })
+}
+
 loadUsersType(): void {
   this.visitorHttpService.getUsersType().pipe(
     takeUntil(this.unsubscribe$)
