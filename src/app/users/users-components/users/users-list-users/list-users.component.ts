@@ -328,6 +328,8 @@ export class ListUsersComponent implements OnInit, OnDestroy {
     });
   }
 
+
+
   //Método para abrir el modal
   async openModal(type: string, userId: number) {
     //Espera a que se cargue el usuario seleccionado
@@ -445,12 +447,19 @@ export class ListUsersComponent implements OnInit, OnDestroy {
 
   //Filtrar por rol
   fillOptionsSelected(options: any) {
-    var optiones = options.map((option: any) => option).join(' ');
-
     const table = $('#myTable').DataTable();
-    table.order([[0, 'desc']]).draw();  // Asumiendo que la fecha está en la primera columna (índice 0) y deseas ordenarla de manera
+    table.order([[0, 'desc']]).draw();
 
-    table.column(2).search(optiones).draw();
+    // Clear previous search
+    $.fn.dataTable.ext.search.splice(0, $.fn.dataTable.ext.search.length);
+
+    // Add new search function
+    $.fn.dataTable.ext.search.push((settings: any, data: any, dataIndex: any) => {
+      const roles = data[2].split(',').map((role: string) => role.trim());
+      return options.some((option: any) => roles.includes(option));
+    });
+
+    table.draw();
   }
 
   //Metodo para filtrar la tabla en base a las 2 fechas

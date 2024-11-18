@@ -69,10 +69,11 @@ throw new Error('Method not implemented.');
     this.loadUserData();  //Roles del user
 
     // Desactiva campos específicos del formulario
-    this.updateForm.get('dni')?.disable();
-    this.updateForm.get('email')?.disable();
-    this.updateForm.get('avatar_url')?.disable();
-    this.updateForm.get('datebirth')?.disable();
+    if(this.authService.getActualRole() != 'SuperAdmin'){
+      this.updateForm.get('dni')?.disable();
+      this.updateForm.get('email')?.disable();
+      this.updateForm.get('datebirth')?.disable();
+    }
   }
 
   //Desuscribirse de los observables
@@ -111,10 +112,12 @@ throw new Error('Method not implemented.');
 
           this.userRoles = data.roles;
           this.filteredUserRoles = this.filterUserRoles(this.userRoles);
-          console.log("Roles del usuario", this.filteredUserRoles);
+
+          console.log("Roles del usuario:", this.userRoles);
           
-          this.updateForm.get('roles')?.setValue(this.filteredUserRoles);
-          this.rolesComponent.setData(this.filteredUserRoles);
+          
+          this.updateForm.get('roles')?.setValue(this.userRoles);
+          this.rolesComponent.setData(this.userRoles);
 
           if (formattedDate) {
             // Formatea la fecha a 'yyyy-MM-dd' para un input de tipo date

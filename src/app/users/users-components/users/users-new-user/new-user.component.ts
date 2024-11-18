@@ -145,17 +145,23 @@ export class NewUserComponent implements OnInit {
                     
         }
         if(this.authService.getActualRole() == "SuperAdmin"){
-          let optionsFilter = this.options.filter(rol => this.options.includes(rol) && rol != "Propietario");
+            let optionsFilter = this.options.filter(rol => !["Propietario", "Familiar mayor", "Familiar menor", "Inquilino"].includes(rol));
           this.options = [];
           optionsFilter.forEach(o => this.options.push({value : o, name: o}))
                     
         }
-        else{
-          let optionsFilter = this.options.filter(rol => !this.optionsForOwner.includes(rol) && rol != "Propietario" && rol != "SuperAdmin");
-          this.options = [];
-          optionsFilter.forEach(o => this.options.push({value : o, name: o}))
+        else if(this.authService.getActualRole() == "Gerente"){
+          let optionsFilter = this.options.filter(rol => !["SuperAdmin","Propietario", "Familiar mayor", "Familiar menor", "Inquilino"].includes(rol));
+        this.options = [];
+        optionsFilter.forEach(o => this.options.push({value : o, name: o}))
+                  
         }
-      },
+          else{
+            let optionsFilter = this.options.filter(rol => ["Familiar mayor", "Familiar menor", "Inquilino"].includes(rol));
+            this.options = [];
+            optionsFilter.forEach(o => this.options.push({value : o, name: o}))
+          }
+        },
       error: (error) => {
         console.error('Error al cargar los roles:', error);
       }
