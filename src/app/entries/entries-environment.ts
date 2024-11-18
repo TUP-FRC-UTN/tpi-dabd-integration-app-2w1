@@ -1,8 +1,10 @@
+import { environment } from "../common/environments/environment";
+
 // src/environments/environment.ts
 export const environmentEntries = {
     production: false,
-    apiUrl: 'http://localhost:9060',
-    movementsApi: 'http://localhost:8090',
+    apiUrl: environment.services.usersAndAddresses,
+    movementsApi: environment.services.accesses,
     endpoints: {
         // Endpoints existentes
         users: '/users/getall',
