@@ -14,7 +14,7 @@ import { environment } from '../../common/environments/environment';
 export class NotificationService {
 
   private urlApi = environment.services.notifications + '/Notification/';
-  private urlPost = environment.services.notifications +'/postNotificationGeneral';
+  private urlPost = environment.services.notifications +'general/postNotificationGeneral';
   private urlput = environment.services.notifications + '/markNotificationRead';
 
   constructor(private http: HttpClient) { }
