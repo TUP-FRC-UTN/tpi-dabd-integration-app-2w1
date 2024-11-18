@@ -15,4 +15,10 @@ COPY . .
 
 EXPOSE 4200
 
-CMD ["ng", "serve", "--host", "0.0.0.0", "--poll=2000"]
+ARG ENVIRONMENT=production
+ENV ENVIRONMENT=$ENVIRONMENT
+
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+ENTRYPOINT ["docker-entrypoint.sh"]
