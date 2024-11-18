@@ -1,5 +1,5 @@
 export const environment = {
-    production: true,
+    production: false,
     services: {
       accesses: 'http://localhost:9030',
       addresses: 'http://localhost:9064',
