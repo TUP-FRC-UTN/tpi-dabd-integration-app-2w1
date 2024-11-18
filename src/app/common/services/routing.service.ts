@@ -27,7 +27,7 @@ export class RoutingService {
         },
         {
           icon: 'bi-clipboard',
-          name: 'Agregar',
+          name: 'Registro',
           title: 'Registro de notificaciones',
           route: 'main/notifications/admin-all-notifications',
           roles: ['SuperAdmin', 'Gerente general'],
