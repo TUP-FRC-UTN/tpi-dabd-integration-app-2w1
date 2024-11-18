@@ -346,17 +346,21 @@
       <div class="row">
         <div class="col" *ngIf="chartType !== 'egresos'">
           <div class="card border-0 shadow-lg rounded-4 mb-3 p-0 hover-scale" (click)="makeBig(1)" style="background-color: #d4edda">
-            <div class="card-body px-0">
-      
-              <!-- Título centrado en la fila del medio -->
-              <div class="text-center p-0">
-                <h5 class="mb-1 fw-medium">Ingresos diarios</h5> 
+            <div class="card-body px-0 py-1">
+              <!-- Contenedor para el primer h5 e ícono -->
+              <div class="d-flex justify-content-center align-items-center">
+                <h5 class="mb-1 fw-medium me-2">Ingresos</h5>
+                <i class="bi bi-box-arrow-right mb-1" style="font-size: 1.2rem;"></i>
               </div>
-      
+            
+              <!-- Segundo h5 debajo, centrado -->
+              <div class="text-center">
+                <h6 class="mb-1 fw-medium">Diarios</h6>
+              </div>
+            
               <!-- Contador e ícono en la misma fila -->
-              <div class="d-flex px-4 justify-content-between align-items-center">
+              <div class="text-center align-items-center">
                 <h6 class="mt-2">{{ currentMonthAccessCount }}</h6>
-                <i class="bi bi-box-arrow-right" style="font-size: 1.2rem;"></i>
               </div>
             </div>
 
@@ -369,17 +373,21 @@
       <div class="row">
         <div class="col" *ngIf="chartType !== 'ingresos'">
           <div class="card border-0 shadow-lg rounded-4 mb-3 hover-scale" (click)="makeBig(1)" style="background-color: #f8d7da">
-            <div class="card-body px-0">
-      
-              <!-- Título centrado en la fila del medio -->
-              <div class="text-center p-0">
-                <h5 class="mb-1 fw-medium">Egresos diarios</h5> 
+            <div class="card-body px-0 py-1">
+              <!-- Contenedor para el primer h5 e ícono -->
+              <div class="d-flex justify-content-center align-items-center">
+                <h5 class="mb-1 fw-medium me-2">Egresos</h5>
+                <i class="bi bi-box-arrow-left mb-1" style="font-size: 1.2rem;"></i>
               </div>
-      
+            
+              <!-- Segundo h5 debajo, centrado -->
+              <div class="text-center">
+                <h6 class="mb-1 fw-medium">Diarios</h6>
+              </div>
+            
               <!-- Contador e ícono en la misma fila -->
-              <div class="d-flex px-4 justify-content-between align-items-center">
+              <div class="text-center align-items-center">
                 <h6 class="mt-2">{{ currentMonthExitCount }}</h6>
-                <i class="bi bi-box-arrow-left" style="font-size: 1.2rem;"></i>
               </div>
             </div>
           </div>
@@ -391,19 +399,24 @@
       <div class="row">
         <div class="col" *ngIf="chartType !== 'egresos'">
           <div class="card border-0 shadow-lg rounded-4 mb-3 hover-scale" (click)="makeBig(1)">
-            <div class="card-body px-0">
-      
-              <!-- Título centrado en la fila del medio -->
-              <div class="text-center p-0">
-                <h6 class="mb-1 fw-medium">Día con más Ingresos esta Semana</h6> 
+            <div class="card-body px-0 py-1">
+              <!-- Contenedor para el primer h5 e ícono -->
+              <div class="d-flex justify-content-center align-items-center mb-0">
+                <h5 class="mb-1 fw-medium me-2">Esta Semana</h5>
+                <i class="bi bi-box-arrow-right mb-1" style="font-size: 1.2rem;"></i>
               </div>
-              <div class="d-flex mt-2 px-3 justify-content-between align-items-center">
+            
+              <!-- Segundo h5 debajo, centrado -->
+              <div class="text-center">
+                <h6 class="mb-1 fw-medium">Día con más Ingresos</h6>
+              </div>
+            
+              <!-- Contador e ícono en la misma fila -->
+              <div class="text-center align-items-center">
                 @if(accessCount > 0){
                   <h6 class="mt-1 fw-medium">{{ capitalizeFirstLetter(dayWithMostAccesses) }} | {{ accessCount }}</h6>
-                  <i class="bi bi-box-arrow-right" style="font-size: 1.2rem;"></i>
                 } @else {
                   <h6 class=""><i class="bi bi-dash-lg"></i></h6>
-                  <i class="bi bi-box-arrow-right" style="font-size: 1.2rem;"></i>
                 }
               </div>
             </div>
@@ -415,18 +428,24 @@
       <div class="row">
         <div class="col" *ngIf="chartType !== 'ingresos'">
           <div class="card border-0 shadow-lg rounded-4 mb-3 hover-scale" (click)="makeBig(1)">
-            <div class="card-body px-0">
-              <!-- Título centrado en la fila del medio -->
-              <div class="text-center p-0">
-                <h6 class="mb-1 fw-medium">Día con más Egresos esta Semana</h6> 
+            <div class="card-body px-0 py-1">
+              <!-- Contenedor para el primer h5 e ícono -->
+              <div class="d-flex justify-content-center align-items-center mb-0">
+                <h5 class="mb-1 fw-medium me-2">Esta Semana</h5>
+                <i class="bi bi-box-arrow-left mb-1" style="font-size: 1.2rem;"></i>
               </div>
-              <div class="d-flex mt-2 px-3 justify-content-between align-items-center">
+            
+              <!-- Segundo h5 debajo, centrado -->
+              <div class="text-center">
+                <h6 class="mb-1 fw-medium">Día con más Egresos</h6>
+              </div>
+            
+              <!-- Contador e ícono en la misma fila -->
+              <div class="text-center align-items-center">
                 @if(exitsCountPeak > 0){
                   <h6 class="mt-1 fw-medium">{{ capitalizeFirstLetter(dayWithMostExits) }} | {{ exitsCountPeak }}</h6>
-                  <i class="bi bi-box-arrow-right" style="font-size: 1.2rem;"></i>
                 } @else {
                   <h6 class=""><i class="bi bi-dash-lg"></i></h6>
-                  <i class="bi bi-box-arrow-left" style="font-size: 1.2rem;"></i>
                 }
               </div>
             </div>
@@ -439,32 +458,47 @@
           <!-- KPI para guardia con más ingresos -->
           <div class="col mt-0" *ngIf="chartType !== 'egresos'">
             <div class="card border-0 shadow-lg rounded-4 mb-3 hover-scale" (click)="redirect(redirectKpis.guardEntries, 'guardEntries')">
-              <div class="card-body px-0">
-                <!-- Título centrado en la fila del medio -->
-                <div class="text-center p-0">
-                  <h6 class="mb-1 fw-medium">Guardia con mayor registro de Ingresos</h6> 
+              <div class="card-body px-0 py-1">
+                <!-- Contenedor para el primer h5 e ícono -->
+                <div class="d-flex justify-content-center align-items-center mb-0">
+                  <h5 class="mb-1 fw-medium me-2">Guardia</h5>
+                  <i class="bi bi-house-lock mb-1" style="font-size: 1.2rem;"></i>
                 </div>
-                <div class="d-flex mt-2 px-3 justify-content-between align-items-center">
-                    <h6 class="mt-2 fw-medium">{{ redirectKpis.guardEntries.name }} | {{ redirectKpis.guardEntries.count }}</h6>
-                    <i class="bi bi-house-lock" style="font-size: 1.2rem;"></i>
+              
+                <!-- Segundo h5 debajo, centrado -->
+                <div class="text-center">
+                  <h6 class="mb-1 p-1 fw-medium">con mayor registro de Ingresos</h6>
                 </div>
-              </div>  
+              
+                <!-- Contador e ícono en la misma fila -->
+                <div class="text-center align-items-center">
+                  <h6 class="mt-2 fw-medium">{{ redirectKpis.guardEntries.name }} | {{ redirectKpis.guardEntries.count }}</h6>
+                </div>
+              </div>
             </div>
           </div>
             
           <!--* KPI para guardia con más egresos *-->
           <div class="col mt-0" *ngIf="chartType !== 'ingresos'">
             <div class="card border-0 shadow-lg rounded-4 mb-4 hover-scale" (click)="redirect(redirectKpis.guardExits, 'guardExits')">
-              <div class="card-body px-0">
-              <!-- Título centrado en la fila del medio -->
-                <div class="text-center p-0">
-                  <h6 class="mb-1 fw-medium">Guardia con mayor registro de Egresos</h6> 
+              <div class="card-body px-0 py-1">
+                <!-- Contenedor para el primer h5 e ícono -->
+                <div class="d-flex justify-content-center align-items-center mb-0">
+                  <h5 class="mb-1 fw-medium me-2">Guardia</h5>
+                  <i class="bi bi-house-lock mb-1" style="font-size: 1.2rem;"></i>
                 </div>
-                <div class="d-flex mt-2 px-3 justify-content-between align-items-center">
-                    <h6 class="mt-2 fw-medium">{{ redirectKpis.guardExits.name }} | {{ redirectKpis.guardExits.count }}</h6>
-                    <i class="bi bi-house-lock" style="font-size: 1.2rem;"></i>
+              
+                <!-- Segundo h5 debajo, centrado -->
+                <div class="text-center p-1">
+                  <h6 class="mb-1 fw-medium">con mayor registro de Egresos</h6>
+                </div>
+              
+                <!-- Contador e ícono en la misma fila -->
+                <div class="text-center align-items-center">
+                  <h6 class="mt-2 fw-medium">{{ redirectKpis.guardExits.name }} | {{ redirectKpis.guardExits.count }}</h6>
                 </div>
               </div>
+
             </div>
           </div>
         </div>
@@ -498,21 +532,22 @@
       <div class="row mt-3">
         <div class="col">
           <div class="card border-0 shadow-lg rounded-4 mb-3 hover-scale" (click)="redirect(redirectKpis.neighborAuthorizations, 'neighborAuthorizations')">
-            <div class="card-body px-0">
-              <!-- Título centrado en la fila del medio -->
-              <div class="text-center p-0">
-                  <h5 class="mb-1 fw-medium">Vecino con más personas autorizadas</h5> 
+            <div class="card-body px-0 py-1">
+              <!-- Contenedor para el primer h5 e ícono -->
+              <div class="d-flex justify-content-center align-items-center mb-0">
+                <h5 class="mb-1 fw-medium me-2">Vecino con más personas autorizadas</h5>
+                <i class="bi bi-house mb-1" style="font-size: 1.2rem;"></i>
               </div>
-              <div class="d-flex mt-2 px-5 justify-content-between align-items-center">
-                  @if(redirectKpis.neighborAuthorizations && redirectKpis.neighborAuthorizations.count){
-                    <h5 class="mt-2 fw-medium">{{ redirectKpis.neighborAuthorizations.name }} | {{ redirectKpis.neighborAuthorizations.count }}</h5>
-                    <i class="bi bi-house" style="font-size: 1.2rem;"></i>
-                  } @else {
-                    <h5 class=""><i class="bi bi-dash-lg"></i></h5>
-                    <i class="bi bi-house" style="font-size: 1.2rem;"></i>
-                  }
+              <!-- Contador e ícono en la misma fila -->
+              <div class="text-center align-items-center">
+                @if(redirectKpis.neighborAuthorizations && redirectKpis.neighborAuthorizations.count){
+                  <h5 class="mt-2 fw-medium">{{ redirectKpis.neighborAuthorizations.name }} | {{ redirectKpis.neighborAuthorizations.count }}</h5>
+                } @else {
+                  <h5 class=""><i class="bi bi-dash-lg"></i></h5>
+                }
               </div>
             </div>
+
           </div>
         </div>
       </div>
