@@ -1,134 +1,117 @@
-<div class="container">
+<div class="container p-2 border border-2 rounded shadow-lg mt-0">
 
-  <div class="row sticky-section border-0 rounded-4 p-3 shadow mb-2">
-
-    <div class="row">
-      <!-- Filtro de fechas -->
-
+  <!-- Sección de Filtros -->
+  <div class="row">
       <div class="col d-flex gap-3">
-        <div class="col">
-          <input type="date" class="form-control border-1 bg-light" [formControl]="startDate" (change)="filterByDate()">
-          <!-- @if(errorRange) {
-            <div class="text-danger">La fecha de inicio no puede ser mayor a la fecha de fin</div>
-          } -->
-        </div>
-        <div class="col">
-          <input type="date" class="form-control border-1 bg-light" [formControl]="endDate" (change)="filterByDate()">
-        </div>
+          <div class="col">
+              <input type="date" class="form-control border-1 bg-light" [formControl]="startDate"
+                  (change)="filterByDate()">
+          </div>
+          <div class="col">
+              <input type="date" class="form-control border-1 bg-light" [formControl]="endDate"
+                  (change)="filterByDate()">
+          </div>
       </div>
 
-
-      <!-- Botones de exportar -->
       <div class="col-auto d-flex gap-1 ms-auto">
-        <button class="btn btn-primary filterbutton" data-bs-toggle="modal" title="Filtros Avanzados"
-          data-bs-target="#filtrosAvanzados">
-          <i class="bi bi-funnel-fill"></i>
-        </button>
-        <button type="button" class="btn btn-secondary bi bi-trash filterbutton" (click)="clearFilters()"
-          title="Limpiar Filtros"></button>
-      </div>
-    </div>
-
-  </div>
-
-  <div class="row mt-3">
-    <div class="col-md-7">
-      <div class="card border-0 shadow-lg rounded-4">
-        <div class="card-body">
-
-        @if(loading){
-          <div class="loading">Cargando...</div>
-        }
-        
-        <div *ngIf="error" class="error-container">
-          <i class="bi bi-exclamation-triangle-fill error-icon"></i>
-          <p>{{ error }}</p>
-          <button class="btn btn-secondary mt-2" (click)="loadPage()">
-            <i class="bi bi-arrow-clockwise me-2"></i>Reintentar
+          <button class="btn btn-primary filterbutton" data-bs-toggle="modal" title="Filtros Avanzados"
+              data-bs-target="#filtrosAvanzados">
+              <i class="bi bi-funnel-fill"></i>
           </button>
-        </div>
-
-        @if(!loading && !error){
-          <h4 class="card-title align-items-center">Análisis Comparativo de Manzanas</h4>
-          <h6 class="card-subtitle">Comparativa de Áreas y Porcentajes Entre Manzanas</h6>
-          <hr>
-          <google-chart [type]="chartType" [data]="chartData" [options]="chartOptions" [width]="width"
-            [height]="height">
-          </google-chart>
-        }
-        </div>
+          <button type="button" class="btn btn-secondary bi bi-trash filterbutton" (click)="clearFilters()"
+              title="Limpiar Filtros"></button>
       </div>
-    </div>
-
-    <div class="col-md-5">
-
-      <div class="card border-0 shadow p-3 hover-shadow mb-3" style="background-color: #d8ffedde;">
-        <div class="card-body d-flex flex-column align-items-center justify-content-center p-2 text-center">
-          <h6 class="card-title">Área Total<i class="bi bi-arrow-up-right"></i></h6>
-          <span>{{selectedBlockskPIs.totalArea}} m²</span>
-        </div>
-      </div>
-
-      <div class="card border-0 shadow mb-3 p-3 hover-shadow" style="background-color: #e7f1ff;">
-        <div class="card-body text-center d-flex flex-column align-items-center justify-content-center p-2">
-          <h6 class="card-title">Área total construida<i class="bi bi-building"></i></h6>
-          <span>{{selectedBlockskPIs.totalBuiltArea}} m²</span>
-        </div>
-      </div>
-
-      <div class="card border-0 shadow mb-3 p-3 hover-shadow" style="background-color: #fff3e0;">
-        <div class="card-body d-flex flex-column align-items-center justify-content-center p-2 text-center">
-          <h6 class="card-title">Porcentaje Total Construido<i class="bi bi-percent"></i></h6>
-          <span>{{selectedBlockskPIs.utilizationPercentage| number:'1.0-1'}}%</span>
-        </div>
-      </div>
-
-      <div class="card border-0 shadow mb-3 p-3 hover-shadow" style="background-color: #d8ffedde;">
-        <div class="card-body d-flex flex-column align-items-center justify-content-center p-2 text-center">
-          <h6 class="card-title">Porcentaje Total No Construido<i class="bi bi-percent"></i></h6>
-          <span>{{selectedBlockskPIs.notUtilizationPercentage| number:'1.0-1'}}%</span>
-        </div>
-      </div>
-    </div>
   </div>
 </div>
 
-<!-- Modal para filtros avanzados -->
-<div class="modal fade" id="filtrosAvanzados" role="dialog">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Información del Dashboard</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label class="form-label fw-semibold mb-2">
-            Seleccione las Manzanas a Comparar
-          </label>
+<div  class="container">
+  <div class="card border-0 shadow-lg rounded-4">
+
+    <div class="card-body">
+      <div class="row mt-3">
+
+        <div class="col-md-2 ml-2">
 
           <div class="row">
-
-            <div class="col-6">
-              <select [formControl]="blockControl1" class="form-select">
-                <option value="" disabled selected>Seleccione una opción</option>
-                <option *ngFor="let block of availableBlocksForSelect1" [value]="block">
-                  Manzana: {{block}}
-                </option>
-              </select>
-            </div>
-
-            <div class="col-6">
-              <select [formControl]="blockControl2" class="form-select">
-                <option value="" selected disabled>Seleccione una opción</option>
-                <option *ngFor="let block of availableBlocksForSelect2" [value]="block">
-                  Manzana: {{block}}
-                </option>
-              </select>
-            </div>
+            <app-users-kpi class="mb-2" title="Área Total" icon="bi bi-arrow-up-right"
+              [amount]="selectedBlockskPIs.totalArea" [customStyles]="{ 'background-color': '#d8ffedde' }"
+              formatPipe="metros" tooltip="Área total disponible">
+            </app-users-kpi>
+            <app-users-kpi class="mb-2" title="Área Total Construida" icon="bi bi-building"
+              [amount]="selectedBlockskPIs.totalBuiltArea" [customStyles]="{ 'background-color': '#d8ffedde' }"
+              tooltip="Superficie total que ya ha sido construida" formatPipe="metros" [selectable]="true"
+              route="/home/charts/users/plots/stats"></app-users-kpi>
+            <app-users-kpi class="mb-2" title="Porcentaje Total Construido" icon="bi bi-percent"
+              [amount]="selectedBlockskPIs.utilizationPercentage" [customStyles]="{ 'background-color': '#d8ffedde' }"
+              tooltip="Porcentaje del área total que ya ha sido utilizada para construcciones" formatPipe="percent"></app-users-kpi>
+            <app-users-kpi class="mb-2" title="Porcentaje Total No Construido" icon="bi bi-percent"
+              [amount]="selectedBlockskPIs.notUtilizationPercentage"
+              [customStyles]="{ 'background-color': '#fcc7ccde' }" tooltip="Porcentaje del área total que permanece libre de construcciones" formatPipe="percent"></app-users-kpi>
           </div>
         </div>
+        <div class="col-md-10">
 
+          @if(loading){
+          <div class="loading">Cargando...</div>
+          }
+
+          <div *ngIf="error" class="error-container">
+            <i class="bi bi-exclamation-triangle-fill error-icon"></i>
+            <p>{{ error }}</p>
+          </div>
+
+          <h4 class="card-title">Análisis Comparativo de Manzanas<button type="button"
+              class="btn btn-sm btn-link text-muted bi bi-arrow-left fs-5 float-end" title="Volver"
+              (click)="changeView('/reports')"></button></h4>
+          <hr>
+          @if(!loading && !error){
+
+          <google-chart [type]="chartType" [data]="chartData" [options]="chartOptions" [width]="width"
+            [height]="height">
+          </google-chart>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para filtros avanzados -->
+  <div class="modal fade" id="filtrosAvanzados" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Información del Dashboard</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label fw-semibold mb-2">
+              Seleccione las Manzanas a Comparar
+            </label>
+
+            <div class="row">
+
+              <div class="col-6">
+                <select [formControl]="blockControl1" class="form-select">
+                  <option value="" disabled selected>Seleccione una opción</option>
+                  <option *ngFor="let block of availableBlocksForSelect1" [value]="block">
+                    Manzana: {{block}}
+                  </option>
+                </select>
+              </div>
+
+              <div class="col-6">
+                <select [formControl]="blockControl2" class="form-select">
+                  <option value="" selected disabled>Seleccione una opción</option>
+                  <option *ngFor="let block of availableBlocksForSelect2" [value]="block">
+                    Manzana: {{block}}
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
   </div>

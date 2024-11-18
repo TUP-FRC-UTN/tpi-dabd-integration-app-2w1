@@ -1,0 +1,10 @@
+<ng-select 
+  [items]="yaersList" 
+  [multiple]="false"
+  [(ngModel)]="selectValue"
+  [closeOnSelect]="true"
+  (change)="onYearChange()"
+  [selectableGroup]="false"
+  [clearable] = "false"
+  >
+</ng-select>

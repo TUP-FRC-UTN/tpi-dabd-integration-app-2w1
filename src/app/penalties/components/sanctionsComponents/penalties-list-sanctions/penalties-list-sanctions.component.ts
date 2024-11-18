@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
-import { PenaltiesSanctionsServicesService } from '../../../services/sanctionsService/sanctions.service';
+import { SanctionService } from '../../../services/sanctions.service';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -106,7 +106,7 @@ export class PenaltiesSanctionsListComponent implements OnInit {
   //Constructor
   constructor(
     private _modal: NgbModal,
-    private sanctionService: PenaltiesSanctionsServicesService,
+    private sanctionService: SanctionService,
     private routingService: RoutingService
   ) {
     (window as any).viewFine = (id: number) => this.viewFine(id);

@@ -40,18 +40,18 @@ export class AccessVisitorsRegisterServiceService {
 
   addVisitorsTemporalsSubject(visitor: AccessVisitor): boolean {
     const currentVisitors = this.visitorsSubject.value;
+    // Verifica si el documento ya existe
     const documentExists = currentVisitors.some(v => v.document === visitor.document);
-    const licensePlateExists = currentVisitors.some(v => 
-      v.vehicle?.licensePlate === visitor.vehicle?.licensePlate && visitor.vehicle?.licensePlate
-    );
-
-    if (documentExists || licensePlateExists) {
+    // Si el documento, matrícula o correo ya existen, rechaza la adición
+    if (documentExists) {
       return false;
     }
-
+  
+    // Agrega el visitante a la lista si todas las validaciones pasaron
     this.visitorsSubject.next([...currentVisitors, visitor]);
     return true;
   }
+  
 
   deleteVisitorsTemporalsSubject(visitor: AccessVisitor): void {
     const currentVisitors = this.visitorsSubject.value;
