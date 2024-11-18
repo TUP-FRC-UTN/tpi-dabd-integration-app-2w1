@@ -5,6 +5,7 @@ import { Provincia } from '../Models/emp-provincia';
 import { Charge, DocumentTypeEnum, PostEmployeeDto } from '../Models/emp-post-employee-dto';
 import { EmpPutEmployees } from '../Models/emp-put-employees';
 import { environment } from '../../../common/environments/environment';
+import { EmpPutEmployeeRequest } from '../Models/EmpPutEmployeeRequest';
 
 @Injectable({
   providedIn: 'root',
@@ -84,7 +85,7 @@ export class EmpPostEmployeeService {
     return this.client.post<any>(url, json, { headers });
   }
 
-  updateEmployee(dto: EmpPutEmployees): Observable<any> {
+  updateEmployee(dto: EmpPutEmployeeRequest): Observable<any> {
     const url = `${this.EMPLOYEE_URL}/put/${dto.id}`;
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     const json = JSON.stringify(dto);
