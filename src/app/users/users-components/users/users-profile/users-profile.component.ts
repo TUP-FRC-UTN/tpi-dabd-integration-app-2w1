@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { UserService } from '../../../users-servicies/user.service';
 import { UserPut } from '../../../users-models/users/UserPut';
 import { AuthService } from '../../../users-servicies/auth.service';
@@ -19,7 +19,7 @@ import { SuscriptionManagerService } from '../../../../common/services/suscripti
   templateUrl: './users-profile.component.html',
   styleUrl: './users-profile.component.css'
 })
-export class UsersProfileComponent implements OnInit {
+export class UsersProfileComponent implements OnInit, OnDestroy {
 
   private readonly authService = inject(AuthService);
   private readonly usersService = inject(UserService);
@@ -30,6 +30,7 @@ export class UsersProfileComponent implements OnInit {
   selectedIconUrl: string = '';
   isDropdownOpen = false;
   plots: GetPlotDto[] = [];
+  formProfile : FormGroup;
   noIcon = 'https://i.ibb.co/bNH6vjf/avatar.png'
   icons = [
     { name: 'Icono 1', url: 'https://i.ibb.co/DpxXd6C/icono1.png' },
@@ -48,85 +49,57 @@ export class UsersProfileComponent implements OnInit {
   type: string = 'info';
 
   ngOnInit(): void {
-
     this.getUserById();
-
-
-    
+    this.getPlotById();
   };
 
-  //Crea y establece las validaciones del formulario
-  formProfile = new FormGroup({
-    name: new FormControl({ value: '...', disabled: true }, [
-      Validators.required,
-      Validators.minLength(1),
-      Validators.maxLength(50)
-    ]),
-    lastName: new FormControl({ value: '...', disabled: true }, [
-      Validators.required,
-      Validators.minLength(1),
-      Validators.maxLength(50)
-    ]),
-    username: new FormControl({ value: "", disabled: true }, [
-      Validators.required,
-      Validators.minLength(1),
-      Validators.maxLength(30)
-    ]),
-    telegram_id: new FormControl({ value: 0, disabled: true }),
-    email: new FormControl({ value: '...', disabled: true }, [
-      Validators.required,
-      Validators.email
-    ]),
-
-    phoneNumber: new FormControl({ value: '', disabled: true }, [
-      Validators.required,
-      Validators.minLength(9),
-      Validators.maxLength(20),
-      Validators.pattern('^[0-9]*$')
-    ]),
-    dni: new FormControl({ value: 0, disabled: true }, [
-      Validators.required,
-      Validators.minLength(1),
-      Validators.maxLength(11)
-    ]),
-    dniType: new FormControl({ value: "", disabled: true }, [
-    ]),
-    avatar_url: new FormControl({ value: '...', disabled: true }),
-    datebirth: new FormControl({ value: '', disabled: true }, [Validators.required]),
-    roles: new FormControl<string[]>({ value: [], disabled: true })
-  });
-
-  //Setea la url del icono seleccionado
-  onIconSelect(event: Event) {
-    const selectElement = event.target as HTMLSelectElement;
-    this.selectedIconUrl = selectElement.value;
+  //Desuscribirse de los observables
+  ngOnDestroy(): void {
+    this.suscriptionService.unsubscribeAll();
   }
 
-  //Método para seleccionar un icono
-  selectIcon(url: string) {
-    this.selectedIconUrl = url;
-    this.isDropdownOpen = false;
-  }
-
-  //Abre o cierra el dropdown para los iconos
-  toggleDropdown() {
-    this.isDropdownOpen = !this.isDropdownOpen;
-  }
-
-  //Cambiar el botón
-  changeType(newType: string): void {
-    this.type = newType;
-    if (newType == 'edit') {
-      this.formProfile.get('name')?.enable();
-      this.formProfile.get('lastName')?.enable();
-      this.formProfile.get('phoneNumber')?.enable();
-      this.formProfile.get('avatar_url')?.enable();
-    }
-    if (newType == 'info') {
-      this.ngOnInit();
-      this.formProfile.disable();
-    }
-  }
+  //Instancia el formulario
+  constructor(private fb : FormBuilder) {
+    this.formProfile = this.fb.group({
+      name: new FormControl({ value: '...', disabled: true }, [
+        Validators.required,
+        Validators.minLength(1),
+        Validators.maxLength(50)
+      ]),
+      lastName: new FormControl({ value: '...', disabled: true }, [
+        Validators.required,
+        Validators.minLength(1),
+        Validators.maxLength(50)
+      ]),
+      username: new FormControl({ value: "", disabled: true }, [
+        Validators.required,
+        Validators.minLength(1),
+        Validators.maxLength(30)
+      ]),
+      telegram_id: new FormControl({ value: 0, disabled: true }),
+      email: new FormControl({ value: '...', disabled: true }, [
+        Validators.required,
+        Validators.email
+      ]),
+  
+      phoneNumber: new FormControl({ value: '', disabled: true }, [
+        Validators.required,
+        Validators.minLength(9),
+        Validators.maxLength(20),
+        Validators.pattern('^[0-9]*$')
+      ]),
+      dni: new FormControl({ value: 0, disabled: true }, [
+        Validators.required,
+        Validators.minLength(1),
+        Validators.maxLength(11)
+      ]),
+      dniType: new FormControl({ value: "", disabled: true }, [
+      ]),
+      avatar_url: new FormControl({ value: '...', disabled: true }),
+      datebirth: new FormControl({ value: '', disabled: true }, [Validators.required]),
+      roles: new FormControl<string[]>({ value: [], disabled: true })
+    });
+   }
 
   //------------------------------------------------------Carga de datos------------------------------------------------------
 
@@ -220,8 +193,7 @@ export class UsersProfileComponent implements OnInit {
         Swal.fire({
           title: 'Perfil actualizado',
           text: 'El perfil se actualizó correctamente',
-          icon: 'success',
-          showConfirmButton: false
+          icon: 'success'
         })
         this.changeType('info');
       },
@@ -237,6 +209,40 @@ export class UsersProfileComponent implements OnInit {
     //Agregar suscripción
     this.suscriptionService.addSuscription(sus);
   }
+
+  //-------------------------------------------------------Funciones-------------------------------------------------------
+
+    //Setea la url del icono seleccionado
+    onIconSelect(event: Event) {
+      const selectElement = event.target as HTMLSelectElement;
+      this.selectedIconUrl = selectElement.value;
+    }
+  
+    //Método para seleccionar un icono
+    selectIcon(url: string) {
+      this.selectedIconUrl = url;
+      this.isDropdownOpen = false;
+    }
+  
+    //Abre o cierra el dropdown para los iconos
+    toggleDropdown() {
+      this.isDropdownOpen = !this.isDropdownOpen;
+    }
+  
+    //Cambiar el botón
+    changeType(newType: string): void {
+      this.type = newType;
+      if (newType == 'edit') {
+        this.formProfile.get('name')?.enable();
+        this.formProfile.get('lastName')?.enable();
+        this.formProfile.get('phoneNumber')?.enable();
+        this.formProfile.get('avatar_url')?.enable();
+      }
+      if (newType == 'info') {
+        this.ngOnInit();
+        this.formProfile.disable();
+      }
+    }
 
 //-------------------------------------------------------Validaciones-------------------------------------------------------
 

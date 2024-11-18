@@ -1,6 +1,6 @@
-import { CommonModule, formatDate } from '@angular/common';
-import { Component, ElementRef, EventEmitter, inject, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { UserGet } from '../../../users-models/users/UserGet';
 import { UserService } from '../../../users-servicies/user.service';
 import Swal from 'sweetalert2';
@@ -43,13 +43,13 @@ export class ModalInfoUserComponent implements OnInit, OnDestroy {
 
   //activeModal = inject(NgbActiveModal);
   private readonly apiService = inject(UserService);
-  private readonly authService = inject(AuthService);
   private readonly suscriptionService = inject(SuscriptionManagerService);
+  private readonly authService = inject(AuthService);
   
   rolesInput: string[] = [];
   editUser: FormGroup;
 
-  //Método para detectar cambios en el @Input
+  // Método para detectar cambios en el @Input
   ngOnInit() {
 
       // Actualiza los valores del formulario cuando cambian los datos del usuario
@@ -91,13 +91,13 @@ export class ModalInfoUserComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.suscriptionService.unsubscribeAll();
   }
-  
 
+  //Eliminar usuario
   confirmDesactivate() {
     var user = new DeleteUser();
     user.id = this.userModal.id;
     user.userIdUpdate = this.authService.getUser().id;
-    this.apiService.deleteUser(user).subscribe({
+    const sus = this.apiService.deleteUser(user).subscribe({
       next: () => {
         console.log('Usuario eliminado correctamente');
         this.activeModal.close();
@@ -105,17 +105,21 @@ export class ModalInfoUserComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         console.error('Error al eliminar el usuario:', error);
-        // Poner un sweetAlert
       }
     });
+
+    //Agregar suscripción
+    this.suscriptionService.addSuscription(sus);
   }
+
+  //--------------------------------------------------------Modal--------------------------------------------------------
 
   //Cerrar modal
   closeModal(){
     this.activeModal.close();
   }
 
-  //Confirmar eliminación de usuario
+  //Confirmar eliminación
   confirmDelete() {
     Swal.fire({
       title: '¿Seguro que desea eliminar el usuario?',
@@ -150,5 +154,4 @@ export class ModalInfoUserComponent implements OnInit, OnDestroy {
       }
     });
   } 
-  
 }

@@ -50,6 +50,7 @@ export class UsersNavbarComponent implements OnInit {
 
   //Obtiene el título y la url del hijo y llama al servicio para redirigir y setear el titulo
   changePath(info: any) {
+    this.authService.logOut();
     this.routingService.redirect(info.path, info.title);
     this.routingService.getRedirectObservable().subscribe(title => {
       this.pageTitle = title

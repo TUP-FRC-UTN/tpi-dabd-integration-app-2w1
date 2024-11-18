@@ -81,13 +81,15 @@ throw new Error('Method not implemented.');
     this.suscriptionService.unsubscribeAll();
   }
 
+  //---------------------------------------------------Carga de datos---------------------------------------------------
+
+  //Cargar todos los roles
   getAllRoles(){
     const sus = this.userService.getAllRoles().subscribe({
       next: (data: RolModel[]) => {
         this.existingRoles = data.map(rol => rol.description);
         this.filteredRoles = this.filterRoles(this.existingRoles)
         this.optionRoles = this.filteredRoles.map(o => ({ value: o, name: o }));
-        console.log("Roles en select", this.optionRoles)
       },
       error: (error) => {
         console.error('Error al cargar los roles:', error);
@@ -98,10 +100,10 @@ throw new Error('Method not implemented.');
     this.suscriptionService.addSuscription(sus);
   }
 
-
+  //Cargar los datos del usuario
   loadUserData(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      this.userService.getUserById(parseInt(this.id)).subscribe({
+      const sus = this.userService.getUserById(parseInt(this.id)).subscribe({
         next: (data: UserGet) => {
           this.updateForm.get('name')?.setValue(data.name);
           this.updateForm.get('lastname')?.setValue(data.lastname);
@@ -145,8 +147,13 @@ throw new Error('Method not implemented.');
           reject(error); // Rechaza la Promesa si hay un error
         }
       });
+
+      //Agregar suscripción
+      this.suscriptionService.addSuscription(sus);
     });
   }
+
+  //-----------------------------------------------------Funciones-----------------------------------------------------
 
   filterRoles(list : any[]){
     let blockOptionsForOwner: string[] = ["Propietario", "SuperAdmin", "Gerente"];
@@ -191,49 +198,6 @@ throw new Error('Method not implemented.');
     return filteredList;
   }
 
-  //Actualiza el usuario
-  updateUser() {
-    const user: UserPut = new UserPut();
-    user.name = this.updateForm.get('name')?.value || '';
-    user.lastName = this.updateForm.get('lastname')?.value || '';
-    user.dni = this.updateForm.get('dni')?.value || '';
-    user.phoneNumber = this.updateForm.get('phoneNumber')?.value?.toString() || '';
-    user.email = this.updateForm.get('email')?.value || '';
-    user.avatar_url = this.updateForm.get('avatar_url')?.value || '';
-
-    //Formatea la fecha correctamente (año-mes-día)
-    const date: Date = new Date(this.updateForm.get('datebirth')?.value || '');
-    
-    //Formatear la fecha como YYYY-MM-DD
-    const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
-
-    user.datebirth = formattedDate;
-    user.roles = this.updateForm.get('roles')?.value +this.blockedRoles || [];
-    user.userUpdateId = this.authService.getUser().id;
-    user.dni_type_id = 1;
-
-    user.roles = this.updateForm.get('roles')?.value;
-    user.roles.push(...this.blockedRoles); 
-
-    //Llama al servicio para actualizar el usuario
-    this.userService.putUser(user, parseInt(this.id)).subscribe({
-      next: (response) => {
-        Swal.fire({
-          icon: "success",
-          title: 'Usuario actualizado exitosamente'
-        });
-        this.redirectList();
-      },
-      error: (error) => {
-        console.error('Error al actualizar el usuario:', error);
-        Swal.fire({
-          icon: "error",
-          title: 'Error al actualizar el usuario'
-        });
-      },
-    });
-  }
-
   toggleSelection(item: any) {
     const index = this.rolesSelected.indexOf(item.value);
     if (index > -1) {
@@ -245,6 +209,58 @@ throw new Error('Method not implemented.');
     }
   }
 
+  updateRoles(newRoles: any) {
+    this.updateForm.patchValue({
+      roles: newRoles
+    })
+  }
+
+  //----------------------------------------------------Formulario----------------------------------------------------
+
+    //Actualiza el usuario
+    updateUser() {
+      const user: UserPut = new UserPut();
+      user.name = this.updateForm.get('name')?.value || '';
+      user.lastName = this.updateForm.get('lastname')?.value || '';
+      user.dni = this.updateForm.get('dni')?.value || '';
+      user.phoneNumber = this.updateForm.get('phoneNumber')?.value?.toString() || '';
+      user.email = this.updateForm.get('email')?.value || '';
+      user.avatar_url = this.updateForm.get('avatar_url')?.value || '';
+  
+      //Formatea la fecha correctamente (año-mes-día)
+      const date: Date = new Date(this.updateForm.get('datebirth')?.value || '');
+      
+      //Formatear la fecha como YYYY-MM-DD
+      const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+  
+      user.datebirth = formattedDate;
+      user.roles = this.updateForm.get('roles')?.value +this.blockedRoles || [];
+      user.userUpdateId = this.authService.getUser().id;
+      user.dni_type_id = 1;
+  
+      user.roles = this.updateForm.get('roles')?.value;
+      user.roles.push(...this.blockedRoles); 
+  
+      //Llama al servicio para actualizar el usuario
+      this.userService.putUser(user, parseInt(this.id)).subscribe({
+        next: (response) => {
+          Swal.fire({
+            icon: "success",
+            title: 'Usuario actualizado exitosamente'
+          });
+          this.redirectList();
+        },
+        error: (error) => {
+          console.error('Error al actualizar el usuario:', error);
+          Swal.fire({
+            icon: "error",
+            title: 'Error al actualizar el usuario'
+          });
+        },
+      });
+    }
+  
+  //-----------------------------------------------------Redirecciones-----------------------------------------------------
 
   //Redirige a la lista
   redirectList() {
@@ -256,6 +272,8 @@ throw new Error('Method not implemented.');
     }
   }
 
+  //-----------------------------------------------------Validaciones-----------------------------------------------------
+
   //Retorna una clase para poner el input en verde o rojo dependiendo si esta validado
   onValidate(controlName: string) {
     const control = this.updateForm.get(controlName);
@@ -265,12 +283,7 @@ throw new Error('Method not implemented.');
     }
   }
 
-  updateRoles(newRoles: any) {
-    this.updateForm.patchValue({
-      roles: newRoles
-    })
-  }
-
+  //Muestra el mensaje de error personalizado
   showError(controlName: string): string {
     const control = this.updateForm.get(controlName);
 
