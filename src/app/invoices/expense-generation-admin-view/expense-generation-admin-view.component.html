@@ -285,12 +285,12 @@
               </div>
               <div class="col-md-8">
                 <div class="input-group">
-                  <input 
-                    type="number" 
+                    <input 
+                    type="number"
                     id="latePaymentInput"
-                    [(ngModel)]="latePaymentPercentage" 
+                    [(ngModel)]="latePaymentPercentage"
                     class="form-control"
-                    min="0" 
+                    min="0"
                     max="100"
                     [disabled]="!!fieldModified && fieldModified !== 'latePayment'"
                     (focus)="onFieldFocus('latePayment')"
@@ -317,17 +317,17 @@
               <div class="col-md-8">
                 <div class="input-group">
                   <input 
-                    type="number" 
+                    type="number"
                     id="expirationInput"
-                    [(ngModel)]="expirationPercentage" 
+                    [(ngModel)]="expirationPercentage"
                     class="form-control"
-                    min="0" 
+                    min="0"
                     max="100"
                     [disabled]="!!fieldModified && fieldModified !== 'expiration'"
                     (focus)="onFieldFocus('expiration')"
                     (blur)="onFieldBlur()"
                     (ngModelChange)="onFieldChange('expiration')"
-                  />
+                />
                 </div>
                 <small class="form-text text-muted">
                   Porcentaje adicional aplicado al valor del primer vencimiento.
@@ -367,7 +367,7 @@
 
   <!-- Rango de fechas para facturación. -->
   <ng-template #dateRangeContent let-modal>
-        <div class="modal-header">
+    <div class="modal-header">
       <h5 class="modal-title">Seleccionar Rango de Fechas</h5>
       <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
     </div>
@@ -375,29 +375,40 @@
       <div class="row">
         <div class="col">
           <label>Fecha Inicio</label>
-          <input type="date" class="form-control" [(ngModel)]="filter.from"
-          (ngModelChange)="validateDates(); searchTickets()" [max]="maxDate" placeholder="Fecha desde">
+          <input
+            type="date"
+            class="form-control"
+            [(ngModel)]="filter.from"
+            (ngModelChange)="validateDates()"
+            [max]="maxDate"
+            placeholder="Fecha desde"
+          >
         </div>
         <div class="col">
           <label>Fecha Fin</label>
-          <input type="date" class="form-control ms-2" [(ngModel)]="filter.until"
-          (ngModelChange)="validateDates(); searchTickets()" [min]="filter.from" [max]="maxDate"
-          placeholder="Fecha hasta">
+          <input
+            type="date"
+            class="form-control ms-2"
+            [(ngModel)]="filter.until"
+            (ngModelChange)="validateDates()"
+            [min]="filter.from"
+            [max]="maxDate"
+            placeholder="Fecha hasta"
+          >
         </div>
       </div>
     </div>
     <div class="modal-footer">
       <button
         class="btn btn-primary"
-        (click)="modal.close('confirm')"
-        [disabled]="!startDate || !endDate"
+        (click)="confirmDateRange()"
+        [disabled]="!validateDates()"
       >
         Confirmar
       </button>
     </div>
   </ng-template>
   
-
   <!-- Modal de Observación -->
   <ng-template #observationContent let-modal>
     <div class="modal-header">

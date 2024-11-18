@@ -32,10 +32,10 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
   @ViewChild('dateRangeContent') dateRangeContent!: TemplateRef<any>;
   @ViewChild('observationContent') observationContent!: TemplateRef<any>;
   @ViewChild('multipliersContent') multipliersContent!: TemplateRef<any>;
+
   // Formatear los períodos
   loadMultipliersData() {
     this.isLoadingMultipliers = true;
-
     forkJoin({
       multipliers: this.expenseService.getMultipliers(),
       generationDay: this.expenseService.getGenerationDay(),
@@ -44,6 +44,11 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
         this.latePaymentPercentage = multipliers.latePayment * 100;
         this.expirationPercentage = multipliers.expiration * 100;
         this.generationDay = generationDay;
+        
+        // Guardar los valores originales
+        this.originalLatePaymentPercentage = this.latePaymentPercentage;
+        this.originalExpirationPercentage = this.expirationPercentage;
+        this.originalGenerationDay = this.generationDay;
       },
       error: (error) => {
         console.error('Error loading multipliers data', error);
@@ -348,14 +353,18 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
 
   ngOnInit() {
     const today = new Date();
-    const lastMonth = new Date();
-    lastMonth.setMonth(lastMonth.getMonth() - 1);
+    const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+    
+    // Actualizamos el filtro con los valores deseados
+    this.filter.until = today.toISOString().split('T')[0];
+    this.filter.from = lastMonth.toISOString().split('T')[0];
+
+
+    // Emitimos los cambios en el filtro
     this.filter$.next({ ...this.filter });
     this.filter$.subscribe(() => {
       this.searchTickets();
     });
-    this.filter.until = today.toISOString().split('T')[0];
-    this.filter.from = lastMonth.toISOString().split('T')[0];
 
     this.loadInitialData();
 
@@ -760,8 +769,8 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
 
 
   confirmDateRange() {
-    if (!this.startDate || !this.endDate) {
-      Swal.fire({
+    if (!this.filter.from || !this.filter.until) {
+        Swal.fire({
         title: 'Error',
         text: 'Debe seleccionar ambas fechas',
         icon: 'error'
@@ -769,7 +778,7 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
       return;
     }
 
-    this.expenseService.generateAllExpenses(this.startDate, this.endDate)
+    this.expenseService.generateAllExpenses(this.filter.from, this.filter.until)
       .subscribe({
         next: () => {
           Swal.fire({
@@ -942,18 +951,9 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
     }
   }
 
-  validateDates() {
-    const from = new Date(this.filter.from);
-    const until = new Date(this.filter.until);
-    const today = new Date();
-
-    if (until < from) {
-      this.filter.until = this.filter.from;
-    }
-
-    if (until > today) {
-      this.filter.until = today.toISOString().split('T')[0];
-    }
+  validateDates(): boolean {
+    return !!(this.filter.from && this.filter.until && 
+      new Date(this.filter.from) <= new Date(this.filter.until));
   }
 
   loadAllOwnersWithExpenses() {
