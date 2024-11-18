@@ -3,13 +3,14 @@ import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { EmpListadoEmpleados, Employee } from '../Models/emp-listado-empleados';
 import { EmpListadoAsistencias } from '../Models/emp-listado-asistencias';
-import { EmpPutEmployeesResponse } from '../Models/EmpPutEmployeesResponse';
+import { EmpPutEmployees } from '../Models/emp-put-employees';
+import { environment } from '../../../common/environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class EmpListadoEmpleadosService {
-  private readonly EMPLOYEE_BASE_URL = 'http://localhost:8080'; // URL base del servidor
+  private readonly EMPLOYEE_BASE_URL = environment.services.employees ; // URL base del servidor
   private _refresh$ = new Subject<void>();
 
   constructor(private http: HttpClient) {}
@@ -31,18 +32,11 @@ export class EmpListadoEmpleadosService {
       `${this.EMPLOYEE_BASE_URL}/employees/employeeById?id=${id}`
     );
   }
-
-
-  getEmployeeById2(id: number): Observable<EmpPutEmployeesResponse> {
-    return this.http.get<EmpPutEmployeesResponse>(
+  getEmployeeById2(id: number): Observable<EmpPutEmployees> {
+    return this.http.get<EmpPutEmployees>(
       `${this.EMPLOYEE_BASE_URL}/employees/employeeById?id=${id}`
     );
   }
-
-
-
-
-
 
   getAttendances(): Observable<EmpListadoAsistencias[]> {
     return this.http.get<EmpListadoAsistencias[]>(
@@ -57,7 +51,7 @@ export class EmpListadoEmpleadosService {
     );
   }
 
-  putAttendances(id: number, state: string, justification: string, userid:number): Observable<any> {
+  putAttendances(id: number, state: string, justification: string): Observable<any> {
     // Inicializa nuevos parámetros en cada ejecución
     let params = new HttpParams()
         .set('id', id.toString())

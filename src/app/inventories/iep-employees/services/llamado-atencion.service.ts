@@ -4,13 +4,14 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import {  RequestWakeUpCallDTO,  RequestWakeUpCallGroupDTO,  ResponseWakeUpCallDTO,  EmployeeGetResponseDTO,} from '../Models/llamado-atencion';
 import { MovementRecord } from '../Models/llamado-atencion';
+import { environment } from '../../../common/environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class LlamadoAtencionService {
   // Base URLs
-  private readonly BASE_URL: string = 'http://localhost:8080/';
+  private readonly BASE_URL: string = environment.services.employees + "/";
   private readonly MOCK_API_URL: string = 'https://mocki.io/v1/';
 
   // Wake Up Calls endpoints

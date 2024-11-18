@@ -2,14 +2,14 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Supplier } from '../models/suppliers';
+import { environment } from '../../../common/environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SuppliersService {
   
-  private readonly INVENTORY_BASE_URL: string = 'http://localhost:9011/';
-  private readonly ACCESSES_URL: string = 'http://localhost:8090/PostNewSupplier';
+  private readonly INVENTORY_BASE_URL: string = environment.services.inventory + "/";
 
   private readonly SUPPLIERS_URL: string = `${this.INVENTORY_BASE_URL}suppliers`;
   private readonly SUPPLIERS_URL_GET_BY_ID: string = `${this.SUPPLIERS_URL}/getbyId/`;
@@ -18,11 +18,6 @@ export class SuppliersService {
   createSupplier(formData: any) {
     return this.http.post(this.SUPPLIERS_URL, formData);
   }
-
-  createSupplierAccess(formData: any ){
-    return this.http.post(this.ACCESSES_URL, formData, { responseType: 'text' });
-  }
-
   searchSuppliers(
     name: string | null,
     supplierType: string | null,
@@ -71,9 +66,8 @@ export class SuppliersService {
     return this.http.get<any>(this.SUPPLIERS_URL_GET_BY_ID + id);
   }
 
-  updateSupplier(supplierUpdate: Supplier, userId: number): Observable<any> {
-    const params = new HttpParams().set('idUser', userId.toString());
-    return this.http.put<any>(this.SUPPLIERS_URL, supplierUpdate,{ params });
+  updateSupplier(supplierUpdate: Supplier): Observable<any> {
+    return this.http.put<any>(this.SUPPLIERS_URL, supplierUpdate);
   }
 
   deleteSupplier(id: number): Observable<any> {
