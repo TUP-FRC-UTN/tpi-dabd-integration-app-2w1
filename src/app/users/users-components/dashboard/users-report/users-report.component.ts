@@ -11,6 +11,7 @@ import { UsersKpiComponent } from '../users-kpi/users-kpi.component';
 import { BlockData } from '../../../users-models/dashboard/BlockData';
 import { Router } from '@angular/router';
 import { AgeDistributionResponse } from '../../../users-models/dashboard/age-distribution';
+import { RoutingService } from '../../../../common/services/routing.service';
 
 @Component({
   selector: 'app-users-report',
@@ -23,7 +24,8 @@ export class UsersReportComponent implements OnInit{
 
   //Datos comunes a todos los graficos
   private readonly dashboardService = inject(DashboardService);
-  private readonly router = inject(Router);
+  private readonly routerService = inject(RoutingService);
+
   subscriptions = new Subscription();
   cardView : number = 0;
   errorRange: string | null = null;
@@ -647,6 +649,11 @@ export class UsersReportComponent implements OnInit{
     });
   }
 
+  private formatDate(date: Date): string {
+    return date.toISOString().split('T')[0];
+  }
+
+
   clearFilters() {
     this.startDate.reset();
     this.endDate.reset();
@@ -663,15 +670,19 @@ export class UsersReportComponent implements OnInit{
   }
 
   //-------------Grafico de barras para la distribución de edades-------------
-  changeView(view: string) {
-    this.router.navigate(['/home/charts/users/' + view]);
-  }
+  // changeView(view: string) {
+  //   this.router.navigate(['/main/charts/users/' + view]);
+  // }
 
-  private formatDate(date: Date): string {
-    return date.toISOString().split('T')[0];
-  }
+  // private formatDate(date: Date): string {
+  //   return date.toISOString().split('T')[0];
+  // }
 
-  onKPISelect() {
-    this.router.navigate(['/home/charts/users/blocks']);
+  // onKPISelect() {
+  //   this.router.navigate(['/main/charts/users/blocks']);
+  // }
+
+  redirect(url : string){
+    this.routerService.redirect('/main' + url);
   }
 }

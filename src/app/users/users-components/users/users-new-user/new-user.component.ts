@@ -139,6 +139,8 @@ export class NewUserComponent implements OnInit {
         if(this.authService.getActualRole() == "Propietario"){
           let optionsFilter = this.options.filter(rol => this.optionsForOwner.includes(rol));
           this.options = [];
+          console.log(optionsFilter);
+          
           optionsFilter.forEach(o => this.options.push({value : o, name: o}))
                     
         }
