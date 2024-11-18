@@ -62,10 +62,8 @@ export class ListUsersComponent implements OnInit, OnDestroy {
   userModal: UserGet = new UserGet();
 
   ngOnInit() {
-
     this.loadRoles();
     this.loadAllPlots();
-
     //Trae todos los usuarios
     const sus = this.apiService.getAllUsers().subscribe({
       next: (data: UserGet[]) => {
