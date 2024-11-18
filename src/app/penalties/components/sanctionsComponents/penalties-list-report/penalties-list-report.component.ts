@@ -170,14 +170,17 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
                   <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
                   <ul class="dropdown-menu">
                     <li><a class="dropdown-item" onclick="viewReport(${data.id})">Ver más</a></li>
-                    ${data.reportState === 'Abierto' || data.reportState === 'Nuevo' || data.reportState === 'Pendiente' ?
+                                              ${data.reportState === 'Cerrado' || data.reportState === 'Pendiente' ?
+              `<li><a class="dropdown-item" data-action="changeState" data-id="${data.id}" data-state="OPEN"">Abrir</a></li>` : ''}
+                    ${data.reportState === 'Abierto' ?
               `<li><hr class="dropdown-divider"></li> <li><a class="dropdown-item" onclick="editReport(${data.id})">Editar</a></li>` : ''}
-                      ${data.reportState === 'Abierto' || data.reportState === 'Pendiente' ?
+                      ${data.reportState === 'Abierto' ?
               `<li><a class="dropdown-item" data-action="newSaction" data-id="${data.id}"">Sancionar</a></li>` : ''}
                         ${data.reportState === 'Abierto' || data.reportState === 'Pendiente' ?
               `<li><a class="dropdown-item" data-action="changeState" data-id="${data.id}" data-state="REJECTED"">Rechazar</a></li>` : ''}
-                          ${data.reportState === 'Abierto' || data.reportState === 'Pendiente' ?
+                          ${data.reportState === 'Abierto' ?
               `<li><a class="dropdown-item" data-action="changeState" data-id="${data.id}" data-state="CLOSED"">Cerrar</a></li>` : ''}
+
                  </ul>
                 </div>
               </div>
