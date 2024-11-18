@@ -312,20 +312,16 @@ export class ExpensesViewCategoryComponent implements OnInit {
       this.cdRef.detectChanges();
       const modalElement = this.modalNG.open(ExpensesEditCategoryComponent,{size:'lg',keyboard:false})
       modalElement.componentInstance.category=this.categorySelected
-     modalElement.result.then((result) => {
-      debugger
-      console.log(result)
-      if(result=="OK"){
-        this.handleEditSuccess()
-      }
-     }).catch((error) => {
-      console.log('Modal dismissed with error:', error);
+      modalElement.componentInstance.eventSucces.subscribe(() => {
+        this.loadAlertAndFilter('Se actualizo la categoría con éxito');
+      });
+      modalElement.componentInstance.eventError.subscribe((errorMessage: string) => {
+        this.showErrorAlert(errorMessage);
       });
   }
   viewSelectedCategory(rowData : any) {
     this.categorySelected=rowData
     this.cdRef.detectChanges();
-    
     const modalElement =this.modalNG.open(ExpensesViewCategoryDetailsComponent,{size:'lg',keyboard:false})
     modalElement.componentInstance.category=this.categorySelected
     modalElement.result.then((result) => {
@@ -334,9 +330,13 @@ export class ExpensesViewCategoryComponent implements OnInit {
     });
   }
   addCategory() {
-    const modalElement = document.getElementById('categoryRegisterModal');
-    // const modal = new bootstrap.Modal(modalElement);
-    // modal.show();
+    const modalElement = this.modalNG.open(ExpenseRegisterCategoryComponent);
+    modalElement.componentInstance.eventSucces.subscribe(() => {
+      this.loadAlertAndFilter('Se registró la categoría con éxito');
+    });
+    modalElement.componentInstance.eventError.subscribe((errorMessage: string) => {
+      this.showErrorAlert(errorMessage);
+    });
   }
 
   handleEditSuccess() {

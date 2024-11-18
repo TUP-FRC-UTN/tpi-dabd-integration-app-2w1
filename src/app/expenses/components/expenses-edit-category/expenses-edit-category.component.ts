@@ -21,9 +21,8 @@ export class ExpensesEditCategoryComponent implements OnInit {
   private readonly categoryService = inject(CategoryService);
 
   @Input() category: Category = new Category();
-  @Output() eventSuccess = new EventEmitter<void>();
+  @Output() eventSucces = new EventEmitter<void>();
   @Output() eventError = new EventEmitter<string>();
-
   validateDescription(): boolean {
     return !(this.category && this.category.description && this.category.description.trim());
   }
@@ -42,7 +41,8 @@ export class ExpensesEditCategoryComponent implements OnInit {
 
       this.categoryService.updateCategory(this.category).subscribe({
         next: () => {
-          this.eventError.emit("OK")
+          this.eventSucces.emit()
+          this.close()
         },
         error: (error) => {
           this.handleError(error);

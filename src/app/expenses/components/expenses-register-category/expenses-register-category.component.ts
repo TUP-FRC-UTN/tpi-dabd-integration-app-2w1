@@ -3,6 +3,7 @@ import { Category } from '../../models/category';
 import { CategoryService } from '../../services/expensesCategoryServices/category.service';
 import { CommonModule, NgIf } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-expense-register-category',
@@ -22,14 +23,18 @@ export class ExpenseRegisterCategoryComponent {
   @Output() eventSucces = new EventEmitter<void>();
   @Output() eventError = new EventEmitter<string>();
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private modal: NgbActiveModal) {
     this.categoryForm = this.fb.group({
       description: ['', [Validators.required, Validators.minLength(3)]]
     });
   }
 
+  close(){
+    this.modal.close()
+  }
   clearInputs() {
     this.categoryForm.reset();
+    this.close()
   }
 
   validateDescription(): boolean {

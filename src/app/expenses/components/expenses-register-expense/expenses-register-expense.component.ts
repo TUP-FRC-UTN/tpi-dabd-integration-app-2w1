@@ -141,7 +141,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
 
   
   redirectToViewAdmin() {
-    this.router.navigate(["/viewExpenseAdmin"])
+    this.router.navigate(["/main/expenses/view-expense-admin"])
     }
     loadFile(fileId: string): void {
       this.fileService.getFile(fileId).subscribe({
