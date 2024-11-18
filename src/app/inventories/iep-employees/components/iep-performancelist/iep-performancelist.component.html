@@ -1,5 +1,55 @@
 <section class="py-5">
   <div class="container p-3 border border-2 rounded shadow-lg">
+
+    <!-- Modal de Información -->
+<div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title">Información sobre Evaluación de Desempeño</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <p>
+                  Bienvenido al sistema de evaluación de desempeño. En esta página, puedes registrar y gestionar
+                  los llamados de atención y el desempeño de los empleados. A continuación, se detallan las secciones:
+              </p>
+              <ul>
+                  <li>
+                      <strong>Período:</strong> Indica el mes y año de la evaluación del empleado
+                  </li>
+                  <li>
+                      <strong>Empleado:</strong> Muestra el nombre del empleado que está siendo evaluado
+                  </li>
+                  <li>
+                      <strong>Observaciones:</strong> Espacio para registrar comentarios o detalles específicos
+                      sobre el desempeño del empleado
+                  </li>
+                  <li>
+                      <strong>Niveles de Desempeño:</strong> Se pueden clasificar en:
+                      <ul>
+                          <li><em>Leve:</em> Problemas menores de desempeño</li>
+                          <li><em>Moderado:</em> Situaciones que requieren atención</li>
+                          <li><em>Severo:</em> Problemas graves que necesitan acción inmediata</li>
+                      </ul>
+                  </li>
+                  <li>
+                      <strong>Fecha:</strong> Debe ser la fecha actual o una fecha anterior al registrar
+                      el llamado de atención
+                  </li>
+              </ul>
+              <p><strong>Notas importantes:</strong></p>
+              <ul>
+                  <li>Todos los llamados de atención deben incluir observaciones detalladas y específicas sobre la situación.</li>
+                  <li>No se puede registrar más de un llamado de atención para el mismo empleado en una misma fecha.</li>
+                  <li>La fecha del llamado de atención no puede ser posterior a la fecha actual.</li>
+              </ul>
+          </div>
+      </div>
+  </div>
+</div>
+
+
     <!-- Fila de búsqueda, selectores de período y botones a la derecha -->
     <div class="row mb-3">
       <div class="col-md-12">
@@ -121,9 +171,14 @@
     </table>
 
     <!-- Floating button -->
-    <button class="floating-btn btn btn-primary" data-bs-target="#newCall" data-bs-toggle="modal">
-      <span class="bi-plus-lg"></span>
+    <button *ngIf="active"
+      class="floating-btn btn btn-primary"
+      data-bs-target="#newCall"
+      data-bs-toggle="modal"
+    >
+      <span class="bi-plus-lg"></span> 
     </button>
+
 
     <!-- Modal del Formulario -->
     <div class="modal fade" id="newCall" tabindex="-1">

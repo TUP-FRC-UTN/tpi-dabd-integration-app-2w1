@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { IepModalSelectComponent } from './iep-modal-select.component';
+import { IepKpiComponent } from './iep-kpi.component';
 
-describe('IepModalSelectComponent', () => {
-  let component: IepModalSelectComponent;
-  let fixture: ComponentFixture<IepModalSelectComponent>;
+describe('IepKpiComponent', () => {
+  let component: IepKpiComponent;
+  let fixture: ComponentFixture<IepKpiComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [IepModalSelectComponent]
+      imports: [IepKpiComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(IepModalSelectComponent);
+    fixture = TestBed.createComponent(IepKpiComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

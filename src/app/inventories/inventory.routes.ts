@@ -7,15 +7,20 @@ import { IepTableComponent } from "./iep-inventory/components/iep-table/iep-tabl
 import { IepWarehouseMovementSearchComponent } from "./iep-inventory/components/iep-warehouse-movement-search/iep-warehouse-movement-search.component";
 import { IepCategoriesListComponent } from "./iep-inventory/components/iep-categories-list/iep-categories-list.component";
 import { IepChartsInventoryComponent } from "./iep-inventory/components/iep-charts-inventory/iep-charts-inventory.component";
+import { IepProductComponent } from "./iep-inventory/components/iep-product/iep-product.component";
+import { IepNuevoIngresoEgresoComponent } from "./iep-inventory/components/iep-nuevo-ingreso-egreso/iep-nuevo-ingreso-egreso.component";
+import { IepSuppliersFormComponent } from "./iep-inventory/components/iep-suppliers-form/iep-suppliers-form.component";
 
 export const INVENTORY_ROUTES: Routes = [
 
  { path: '', component: InventoryEmployeeProviderHomeComponent }, //agregado para desarrollar
     
- { path: 'inventory', component: IepInventoryComponent },
-    { path: 'stock-increase', component: IepStockIncreaseComponent },
+    { path: 'inventory', component: IepInventoryComponent },
+    { path: 'new-product', component: IepProductComponent },
     { path: 'stock-movements-history', component: IepTableComponent },
+    { path: 'stock-increase', component: IepNuevoIngresoEgresoComponent },
+    { path: 'new-provider', component: IepSuppliersFormComponent },
     { path: 'warehouse-movements', component: IepWarehouseMovementSearchComponent },
-    { path: 'categories', component: IepCategoriesListComponent }, 
+    { path: 'categories-list', component: IepCategoriesListComponent }, 
     { path: 'dashboard', component: IepChartsInventoryComponent }, 
 ];

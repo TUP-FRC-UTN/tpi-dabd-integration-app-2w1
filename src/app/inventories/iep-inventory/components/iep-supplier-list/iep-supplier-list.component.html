@@ -1,5 +1,64 @@
 <section class="py-5">
   <div class="container p-3 border border-2 rounded shadow-lg">
+
+    <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+            <h5 class="modal-title">Información sobre Gestión de Proveedores</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>
+              Bienvenido al sistema de gestión de proveedores. Esta sección te permite administrar
+              la información de todos los proveedores de la empresa. A continuación, se detallan
+              las principales características y funcionalidades:
+            </p>
+            <ul>
+              <li>
+                <strong>Filtros y Búsqueda:</strong>
+                <ul>
+                  <li><em>Búsqueda Global:</em> Busca en todos los campos de la tabla</li>
+                  <li><em>Filtro de Estado:</em> Filtra proveedores por su estado actual</li>
+                  <li><em>Tipo de Proveedor:</em> Filtra por categoría de proveedor</li>
+                </ul>
+              </li>
+              <li>
+                <strong>Información Registrada:</strong>
+                <ul>
+                  <li><em>Razón Social:</em> Nombre legal del proveedor</li>
+                  <li><em>Tipo de Proveedor:</em> Categorización del proveedor</li>
+                  <li><em>Dirección:</em> Ubicación física del proveedor</li>
+                  <li><em>Obra Social:</em> Información de obra social asociada</li>
+                  <li><em>Descripción:</em> Detalles adicionales del proveedor</li>
+                  <li><em>Teléfono:</em> Número de contacto</li>
+                  <li><em>Email:</em> Correo electrónico de contacto</li>
+                </ul>
+              </li>
+              <li>
+                <strong>Funcionalidades Disponibles:</strong>
+                <ul>
+                  <li><em>Crear:</em> Agregar nuevos proveedores (botón flotante +)</li>
+                  <li><em>Editar:</em> Modificar información existente</li>
+                  <li><em>Eliminar:</em> Dar de baja proveedores</li>
+                  <li><em>Exportar:</em> Generar reportes en Excel o PDF</li>
+                  <li><em>Limpiar Filtros:</em> Restablecer todos los criterios de búsqueda</li>
+                </ul>
+              </li>
+            </ul>
+            <p><strong>Notas importantes:</strong></p>
+            <ul>
+              <li>Todos los proveedores deben tener una razón social única en el sistema</li>
+              <li>La información de contacto (teléfono y email) debe mantenerse actualizada</li>
+              <li>Antes de eliminar un proveedor, verifica que no tenga transacciones activas</li>
+              <li>Los filtros se pueden combinar para una búsqueda más específica</li>
+              <li>La exportación incluirá todos los registros filtrados actualmente visibles</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="row">
       <!-- Sección para filtro global -->
       <div class="col-md-8">
@@ -46,7 +105,7 @@
                   bindLabel="label"
                   bindValue="value"
                   [multiple]="true"
-                  placeholder="Tipo proveedor"
+                  placeholder="Seleccionar Tipo proveedor"
                   (change)="applyFilters()"
                   class="w-100"
               >
@@ -74,17 +133,17 @@
       
         <div class="col-6 d-flex justify-content-end"> <!-- Usar d-flex para alinear los botones a la derecha -->
           <!-- Botón para limpiar filtros -->
-          <button class="btn btn-secondary me-1 filterbutton" (click)="cleanFilters()"> <!-- Espacio a la derecha reducido -->
+          <button title="Limpiar Filtros" class="btn btn-secondary me-1 filterbutton" (click)="cleanFilters()"> <!-- Espacio a la derecha reducido -->
             <i class="bi bi-trash"></i>
           </button>
       
           <!-- Botón de exportación a Excel -->
-          <button class="btn btn-success me-1 filterbutton" (click)="exportToExcel()"> <!-- Espacio a la derecha reducido -->
+          <button title="Exportar a Excel" class="btn btn-success me-1 filterbutton" (click)="exportToExcel()"> <!-- Espacio a la derecha reducido -->
             <i class="fa-solid bi-file-earmark-excel"></i>
           </button>
       
           <!-- Botón de exportación a PDF -->
-          <button class="btn btn-danger filterbutton" (click)="exportToPdf()">
+          <button title="Exportar a PDF" class="btn btn-danger filterbutton" (click)="exportToPdf()">
             <i class="fas bi-file-earmark-pdf"></i>
           </button>
         </div>
@@ -235,7 +294,7 @@
     </div>
   </div>
 
-  <button class="floating-btn btn btn-primary" routerLink="/home/create-supplier">
+  <button class="floating-btn btn btn-primary" (click)="goTo('main/inventories/new-provider')">
     <span class="bi-plus-lg"></span>
   </button>
 </section>
