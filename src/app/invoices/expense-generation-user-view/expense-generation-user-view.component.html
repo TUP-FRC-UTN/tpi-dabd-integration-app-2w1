@@ -157,7 +157,7 @@
         <tbody>
           @for (item of paidExpenses; track $index) {
           <tr>
-            <td class="text-nowrap font-monospace">{{ item.period | date : "MM/yyyy" }}</td>
+            <td class="text-nowrap font-monospace">{{ item.period | date : "MM/yyyy" : 'es-AR' }}</td>
             <td>
               <span class="badge rounded-pill text-bg-success" [ngClass]="{
               'text-bg-success': item.status === 'Pago',
