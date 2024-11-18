@@ -30,18 +30,18 @@ export class UsersProfileComponent implements OnInit {
   selectedIconUrl: string = '';
   isDropdownOpen = false;
   plots : GetPlotDto[] = [];
-  noIcon = '../../../../assets/icons/avatar.png'
+  noIcon = 'https://i.ibb.co/bNH6vjf/avatar.png'
   icons = [
-    {name: 'Icono 1', url:'../../../../assets/icons/icono1.svg'},
-    {name: 'Icono 2', url:'../../../../assets/icons/icono2.svg'},
-    {name: 'Icono 3', url:'../../../../assets/icons/icono3.svg'},
-    {name: 'Icono 4', url:'../../../../assets/icons/icono4.svg'},
-    {name: 'Icono 5', url:'../../../../assets/icons/icono5.svg'},
-    {name: 'Icono 6', url:'../../../../assets/icons/icono6.svg'},
-    {name: 'Icono 7', url:'../../../../assets/icons/icono7.svg'},
-    {name: 'Icono 8', url:'../../../../assets/icons/icono8.svg'},
-    {name: 'Icono 9', url:'../../../../assets/icons/icono9.svg'},
-    {name: 'Icono 10', url:'../../../../assets/icons/icono10.svg'},
+    {name: 'Icono 1', url:'https://i.ibb.co/DpxXd6C/icono1.png'},
+    {name: 'Icono 2', url:'https://i.ibb.co/Vp515Fc/icono2.png'},
+    {name: 'Icono 3', url:'https://i.ibb.co/rvWz6Sh/icono3.png'},
+    {name: 'Icono 4', url:'https://i.ibb.co/1snjZn2/icono4.png'},
+    {name: 'Icono 5', url:'https://i.ibb.co/HNRqv7m/icono5.png'},
+    {name: 'Icono 6', url:'https://i.ibb.co/23B7tMh/icono6.png'},
+    {name: 'Icono 7', url:'https://i.ibb.co/FHR80gq/icono7.png'},
+    {name: 'Icono 8', url:'https://i.ibb.co/fMcysX4/icono8.png'},
+    {name: 'Icono 9', url:'https://i.ibb.co/k23ngcS/icono9.png'},
+    {name: 'Icono 10', url:'https://i.ibb.co/2gJgvFt/icono10.png'},
   ]
 
   //Cambia la acción del botón
@@ -51,6 +51,10 @@ export class UsersProfileComponent implements OnInit {
     this.usersService.getUserById2(this.authService.getUser().id).subscribe({
         next: (user: GetuserDto) => {
 
+          console.log(user.roles);
+
+          let roles = user.roles.map(role => " " + role);
+          
             this.formProfile.patchValue({
                 name: user.name,
                 lastName: user.lastname,

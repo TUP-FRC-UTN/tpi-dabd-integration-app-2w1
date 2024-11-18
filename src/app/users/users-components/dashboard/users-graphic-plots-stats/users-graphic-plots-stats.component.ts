@@ -17,6 +17,8 @@ import { UsersMultipleSelectComponent } from '../../users-components/utils/users
 import { PlotTypeModel } from '../../users-models/plot/PlotType';
 import { PlotStateModel } from '../../users-models/plot/PlotState';
 import { PlotService } from '../../users-servicies/plot.service';
+import { UsersKpiComponent } from "../users-kpi/users-kpi.component";
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-users-graphic-plots-stats',
@@ -27,13 +29,15 @@ import { PlotService } from '../../users-servicies/plot.service';
     FormsModule,
     CommonModule,
     UsersMultipleSelectComponent,
-  ],
+    UsersKpiComponent
+],
   templateUrl: './users-graphic-plots-stats.component.html',
   styleUrls: ['./users-graphic-plots-stats.component.css'],
 })
 export class UsersGraphicPlotsStatsComponent implements OnInit {
   private readonly apiService = inject(DashboardService);
   private readonly plotService = inject(PlotService);
+  private readonly router = inject(Router);
 
   plotsByBlock: PlotsByBlock[] = [];
   ownerDistribution: OwnersPlotsDistribution[] = [];
@@ -66,6 +70,8 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
   barChartData: any[] = [];
 
   barChartOptions = {
+    title: 'Distribución de Lotes por Manzana',
+    titleTextStyle: { fontSize: 14},
     isStacked: true,  
     legend: { position: 'top', alignment: 'center' },
     series: {
@@ -102,6 +108,8 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
   pieChart = ChartType.PieChart;
   pieChartData: any[] = [];
   pieChartOptions = {
+    title: 'Distribución de Lotes por Propietario',
+    titleTextStyle: { fontSize: 14 },
     pieSliceText: 'percentage',
     series: {
       0: { color: '#FF9900' },
@@ -455,5 +463,9 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
     this.startDate.reset();
     this.endDate.reset();
     this.loadData();
+  }
+
+  changeView(view: string){
+    this.router.navigate(['home/charts/users' + view]);
   }
 }

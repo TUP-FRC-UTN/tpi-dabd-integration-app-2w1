@@ -5,7 +5,7 @@ import { Provincia } from '../Models/emp-provincia';
 import { Charge, DocumentTypeEnum, PostEmployeeDto } from '../Models/emp-post-employee-dto';
 import { EmpPutEmployees } from '../Models/emp-put-employees';
 import { EmpPutEmployeeRequest } from '../Models/EmpPutEmployeeRequest';
-import { environment } from '../../../common/environments/environment.prod';
+import { environment } from '../../../common/environments/environment';
 
 @Injectable({
   providedIn: 'root',

@@ -16,10 +16,10 @@
           </div>
         </div>
         <div class="col-md-4 d-flex flex-column justify-content-evenly align-items-center">
-          @if(familiar.avatar_url != "asd") {
-          <img src="{{familiar.avatar_url}}" class="w-75 img-fluid rounded-start" alt="...">
+          @if(haveIcon(familiar.avatar_url)) {
+            <img src="{{familiar.avatar_url}}" class="w-75 img-fluid rounded-start" alt="...">
           }@else {
-          <img src="../../../../assets/icons/avatar.png" class="w-75 img-fluid rounded-start" alt="...">
+            <img src="https://i.ibb.co/bNH6vjf/avatar.png" class="w-75 img-fluid rounded-start" alt="...">
           }
           <div class="dropdown-center d-flex align-items-center">
             <button class="btn btn-light border border-1 " type="button" data-bs-toggle="dropdown" title="Acciones"

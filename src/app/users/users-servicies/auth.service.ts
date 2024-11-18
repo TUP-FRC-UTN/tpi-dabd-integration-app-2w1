@@ -9,7 +9,6 @@ import { UserLoged } from '../users-models/users/UserLoged';
 })
 export class AuthService {
 
-  
   async login(data: any): Promise<void> {
     this.saveToken(data.token);
     this.saveActualRole(this.getUser().roles[0]);

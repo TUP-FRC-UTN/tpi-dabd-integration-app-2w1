@@ -4,7 +4,8 @@ import { Observable, Subject } from 'rxjs';
 import { EmpListadoEmpleados, Employee } from '../Models/emp-listado-empleados';
 import { EmpListadoAsistencias } from '../Models/emp-listado-asistencias';
 import { EmpPutEmployeesResponse } from '../Models/EmpPutEmployeesResponse';
-import { environment } from '../../../common/environments/environment.prod';
+import { environment } from '../../../common/environments/environment';
+
 
 @Injectable({
   providedIn: 'root',

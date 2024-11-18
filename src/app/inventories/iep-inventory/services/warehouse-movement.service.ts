@@ -5,7 +5,8 @@ import { WarehouseMovement } from '../models/getWarehouseMovementResponse';
 import { Observable } from 'rxjs';
 import { IepCreateWarehouseMovementDTO } from '../models/iep-create-warehouse-movement-dto';
 import { WarehouseMovementByProduct } from '../models/WarehouseMovementByProduct';
-import { environment } from '../../../common/environments/environment.prod';
+import { environment } from '../../../common/environments/environment';
+
 @Injectable({
   providedIn: 'root',
 })

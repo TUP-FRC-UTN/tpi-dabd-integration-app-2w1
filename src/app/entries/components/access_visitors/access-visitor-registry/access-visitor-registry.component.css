@@ -1,23 +1,363 @@
+/* Estilos para los filtros principales */
+.input-group-with-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-.botones{
+.input-group-with-label .form-label {
+  min-width: 55px;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.input-group-with-label .input-group {
+  flex: 1;
+  margin: 0;
+}
+
+#unifiedSearchFilter {
+  margin-left: 0;
+  padding-left: 8px;
+}
+
+/* Estilos específicos para el modal de filtros avanzados */
+.modal-body .input-group-with-label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0;
+}
+
+.modal-body .input-group-with-label .modal-label {
+  min-width: 80px;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.modal-body .input-group-with-label .input-group {
+  flex: 1;
+}
+
+.modal-body .row {
+  row-gap: 1rem !important;
+}
+
+.modal-body .ng-select {
+  width: 100%;
+}
+
+/* Asegurar que todos los controles en el modal tengan la misma altura */
+.modal-body .form-control,
+.modal-body .ng-select .ng-select-container {
+  height: 38px !important;
+}
+
+/* Ajustar el espacio entre columnas */
+.modal-body .col-md-6 {
+  padding-right: 10px;
+  padding-left: 10px;
+}
+
+/* Estilos para columnas de igual tamaño */
+.col-md-2-4 {
   position: relative;
-  top: 35px;
-  left: 460px;
-  width: 600px;
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+@media (min-width: 768px) {
+  .col-md-2-4 {
+      flex: 0 0 20%;
+      max-width: 20%;
+  }
+}
+
+/* Asegurar que todos los inputs y ng-select tengan la misma altura y apariencia */
+.form-control,
+.input-group,
+.input-group .ng-select .ng-select-container,
+.action-buttons-container {
+  min-height: 38px;
+  height: 38px;
+}
+
+.input-group {
+  width: 100%;
+  display: flex;
+}
+
+.input-group > * {
+  flex: 1 1 auto;
+  width: auto;
+}
+
+.input-group .ng-select {
+  width: 100% !important;
+  flex: 1 1 auto !important;
+}
+
+/* Estilos generales */
+.filter-section {
+  margin-bottom: 1rem;
+}
+
+/* Estilos de los botones */
+.action-buttons-container {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.action-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.action-btn i {
+  font-size: 1rem;
+}
+
+/* Estilos de la tabla */
+.table-responsive {
+  overflow-x: auto;
+  margin-top: 1rem;
+}
+
+#myTable {
+  width: 100%;
+  background-color: #f9f9f9;
+ 
+ 
+}
+
+#myTable th, 
+#myTable td {
+  
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+ 
+}
+
+/* Estilos para los botones de estado en la tabla */
+#myTable td .btn.rounded-pill {
+  min-width: 130px;
+  height: 32px;
+  padding: 4px 15px;
+  font-size: 12px;
+  margin: 0 auto;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+#myTable td .btn.estado-btn {
+  min-width: 150px;
+}
+
+#myTable td .btn.rounded-pill i {
+  font-size: 14px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+#myTable td .btn.rounded-pill .estado-text {
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Estilos para hacer que ng-select se parezca a los inputs de Bootstrap */
+::ng-deep .ng-select .ng-select-container {
+  min-height: 38px !important;
+  height: 38px !important;
+  background-color: white !important;
+  border: 1px solid #ced4da !important;
+  border-radius: 0.375rem !important;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 1rem !important;
+  line-height: 1.5 !important;
+  color: #212529 !important;
+}
+
+::ng-deep .ng-select.ng-select-focused .ng-select-container {
+  border-color: #86b7fe !important;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+}
+
+::ng-deep .ng-select .ng-dropdown-panel {
+  background-color: white !important;
+  border: 1px solid #ced4da !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+::ng-deep .ng-select .ng-dropdown-panel .ng-dropdown-panel-items {
+  background-color: white !important;
+  max-height: 200px;
+  padding: 0 !important;
+}
+
+::ng-deep .ng-select .ng-dropdown-panel .ng-option {
+  padding: 8px 10px !important;
+  background-color: white !important;
+  border-bottom: 1px solid #f8f9fa !important;
+  font-size: 1rem !important;
+  line-height: 1.5 !important;
+}
+
+::ng-deep .ng-select .ng-dropdown-panel .ng-option:hover {
+  background-color: #f8f9fa !important;
+}
+
+::ng-deep .ng-select .ng-dropdown-panel .ng-option.ng-option-selected {
+  background-color: #e9ecef !important;
+  color: #212529 !important;
+}
+
+::ng-deep .ng-select .ng-value-container {
+  padding-left: 0 !important;
+  padding-top: 0 !important;
+}
+
+::ng-deep .ng-select .ng-placeholder {
+  color: #6c757d !important;
+}
+
+/* Estilos específicos para ng-select múltiple */
+::ng-deep .ng-select.ng-select-multiple .ng-select-container {
+  height: 38px !important;
+  min-height: 38px !important;
+  overflow: hidden;
+}
+
+::ng-deep .ng-select.ng-select-multiple .ng-value-container {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  gap: 0.25rem !important;
+  align-items: center !important;
+}
+
+::ng-deep .ng-select.ng-select-multiple .ng-value {
+  background-color: #e9ecef !important;
+  border: 1px solid #ced4da !important;
+  border-radius: 4px !important;
+  padding: 2px 8px !important;
+  margin: 2px 4px 2px 0 !important;
+  font-size: 0.875rem !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* DataTables y otros estilos específicos */
+.dataTables_wrapper {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.dataTables_scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.bottom {
+  position: sticky;
+  left: 0;
+  right: 0;
+  background-color: white;
+  z-index: 1;
+  margin-top: 10px;
+  padding: 8px;
+  border-top: 1px solid #dee2e6;
+}
+
+/* Media queries para responsividad */
+@media (max-width: 768px) {
+  .action-btn {
+      padding: 0.25rem;
+  }
+  
+  .action-btn i {
+      font-size: 0.875rem;
+  }
+
+  .col-md-2-4 {
+      margin-bottom: 0.5rem;
+  }
+
+  ::ng-deep .ng-select .ng-select-container {
+      font-size: 0.875rem !important;
+  }
+
+  .input-group-with-label {
+      width: 100%;
+  }
+  
+  .col-md-4 {
+      margin-bottom: 1rem;
+  }
+
+  .action-buttons-container {
+      justify-content: flex-end;
+      width: 100%;
+  }
+
+  .modal-body .input-group-with-label {
+      flex-direction: row;
+  }
+}
+
+@media (max-width: 576px) {
+  .col-md-2-4 {
+      flex: 0 0 100%;
+      max-width: 100%;
+  }
+
+  .action-buttons-container {
+      justify-content: center;
+  }
+
+  .action-btn {
+      flex: 1;
+      max-width: calc(50% - 0.25rem);
+  }
+}
+
+/* Estilos para los checkboxes en el dropdown */
+::ng-deep .ng-select .ng-option-tmp input[type="checkbox"] {
+  margin-right: 5px;
+  vertical-align: middle;
+}
+
+::ng-deep .ng-select .ng-option-tmp span {
+  vertical-align: middle;
+}
+
+/* Estilos para el modal */
+.modal-dialog.modal-lg {
+  max-width: 800px;
+}
+
+.modal-body {
+  padding: 20px;
 }
 
 
-/* Estilo para la cabecera de la tabla */
-.table thead {
-  border-top: 2px solid black !important; /* Línea negra en la parte superior */
-}
 
-
-
-/* Opcional: mejorar el contraste de las cabeceras */
-.table thead th {
-  background-color: #f8f9fa; /* Color de fondo suave */
-  color: #343a40; /* Color del texto */
+.dropdown{
+  position: relative;
+  right: 530px;
+  bottom: 1px;
 }
 
 .modal {
@@ -52,3 +392,19 @@
   cursor: pointer;
 }
 
+
+/* Eliminar la línea gris en el modal footer */
+#confirmIngresoModal .modal-footer {
+  border-top: none !important;
+}
+#confirmEgresoModal .modal-footer {
+  border-top: none !important;
+}
+
+#confirmIngresoEmpModal .modal-footer{
+  border-top: none !important;
+}
+
+#confirmEgresoEmpModal .modal-footer{
+  border-top: none !important;
+}

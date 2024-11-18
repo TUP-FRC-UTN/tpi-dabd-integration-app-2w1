@@ -7,6 +7,9 @@ import { PutReportDTO } from '../models/PutReportDTO';
 import { Subject } from 'rxjs';
 import { Fine } from '../models/Dashboard-models';
 import { ReportReasonDto } from '../models/ReportReasonDTO';
+import { AuthService } from '../../users/users-servicies/auth.service';
+import { environment } from '../../common/environments/environment';
+
 
 @Injectable({
   providedIn: 'root'
@@ -14,8 +17,9 @@ import { ReportReasonDto } from '../models/ReportReasonDTO';
 export class SanctionService {
 
   private readonly http: HttpClient = inject(HttpClient);
-  private readonly url = 'http://localhost:8042/api/';
-  private readonly reportReasonUrl = 'http://localhost:8042/api/report-reason';
+  private readonly authService = inject(AuthService);
+  private readonly url = environment.services.sanctions + '/api/';
+  private readonly reportReasonUrl = environment.services.sanctions + '/api/report-reason';
 
 
   constructor() { }
@@ -56,10 +60,12 @@ export class SanctionService {
   }
 
   postFine(fineData: any): Observable<any> {
+    fineData.createdUser = this.authService.getUser().id;
     return this.http.post(this.url + 'sanction/fine', fineData);
   }
 
   postWarning(warningData: any): Observable<any> {
+    warningData.createdUser = this.authService.getUser().id;
     return this.http.post(this.url + 'sanction/warning', warningData);
   }
 
@@ -71,19 +77,22 @@ export class SanctionService {
 
   //Este metodo no tiene endpoint por ahora
   addDisclaimer(disclaimerData: any) {
-
+    disclaimerData.userId = this.authService.getUser().id;
     return this.http.post<any>(this.url + "disclaimer/", disclaimerData)
   }
 
   updateReport(reportDTO: PutReportDTO): Observable<any> {
+    reportDTO.userId = this.authService.getUser().id;
     return this.http.put(this.url + 'report', reportDTO);
   }
 
   putStateFine(data:any){
+    data.userId = this.authService.getUser().id;
     return this.http.put(this.url + 'sanction/changeStateFine', data);
   }
 
   updateFine(fineData: any): Observable<any> {
+    fineData.userId = this.authService.getUser().id;
     return this.http.put(this.url + 'sanction/updateFine', fineData);
   }
 

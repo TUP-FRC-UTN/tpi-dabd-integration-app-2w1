@@ -10,7 +10,8 @@ import { createProductDTO } from '../models/create-product-dto';
 import { UsersMockIdService } from '../../common-services/users-mock-id.service';
 import { UpdateProductDto } from '../models/update-product-dto';
 import { AuthService } from '../../../users/users-servicies/auth.service';
-import { environment } from '../../../common/environments/environment.prod';
+import { environment } from '../../../common/environments/environment';
+
 @Injectable({
   providedIn: 'root',
 })

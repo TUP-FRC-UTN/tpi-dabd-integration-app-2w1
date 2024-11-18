@@ -8,6 +8,7 @@
     newUserAllowedDto: AccessNewUserAllowedDto; //interface declarada mas abajo
     authRangesDto: AccessNewAuthRangeDto; //interface declarada mas abajo
     vehiclesId: number;
+    userId: number;
   }
 
     // todo lo necesario para NewAuthRangeDto
@@ -58,6 +59,7 @@
     //METODO getAllUserAllowedVisitors(@PathVariable String visitor)
     //Clase necesaria (para recibir la data): User_AllowedInfoDto
     export interface AccessUserAllowedInfoDto {
+      
       document: string;
       name: string;
       last_name: string;
@@ -73,6 +75,27 @@
       neighbor_id: number; //se necesita para el post del Visitor
     }
 
+
+    export interface QRData {
+      neighborId: number;
+      neighborName: string;
+      neighborNameLastName: string;
+      name: string;
+      lastName: string;
+      document: string;
+      documentType: string;
+      vehicleType: string;
+      plate: string;
+      uid: string;
+      init_date: string;
+      end_date: string;
+      init_hour: string;
+      end_hour: string;
+      generatedDate: string;
+    }
+    
+
+    
     export interface AuthRangeInfoDto {
       neighbor_id: number;
       init_date: Date; //LocalDate (EJ: "2024-10-10" / "yyyy-MM-dd")
@@ -178,17 +201,26 @@ export interface AccessFormattedHours {
 
 export interface AccessUserAllowedInfoDto2 {
   document: string;
+  documentType: number;
   name: string;
   last_name: string;
   email: string;
-  authId : string;
-  authRange: AccessAuthRangeInfoDto2; //List<AuthRangeInfoDto>
-  observations?: string; //campo extra (no esta en el back)
+  authId : string ;
+  authRange: AccessAuthRangeInfoDto2;
+  vehicle: AccessNewVehicleDto2 | null;
+  visitorId: number | null;
+}
+export interface AccessNewVehicleDto2 {
+  id: number;
+  plate: string;
+  vehicle_Type: VehicleTypeDto;
+  insurance: string;
 }
 export interface AccessAuthRangeInfoDto2 {
   init_date: Date; //LocalDate (EJ: "2024-10-10" / "yyyy-MM-dd")
   end_date: Date; //LocalDate (EJ: "2024-10-10" / "yyyy-MM-dd")
   allowedDays: AccessApiAllowedDay[]; //List<Allowed_DaysDto> 
+  neighbor_id : number;
 }
 export interface AccessCommonSettings {
   authRange: {
@@ -197,3 +229,15 @@ export interface AccessCommonSettings {
     allowedDays: any[];
   };
 }
+
+export interface Owner {
+  document: string;
+  name: string;
+  last_name: string;
+  email: string;
+  vehicles: AccessNewVehicleDto[]; //List<NewVehicleDto> 
+  authRanges: AccessAuthRangeInfoDto2[]; //List<AuthRangeInfoDto>
+  documentTypeDto : AccessDocumentTypeDto;
+  neighbor_id : number| null;
+}
+

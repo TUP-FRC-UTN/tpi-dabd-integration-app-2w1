@@ -6,7 +6,7 @@ import { PostNotificationAdminComponent } from "./components/post-notification-a
 import { roleGuard } from "./guard";
 
 export const NOTIFICATION_ROUTES: Routes = [
-  { path: "pepito", component: NotificationComponent },
+  { path: "show", component: NotificationComponent },
   { path: "admin-post-notification", component: PostNotificationAdminComponent },
   { path: "admin-all-notifications", component: AllNotificationComponent}, //canActivate: [roleGuard], data: ["SuperAdmin", "Gerente"]
 {path: 'test', component: AllNotificationComponent},

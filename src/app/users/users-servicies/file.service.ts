@@ -1,13 +1,14 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, map, Observable, throwError } from 'rxjs';
+import { environment } from '../../common/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FileService {
 
-  private baseUrl = 'http://localhost:8084/fileManager';  // Cambia esto por tu URL base
+  private baseUrl = environment.services.fileManager + '/fileManager';  // Cambia esto por tu URL base
 
   constructor(private http: HttpClient) { }
 

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { OwnerService } from '../../../users-servicies/owner.service';
 import { DeleteUser } from '../../../users-models/owner/DeleteUser';
@@ -18,8 +18,7 @@ export class ModalEliminarOwnerComponent {
   @Input() userModal: { id: number } = { id: 0 }; // Recibe solo el userId
   @Output() userDeleted = new EventEmitter<void>(); // Emitir evento para que el componente principal recargue la tabla
 
-  constructor(public activeModal: NgbActiveModal, private fb: FormBuilder, private apiService: OwnerService, private modal: NgbModal) {
-  }
+  constructor(public activeModal: NgbActiveModal, private fb: FormBuilder, private apiService: OwnerService, private modal: NgbModal) {}
 
   confirmDesactivate() {
     var user = new DeleteUser();

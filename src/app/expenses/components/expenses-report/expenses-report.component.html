@@ -1,0 +1,656 @@
+<!--Si ves esto es porque anda bien en nanvar y tenes que borrar este div -->
+<div class="row mb-2">-</div>
+<div class="container my-2 p-2 border border-2 rounded shadow-lg ">
+
+  <!-- Fila de botones de filtro -->
+  <div class="row ">
+    <!-- Filtro de fechas -->
+    <div class="col d-flex gap-3">
+      <div class="col">
+
+        @if (cardView==3) {
+          <app-expenses-year-ngSelect
+            [yaersList]="yearsFromList"
+            [(selectedYear)]="yearFrom"
+            (selectedYearChange)="updateYear('from')"
+          />
+        }
+        @if (cardView==0 || cardView ==1) {
+          <input (change)="filterDataOnChange()" [(ngModel)]="dateFrom" class="form-control" type="date" [max]="dateTo">
+        }
+        
+
+      </div>
+      <div class="col">
+        @if (cardView==3) {
+          <app-expenses-year-ngSelect
+            [yaersList]="yearsToList"
+            [(selectedYear)]="yearTo"
+            (selectedYearChange)="updateYear('to')"
+          />
+        }
+        @if (cardView==0 || cardView ==1) {
+          <input (change)="filterDataOnChange()" [(ngModel)]="dateTo" class="form-control" type="date" [max]="maxDateTo"
+          [min]="dateFrom">
+        }
+        
+    
+      </div>
+    
+    </div>
+    <!-- Botones de exportar -->
+    <div class="col-auto d-flex gap-1 ms-auto">
+      <button class="btn btn-primary filterbutton" data-bs-toggle="modal" title="Filtros Avanzados"
+        data-bs-target="#filtrosAvanzados">
+        <i class="bi bi-funnel-fill"></i>
+      </button>
+      <button type="button" class="btn btn-secondary bi bi-trash filterbutton" title="Limpiar Filtros"
+        (click)="clearFiltered()"></button>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="container">
+  <!-- Inicia en esta vista -->
+  @if (cardView == 0) {
+  <div class="row">
+    <!-- KPI LIMITE 5-->
+    <div class="col-2 gap-2 d-flex flex-column justify-content-center">
+      <!-- KPI 1 -->
+      <app-expenses-kpi [amount]="amountCommon+amountExtraordinary
+                                      +amountIndividual+amountNoteCredit" title="Total" subTitle="Periodo"
+        tooltip="Total del Periodo" [customStyles]="{ 'background-color': '#fcc7ccde' }" icon="bi bi-cash"
+        formatPipe="currency" (click)="changeView(1)"></app-expenses-kpi>
+      <!-- KPI 2 -->
+      <app-expenses-kpi [amount]="totalLastBillRecord" title="Total" subTitle="Ultimo Facturado"
+        tooltip="Total Ultimo Periodo Facturado" formatPipe="currency"
+        [customStyles]="{ 'background-color': '#d8ffedde' }" icon="bi bi-cash" (click)="changeView(2)"></app-expenses-kpi>
+      <!-- KPI 3 -->
+      @if (percentageVariation>=0) {
+      <app-expenses-kpi [amount]="percentageVariation" title="Variación" subTitle="Interanual" formatPipe="percent"
+        tooltip="Variación Interanual" [customStyles]="{ 'background-color': '#fcc7ccde' }"
+        icon="bi bi-arrow-up-short" (click)="changeView(3)"></app-expenses-kpi>
+      }@else {
+      <app-expenses-kpi [amount]="percentageVariation * -1" title="Variación" subTitle="Interanual" formatPipe="percent"
+        tooltip="Variación Interanual" [customStyles]="{ 'background-color': '#d8ffedde' }"
+        icon="bi bi-arrow-down-short"(click)="changeView(3)"></app-expenses-kpi>
+      }
+    </div>
+
+    <div class="col-10">
+      <!-- Graficos chicos (pie, lines, list)-->
+      <div class="row mb-2">
+        <!-- Grafico 1 -->
+        <div class="col">
+          <div class="card border-0 shadow-lg  rounded-4 h-100">
+            <div class="card-body">
+              <h4 class="card-title align-items-center">Gastos del Período <button type="button"
+                  class="btn btn-sm btn-link text-muted bi bi-arrows-angle-expand fs-5 float-end" title="Expandir"
+                  (click)="changeView(1)"></button></h4>
+
+              <hr>
+              <div class="row justify-content-center text-center align-items-center">
+                @if (chartExpensesPeriod.data.length>0) {
+                <div class="col-12 hover-scale flex-grow-1 d-flex align-items-center ">
+                  <google-chart [type]="chartExpensesPeriod.type" [data]="chartExpensesPeriod.data"
+                    [options]="chartExpensesPeriod.options" style="width: 100%; height: 150px;"></google-chart>
+                </div>
+                }@else {
+                  <span>No se encontraron datos</span>
+                }
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <!-- Grafico 2 -->
+        <div class="col ">
+          <div class="card border-0 shadow-lg  rounded-4 h-100">
+            <div class="card-body">
+              <h4 class="card-title align-items-center">Ultimo Período Facturado<button type="button"
+                  class="btn btn-sm btn-link text-muted bi bi-arrows-angle-expand fs-5 float-end" title="Expandir"
+                  (click)="changeView(2)"></button></h4>
+
+              <hr>
+              <div class="row justify-content-center text-center align-items-center">
+                @if (chartExpensesPeriod.data.length>0) {
+                <div class="col-12 hover-scale flex-grow-1 d-flex align-items-center ">
+                  <google-chart [type]="chartLastBill.type" [data]="chartLastBill.data"
+                    [options]="chartLastBill.options" style="width: 100%; height: 150px;"></google-chart>
+                </div>
+                }@else {
+                  <span>No se encontraron datos</span>
+                }
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <!-- Graficos Grande (stonk, column) -->
+      <div class="row ">
+        <!-- Grafico 3 -->
+        <div class="col ">
+          <div class="card border-0 shadow-lg  rounded-4 h-100">
+            <div class="card-body">
+              <h4 class="card-title align-items-center"> Comparación Interanual <button type="button"
+                  class="btn btn-sm btn-link text-muted bi bi-arrows-angle-expand fs-5 float-end" title="Expandir"
+                  (click)="changeView(3)"></button></h4>
+              <hr>
+              @if (chartCompareYearMonth.data.length>0 && chartCompareYearMonth.columns.length>0  && comparateYearMonthFiltered.length>0) {
+              <div class="col-12 hover-scale flex-grow-1 d-flex align-items-center justify-content-center">
+                <google-chart [type]="chartCompareYearMonth.type" [columns]="chartCompareYearMonth.columns"
+                  [data]="chartCompareYearMonth.data" [options]="chartCompareYearMonth.options"
+                  style="width: 100%; height:210px;">
+                </google-chart>
+              </div>
+              }@else {
+                <div class="row justify-content-center text-center align-items-center">
+
+                  <span>No se encontraron datos</span>
+                </div>
+              }
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+  <!-- Y de acuerdo van tocando los botones de navegacion se iran abriendo esto -->
+  @if (cardView==1) {
+  <div class="row">
+    <div class="col-12">
+      <div class="card h-100 border-0 shadow-lg  rounded-4">
+        <div class="card-body d-flex flex-column">
+          <h4 class="card-title align-items-center">Gastos del Período <button type="button"
+              class="btn btn-sm btn-link text-muted bi bi-arrow-left fs-5 float-end" title="Volver"
+              (click)="changeView(0)"></button></h4>
+          <hr>
+          <div class="row">
+            <div class="col-4">
+              <div class="row justify-content-center text-center align-items-center">
+                <div class="row justify-content-center text-center align-items-center">
+                  <div class="col-8 mb-1">
+                    <app-expenses-kpi [amount]="amountCommon+amountExtraordinary
+                            +amountIndividual+amountNoteCredit" title="Total"
+                      [customStyles]="{ 'background-color': '#fcc7ccde'}" [icon]="'bi bi-cash'"
+                      [formatPipe]="'currency'"></app-expenses-kpi>
+                  </div>
+                </div>
+                <div class="row justify-content-center text-center align-items-center">
+
+                  <div class="col-8 mb-1">
+                    <app-expenses-kpi [amount]="amountCommon" title="Comunes"
+                      [customStyles]="{ 'background-color': '#fcc7ccde' }" [icon]="'bi bi-people-fill'"
+                      [formatPipe]="'currency'"></app-expenses-kpi>
+                  </div>
+                </div>
+                <div class="row justify-content-center text-center align-items-center">
+
+                  <div class="col-8 mb-1">
+                    <app-expenses-kpi [amount]="amountExtraordinary" title="Extraordinarios"
+                      [customStyles]="{ 'background-color': '#fcc7ccde' }" [icon]="'bi bi-tools'"
+                      [formatPipe]="'currency'"></app-expenses-kpi>
+                  </div>
+                </div>
+                <div class="row justify-content-center text-center align-items-center">
+
+                  <div class="col-8 mb-1">
+                    <app-expenses-kpi [amount]="amountIndividual" title="Individuales"
+                      [customStyles]="{ 'background-color': '#fcc7ccde' }" [icon]="'bi bi-person-fill'"
+                      [formatPipe]="'currency'"></app-expenses-kpi>
+                  </div>
+                </div>
+                <div class="row justify-content-center text-center align-items-center">
+
+                  <div class="col-8 mb-1">
+                    <app-expenses-kpi [amount]="amountNoteCredit*-1" title="Nota de Crédito"
+                      [customStyles]="{ 'background-color': '#d8ffedde' }" [icon]="'bi bi-receipt-cutoff'"
+                      [formatPipe]="'currency'"></app-expenses-kpi>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-8">
+              <div class="row flex-grow-1 d-flex justify-content-center align-items-center mt-1 h-100">
+                @if (chartExpensesPeriod.data.length>0) {
+                <div class="col-12  d-flex align-items-center justify-content-center hover-scale">
+                  <google-chart [type]="chartExpensesPeriod.type" [data]="chartExpensesPeriod.data"
+                    [options]="chartExpensesPeriod.options" style="width: 100%; height:100%;"></google-chart>
+                </div>
+                }@else {
+                  <div class="row justify-content-center text-center align-items-center">
+
+                    <span>No se encontraron datos</span>
+                  </div>
+                }
+                @if (chartExpensesPeriodProvider.data.length>0) {
+                <div class="col-12 d-flex align-items-center justify-content-center hover-scale">
+                  <google-chart [type]="chartExpensesPeriodProvider.type" [data]="chartExpensesPeriodProvider.data"
+                    [options]="chartExpensesPeriodProvider.options" style="width: 100%; height:100%;"></google-chart>
+                </div>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  }
+  @if (cardView==2){
+  <div class="row">
+    <div class="col-12">
+      <div class="card h-100 border-0 shadow-lg  rounded-4">
+        <div class="card-body d-flex flex-column">
+          <h4 class="card-title align-items-center">Ultimo Período Facturado
+            <button type="button" class="btn btn-sm btn-link text-muted bi bi-arrow-left fs-5 float-end" title="Volver"
+              (click)="changeView(0)"></button>
+          </h4>
+          @if(lastBillRecord && lastBillRecord.id>0){
+          <div class="card-subtitle">Desde {{lastBillRecord.start_date | date: 'dd/MM/yyyy'}} Hasta:
+            {{lastBillRecord.end_date | date: 'dd/MM/yyyy'}} </div>
+          }
+
+          <hr>
+          <div class="row">
+            <div class="col-6">
+              <div class="row justify-content-center text-center align-items-center">
+                <div class="row justify-content-center text-center align-items-center">
+                  <div class="col-5 m-1">
+                    <app-expenses-kpi [amount]="totalLastBillRecord" title="Total"
+                      [customStyles]="{ 'background-color': '#d8ffedde'}" [icon]="'bi bi-cash'"
+                      [formatPipe]="'currency'"></app-expenses-kpi>
+                  </div>
+                  <div class="col-5 m-1">
+                    <app-expenses-kpi [amount]="lastBillCommon" title="Comunes"
+                      [customStyles]="{ 'background-color': '#d8ffedde' }" [icon]="'bi bi-people-fill'"
+                      [formatPipe]="'currency'"></app-expenses-kpi>
+                  </div>
+                </div>
+                <div class="row justify-content-center text-center align-items-center">
+
+                  <div class="col-5 m-1">
+                    <app-expenses-kpi [amount]="lastBillExtraordinary" title="Extraordinarios"
+                      [customStyles]="{ 'background-color': '#d8ffedde' }" [icon]="'bi bi-tools'"
+                      [formatPipe]="'currency'"></app-expenses-kpi>
+                  </div>
+                  <div class="col-5 m-1">
+                    <app-expenses-kpi [amount]="lastBillIndividual" title="Individuales"
+                      [customStyles]="{ 'background-color': '#d8ffedde' }" [icon]="'bi bi-person-fill'"
+                      [formatPipe]="'currency'"></app-expenses-kpi>
+                  </div>
+                </div>
+                <div class="row justify-content-center text-center align-items-center">
+
+                  <div class="col-5 m-1">
+                    <app-expenses-kpi [amount]="lastBillNoteCredit*-1" title="Notas Crédito"
+                      [customStyles]="{ 'background-color': '#fcc7ccde' }" [icon]="'bi bi-receipt-cutoff'"
+                      [formatPipe]="'currency'"></app-expenses-kpi>
+                  </div>
+                  <div class="col-5 m-1">
+                    @if(lastBillRecord && lastBillRecord.id>0){
+                    <app-expenses-kpi [amount]="lastBillRecord.fineAmount" title="Multas"
+                      [customStyles]="{ 'background-color': '#d8ffedde' }" [icon]="'bi-exclamation-triangle'"
+                      [formatPipe]="'currency'"></app-expenses-kpi>
+                    }@else {
+                    <app-expenses-kpi [amount]="0" title="Multas" [customStyles]="{ 'background-color': '#d8ffedde' }"
+                      [icon]="'bi-exclamation-triangle'" [formatPipe]="'currency'"></app-expenses-kpi>
+                    }
+
+                  </div>
+                </div>
+                <div class="row justify-content-center text-center align-items-center">
+
+                  <div class="col-5 m-1">
+                    @if(lastBillRecord && lastBillRecord.id>0){
+                    <app-expenses-kpi [amount]="lastBillRecord.pendingAmount" title="Pendiente"
+                      [customStyles]="{ 'background-color': '#fcc7ccde' }" [icon]="'bi-calendar-x'"
+                      [formatPipe]="'currency'"></app-expenses-kpi>
+                    }@else {
+                    <app-expenses-kpi [amount]="0" title="Pendiente"
+                      [customStyles]="{ 'background-color': '#fcc7ccde' }" [icon]="'bi-calendar-x'"
+                      [formatPipe]="'currency'"></app-expenses-kpi>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="row flex-grow-1 d-flex justify-content-center align-items-center mt-1 h-100">
+                @if(lastBillRecordFiltered.length>0){
+                  @if (chartLastBill.data.length>0) {
+                    <div class="col-12  d-flex align-items-center justify-content-center hover-scale">
+                      <google-chart [type]="chartLastBill.type" [data]="chartLastBill.data"
+                        [options]="chartLastBill.options"></google-chart>
+                    </div>
+                    }
+                    @if (chartExpensesPeriodProvider.data.length>0) {
+                    <div class="col-12 d-flex align-items-center justify-content-center hover-scale">
+                      <google-chart [type]="chartExpensesPeriodProvider.type" [data]="chartExpensesPeriodProvider.data"
+                        [options]="chartExpensesPeriodProvider.options" style="width: 100%; height:100%;"></google-chart>
+                    </div>
+                    }
+                }@else {
+                  <div class="row justify-content-center text-center align-items-center">
+
+                    <span>No se encontraron datos</span>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+  @if (cardView==3) {
+  <div class="row justify-content-center align-items-center m-1" style="max-height: 550px;">
+    <div class="card h-100 border-0 shadow-lg  rounded-4">
+      <div class="card-body">
+        <h4 class="card-title">Comparación Interanual <button type="button"
+            class="btn btn-sm btn-link text-muted bi bi-arrow-left fs-5 float-end" title="Volver"
+            (click)="changeView(0)"></button></h4>
+        <hr>
+        <div class="row">
+          <!-- KPIS -->
+          <div class="col-2 gap-2 d-flex flex-column justify-content-center">
+            <!-- KPI 1 -->
+            <app-expenses-kpi [amount]="amountLastYear" [title]="titleLAstYear" [formatPipe]="'currency'"
+              [customStyles]="{ 'background-color': '#fcc7ccde' }" [icon]="'bi bi-cash'"></app-expenses-kpi>
+            <!-- KPI 2 -->
+            <app-expenses-kpi [amount]="amountThisYear" [title]="titleThisYear" [formatPipe]="'currency'"
+              [customStyles]="{ 'background-color': '#fcc7ccde' }" [icon]="'bi bi-cash'"></app-expenses-kpi>
+            <!-- KPI 3 -->
+            @if (percentageVariation>=0) {
+            <app-expenses-kpi [amount]="percentageVariation" title="Variación" subTitle="Interanual" formatPipe="percent"
+              tooltip="Amunto de Gasto" [customStyles]="{ 'background-color': '#fcc7ccde' }"
+              icon="bi bi-arrow-up-short"></app-expenses-kpi>
+            }@else {
+            <app-expenses-kpi [amount]="percentageVariation * -1" title="Variación" subTitle="Interanual"
+              formatPipe="percent" tooltip="Reducción de Gasto" [customStyles]="{ 'background-color': '#d8ffedde' }"
+              icon="bi bi-arrow-down-short"></app-expenses-kpi>
+            }
+          </div>
+
+          <div class="col-10">
+            @if (comparateYearMonthFiltered.length>0) {
+              <!-- Graficos Grande (stonk, column) -->
+            <div class="row ">
+              <!-- Grafico Columna -->
+              <div class="col ">
+                @if (chartCompareYearMonth.data.length>0 && chartCompareYearMonth.columns.length>0 && comparateYearMonthFiltered.length>0) {
+                <div class="col-12 hover-scale flex-grow-1 d-flex align-items-center justify-content-center">
+                  <google-chart [type]="chartCompareYearMonth.type" [columns]="chartCompareYearMonth.columns"
+                    [data]="chartCompareYearMonth.data" [options]="chartCompareYearMonth.options"
+                    style="width: 100%; height:250px;">
+                  </google-chart>
+                </div>
+                }
+              </div>
+            </div>
+            <!-- Graficos chicos (pie, lines, list)-->
+            <div class="row mt-2">
+              <!-- Grafico 1 -->
+              @if (chartExpensesPeriodProviderLastYear.data.length>0) {
+              <div [ngClass]="chartExpensesPeriodProviderThisYear.data.length>0? 'col-6': 'col-12'">
+                <div class="col-12 d-flex align-items-center justify-content-center hover-scale w-100">
+                  <google-chart [type]="chartExpensesPeriodProviderLastYear.type" [data]="chartExpensesPeriodProviderLastYear.data"
+                    [options]="chartExpensesPeriodProviderLastYear.options" title="Gasto por proveedor año {{yearFrom}}"
+                    style="width: 100%; height:100%;"></google-chart>
+                </div>
+              </div>
+              }
+              <!-- Grafico 2 -->
+                @if (chartExpensesPeriodProviderThisYear.data.length>0) {
+                <div [ngClass]="chartExpensesPeriodProviderLastYear.data.length>0? 'col-6': 'col-12'">
+                  <div class="col-12 d-flex align-items-center justify-content-center hover-scale w-100">
+                    <google-chart [type]="chartExpensesPeriodProviderThisYear.type" [data]="chartExpensesPeriodProviderThisYear.data"
+                      [options]="chartExpensesPeriodProviderThisYear.options" title="Gasto por proveedor año {{yearTo}}"
+                      style="width: 100%; height:100%;"></google-chart>
+                  </div>
+                </div>
+                }
+            </div>
+            }@else {
+              <div class="row h-100 justify-content-center text-center align-items-center">
+
+                <span>No se encontraron datos</span>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+</div>
+
+
+
+<app-expenses-filters [(selectedCategories)]="selectedCategories" [(selectedProviders)]="selectedProviders"
+  [(selectedTypes)]="selectedType" (selectedCategoriesChange)="filteredCharts()"
+  (selectedProvidersChange)="filteredCharts()" (selectedTypesChange)="filteredCharts()"></app-expenses-filters>
+
+
+<!-- Modal de info -->
+@if(cardView == 0){
+<div class="modal fade" id="infoModal" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Reportes</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          En esta pantalla podrá visualizar diferentes tipos de reportes. Cada uno puede expandirse para ver más
+          información.
+        </p>
+        <p>
+          Los gráficos pueden filtrarse por fecha (desde y hasta) y aplicar filtros avanzados de forma dinámica.
+        </p>
+        <ul>
+          <li>
+            <p>
+              <strong>Gastos del Período</strong>
+              Muestra los gastos del período filtrado, desglosados en categorías como gastos comunes,
+              individuales, notas de crédito y extraordinarios. Al expandirlo, se pueden ver KPIs que reflejan 
+              el impacto financiero de cada tipo de gasto y el total de los mismos.
+            </p>
+            <p>
+              El gráfico de dona muestra la proporción de gastos por categoría; aquellas categorías que no superen el 1%
+              serán agrupadas.
+            </p>
+          </li>
+          <li>
+            <p>
+              <strong>Último Período Facturado</strong>: Muestra el último período que se pasó a cobrar. No representa
+              lo recaudado, sino lo que se debe cobrar a los propietarios. Al expandir el reporte se pueden visualizar 
+              montos totales, comunes, extraordinarios, multas, pendientes y notas de creditos mediante KPIS.
+            </p>
+            <p>
+              El gráfico de dona muestra la proporción de gastos por categoría, aquellas categorías que no superen el 1%
+              serán agrupadas.
+            </p>
+          </li>
+          <li>
+            <p>
+              <strong>Comparación Mensual de Gastos</strong>: Muestra una comparativa entre el año anterior y el año
+              actual. 
+            </p>
+            <p>
+              El gráfico de columnas presenta el total mensual de cada año, ajustando automáticamente la escala de los montos
+              para facilitar su interpretación. Al expandir el reporte, se visualizan KPIs que detallan informacion sobre el 
+              total de gastos de cada año.
+            </p>
+          </li>
+          <li>
+            <strong>Botones</strong>:
+            <ul>
+              <li><button class="btn btn-primary bi bi-funnel-fill mb-2"></button> Permite aplicar filtros avanzados.
+              </li>
+              <li><button class="btn btn-secondary bi bi-trash mb-2"></button> Elimina los filtros avanzados aplicados.
+              </li>
+              <li><button class="btn btn-sm btn-link text-muted bi bi-arrows-angle-expand fs-5"></button> Expande el
+                reporte para ver más.</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div>
+}
+@if(cardView == 1){
+<div class="modal fade" id="infoModal" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Reporte</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <ul>
+          <li>
+            <p>
+              <strong>Gastos del Período</strong>: Muestra los gastos de acuerdo con el período establecido en el
+              filtro.
+              Incluye un KPI que indica el total, que es la suma de los gastos Comunes, Extraordinarios, Individuales y
+              Notas de Crédito.
+              Además, se agregan los KPI de los montos individuales de cada tipo de gasto.
+            </p>
+            <p>
+              El gráfico de dona muestra la proporción de gastos por categoría, aquellas categorías que no superen el 1%
+              serán agrupadas.
+            </p>
+            <p>
+              El gráfico de barras muestra el total de gastos por proveedor, ordenados de mayor a menor. La escala de
+              los montos se ajusta de forma automática.
+            </p>
+          </li>
+          <li>
+            <strong>Botones</strong>:
+            <ul>
+              <li><button class="btn btn-primary bi bi-funnel-fill mb-2"></button> Permite aplicar filtros avanzados.
+              </li>
+              <li><button class="btn btn-secondary bi bi-trash mb-2"></button> Elimina los filtros avanzados aplicados.
+              </li>
+              <li><button class="btn btn-sm btn-link text-muted bi bi-arrow-left fs-5"></button> Vuelve a la pantalla
+                principal.</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div>
+}
+@if(cardView == 2){
+<div class="modal fade" id="infoModal" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Reporte</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <ul>
+          <li>
+            <p>
+              <strong>Último Período Facturado</strong>: Muestra el último período que se pasó a cobrar.
+              No representa lo recaudado, sino lo que se debe cobrar a los propietarios.
+              Incluye un KPI que indica el total, que es la suma de los gastos Comunes, Extraordinarios, Individuales,
+              Notas de Crédito y Multas.
+              Además, se agregan los KPI de los montos individuales de cada tipo de gasto, las multas, y el monto total
+              pendiente para próximos períodos.
+            </p>
+            <p>
+              El gráfico de dona muestra la proporción de gastos por categoría, aquellas categorías que no superen el 1%
+              serán agrupadas.
+            </p>
+            <p>
+              El gráfico de barras muestra el total de gastos por proveedor, ordenados de mayor a menor. La escala de
+              los montos se ajusta de forma automática.
+            </p>
+          </li>
+          <li>
+            <strong>Botones</strong>:
+            <ul>
+              <li><button class="btn btn-primary bi bi-funnel-fill mb-2"></button> Permite aplicar filtros avanzados.
+              </li>
+              <li><button class="btn btn-secondary bi bi-trash mb-2"></button> Elimina los filtros avanzados aplicados.
+              </li>
+              <li><button class="btn btn-sm btn-link text-muted bi bi-arrow-left fs-5"></button> Vuelve a la pantalla
+                principal.</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div>
+}
+@if(cardView == 3){
+<div class="modal fade" id="infoModal" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Reporte</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <ul>
+          <li>
+            <p>
+              <strong>Comparación Mensual de Gastos</strong>: Muestra una comparativa entre el año anterior y el año
+              actual.
+              Incluye dos KPI que indican el total de cada año y un tercero que muestra el % de aumento o disminución
+              del gasto del año actual respecto al año anterior.
+            </p>
+            <p>
+              El gráfico de columnas muestra el total de cada año por mes. La escala de los montos se ajusta de forma
+              automática.
+            </p>
+            <p>
+              Hay dos gráficos de barras que muestran el total de gastos por proveedor de cada año, ordenados de mayor a
+              menor. La escala de los montos se ajusta de forma automática.
+            </p>
+          </li>
+          <li>
+            <strong>Botones</strong>:
+            <ul>
+              <li><button class="btn btn-primary bi bi-funnel-fill mb-2"></button> Permite aplicar filtros avanzados.
+              </li>
+              <li><button class="btn btn-secondary bi bi-trash mb-2"></button> Elimina los filtros avanzados aplicados.
+              </li>
+              <li><button class="btn btn-sm btn-link text-muted bi bi-arrow-left fs-5"></button> Vuelve a la pantalla
+                principal.</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div>
+}

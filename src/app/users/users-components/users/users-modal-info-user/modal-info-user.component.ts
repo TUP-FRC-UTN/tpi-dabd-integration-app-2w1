@@ -105,6 +105,7 @@ export class ModalInfoUserComponent implements OnInit {
     this.activeModal.close();
   }
 
+
   confirmDelete() {
     Swal.fire({
       title: '¿Seguro que desea eliminar el usuario?',

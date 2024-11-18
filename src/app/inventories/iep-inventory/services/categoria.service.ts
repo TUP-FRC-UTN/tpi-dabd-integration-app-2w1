@@ -4,7 +4,8 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { CreateCategoryDto } from '../models/create-category-dto';
 import { ProductCategory } from '../models/product-category';
 import { PutCategoryDTO } from '../models/putCategoryDTO';
-import { environment } from '../../../common/environments/environment.prod';
+import { environment } from '../../../common/environments/environment';
+
 @Injectable({
   providedIn: 'root'
 })

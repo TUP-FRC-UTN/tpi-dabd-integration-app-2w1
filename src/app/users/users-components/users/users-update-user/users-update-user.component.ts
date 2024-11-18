@@ -53,10 +53,7 @@ throw new Error('Method not implemented.');
   filteredUserRoles : string[] = [];                  //Listado de roles del usuario a mostrar    
   optionRoles : {name: string, value: any}[] = [];    //Listado de objetos para el select
   blockedRoles: string[] = [];                        //Listado de roles del usuario sin mostrar
-
   rolesSelected: any[] = [];
-
-  
   opt: any[] = [];
   checkedOpt: string[] = [];
 
@@ -72,10 +69,7 @@ throw new Error('Method not implemented.');
     this.updateForm.get('email')?.disable();
     this.updateForm.get('avatar_url')?.disable();
     this.updateForm.get('datebirth')?.disable();
-  
-
   }
-
 
   getAllRoles(){
     this.userService.getAllRoles().subscribe({
@@ -105,6 +99,10 @@ throw new Error('Method not implemented.');
 
           this.userRoles = data.roles;
           this.filteredUserRoles = this.filterUserRoles(this.userRoles);
+          console.log("Roles del usuario", this.filteredUserRoles);
+          
+          this.updateForm.get('roles')?.setValue(this.filteredUserRoles);
+          this.rolesComponent.setData(this.filteredUserRoles);
 
           if (formattedDate) {
             // Formatea la fecha a 'yyyy-MM-dd' para un input de tipo date
@@ -154,7 +152,6 @@ throw new Error('Method not implemented.');
         
         return true;
     });
-
     return filteredList;
   }
 
@@ -174,18 +171,17 @@ throw new Error('Method not implemented.');
             this.blockedRoles.push(opt);
             return false;
         }
-        
         return true;
     });
-
     return filteredList;
   }
 
   confirmExit() {
     if (this.authService.getActualRole() === 'Propietario') {
-      this.router.navigate(['home/family']);
-    } else if (this.authService.getActualRole() === 'Gerente') {
-      this.router.navigate(['home/users/list']);
+      this.router.navigate(['main/users/family']);
+    } else {
+
+      this.router.navigate(['main/users/list']);
     }
   }
 
@@ -250,10 +246,10 @@ throw new Error('Method not implemented.');
   //Redirige a la lista
   redirectList() {
     if (this.authService.getActualRole() == 'Propietario') {
-      this.router.navigate(['home/family']);
+      this.router.navigate(['main/users/family']);
     }
-    else if (this.authService.getActualRole() == 'Gerente') {
-      this.router.navigate(['home/users/list']);
+    else {
+      this.router.navigate(['main/users/list']);
     }
   }
 

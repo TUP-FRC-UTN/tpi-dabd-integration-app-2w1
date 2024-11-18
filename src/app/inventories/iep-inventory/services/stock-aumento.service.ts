@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { StockAumento } from '../models/stock-aumento';
 import { Supplier } from '../models/suppliers';
 import { BehaviorSubject } from 'rxjs';
-import { environment } from '../../../common/environments/environment.prod';
+import { environment } from '../../../common/environments/environment';
 
 @Injectable({
   providedIn: 'root',
