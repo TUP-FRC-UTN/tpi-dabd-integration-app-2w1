@@ -20,8 +20,25 @@ export class ExpenseService {
   }
   registerExpense(expense: Expense, file?: File): Observable<HttpResponse<any>> {
     const formData = new FormData();
-  
-    formData.append('expense', JSON.stringify(expense));
+    debugger
+    let expenseSave = {
+      id: expense.id,
+      description: expense.description,
+      providerId: expense.providerId,
+      expenseDate: expense.expenseDate,
+      invoiceNumber: expense.invoiceNumber,
+      typeExpense: expense.typeExpense,
+      categoryId: expense.categoryId,
+      amount: expense.amount,
+      fileId: expense.fileId,
+      installments: expense.installments,
+      distributions: expense.distributions.map(dist => ({ ...dist }))
+  };
+    expenseSave.distributions.forEach(d => {
+      d.proportion=d.proportion/100
+    });
+    debugger
+    formData.append('expense', JSON.stringify(expenseSave));
   
     if (file) {
       formData.append('file', file);
