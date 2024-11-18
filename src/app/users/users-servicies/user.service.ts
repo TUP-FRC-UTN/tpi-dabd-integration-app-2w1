@@ -21,15 +21,15 @@ export class UserService {
   constructor() { }
 
   putUser(user: UserPut, userId: number): Observable<UserPut> {
-    return this.http.put<UserPut>(this.url + "/put/" + userId, user);
+    return this.http.put<UserPut>(this.url + "/users/put/" + userId, user);
   }
 
   postUser(user: UserPost): Observable<UserGet> {    
-    return this.http.post<UserGet>(this.url + "/post", user);
+    return this.http.post<UserGet>(this.url + "/users/post", user);
   } 
 
   getAllUsers(): Observable<UserGet[]> {
-    return this.http.get<UserGet[]>(this.url + "/getall");
+    return this.http.get<UserGet[]>(this.url + "/users/getall");
   }
 
   verifyLogin(user: LoginUser): Observable<LoginUser> {
@@ -41,26 +41,26 @@ export class UserService {
   }
 
   getUserById(userId: number): Observable<UserGet> {
-    return this.http.get<UserGet>(this.url + "/getById/" + userId);
+    return this.http.get<UserGet>(this.url + "/users/getById/" + userId);
   }
 
   getUserById2(userId: number): Observable<GetuserDto> {
-    return this.http.get<GetuserDto>(this.url + "/getById/" + userId);
+    return this.http.get<GetuserDto>(this.url + "/users/getById/" + userId);
   }
 
   getUserByEmail(email: string): Observable<UserGet> {
-    return this.http.get<UserGet>(this.url + "/getByEmail/" + email);
+    return this.http.get<UserGet>(this.url + "/users/getByEmail/" + email);
   }
 
   getUsersByPlotID(plotId: number): Observable<UserGet[]> {
-    return this.http.get<UserGet[]>(this.url + "/getall/" + plotId);
+    return this.http.get<UserGet[]>(this.url + "/users/getall/" + plotId);
   }
 
   getUsersByOwner(ownerId: number): Observable<UserGet> {
-    return this.http.get<UserGet>(this.url + "/byOwner/"+ ownerId + "/WithoutTheOwner");
+    return this.http.get<UserGet>(this.url + "/users/byOwner/"+ ownerId + "/WithoutTheOwner");
   }
 
   deleteUser( user: DeleteUser): Observable<any> {
-    return this.http.delete(this.url + '/delete/' + user.id + '/' + user.userIdUpdate); 
+    return this.http.delete(this.url + '/users/delete/' + user.id + '/' + user.userIdUpdate); 
   }
 }
