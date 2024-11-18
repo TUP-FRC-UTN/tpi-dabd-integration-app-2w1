@@ -1,0 +1,20 @@
+sticky-section {
+  position: sticky;
+  top: 70px;
+  z-index: 10;
+  background-color: white;
+}
+
+google-chart {
+  transition: all 0.4s ease;
+  height: 100%;
+}
+
+.hover-scale {
+  transition: all 0.3s ease;
+}
+
+.hover-scale:hover {
+  transform: scale(1.01);
+  cursor: pointer;
+}

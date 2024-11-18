@@ -1,0 +1,26 @@
+<ng-select 
+  [items]="expenseTypeList" 
+  bindLabel="description" 
+  [bindValue]="multiple ? '':'id'"
+  [multiple]="multiple"
+  [(ngModel)]="selectValue"
+  [closeOnSelect]="!multiple"
+  (change)="onTypeChange()"
+  [selectableGroup]="true"
+  [clearable] = "multiple"
+  >
+    
+  @if (multiple) {
+    <ng-template ng-multi-label-tmp let-items="items">
+      @if(items.length == 1){
+          {{ items[0].description }}
+      }
+      @if(items.length>1){
+          {{ items.length }} seleccionados
+      }
+    </ng-template>
+    <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+      <input id="item-{{ index }}" type="checkbox" [ngModel]="item$.selected" /> {{ item.description }}
+    </ng-template>
+  }
+</ng-select>

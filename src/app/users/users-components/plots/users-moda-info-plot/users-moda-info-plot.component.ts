@@ -1,13 +1,12 @@
-import { CommonModule, formatDate } from '@angular/common';
-import { Component, ElementRef, EventEmitter, inject, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { UserGet } from '../../../users-models/users/UserGet';
-import { UserService } from '../../../users-servicies/user.service';
-import Swal from 'sweetalert2';
+import { CommonModule } from '@angular/common';
+import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { GetPlotModel } from '../../../users-models/plot/GetPlot';
 import { FileDto } from '../../../users-models/owner/FileDto';
 import { FileService } from '../../../users-servicies/file.service';
+import { OwnerService } from '../../../users-servicies/owner.service';
+import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
 
 @Component({
   selector: 'app-users-moda-info-plot',
@@ -16,14 +15,21 @@ import { FileService } from '../../../users-servicies/file.service';
   templateUrl: './users-moda-info-plot.component.html',
   styleUrl: './users-moda-info-plot.component.css'
 })
-export class UsersModaInfoPlotComponent implements OnInit {
+export class UsersModaInfoPlotComponent implements OnInit, OnDestroy {
 
   @Input() plotModel: GetPlotModel = new GetPlotModel();
 
   plotForm: FormGroup;
   filesPlot: FileDto[];
 
+  ownerName: string = '';           // Para almacenar el nombre del propietario
+  ownerLastName: string = '';      // Para almacenar el apellido del propietario
+  ownerDNI: string = '';          // Para almacenar el DNI del propietario
+  ownerType: string = ''         //Tipo de propietario
+
+  private readonly ownerService = inject(OwnerService);
   private readonly fileService = inject(FileService);
+  private readonly suscriptionService = inject(SuscriptionManagerService);
 
   constructor(public activeModal: NgbActiveModal, private fb: FormBuilder) {
     this.plotForm = this.fb.group({
@@ -49,12 +55,41 @@ export class UsersModaInfoPlotComponent implements OnInit {
       });
       this.plotForm.disable();
       this.filesPlot = this.plotModel.files;
+
+      // Obtener información del propietario
+      this.getOwnerByPlotId(this.plotModel.id);
   }
 
+  ngOnDestroy(): void {
+    this.suscriptionService.unsubscribeAll();
+  }
+
+  //Obtiene el propietario por id
+  getOwnerByPlotId(id: number) {
+    const sus = this.ownerService.getOwnerByPlotId(this.plotModel.id).subscribe({
+      next: (owners) => {
+        if (owners.length > 0) {
+          this.ownerName = owners[0].name;
+          this.ownerLastName = owners[0].lastname;
+          this.ownerDNI = owners[0].dni;
+          this.ownerType = owners[0].ownerType;
+        }
+      },
+      error: (error) => {
+        console.error('Error al obtener el propietario:', error);
+      }
+    });
+
+    //Agregar suscripcion
+    this.suscriptionService.addSuscription(sus);
+  }
+
+  //Cierra el modal
   closeModal(){
     this.activeModal.close();
   }
 
+  //Descarga los archivos
   downloadFile(fileId: string) {
     this.fileService.downloadFile(fileId);
   }

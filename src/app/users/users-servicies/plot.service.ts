@@ -6,6 +6,7 @@ import { PlotStateModel } from '../users-models/plot/PlotState';
 import { PlotModel } from '../users-models/plot/Plot';
 import { GetPlotModel } from '../users-models/plot/GetPlot';
 import { PutPlot } from '../users-models/plot/PutPlot';
+import { environment } from '../../common/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,7 @@ import { PutPlot } from '../users-models/plot/PutPlot';
 export class PlotService {
 
   private readonly http: HttpClient = inject(HttpClient);
-  private readonly url = 'http://localhost:8081';
+  private readonly url = environment.services.ownersAndPlots;
 
   constructor() { }
 
@@ -56,6 +57,10 @@ export class PlotService {
 
   getPlotById(plotId: number): Observable<GetPlotModel>{
     return this.http.get<GetPlotModel>(this.url + '/plots/' + plotId);
+  }
+
+  getPlotsByOwnerId(ownerId: number): Observable<GetPlotModel[]>{
+    return this.http.get<GetPlotModel[]>(this.url + '/plots/' + ownerId + '/owner' )
   }
   
   getAllStates(): Observable<PlotStateModel[]>{

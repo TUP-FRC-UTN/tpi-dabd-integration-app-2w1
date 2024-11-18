@@ -8,11 +8,12 @@ import { Producto } from '../models/producto';
 import { ProductXDetailDto } from '../models/product-xdetail-dto';
 import { createProductDTO } from '../models/create-product-dto';
 import { UsersMockIdService } from '../../common-services/users-mock-id.service';
+import { environment } from '../../../common/environments/environment';
 @Injectable({
   providedIn: 'root',
 })
 export class ProductService {
-  private readonly INVENTORY_BASE_URL: string = 'http://localhost:8081/';
+  private readonly INVENTORY_BASE_URL: string = environment.services.inventory + "/";
 
   private readonly CATEGORY_URL_GET_ALL: string = `${this.INVENTORY_BASE_URL}category`; // Tomas C
 

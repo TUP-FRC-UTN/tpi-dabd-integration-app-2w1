@@ -1,26 +1,25 @@
-import { AfterViewInit, Component, EventEmitter, inject, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { FormsModule, NgForm, NgModel } from '@angular/forms';
+import { AfterViewInit, Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
 import { NotificationService } from '../../service/notification.service';
-import { NotificationGeneral } from '../../notificationGeneral';
 import { UserApiDTO } from '../../models/DTOs/UserApiDTO';
 import $ from 'jquery';
 import 'datatables.net'
 import 'datatables.net-bs5';
-import { style } from '@angular/animations';
 import "datatables.net-select"
 import { NgClass } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { General } from '../../models/general';
 import { NotificationGeneralDTO } from '../../models/DTOs/NotificationGeneralDTO';
 import { UserDTO } from '../../models/DTOs/UserDTO';
 import Swal from 'sweetalert2';
-
+import { ReactiveFormsModule, FormsModule, NgForm } from '@angular/forms';
+import { Subscription } from 'rxjs';
+import { environment } from '../../../common/environments/environment';
 
 @Component({
   selector: 'app-post-notification-admin',
   standalone: true,
-  imports: [FormsModule, NgClass],
+  imports: [FormsModule, NgClass, ReactiveFormsModule],
   templateUrl: './post-notification-admin.component.html',
+  styles: ['.hidden {display:none;}'],
   styleUrl: './post-notification-admin.component.css'
 })
 export class PostNotificationAdminComponent implements AfterViewInit, OnInit{
@@ -37,25 +36,30 @@ export class PostNotificationAdminComponent implements AfterViewInit, OnInit{
 
   httpClient : HttpClient = inject(HttpClient);
   constructor(private notificationService: NotificationService) {}
+
   selectValue : string = "1";
   users : UserApiDTO[] = []
-
+  subscription = new Subscription()
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe()
+  }
+  
   ngOnInit(): void {
     
       const users = this.httpClient.get<UserApiDTO[]>
-      ("https://my-json-server.typicode.com/405786MoroBenjamin/users-responses/users")
+      (environment.services.notifications + "/general/getUsers")
       .subscribe(response =>
         {this.users = response;
           this.fillTable();
+          console.log(this.users);
       })
   }
 
   fillTable() {
-    //TODO: JQUERY?????????
     let table = $("#myTable").DataTable();
     for (let user of this.users) {
-      
-      table.row.add([user.name,user.lastname,user.dni,user.email]).draw(false);
+
+      table.row.add([user.name,user.lastname,user.dni,user.email, '<input type="checkbox" class="userCheckbox" />']).draw(false);
     }
   }
   radioButtonValue : string = "allUsers";
@@ -64,39 +68,67 @@ export class PostNotificationAdminComponent implements AfterViewInit, OnInit{
   ngAfterViewInit(): void {
       this.setTable();
       this.selectValue = "1"
+      
   }
 
   setTable(): void {
-    $('#myTable').DataTable({
+    $("#myTable").DataTable({
+      dom: '<"mb-3"t>' + '<"d-flex justify-content-between"lp>',
+      
+      columnDefs: [
+        {
+          targets: 4,
+          className: 'text-center align-middle',
+        }
+      ],
+
+      select: {
+        style: "multi",
+        selector: 'td:first-child input[type="checkbox"]'
+      },
       paging: true,
       searching: true,
-      order: [[1,"asc"]],
+      ordering: true,
       lengthChange: true,
-      pageLength: 10,
-      
+      pageLength: 5,
+      lengthMenu: [5, 10, 25, 50],
+      order: [[1, "asc"]],
       language: {
-        emptyTable: "No hay datos para mostrar",
+        emptyTable: "Cargando...",
         search: "Buscar",
         loadingRecords: "Cargando...",
-        infoEmpty: "No hay usuarios disponibles",
-        lengthMenu: "_MENU_ usuarios por pagina",
-        info:"Mostrando de _START_ a _END_ total de _TOTAL_ usuarios",
-      }
+        zeroRecords: "No se han encontrado registros",
+        lengthMenu: "_MENU_",
+        info: " ",
+      },
+    });
+
+    $("#searchTerm").on("keyup", function () {
+      $("#myTable")
+        .DataTable()
+        .search($(this).val() as string)
+        .draw();
+    });
+
+    $('#selectAll').on('click', function() {
+      const isChecked = $(this).prop('checked');
+      $('input[type="checkbox"].userCheckbox').prop('checked', isChecked);
     });
   }
 
   newNotification : NotificationGeneralDTO = {
     users : [],
-    senderId: 0,
+    senderId: 1,
     subject: "",
     description : "",
-    channel: "EMAIL"
+    channel: "EMAIL",
   }
 
   selectedUser: string = ''; 
 
   onSubmit(form: NgForm) {
     console.log('click: ', form.value);
+
     
 
     if (form.valid && this.selectValue != "1") {
@@ -114,20 +146,25 @@ export class PostNotificationAdminComponent implements AfterViewInit, OnInit{
 
       this.newNotification.channel = this.selectValue;
       
-      this.notificationService.postNotification(this.newNotification).subscribe({
+      const postNotification =this.notificationService.postNotification(this.newNotification).subscribe({
         next: (response: any) => {
           console.log('Notificacion enviada: ', response);
+          console.log(this.newNotification.users[0].telegramChatId);
           Swal.fire({
             title: '¡Notificación enviada!',
             text: 'La notificacion ha sido enviada correctamente.',
             icon: 'success',
-            timer: 1500,
-            showConfirmButton: false});
+            showConfirmButton: true,
+            confirmButtonText: 'Aceptar'
+          });
+          
         },
         error: (error) => {
           console.error('Error al enviar la notificacion: ', error);
         }
       });
+      this.subscription.add(postNotification)
+      
     }
     else {
       console.log("form invalid");
@@ -135,52 +172,38 @@ export class PostNotificationAdminComponent implements AfterViewInit, OnInit{
   }
 
 
-
   clearForm(form : NgForm) {
     // form.reset();
     // this.radioButtonValue = "allUsers";
     let table = $("#myTable").DataTable()
-    //TODO: REVISAR ESTO
-   // table.search((d:any) => d.includes('Alice')).draw();
+    
   }
   getSelectedUsers() : UserDTO[]{
     let table = $("#myTable").DataTable();
     
     let users : UserDTO[] = []
-    const amountOfUsers = table.rows({selected:true}).count();
-    let rowData = table.rows({ selected: true }).data() as { [key: string]: any };
-    for (let i = 0; i < amountOfUsers; i++) {
-      //hardcoded telegram chatId and email for demo
-      if (i == 0 ) {
-        let user : UserDTO = {
-          //HARDCODED ID
-          id : i,
-          email: "solis.luna.ignacio@gmail.com",
-          chatId : 5869258860
-        }
-        users.push(user)
+    const component = this;
+    
+    $("#myTable tbody tr").each(function () {
+      const checkbox = $(this).find("input.userCheckbox");
+      if (checkbox.is(":checked")) {
+
+        const rowData = $("#myTable").DataTable().row(this).data();
+        let user: UserDTO = {
+          //encontrar el ID del user a travez del DNI
+          id: component.users.find(user => user.dni == rowData[2])?.id || 4,
+          nombre: component.users.find(user => user.dni == rowData[2])?.name || "test",
+          apellido: component.users.find(user => user.dni == rowData[2])?.lastname || "test",
+          dni: component.users.find(user => user.dni == rowData[2])?.dni || 9999999,
+          email: component.users.find(user => user.dni == rowData[2])?.email || "test@test.com",
+          telegramChatId: component.users.find(user => user.dni == rowData[2])?.telegram_id || 801000,
+        };
+        console.log("mira bro" +user.telegramChatId + " " + user.dni + " " + user.id);
+        users.push(user);
       }
-      else if (i == 1 ) {
-        let user : UserDTO = {
-          id : i,
-          email: "facuu.arguellog@gmail.com",
-          chatId : 1129773792
-        }
-        users.push(user)
-      }
-      else {
-        let user : UserDTO = {
-          id : i,
-          email: rowData[i][3],
-          //Cambiar a chatId cuando api users tenga ese campo
-          chatId: 0
-          
-        }
-        users.push(user)
-      }
-      
-    }
+    }); 
     return users;
+    console.log(users)
   }
 
   mapUserApiDTOToUserDTO(userApiArr : UserApiDTO[]) : UserDTO[]{
@@ -189,8 +212,11 @@ export class PostNotificationAdminComponent implements AfterViewInit, OnInit{
     for (let user of userApiArr) {
       let userDTO : UserDTO = {
         id: user.id,
+        nombre: user.name,
+        apellido: user.lastname,
+        dni: 999999,
         email: user.email,
-        chatId : 0
+        telegramChatId : 0
       }
       userDTOArray.push(userDTO);
     }
@@ -206,8 +232,7 @@ export class PostNotificationAdminComponent implements AfterViewInit, OnInit{
     
     let filteredUserDTOArray = this.mapUserApiDTOToUserDTO(filteredUsers);
     
-    filteredUserDTOArray[0].chatId = 5869258860;
-    filteredUserDTOArray[0].email = "solis.luna.ignacio@gmail.com"
+    console.log(filteredUserDTOArray);
     return filteredUserDTOArray;
     
   }

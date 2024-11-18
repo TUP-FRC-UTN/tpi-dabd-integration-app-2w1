@@ -5,11 +5,12 @@ import { ExpenseView } from '../../models/expenseView';
 import { DistributionList } from '../../models/distributionList';
 import { Instalmentlist } from '../../models/installmentList';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../common/environments/environment.prod';
 @Injectable({
     providedIn: 'root',
   })
   export class ExpenseViewService{
-    private apiUrl = 'http://localhost:8080/expenses/getById?expenseId=';
+    private apiUrl = environment.services.expensesManager+'/expenses/getById?expenseId=';
     constructor(private http: HttpClient){
 
     }

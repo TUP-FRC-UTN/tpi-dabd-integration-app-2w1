@@ -1,71 +1,111 @@
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
-import { UserGet } from '../../../users-models/users/UserGet';
-import { CommonModule, getLocaleMonthNames } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { UserService } from '../../../users-servicies/user.service';
+import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import $ from 'jquery';
 import 'datatables.net';
 import 'datatables.net-bs5';
-import { Router, RouterModule } from '@angular/router';
+import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import Swal from 'sweetalert2';
-import { PlotModel } from '../../../users-models/plot/Plot';
 import { PlotService } from '../../../users-servicies/plot.service';
 import { GetPlotModel } from '../../../users-models/plot/GetPlot';
 import { UsersModaInfoPlotComponent } from '../users-moda-info-plot/users-moda-info-plot.component';
+import { PlotStateModel } from '../../../users-models/plot/PlotState';
+import { PlotTypeModel } from '../../../users-models/plot/PlotType';
+import { OwnerService } from '../../../users-servicies/owner.service';
+import { Owner } from '../../../users-models/owner/Owner';
+import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
+import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
 
 @Component({
   selector: 'app-users-list-plots',
   standalone: true,
-  imports: [],
+  imports: [ReactiveFormsModule, CustomSelectComponent],
   templateUrl: './users-list-plots.component.html',
   styleUrl: './users-list-plots.component.css'
 })
-export class UsersListPlotsComponent {
+export class UsersListPlotsComponent implements OnInit, OnDestroy {
   plots: GetPlotModel[] = [];
-  private readonly apiService = inject(PlotService);
+  private readonly plotService = inject(PlotService);
+  private readonly ownerService = inject(OwnerService);
   showDeactivateModal: boolean = false;
   userToDeactivate: number = 0;
 
-  constructor(private router: Router,private modal: NgbModal) { }
+  //Filtros
+  selectType = new FormControl();
+  selectState = new FormControl();
 
-  ngOnInit() {
-    this.apiService.getAllPlots().subscribe({
-      next: (data: GetPlotModel[]) => {
-        // Cambiar guiones por barras en la fecha de nacimiento
-        this.plots = data;         
-        
-        // Inicializar DataTables después de cargar los datos
+  plotTypes: string[] = [];
+  plotStatus: string[] = [];
+  typesForFilter: any[] = [];
+  statusForFilter: any[] = [];
+
+  @ViewChild('customSelectType') customSelectType!: CustomSelectComponent;
+  @ViewChild('customSelectState') customSelectState!: CustomSelectComponent;
+
+  private readonly suscriptionService = inject(SuscriptionManagerService);
+
+  constructor(private router: Router, private modal: NgbModal) { }
+
+  ngOnDestroy(): void {
+    this.suscriptionService.unsubscribeAll();
+  }
+
+  async ngOnInit() {
+    this.loadAllPlotsStates();
+    this.loadAllPlotsTypes();
+
+    const sus = this.plotService.getAllPlots().subscribe({
+      next: async (data: GetPlotModel[]) => {
+        this.plots = data;
+
+        // Crear un arreglo de promesas para obtener los propietarios
+        const ownerPromises = this.plots.map(async plot => {
+          return await this.showOwner(plot.id); // Esperar el nombre del propietario
+        });
+
+        // Esperar a que todas las promesas se resuelvan
+        const owners = await Promise.all(ownerPromises);
+
+        // Inicializar DataTables después de cargar todos los datos
         setTimeout(() => {
-          const table = $('#myTable').DataTable({
+          const table = $('#myTablePlot').DataTable({
             paging: true,
             searching: true,
             ordering: true,
             lengthChange: true,
-            lengthMenu: [10, 25, 50],
+            lengthMenu: [5, 10, 25, 50],
             order: [[0, 'asc']],
-            pageLength: 10,
+            pageLength: 5,
+            data: this.plots.map((plot, index) => [
+              `<p class="text-end">${plot.plot_number}<p/>`,
+              `<p class="text-end">${plot.block_number}<p/>`,
+              ` <p class="text-end">${plot.total_area_in_m2} m²<p/>`,
+              `<p class="text-end">${plot.built_area_in_m2} m²<p/>`,
+              this.showPlotType(plot.plot_type),
+              this.showPlotState(plot.plot_state),
+              owners[index] // Usar el nombre del propietario cargado
+            ]),
             columns: [
-              { title: 'Lote', width: '10%', className: 'text-start' },
-              { title: 'Manzana', width: '10%', className: 'text-start'},
+              { title: 'Lote', width: '10%', className: 'text-center' },
+              { title: 'Manzana', width: '10%', className: 'text-start' },
               { title: 'Mts.2 Terreno', width: '15%', className: 'text-start' },
               { title: 'Mts.2 Construidos', width: '15%', className: 'text-start' },
               { title: 'Tipo Lote', width: '15%', className: 'text-start' },
               { title: 'Estado', width: '15%', className: 'text-start' },
+              { title: 'Propietario', width: '15%', className: 'text-start' }, // Nueva columna
               {
                 title: 'Acciones',
                 orderable: false,
                 width: '15%',
-                className: 'text-left',  
+                className: 'text-center',
                 render: (data, type, row, meta) => {
                   const plotId = this.plots[meta.row].id;
                   return `
-                    <div class="dropdown-center d-flex align-items-center">
-                      <button class="btn btn-light border border-1 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <div class="dropdown-center d-flex align-items-center justify-content-center">
+                      <button class="btn btn-light border border-1" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-three-dots-vertical"></i>
                       </button>
                       <ul class="dropdown-menu">
@@ -74,22 +114,11 @@ export class UsersListPlotsComponent {
                         <li><a class="dropdown-item edit-plot" data-id="${plotId}">Editar</a></li>
                       </ul>
                     </div>
-                  `; // si queremos el ver mas de nuevo <li><a class="dropdown-item view-plot" data-id="${meta.row}">Ver más</a></li>
+                  `;
                 }
               }
             ],
-            data: this.plots.map(plot => [
-               // Ejemplo de acción
-              plot.plot_number,
-              plot.block_number,
-              plot.total_area_in_m2,
-              plot.built_area_in_m2,  
-              plot.plot_type,
-              plot.plot_state
-            ]),
-            dom:
-            '<"mb-3"t>' +                           
-            '<"d-flex justify-content-between"lp>',
+            dom: '<"mb-3"t>' + '<"d-flex justify-content-between"lp>',
             language: {
               lengthMenu: "_MENU_",
               zeroRecords: "No se encontraron resultados",
@@ -101,148 +130,286 @@ export class UsersListPlotsComponent {
               processing: "Procesando...",
               emptyTable: "No hay datos disponibles en la tabla"
             },
-          });    
+          });
 
           // Alinear la caja de búsqueda a la derecha
-          const searchInputWrapper = $('#myTable_filter');
+          const searchInputWrapper = $('#myTable_filterPlot');
           searchInputWrapper.addClass('d-flex justify-content-start');
 
           // Desvincular el comportamiento predeterminado de búsqueda
-          $('#myTable_filter input').unbind(); 
-          $('#myTable_filter input').bind('input', (event) => { // Usar función de flecha aquí
-              const searchValue = (event.target as HTMLInputElement).value; // Acceder al valor correctamente
-          
-              // Comienza a buscar solo si hay 3 o más caracteres
-              if (searchValue.length >= 2) {
-                  table.search(searchValue).draw();
-              } else {
-                  table.search('').draw(); // Limpia la búsqueda si hay menos de 3 caracteres
-              }
+          $('#myTable_filterPlot input').unbind();
+          $('#myTable_filterPlot input').bind('input', (event) => {
+            const searchValue = (event.target as HTMLInputElement).value;
+            if (searchValue.length >= 2) {
+              table.search(searchValue).draw();
+            } else {
+              table.search('').draw();
+            }
           });
 
-          // Asignar el evento click a los botones "Ver más"
-          // Asignar el evento click a los botones "Ver más"
-        $('#myTable').on('click', '.view-plot', (event) => {
-          
-          //Comente estas lineas porque daba error
-          //const id = $(event.currentTarget).data('id');
-          //const userId = this.plots[id].id; // Obtén el ID real del usuario
-          const plotId = $(event.currentTarget).data('id');
-          this.abrirModal( plotId); // Abre el modal en modo "ver"
-        });
-
-          // Asignar el evento click a los botones "Editar"
-          $('#myTable').on('click', '.edit-plot', (event) => {
-            console.log("a");
-            
-            const userId = $(event.currentTarget).data('id');
-            this.redirectEdit(userId); // Redirigir al método de edición
+          // Asignar eventos a los botones "Ver más" y "Editar"
+          $('#myTablePlot').on('click', '.view-plot', (event) => {
+            const plotId = $(event.currentTarget).data('id');
+            this.openModal(plotId);
           });
 
+          $('#myTablePlot').on('click', '.edit-plot', (event) => {
+            const plotId = $(event.currentTarget).data('id');
+            this.redirectEdit(plotId);
+          });
 
-        }, 0); // Asegurar que la tabla se inicializa en el próximo ciclo del evento
+        }, 0);
       },
       error: (error) => {
         console.error('Error al cargar los lotes:', error);
       }
     });
+
+    //Agregar servicio
+    this.suscriptionService.addSuscription(sus);
+
+  }
+  //--------------------------------------------------Carga de datos--------------------------------------------------
+
+  //Cargar estados de los lotes
+  loadAllPlotsStates() {
+    const sus = this.plotService.getAllStates().subscribe({
+      next: (data: PlotStateModel[]) => {
+
+        this.plotStatus = data.map(state => state.name);
+
+        this.statusForFilter = data.map(r => ({
+          value: r.name,
+          name: r.name
+        }));
+      },
+      error: (error) => {
+        console.error('Error al cargar los estados:', error);
+      }
+    });
+
+    //Agregar servicio
+    this.suscriptionService.addSuscription(sus);
   }
 
-   //Exporta a pdf la tabla, si esta filtrada solo exporta los datos filtrados
-   exportPdf() {
-    const doc = new jsPDF();
-  
-    // Agregar título centrado
+  //Cargar tipos de los lotes
+  loadAllPlotsTypes() {
+    const sus = this.plotService.getAllTypes().subscribe({
+      next: (data: PlotTypeModel[]) => {
+        this.plotTypes = data.map(type => type.name);
+
+        this.typesForFilter = data.map(r => ({
+          value: r.name,
+          name: r.name
+        }));
+      },
+      error: (error) => {
+        console.error('Error al cargar los tipos:', error);
+      }
+    });
+
+    //Agregar servicio
+    this.suscriptionService.addSuscription(sus);
+  }
+
+  //Obtener el propietario por id
+  async showOwner(plotId: number): Promise<string> {
+    return new Promise<string>((resolve) => {
+      const sus = this.ownerService.getOwnerByPlotId(plotId).subscribe({
+        next: (data: Owner[]) => {
+          if (data.length > 0) {
+            resolve(data[0].lastname + ', ' + data[0].name);
+          } else {
+            resolve('Sin propietario');
+          }
+        },
+        error: (error) => {
+          console.error('Error al cargar el propietario:', error);
+          resolve('Error al cargar propietario');
+        }
+      });
+      //Agregar servicio
+      this.suscriptionService.addSuscription(sus);
+    });
+
+  }
+
+  //--------------------------------------------------Filtros------------------------------------------------
+
+  //Filtrar por tipo
+  updateFilterType(options: any[]) {
+    // Asignamos directamente los roles emitidos
+    var optionsFilter = options.map((option: any) => option).join('|'); // Usar '|' para permitir múltiples filtros
+    const table = $('#myTablePlot').DataTable();
+
+    // Filtrar por el contenido de la columna de tipo de lote, teniendo en cuenta que puede tener unicamente 1 valor, pero se tiene que filtrar x varios
+    table.column(4).search(optionsFilter, true, false).draw(); // Usar expresión regular para permitir múltiples filtros
+  }
+
+  //Filtrar por tipo
+  updateFilterTypeSimple(filter : any[]) {
+    const table = $('#myTablePlot').DataTable();
+    table.column(4).search((this.selectType.value as string[]).join(' ') ?? '').draw();
+  }
+
+  //Filtrar por estado
+  updateFilterStateSimple() {
+    const table = $('#myTablePlot').DataTable();
+    table.column(5).search((this.selectState.value as string[]).join(' ') ?? '').draw();
+  }
+
+  //Filtrar por estado
+  updateFilterState(options: any[]) {
+    // Asignamos directamente los roles emitidos
+    var optionsFilter = options.map((option: any) => option).join('|'); // Usar '|' para permitir múltiples filtros
+    const table = $('#myTablePlot').DataTable();
+
+    // Filtrar por el contenido de la columna de tipo de lote, teniendo en cuenta que puede tener unicamente 1 valor, pero se tiene que filtrar x varios
+    table.column(5).search(optionsFilter, true, false).draw(); // Usar expresión regular para permitir múltiples filtros
+  }
+
+  //Limpiar filtros
+  resetFilters() {
+    // Reiniciar el valor de los controles de filtro
+    this.selectType.setValue([]);
+    this.selectState.setValue([]);
+
+    // Limpiar el campo de búsqueda general y los filtros de las columnas
+    const searchInput = document.querySelector('#myTable_filterPlot input') as HTMLInputElement;
+    if (searchInput) {
+      searchInput.value = ''; 
+    }
+    const table = $('#myTablePlot').DataTable();
+
+    if (this.customSelectState) {
+      this.customSelectState.setData([]); // Reiniciar datos del custom select
+    }
+    if(this.customSelectType){
+      this.customSelectType.setData([]); // Reiniciar datos del custom select
+    }
+
+    // Limpiar búsqueda y filtros
+    table.search('').draw();
+    table.columns().search('').draw();
+  }
+
+  //--------------------------------------------------Exportar------------------------------------------------
+
+  //Exporta a pdf la tabla
+  exportPdf() {
+    //Mantener la orientación del documento en portrait
+    const doc = new jsPDF('portrait');
+
+    //Agregar título centrado con la fecha actual a la derecha
     const title = 'Lista de Lotes';
-    const pageWidth = doc.internal.pageSize.getWidth();
-    doc.setFontSize(16);
-    const textWidth = doc.getTextWidth(title);
-    doc.text(title, (pageWidth - textWidth) / 2, 20);
-  
-    // Obtener columnas de la tabla (añadido 'Email')
-    const columns = ['Lote', 'Manzana', 'M2', 'M2 Construidos','Tipo','Estado'];
-  
-    // Filtrar datos visibles en la tabla
-    const table = $('#myTable').DataTable(); // Inicializa DataTable una vez
-  
-    // Cambia la forma de obtener las filas visibles usando 'search' en lugar de 'filter'
-    const visibleRows = table.rows({ search: 'applied' }).data().toArray(); // Usar 'search: applied'
-  
-    // Mapear los datos filtrados a un formato adecuado para jsPDF
+    doc.setFontSize(18);
+    doc.text(title, 15, 20);
+    doc.setFontSize(12);
+
+    const today = new Date();
+    const formattedDate =
+      today.getDate().toString().padStart(2, '0') + '/' +
+      (today.getMonth() + 1).toString().padStart(2, '0') + '/' +
+      today.getFullYear();
+    doc.text(`Fecha: ${formattedDate}`, 15, 30);
+
+    //Configuración del título
+    const titleText = `${title}`;
+
+    //Definir las columnas de la tabla
+    const columns = ['Lote', 'Manzana', 'M2 Totales', 'M2 Construidos', 'Tipo', 'Estado', 'Propietario'];
+
+    //Obtener los datos filtrados en la tabla HTML
+    const table = $('#myTablePlot').DataTable();
+    const visibleRows = table.rows({ search: 'applied' }).data().toArray();
+
+    //Mapear los datos visibles para el PDF
     const rows = visibleRows.map((row: any) => [
-      `${row[0]}`,       // Nombre
-      `${row[1]}`,       // Rol
-      `${row[2]}`,       // Lote
-      `${row[3]}`,
-      `${row[4]}`,
-      `${row[5]}`,
+      `${this.getContentBetweenArrows(row[0])}`,
+      `${this.getContentBetweenArrows(row[1])}`,
+      `${this.getContentBetweenArrows(row[2])}`,
+      `${this.getContentBetweenArrows(row[3])}`,
+      `${this.getContentBetweenArrows(row[4])}`,
+      `${this.getContentBetweenArrows(row[5])}`,
+      `${row[6]}`
     ]);
-  
-    // Generar la tabla en el PDF usando autoTable
+
+    // Configuración de autoTable en modo portrait, con fuente y padding reducidos
     autoTable(doc, {
       head: [columns],
       body: rows,
-      startY: 30, // Ajusta la posición de inicio de la tabla
-      theme: 'striped', // Tema de tabla con filas alternadas
-      headStyles: { fillColor: [0, 0, 0] }, // Color de fondo del encabezado
-      styles: { halign: 'center', valign: 'middle' }, // Alineación del contenido
-      columnStyles: { 
-        0: { cellWidth: 30 }, 
-        1: { cellWidth: 30 }, 
-        2: { cellWidth: 30 }, 
-        3: { cellWidth: 30 }, 
-        4: { cellWidth: 40 },
-        5: { cellWidth: 40 }
-      }, // Ajusta el ancho de las columnas
+      startY: 35,
+      theme: 'grid', // Reducción de fuente y padding
+      margin: { top: 30, bottom: 20 }, // Márgenes más ajustados
+      columnStyles: {
+        0: { cellWidth: 25 },
+        1: { cellWidth: 25 },
+        2: { cellWidth: 25 },
+        3: { cellWidth: 25 },
+        4: { cellWidth: 30 },
+        5: { cellWidth: 30 },
+        6: { cellWidth: 30 }
+      },
     });
-  
-    doc.save('lotes.pdf'); // Descarga el archivo PDF
+
+    // Guardar el PDF con la fecha actual en el nombre
+    const fileName = `${formattedDate}_listado_lotes.pdf`;
+    doc.save(fileName);
   }
 
-  //Exporta por excel los registros de la tabla
+  //Exporta a excel la tabla
   exportExcel() {
+    //Obtenemos los datos visibles de la tabla (basados en los filtros aplicados)
+    const table = $('#myTablePlot').DataTable();
+    const visibleRows = table.rows({ search: 'applied' }).data().toArray();
 
-    const table = $('#myTable').DataTable(); // Inicializa DataTable una vez
-  
-    // Cambia la forma de obtener las filas visibles usando 'search' en lugar de 'filter'
-    const visibleRows = table.rows({ search: 'applied' }).data().toArray(); // Usar 'search: applied'
+    const today = new Date();
+    const formattedDate =
+      today.getDate().toString().padStart(2, '0') + '/' +
+      (today.getMonth() + 1).toString().padStart(2, '0') + '/' +
+      today.getFullYear();
 
-    // Filtrar a los lotes x aquellos que aparzcan en la tabla visibleRows
-    let plots = this.plots.filter(plot => visibleRows.some(row => row[0] === plot.plot_number));
+    //Preparamos los datos en formato adecuado para Excel
+    const rows = visibleRows.map((row: any) => [
+      `${this.getContentBetweenArrows(row[0])}`,
+      `${this.getContentBetweenArrows(row[1])}`,
+      `${this.getContentBetweenArrows(row[2])}`,
+      `${this.getContentBetweenArrows(row[3])}`,
+      `${this.getContentBetweenArrows(row[4])}`,
+      `${this.getContentBetweenArrows(row[5])}`,
+      `${row[6]}`  //Propietario
+    ]);
 
-    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(plots.map(plot => ({
-      Lote: plot.plot_number,
-      Manzana: plot.block_number,
-      M2: plot.total_area_in_m2,
-      M2_Construidos: plot.built_area_in_m2,
-      Tipo: plot.plot_type,
-      Estado: plot.plot_state 
-    })));
-  
+    //Definimos las columnas para el archivo Excel
+    const header = ['Lote', 'Manzana', 'M2 Totales', 'M2 Construidos', 'Tipo', 'Estado', 'Propietario'];
+
+    //Creamos la hoja de Excel
+    const ws: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet([header, ...rows]);
+
+    //Creamos un libro de trabajo con la hoja
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Lotes');
-  
-    XLSX.writeFile(wb, 'lotes.xlsx'); // Descarga el archivo Excel
+    XLSX.utils.book_append_sheet(wb, ws, 'Lista de Lotes');
+
+    //Exportamos el archivo Excel
+    const fileName = `${formattedDate}_listado_lotes.xlsx`;
+    XLSX.writeFile(wb, fileName);
   }
 
-  async abrirModal(plotId: number) {
+  //--------------------------------------------------Modal------------------------------------------------
+
+  //Abre el modal con la información del lote
+  async openModal(plotId: number) {
     console.log("Esperando a que userModal se cargue...");
-  
+
     // Espera a que se cargue el usuario seleccionado
     try {
-      console.log("Cargando lote...");
-      
       await this.selectUser(plotId);
-      console.log("lote cargado:", this.plotModel);
-      console.log("Abriendo modal...");
-      
-  
       // Una vez cargado, abre el modal
-      const modalRef = this.modal.open(UsersModaInfoPlotComponent, { size: 'md', keyboard: false });
+      const modalRef = this.modal.open(UsersModaInfoPlotComponent, { size: 'lg', keyboard: false });
       modalRef.componentInstance.plotModel = this.plotModel;
 
-      modalRef.result.then((result) => {        
-        $('#myTable').DataTable().ajax.reload();
+      modalRef.result.then((result) => {
+        $('#myTablePlot').DataTable().ajax.reload();
       });
 
     } catch (error) {
@@ -250,33 +417,89 @@ export class UsersListPlotsComponent {
     }
   }
 
-  
-  redirectEdit(id: number) {
-    this.router.navigate(['/home/plots/edit', id])
-  }
-
   // Busca el user y se lo pasa al modal
   plotModel: GetPlotModel = new GetPlotModel();
-   selectUser(id: number): Promise<GetPlotModel> {
-       // Mostrar SweetAlert de tipo 'cargando'
-     return new Promise((resolve, reject) => {
-       this.apiService.getPlotById(id).subscribe({
-         next: (data: GetPlotModel) => {
-           this.plotModel = data;        
-           Swal.close(); // Cerrar SweetAlert
-           resolve(data); // Resuelve la promesa cuando los datos se cargan
-         },
-         error: (error) => {
-           console.error('Error al cargar el lote:', error);
-           reject(error); // Rechaza la promesa si ocurre un error
-           Swal.close();
-           Swal.fire({
-             icon: 'error',
-             title: 'Error',
-             text: 'Hubo un problema al cargar el lote. Por favor, inténtalo de nuevo.'
-           });
-         }
-       });
-     });
+  selectUser(id: number): Promise<GetPlotModel> {
+    return new Promise((resolve, reject) => {
+      this.plotService.getPlotById(id).subscribe({
+        next: (data: GetPlotModel) => {
+          this.plotModel = data;
+          Swal.close();
+          resolve(data);
+        },
+        error: (error) => {
+          console.error('Error al cargar el lote:', error);
+          reject(error);
+          Swal.close();
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Hubo un problema al cargar el lote. Por favor, inténtalo de nuevo.',
+            confirmButtonText: 'Aceptar'
+          });
+        }
+      });
+    });
   }
+
+  //--------------------------------------------------Estilos------------------------------------------------
+
+  //Establece un estilo según el tipo de lote
+  showPlotType(plotType: any): string {
+    let color: string = ''
+
+    switch (plotType) {
+      case "Comercial":
+        color = "text-bg-secondary";
+        break;
+      case "Residencial":
+        color = "text-bg-success";
+        break;
+      case "Baldio":
+        color = "text-bg-danger";
+        break;
+    }
+    return `<div class="d-flex justify-content-center"> <span class='badge rounded-pill ${color}'>${plotType}</span> </div>`;
+  }
+
+  //Establece un estilo según el estado del lote
+  showPlotState(plotState: any): string {
+    let color: string = ''
+
+    switch (plotState) {
+      case "Disponible":
+        color = "text-bg-success";
+        break;
+      case "Habitado":
+        color = "text-bg-secondary";
+        break;
+      case "En construccion":
+        color = "text-bg-danger";
+        break;
+    }
+
+    return `<div class="d-flex justify-content-center"> <span class='${color} badge rounded-pill'>${plotState}</span></div>`;
+  }
+
+  //Quedarse sólo con el contenido entre las etiquetas de los elementos
+  getContentBetweenArrows(input: string): string[] {
+    const matches = [...input.matchAll(/>(.*?)</g)];
+    const cleanedResults = matches
+      .map(match => match[1].trim()) //Elimina los espacios al inicio y al final de cada elemento
+      .filter(content => content !== ""); //Filtra los elementos que solo sean espacios o estén vacíos
+
+    return cleanedResults;
+  }
+
+  //--------------------------------------------------Redirecciones------------------------------------------------
+
+    // Redirige a la vista de agregar lote
+    addPlot() {
+      this.router.navigate(['/main/plots/add'])
+    }
+  
+    // Redirige a la vista para editar l
+    redirectEdit(id: number) {
+      this.router.navigate(['/main/plots/edit', id])
+    }
 }

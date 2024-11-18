@@ -1,6 +1,6 @@
 import { Component, inject, Input, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ComplaintService } from '../../../../services/complaintsService/complaints.service';
+import { ComplaintService } from '../../../../services/complaints.service';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PutStateComplaintDto } from '../../../../models/complaint';

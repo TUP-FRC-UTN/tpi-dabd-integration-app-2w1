@@ -2,8 +2,8 @@ import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { PutReportDTO } from '../../../models/PutReportDTO';
-import { ComplaintService } from '../../../services/complaintsService/complaints.service';
-import { PenaltiesSanctionsServicesService } from '../../../services/sanctionsService/sanctions.service';
+import { ComplaintService } from '../../../services/complaints.service';
+import { SanctionService } from '../../../services/sanctions.service';
 import { ModalComplaintsListComponent } from '../../complaintComponents/modals/penalties-list-complaints-modal/penalties-list-complaints-modal.component';
 import { RoutingService } from '../../../../common/services/routing.service';
 import Swal from 'sweetalert2';
@@ -35,7 +35,7 @@ export class ReportModifyComponent implements OnInit {
   formType = 'modify';
 
   constructor(private complaintService: ComplaintService,
-     private reportService: PenaltiesSanctionsServicesService,
+     private reportService: SanctionService,
        route: ActivatedRoute,
        private routingService: RoutingService
       ) {

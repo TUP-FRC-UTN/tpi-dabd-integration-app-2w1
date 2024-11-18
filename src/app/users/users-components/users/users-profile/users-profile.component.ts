@@ -7,15 +7,16 @@ import { UserPut } from '../../../users-models/users/UserPut';
 import { AuthService } from '../../../users-servicies/auth.service';
 import { DateService } from '../../../users-servicies/date.service';
 import Swal from 'sweetalert2';
-import { ImageUploadComponent } from "../../utils/image-upload/image-upload.component";
 import { GetuserDto } from '../../../users-models/users/GetUserDto';
 import { PlotService } from '../../../users-servicies/plot.service';
 import { GetPlotDto } from '../../../users-models/plot/GetPlotDto';
+import { ValidatorsService } from '../../../users-servicies/validators.service';
+import { ChangePasswordComponent } from '../../../../common/components/users-change-password/users-change-password.component';
 
 @Component({
   selector: 'app-users-profile',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, FormsModule, ImageUploadComponent],
+  imports: [ReactiveFormsModule, CommonModule, FormsModule, ChangePasswordComponent],
   templateUrl: './users-profile.component.html',
   styleUrl: './users-profile.component.css'
 })
@@ -29,18 +30,18 @@ export class UsersProfileComponent implements OnInit {
   selectedIconUrl: string = '';
   isDropdownOpen = false;
   plots : GetPlotDto[] = [];
-  noIcon = '../../../../assets/icons/avatar.png'
+  noIcon = 'https://i.ibb.co/bNH6vjf/avatar.png'
   icons = [
-    {name: 'Icono 1', url:'../../../../assets/icons/icono1.svg'},
-    {name: 'Icono 2', url:'../../../../assets/icons/icono2.svg'},
-    {name: 'Icono 3', url:'../../../../assets/icons/icono3.svg'},
-    {name: 'Icono 4', url:'../../../../assets/icons/icono4.svg'},
-    {name: 'Icono 5', url:'../../../../assets/icons/icono5.svg'},
-    {name: 'Icono 6', url:'../../../../assets/icons/icono6.svg'},
-    {name: 'Icono 7', url:'../../../../assets/icons/icono7.svg'},
-    {name: 'Icono 8', url:'../../../../assets/icons/icono8.svg'},
-    {name: 'Icono 9', url:'../../../../assets/icons/icono9.svg'},
-    {name: 'Icono 10', url:'../../../../assets/icons/icono10.svg'},
+    {name: 'Icono 1', url:'https://i.ibb.co/DpxXd6C/icono1.png'},
+    {name: 'Icono 2', url:'https://i.ibb.co/Vp515Fc/icono2.png'},
+    {name: 'Icono 3', url:'https://i.ibb.co/rvWz6Sh/icono3.png'},
+    {name: 'Icono 4', url:'https://i.ibb.co/1snjZn2/icono4.png'},
+    {name: 'Icono 5', url:'https://i.ibb.co/HNRqv7m/icono5.png'},
+    {name: 'Icono 6', url:'https://i.ibb.co/23B7tMh/icono6.png'},
+    {name: 'Icono 7', url:'https://i.ibb.co/FHR80gq/icono7.png'},
+    {name: 'Icono 8', url:'https://i.ibb.co/fMcysX4/icono8.png'},
+    {name: 'Icono 9', url:'https://i.ibb.co/k23ngcS/icono9.png'},
+    {name: 'Icono 10', url:'https://i.ibb.co/2gJgvFt/icono10.png'},
   ]
 
   //Cambia la acción del botón
@@ -50,12 +51,16 @@ export class UsersProfileComponent implements OnInit {
     this.usersService.getUserById2(this.authService.getUser().id).subscribe({
         next: (user: GetuserDto) => {
 
+          console.log(user.roles);
+
+          let roles = user.roles.map(role => " " + role);
+          
             this.formProfile.patchValue({
                 name: user.name,
                 lastName: user.lastname,
                 email: user.email,
                 username: user.username,
-                phoneNumber: user.phone_number,
+                phoneNumber: String(user.phone_number),
                 dni: user.dni,
                 dniType: user.dni_type,
                 avatar_url: user.avatar_url,
@@ -75,9 +80,18 @@ export class UsersProfileComponent implements OnInit {
   
             // Setea la fecha de nacimiento en el input
             const formattedDate :Date = DateService.parseDateString(user.datebirth)!;
-            this.formProfile.patchValue({
-              datebirth: formattedDate ? DateService.formatDate(formattedDate) : ''
-            });
+            if (formattedDate) {
+              // Formatea la fecha a 'yyyy-MM-dd' para un input de tipo date
+              const formattedDateString = formattedDate.toISOString().split('T')[0];
+  
+              this.formProfile.patchValue({
+                datebirth: formattedDateString
+              });
+            } else {
+              this.formProfile.patchValue({
+                datebirth: ''
+              });
+            }
         }
     })
 
@@ -105,21 +119,19 @@ export class UsersProfileComponent implements OnInit {
       Validators.required,
       Validators.minLength(1),
       Validators.maxLength(30)
-    ]),
-    telegram_id: new FormControl({value: 0, disabled: true }, [
-        Validators.required,
-        Validators.minLength(1),
-        Validators.maxLength(30)
-    ]),
+    ] ),
+    telegram_id: new FormControl({value: 0, disabled: true }),
     email: new FormControl({value: '...', disabled: true }, [
         Validators.required,
         Validators.email
     ]),
-    phoneNumber: new FormControl({value: 0, disabled: true }, [
-        Validators.required,
-        Validators.minLength(10),
-        Validators.maxLength(20)
-    ]),
+
+    phoneNumber: new FormControl({ value: '', disabled: true }, [
+      Validators.required,
+      Validators.minLength(9),
+      Validators.maxLength(20),
+      Validators.pattern('^[0-9]*$')
+  ]),
     dni: new FormControl({value: 0, disabled: true }, [
         Validators.required,
         Validators.minLength(1),
@@ -157,7 +169,6 @@ export class UsersProfileComponent implements OnInit {
       this.formProfile.get('lastName')?.enable();
       this.formProfile.get('phoneNumber')?.enable();
       this.formProfile.get('avatar_url')?.enable();
-      this.formProfile.get('telegram_id')?.enable();
     }
     if(newType == 'info'){
       this.ngOnInit();

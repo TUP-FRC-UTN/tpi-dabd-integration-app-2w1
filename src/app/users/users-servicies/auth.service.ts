@@ -1,15 +1,14 @@
 import { inject, Injectable } from '@angular/core';
 import { LoginService } from './login.service';
 import { UserGet } from '../users-models/users/UserGet';
-import { UserLoged } from '../users-models/users/UserLoged';
 import { KJUR } from 'jsrsasign';
+import { UserLoged } from '../users-models/users/UserLoged';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
 
-  
   async login(data: any): Promise<void> {
     this.saveToken(data.token);
     this.saveActualRole(this.getUser().roles[0]);

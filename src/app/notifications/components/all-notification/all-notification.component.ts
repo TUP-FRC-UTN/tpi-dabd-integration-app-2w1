@@ -1,316 +1,557 @@
-import { Component, OnInit } from '@angular/core';
-import { NotificationRegisterService } from '../../service/notification-register.service';
-import { Notifications } from '../../models/notifications';
-import { Access } from '../../models/access';
-import { Fine } from '../../models/fine';
-import { Payments } from '../../models/payments';
-import { General } from '../../models/general';
-import $ from 'jquery';
-import 'datatables.net'
-import 'datatables.net-bs5';
-import { style } from '@angular/animations';
-import "datatables.net-select"
-import { DatePipe } from '@angular/common';
-import * as XLSX from 'xlsx';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
-import { RouterModule } from '@angular/router';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { DateValidator } from '../../validators/date.validators';
-import { MockUserService } from '../../service/mockUser.service';
+import { Component, OnInit, ViewChild } from "@angular/core";
+import { NotificationRegisterService } from "../../service/notification-register.service";
+import { Notifications } from "../../models/notifications";
+import { Access } from "../../models/access";
+import { Fine } from "../../models/fine";
+import { Payments } from "../../models/payments";
+import { General } from "../../models/general";
+import $ from "jquery";
+import "datatables.net";
+import "datatables.net-bs5";
+import "datatables.net-select";
+import { DatePipe } from "@angular/common";
+import * as XLSX from "xlsx";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import { RouterModule } from "@angular/router";
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from "@angular/forms";
+import { DateValidator } from "../../validators/date.validators";
+import { MockUserService } from "../../service/mockUser.service";
+import { AllNotifications } from "../../models/all-notifications";
+import { Inventory } from "../../models/inventory";
+import { SelectMultipleComponent } from "../../select-multiple/select-multiple.component";
+import { Subscription } from "rxjs";
+
+declare var bootstrap: any;
 
 @Component({
-  selector: 'app-all-notification',
+  selector: "app-all-notification",
   standalone: true,
-  imports: [DatePipe,RouterModule,ReactiveFormsModule],
-  templateUrl: './all-notification.component.html',
-  styleUrl: './all-notification.component.css'
+  imports: [
+    DatePipe,
+    RouterModule,
+    ReactiveFormsModule,
+    SelectMultipleComponent,
+  ],
+  providers: [DatePipe],
+  templateUrl: "./all-notification.component.html",
+  styleUrl: "./all-notification.component.css",
 })
-export class AllNotificationComponent implements OnInit{
-  
-  form = new FormGroup({
-    startDate : new FormControl(new Date(),[Validators.required,DateValidator.greatherThanToday]),
-    endDate :new FormControl(new Date(),[Validators.required,DateValidator.greatherThanToday])
-  });
-  
-
-
+export class AllNotificationComponent implements OnInit {
   //propiedades
-  selected:string="Todas"
-  originalAccessList: Access[] = []; 
-  originalFinesList:Fine[] = []
-  originalPaymentsList:Payments[] = []
-  originalGeneralsList:General[]= []
-  data: Notifications = {
+  selected: string = "Todas";
+  originalAccessList: Access[] = [];
+  originalFinesList: Fine[] = [];
+  originalPaymentsList: Payments[] = [];
+  originalGeneralsList: General[] = [];
+  originalInventoryList: Inventory[] = [];
+  form: FormGroup;
+  table: any;
+  data: AllNotifications = {
     fines: [],
     access: [],
     payments: [],
-    generals: []
+    generals: [],
+    inventories: [],
   };
+  subscription = new Subscription()
+  notificationTypes: any[] = [
+    { value: "Multas", name: "Multas" },
+    { value: "Accesos", name: "Accesos" },
+    { value: "Pagos", name: "Pagos" },
+    { value: "Generales", name: "Generales" },
+    { value: "Inventario", name: "Inventario" },
+  ];
+
+  selectedNotificationType: string[] = [];
+
+  dropdownSeleccionadas: any[] = [];
+
+  allNotificationsArray: any[] = [];
+
+  recibirSeleccionadas(node: any) {
+    this.dropdownSeleccionadas = node;
+    this.fillTable();
+    console.log(node);
+  }
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe()
+  }
   //onInit y onDestroy
   ngOnInit(): void {
-    this.form.get('startDate')?.valueChanges.subscribe(value=>{
-      this.updatedList();
+    this.table = $("#myTable").DataTable({
+      dom: '<"mb-3"t>' + '<"d-flex justify-content-between"lp>',
+      columns: [
+        { width: "13%" },
+        { width: "20%" },
+        { width: "7%" },
+        { width: "10%" },
+        { width: "20%" },
+        { width: "30%" },
+      ],
+      columnDefs: [
+        { targets: 3, className: "text-center align-middle" },
+      ],
 
-    })
-
-    this.form.get('endDate')?.valueChanges.subscribe(value=>{
-      this.updatedList();
-      
-    })
-    this.llenarData();
-    ($('#myTable') as any).DataTable({
-      select: {
-        style: 'multi'
-    },
       paging: true,
+      select: { style: "single" },
       searching: true,
       ordering: true,
       lengthChange: true,
-      pageLength: 10,
-      
+      pageLength: 5,
+      lengthMenu: [5, 10, 25, 50],
+      order: [[0, "desc"]],
       language: {
         emptyTable: "Cargando...",
         search: "Buscar",
         loadingRecords: "Cargando...",
-        zeroRecords:"No se han encontrado registros" ,
-        infoEmpty:"Mostrando 0 de 0 registros.",
-        lengthMenu:"Mostrando _MENU_ entradas.",
-        paginate: {
-        first: "<<",
-        last: ">>",
-        next: ">",
-        previous: "<",
+        zeroRecords: "No se han encontrado registros",
+        lengthMenu: "_MENU_",
+        info: " ",
       },
-      info:"Mostrando de _START_ a _END_ total de _TOTAL_ notificaciones",
-    }
+    });
 
+    // Connect external search input to DataTables
+    $("#searchTerm").on("keyup", function () {
+      $("#myTable")
+        .DataTable()
+        .search($(this).val() as string)
+        .draw();
+    });
+
+    this.llenarData();
+    this.initialzeDates();
+
+    this.form.get("startDate")?.valueChanges.subscribe((value) => {
+      this.updatedList();
+    });
+    this.form.get("endDate")?.valueChanges.subscribe((value) => {
+      this.updatedList();
     });
   }
   //injecciones
-
-  constructor(private service: NotificationRegisterService,private serviceUser:MockUserService) {}
-
-
+  constructor(
+    private service: NotificationRegisterService,
+    private datePipe: DatePipe
+  ) {
+    this.form = new FormGroup({
+      startDate: new FormControl(new Date(), [
+        Validators.required,
+        DateValidator.greatherThanToday,
+      ]),
+      endDate: new FormControl(new Date(), [
+        Validators.required,
+        DateValidator.greatherThanToday,
+      ]),
+    });
+  }
   //metodos
-
-
   llenarData() {
     const getSubscription = this.service.getData().subscribe({
-      next: (value:Notifications) =>{
-        this.data = value
-        this.originalAccessList = [...value.access]
-        this.originalFinesList = [...value.fines]
-        this.originalPaymentsList = [...value.payments]
-        this.originalGeneralsList = [...value.generals]
-        console.log(this.data)
-        this.fillTable(); 
+      next: (value: AllNotifications) => {
+        this.data = value;
+        this.originalAccessList = [...value.access];
+        this.originalFinesList = [...value.fines];
+        this.originalPaymentsList = [...value.payments];
+        this.originalGeneralsList = [...value.generals];
+        this.originalInventoryList = [...value.inventories];
+        console.log(this.data);
+        this.updatedList();
+        this.fillTable();
       },
-      error: ()=> {
-        alert('error al cargar las notifications')
-      }
-     })
+      error: () => {
+        alert("error al cargar las notifications");
+      },
+    });
+    this.subscription.add(getSubscription)
+  }
+  formatDate(date: Date): string {
+    return this.datePipe.transform(date, "dd/MM/yyyy hh:mm:ss") || "";
   }
 
   fillTable() {
-    let table = $("#myTable").DataTable();
-    table.clear().draw()
-    if(this.data.access.length>0){
-      if(this.selected=="Accesos" || this.selected=="Todas" ){
-        for (let notification of this.data.access) {
-          const date = notification.date as { [key: string]: any }
-          let dateString = date
-            table.row.add([notification.subject, notification.description, dateString, notification.nombre + " " + notification.apellido, notification.dni]).draw(false);
-          }
-      }
-    }
-    if(this.data.fines.length>0){
-      if(this.selected=="Multas" || this.selected=="Todas" ){
-        for (let notification of this.data.fines) {
-          const date = notification.date as { [key: string]: any }
-          let dateString =date
-          table.row.add([notification.subject, notification.description, dateString, notification.nombre + " " + notification.apellido, notification.dni]).draw(false);
+    const table = $("#myTable").DataTable();
+
+    table.on("select", (e, dt, type, indexes,$element) => {
+
+      if (type === "row") {
+        const rowData = table.row(indexes[0]).data();
+        let rowIndex = indexes[0];
+        let selectedNotificationObject = this.allNotificationsArray[rowIndex];
+        let status = "No leida";
+        if (selectedNotificationObject.markedRead == true) {
+          status = "Leida";
         }
+        this.setNotification(rowData, status);
+        this.openModal(this.selectedNotification)
       }
+    });
+
+    this.table.clear().draw();
+
+    const AddRow = (notification: any, tipo: string) => {
+      //Setear color de Pill
+      const getBadgeClass = (tipo: string) => {
+        switch (tipo) {
+          case "Generales":
+            return "bg-warning";
+          case "Accesos":
+            return "bg-success";
+          case "Multas":
+            return "bg-danger";
+          case "Pagos":
+            return "text-bg-indigo";
+          case "Inventario":
+            return "text-bg-primary";
+          default:
+            return "bg-secondary";
+        }
+      };
+
+      const badgeClass = getBadgeClass(tipo);
+      const tipoPill = `<span class=" badge rounded-pill ${badgeClass}">${tipo}</span>`;
+      
+        const row = this.table.row
+          .add([
+            this.formatDate(notification.created_datetime),
+            notification.nombre + " " + notification.apellido,
+            notification.dni,
+            tipoPill,
+            notification.subject,
+            notification.message,
+          ])
+          .draw(false);
+
+          // $(row).on('click', () => this.openModal(this.selectedNotification));
+      
+    };
+
+    if (this.dropdownSeleccionadas.length === 0) {
+      this.data.access.forEach((notification) => {
+        AddRow(notification, "Accesos");
+        this.allNotificationsArray.push(notification);
+      });
+      this.data.fines.forEach((notification) => {
+        AddRow(notification, "Multas");
+         this.allNotificationsArray.push(notification);
+      });
+      this.data.payments.forEach((notification) => {
+        AddRow(notification, "Pagos");
+         this.allNotificationsArray.push(notification);
+      });
+      this.data.generals.forEach((notification) => {
+        AddRow(notification, "Generales");
+         this.allNotificationsArray.push(notification);
+      });
+      this.data.inventories.forEach((notification) => {
+        AddRow(notification, "Inventario");
+         this.allNotificationsArray.push(notification);
+      });
+    } else {
+      this.dropdownSeleccionadas.forEach((e) => {
+        if (e === "Accesos")
+          this.data.access.forEach((notification) => {
+            AddRow(notification, "Accesos");
+            this.allNotificationsArray.push(notification);
+          });
+        if (e === "Multas")
+          this.data.fines.forEach((notification) => {
+            AddRow(notification, "Multas");
+            this.allNotificationsArray.push(notification);
+          });
+        if (e === "Pagos")
+          this.data.payments.forEach((notification) => {
+            AddRow(notification, "Pagos");
+            this.allNotificationsArray.push(notification);
+          });
+        if (e === "Generales")
+          this.data.generals.forEach((notification) => {
+            AddRow(notification, "Generales");
+            this.allNotificationsArray.push(notification);
+          });
+        if (e === "Inventario")
+          this.data.inventories.forEach((notification) => {
+            AddRow(notification, "Inventario");
+            this.allNotificationsArray.push(notification);
+          });
+      });
     }
 
-    if(this.data.payments.length>0){
-      if(this.selected=="Pagos" || this.selected=="Todas" ){
-        for (let notification of this.data.payments) {
-          const date = notification.date as { [key: string]: any }
-          let dateString = date
-          table.row.add([notification.subject, notification.description, dateString, notification.nombre + " " + notification.apellido, notification.dni]).draw(false);
-        }
-      }
-    }
-    if(this.data.generals.length>0){
-      if(this.selected=="Generales" || this.selected=="Todas" ){
-        for (let notification of this.data.generals) {
-          const date = notification.date as { [key: string]: any }
-          let dateString = date
-          table.row.add([notification.subject, notification.description, dateString, notification.nombre + " " + notification.apellido, notification.dni]).draw(false);
-        }
-      }
-    }
-    
-    
-
+    console.log("filleando");
   }
-  
+
+  selectedNotification: any = {
+    subject: "placeholder",
+    message: "placeholder",
+    date: "placeholder",
+    type: "placeholder",
+    status: "placeholder"
+  };
+
+  // Otros métodos y propiedades
+
+  openModal(notification: any) {
+    console.log(notification);
+    const modal = new bootstrap.Modal(document.getElementById('idMODAL')!);
+    modal.show();
+  }
+
+  setNotification(data: any, status: string) {
+    this.selectedNotification = {
+      subject: data[4],
+      message: data[5],
+      date: data[0],
+      type: data[3],
+      status: status
+    };
+  } 
+
   exportarAExcel() {
-        const tabla = $('#myTable').DataTable();
-        const filteredData = tabla.rows({ search: 'applied' }).data().toArray();
-        
-        const worksheet = XLSX.utils.json_to_sheet(filteredData);
-        const workBook = XLSX.utils.book_new();
-        
-        XLSX.utils.book_append_sheet(workBook, worksheet, 'Notificaciones');
-        XLSX.writeFile(workBook, 'notificaciones.xlsx');
+    const tabla = this.table;
+    const filteredData = tabla.rows({ search: "applied" }).data().toArray();
+    filteredData.forEach((arr: any) => {
+      arr[3] = this.getTextContent(arr[3]);
+    });
+    // Obtener los nombres de las columnas
+    const headers = tabla
+      .columns()
+      .header()
+      .toArray()
+      .map((th: any) => $(th).text());
+
+    // Crear la hoja con los datos
+    const worksheet = XLSX.utils.json_to_sheet(filteredData, {});
+
+    // Insertar headers manualmente
+    XLSX.utils.sheet_add_aoa(worksheet, [headers], { origin: "A1" });
+
+    // Configurar ancho de columnas (150px ≈ 20 caracteres en Excel)
+    worksheet["!cols"] = headers.map(() => ({
+      width: 20,
+      wch: 20, // ancho en caracteres
+      wpx: 150, // ancho en píxeles
+    }));
+
+    // Configurar que el texto se ajuste automáticamente
+    const range = XLSX.utils.decode_range(worksheet["!ref"] || "A1");
+    for (let R = range.s.r; R <= range.e.r; R++) {
+      for (let C = range.s.c; C <= range.e.c; C++) {
+        const cellRef = XLSX.utils.encode_cell({ r: R, c: C });
+        if (!worksheet[cellRef]) continue;
+
+        if (!worksheet[cellRef].s) worksheet[cellRef].s = {};
+        worksheet[cellRef].s.alignment = {
+          wrapText: true, // Permitir ajuste de texto
+          vertical: "top",
+        };
+
+        // Aplicar negrita y centrado a la primera fila (headers)
+        if (R === 0) {
+          worksheet[cellRef].s.font = { bold: true };
+          worksheet[cellRef].s.alignment = {
+            horizontal: "center",
+            vertical: "center",
+            wrapText: true,
+          };
+        }
+      }
+    }
+
+    const workBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workBook, worksheet, "Notificaciones");
+
+    XLSX.writeFile(
+      workBook,
+      this.formatDate(new Date()) + " Registro de Notificaciones.xlsx"
+    );
   }
 
   exportarAPDF() {
-    const tabla = $('#myTable').DataTable();
-    const filteredData = tabla.rows({ search: 'applied' }).data().toArray();
-  
+    const tabla = this.table;
+    const filteredData = tabla.rows({ search: "applied" }).data().toArray();
+    const dateFrom = this.formatDateFromString(
+      this.form.controls["startDate"].value
+    );
+    const dateTo= this.formatDateFromString(
+      this.form.controls["endDate"].value
+    );
     const doc = new jsPDF();
-  
+
     doc.setFontSize(18);
-    doc.text('Reporte de Notificaciones', 14, 22);
-  
+    doc.text("Reporte de Notificaciones", 14, 22);
+    doc.text("Fechas: Desde " + dateFrom + " hasta " + dateTo + "", 14, 33);
+
     autoTable(doc, {
-      head: [['Asunto', 'Descripción', 'Fecha', 'Nombre Destinatario', 'DNI']],
+      head: [["Fecha", "Destinatario", "DNI", "Tipo", "Asunto", "Descripción"]],
       body: filteredData.map((item: any) => [
-        item[0] || 'N/A',
-        item[1] || 'N/A',
-        item[2] || 'N/A',
-        item[3] || 'N/A',
-        item[4] || 'N/A' 
+        item[0] || "N/A",
+        item[1] || "N/A",
+        item[2] || "N/A",
+        this.getTextContent(item[3]) || "N/A",
+        item[4] || "N/A",
+        item[5] || "N/A",
       ]),
-      startY: 30,
+      startY: 44,
+      theme: "grid",
     });
-  
-    doc.save('notificaciones.pdf');
+
+    doc.save(this.formatDate(new Date()) + " Registro de Notificaciones.pdf");
   }
 
   //filtro de tipo de notificacion
-  cambiar(value:string){
-    switch (value){
-      case 'Todas':
-        this.selected = 'Todas'
-        this.fillTable(); 
+  cambiar(value: string) {
+    switch (value) {
+      case "Todas":
+        this.selected = "Todas";
+        this.fillTable();
         break;
 
-      case 'Multas':
-        this.selected = 'Multas'
-        this.fillTable(); 
+      case "Multas":
+        this.selected = "Multas";
+        this.fillTable();
         break;
 
-      case 'Accesos':
-        this.selected = 'Accesos'
-        this.fillTable(); 
+      case "Accesos":
+        this.selected = "Accesos";
+        this.fillTable();
         break;
 
-      case 'Pagos':
-        this.selected = 'Pagos'
-        this.fillTable(); 
+      case "Pagos":
+        this.selected = "Pagos";
+        this.fillTable();
         break;
 
-      case 'Generales':
-        this.selected = 'Generales'
-        this.fillTable(); 
+      case "Generales":
+        this.selected = "Generales";
+        this.fillTable();
+        break;
+
+      case "Inventory":
+        this.selected = "Inventory";
+        this.fillTable();
         break;
     }
   }
   //filtro por fechas
-  updatedList(){
+  updatedList() {
+    const filterListByDate = (
+      list: any[],
+      startDate: Date,
+      endDate: Date
+    ): any[] => {
+      return list.filter((e) => {
+        const createdDate = new Date(e.created_datetime);
+        const createdDateStr = createdDate.toISOString().split("T")[0];
+        const startDateStr = startDate.toISOString().split("T")[0];
+        const endDateStr = endDate.toISOString().split("T")[0];
+        return createdDateStr >= startDateStr && createdDateStr <= endDateStr;
+      });
+    };
 
-    let accessList:Access[] = []
-    this.data.access = this.originalAccessList
-    this.data.access.forEach(e => {
-      console.log(e.date)
-      const apiDate = new Date(e.date)
-      console.log(apiDate)  
-      const createdDate = new Date(
-        apiDate.getFullYear(),
-        apiDate.getMonth(),
-        apiDate.getDate(),
-        apiDate.getHours(),
-        apiDate.getMinutes(),
-        apiDate.getSeconds()
-      )
-      const startDate2 = new Date(this.form.get('startDate')?.value ?? new Date() )
-      const endDate2 = new Date(this.form.get('endDate')?.value ?? new Date())
-      console.log(createdDate)
-      console.log(startDate2)
-      console.log(endDate2)
-      
+    const startDate = new Date(this.form.get("startDate")?.value ?? new Date());
+    const endDate = new Date(this.form.get("endDate")?.value ?? new Date());
 
-      if(createdDate.toISOString().split('T')[0] >= startDate2.toISOString().split('T')[0] && createdDate.toISOString().split('T')[0] <= endDate2.toISOString().split('T')[0] ){
-        accessList.push(e)
-      }
-    
-    });
-    this.data.access=accessList
-
-    let finesList:Fine[] = []
-    this.data.fines = this.originalFinesList
-    this.data.fines.forEach(e => {
-      const createdDate = new Date(e.date)
-      const startDate2 = new Date(this.form.get('startDate')?.value ?? new Date() )
-      const endDate2 = new Date(this.form.get('endDate')?.value ?? new Date())
-      
-
-      if(createdDate.toISOString().split('T')[0] >= startDate2.toISOString().split('T')[0] && createdDate.toISOString().split('T')[0] <= endDate2.toISOString().split('T')[0] ){
-        finesList.push(e)
-      }
-    
-    });
-    this.data.fines=finesList
-
-
-    let paymentsList:Payments[] = []
-    this.data.payments = this.originalPaymentsList
-    this.data.payments.forEach(e => {
-      const createdDate = new Date(e.date)
-      const startDate2 = new Date(this.form.get('startDate')?.value ?? new Date() )
-      const endDate2 = new Date(this.form.get('endDate')?.value ?? new Date())
-      
-
-      if(createdDate.toISOString().split('T')[0] >= startDate2.toISOString().split('T')[0] && createdDate.toISOString().split('T')[0] <= endDate2.toISOString().split('T')[0] ){
-        paymentsList.push(e)
-      }
-    
-    });
-    this.data.payments=paymentsList
-    
-
-
-
-
-
-    let generalsList:General[] = []
-    this.data.generals = this.originalGeneralsList
-    this.data.generals.forEach(e => {
-      const createdDate = new Date(e.date)
-      const startDate2 = new Date(this.form.get('startDate')?.value ?? new Date() )
-      const endDate2 = new Date(this.form.get('endDate')?.value ?? new Date())
-      if(createdDate.toISOString().split('T')[0] >= startDate2.toISOString().split('T')[0] && createdDate.toISOString().split('T')[0] <= endDate2.toISOString().split('T')[0] ){
-        generalsList.push(e)
-      }
-    
-    });
-    this.data.generals=generalsList
+    this.data.access = filterListByDate(
+      this.originalAccessList,
+      startDate,
+      endDate
+    );
+    this.data.fines = filterListByDate(
+      this.originalFinesList,
+      startDate,
+      endDate
+    );
+    this.data.payments = filterListByDate(
+      this.originalPaymentsList,
+      startDate,
+      endDate
+    );
+    this.data.generals = filterListByDate(
+      this.originalGeneralsList,
+      startDate,
+      endDate
+    );
+    this.data.inventories = filterListByDate(
+      this.originalInventoryList,
+      startDate,
+      endDate
+    );
 
     this.fillTable();
-    console.log(this.data)
-  }
-  borrar(){
-    this.selected="Todas";
-    this.form.get('startDate')?.reset()
-    this.form.get('endDate')?.reset()
-    this.fillTable()
+    console.log(this.data);
   }
 
+  initialzeDates() {
+    const today = new Date();
+    const startDate = new Date(
+      today.getFullYear(),
+      today.getMonth() - 1,
+      today.getDate()
+    );
+    console.log(today.toISOString(), "startDate", today.getDate(), today.getMonth(), today.getFullYear());
+    const endDate = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate() +1
+    );
 
-  
+    this.form.patchValue({
+      startDate: this.formatDate2(startDate),
+      endDate: this.formatDate2(endDate),
+    });
+  }
+  formatDate2(date: Date): string {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Mes debe ser 1-12
+    const day = date.getDate().toString().padStart(2, "0"); // Día debe ser 1-31
+    return `${year}-${month}-${day}`; // Retornar en formato yyyy-MM-dd
+  }
+
+  @ViewChild(SelectMultipleComponent)
+  selectMultipleComponent!: SelectMultipleComponent;
+
+  borrar() {
+    this.form.reset();
+    const searchInput = document.getElementById(
+      "searchTerm"
+    ) as HTMLInputElement;
+
+    this.selectedNotificationType = [];
+    this.dropdownSeleccionadas = [];
+
+    // Limpiar la selección en el componente hijo ng-select
+    if (this.selectMultipleComponent) {
+      this.selectMultipleComponent.clearSelection();
+    }
+
+    if (searchInput) {
+      searchInput.value = "";
+    }
+    this.selected = "Todas";
+    this.initialzeDates();
+    this.fillTable();
+  }
+
+  formatDateFromString(date: string) {
+    const [year, month, day] = date.split("-");
+    return `${day}-${month}-${year}`;
+  }
+
+  getTextContent(cellData: any): string {
+    // Check if cellData is an HTML element or text
+    if (typeof cellData === "string") {
+      // If it's a string, strip out any HTML tags using a regex
+      return cellData.replace(/<[^>]*>?/gm, "");
+    }
+    return cellData;
+  }
+
+  closeModal() {
+    $(".modal-backdrop").remove();
+  }
 }

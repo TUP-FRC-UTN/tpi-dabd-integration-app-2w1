@@ -1,7 +1,8 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ComplaintService } from '../../../../services/complaintsService/complaints.service';
+import { ComplaintService } from '../../../../services/complaints.service';
+import { ComplaintDto } from '../../../../models/complaint';
 
 @Component({
   selector: 'app-modal-complaints-list',
@@ -27,6 +28,7 @@ export class ModalComplaintsListComponent implements OnInit {
   // from the database using the service.
   getComplaints(): void {
     this.complaintService.getAllComplaints().subscribe(res => {
+      console.log(res)
       this.complaints = res.filter(complaint => {
         if (this.formType === 'modify') {
           return (complaint.complaintState == 'Nueva' && complaint.reportId == null) ||

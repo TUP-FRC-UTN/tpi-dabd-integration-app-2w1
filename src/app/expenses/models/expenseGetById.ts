@@ -1,7 +1,9 @@
 export interface ExpenseGetById{
     id: number;
   category: string;
+  categoryId: number;
   provider: string;
+  providerId: number;
   description: string;
   amount: number;
   expenseType: string;

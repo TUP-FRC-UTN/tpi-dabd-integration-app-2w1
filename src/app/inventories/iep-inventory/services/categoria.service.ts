@@ -4,12 +4,13 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { CreateCategoryDto } from '../models/create-category-dto';
 import { ProductCategory } from '../models/product-category';
 import { PutCategoryDTO } from '../models/putCategoryDTO';
+import { environment } from '../../../common/environments/environment';
 @Injectable({
   providedIn: 'root'
 })
 export class CategoriaService {
 
-  private readonly INVENTORY_BASE_URL: string = 'http://localhost:8081/';
+  private readonly INVENTORY_BASE_URL: string = environment.services.inventory + "/";
 
   private readonly CATEGORY_URL: string = `${this.INVENTORY_BASE_URL}category`;
   

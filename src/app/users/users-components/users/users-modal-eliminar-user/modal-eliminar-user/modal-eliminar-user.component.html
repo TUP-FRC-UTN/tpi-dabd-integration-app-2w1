@@ -1,0 +1,14 @@
+<div class="modal-header">
+    <h5 class="modal-title">Confirmar Eliminación</h5>
+    <button type="button" class="btn-close" aria-label="Cerrar" (click)="closeModal()"></button>
+  </div>
+  
+  <div class="modal-body text-center">
+    <p>¿Estás seguro de que deseas eliminar a este usuario?</p>
+    <p class="text-muted">Esta acción no se puede deshacer.</p>
+  </div>
+  
+  <div class="modal-footer d-flex justify-content-center">
+    <button type="button" class="btn btn-danger" (click)="confirmDesactivate()">Eliminar</button>
+    <button type="button" class="btn btn-secondary me-2" (click)="closeModal()">Cancelar</button>
+  </div>

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ComplaintService } from '../../../services/complaintsService/complaints.service';
+import { ComplaintService } from '../../../services/complaints.service';
 import { Router, RouterModule } from '@angular/router';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';

@@ -1,0 +1,103 @@
+<div class="container p-2 border border-2 rounded shadow-lg mt-0">
+
+  <!-- Sección de Filtros -->
+  <div class="row">
+    <div class="col d-flex gap-3">
+      <div class="col">
+        <input type="date" class="form-control border-1 bg-light" [formControl]="startDate" (change)="filterByDate()">
+      </div>
+      <div class="col">
+        <input type="date" class="form-control border-1 bg-light" [formControl]="endDate" (change)="filterByDate()">
+      </div>
+    </div>
+
+    <div class="col-auto d-flex gap-1 ms-auto">
+      <button class="btn btn-primary filterbutton" data-bs-toggle="modal" title="Filtros Avanzados"
+        data-bs-target="#filtrosAvanzados">
+        <i class="bi bi-funnel-fill"></i>
+      </button>
+      <button type="button" class="btn btn-secondary bi bi-trash filterbutton" (click)="clearFilters()"
+        title="Limpiar Filtros"></button>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <!-- Sección Principal -->
+  <div class="card border-0 shadow-lg rounded-4">
+    <div class="card-body">
+      <h4 class="card-title">Estado de los Lotes<button type="button"
+          class="btn btn-sm btn-link text-muted bi bi-arrow-left fs-5 float-end" title="Volver"
+          (click)="changeView('/reports')"></button></h4>
+      <hr>
+      <div class="row">
+        <!-- Gráfico de Estado de los Lotes -->
+        <!-- Distribución de Lotes y KPIs -->
+        <div class="col-md-3">
+
+          <app-users-kpi class="mb-3" title="Cantidad de Lotes" icon="bi bi-houses" [amount]="totalLots"
+            [customStyles]="{ 'background-color': '#d8ffedde' }" formatPipe="text" tooltip="Cantidad total de lotes">
+          </app-users-kpi>
+          <app-users-kpi class="mb-3" title="Lotes Residenciales" icon="bi bi-house-heart" [amount]="residentialLots"
+            [customStyles]="{ 'background-color': '#e7f1ff' }" tooltip="Cantidad de lotes destinados a uso residencial"
+            formatPipe="text">
+          </app-users-kpi>
+
+          <app-users-kpi class="mb-3" title="Comerciales" icon="bi bi-shop" [amount]="commercialLots"
+            [customStyles]="{ 'background-color': '#fff3e0' }" tooltip="Cantidad de lotes destinados a uso comercial"
+            formatPipe="text">
+          </app-users-kpi>
+
+          <app-users-kpi class="mb-3" title="Baldíos" icon="bi bi-tree" [amount]="emptyLots"
+            [customStyles]="{ 'background-color': '#d8ffedde' }" tooltip="Cantidad de lotes sin construcción"
+            formatPipe="text">
+          </app-users-kpi>  
+        </div>
+
+        <div class="col-md-9">
+          @if(loadingPieChart){
+            <div class="loading">Cargando...</div>
+            }
+  
+            <div *ngIf="errorPieChart" class="error-container">
+              <i class="bi bi-exclamation-triangle-fill error-icon"></i>
+              <p>{{ errorPieChart }}</p>
+            </div>
+            @if(!loadingPieChart && !errorPieChart){
+  
+            <google-chart [type]="pieChart" [data]="plotStateData" [options]="pieChartOptions" [height]="300">
+            </google-chart>
+            }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para filtros avanzados de tipo de lote -->
+<div class="modal fade" id="filtrosAvanzados" tabindex="-1" role="dialog" aria-labelledby="modalTitle"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalTitle">Información del Dashboard</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="plotTypeSelect" class="form-label fw-semibold mb-2">Seleccione el Tipo de Lote</label>
+          <select id="plotTypeSelect" class="form-select" [formControl]="plotTypes">
+            <option value="" disabled selected>Seleccione una opción</option>
+            <option value="2">Residencial</option>
+            <option value="1">Comercial</option>
+            <option value="3">Baldío</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        <!-- <button type="button" class="btn btn-primary" (click)="applyAdvancedFilters()">Aplicar Filtro</button> -->
+      </div>
+    </div>
+  </div>
+</div>

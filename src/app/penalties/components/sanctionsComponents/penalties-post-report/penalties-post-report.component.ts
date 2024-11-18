@@ -19,7 +19,7 @@ import { CustomSelectComponent } from '../../../../common/components/custom-sele
 @Component({
   selector: 'app-new-report',
   standalone: true,
-  imports: [FormsModule, RouterLink, ModalComplaintsListComponent, RouterModule, CommonModule,ReactiveFormsModule,CustomSelectComponent],
+  imports: [FormsModule, RouterLink, ModalComplaintsListComponent, RouterModule, CommonModule, ReactiveFormsModule, CustomSelectComponent],
   templateUrl: './penalties-post-report.component.html',
   styleUrl: './penalties-post-report.component.scss'
 })
@@ -97,8 +97,8 @@ export class NewReportComponent {
 
   getPlots(): void {
     //el mock se usa para no pegarle a usuarios
-    // this.plotService.getAllPlots().subscribe(
-    this.mockGetPlots().subscribe(
+    this.plotService.getAllPlots().subscribe(
+    // this.mockGetPlots().subscribe(
       (plots: any[]) => {
         plots.forEach((plot) => this.plots.push({ name:`Bloque ${plot.block_number}, Lote ${plot.plot_number}` , value: plot.id }))
         this.optionsplot = this.plots.map(opt => ({ name: opt.name, value: opt.value }))

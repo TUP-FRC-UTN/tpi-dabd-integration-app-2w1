@@ -1,0 +1,73 @@
+<section class="p-5 pt-0">
+  <div class="container-fluid p-3 mt-0 pt-0">
+    <!-- Fila de Notificaciones y Clima -->
+    <div class="row m-2">
+      <!-- Card de Notificaciones (arriba) -->
+      <div class="col-md-6 col-sm-12 p-0 pe-2">
+        <div class="card border border-2 rounded-3 shadow-lg overflow-hidden">
+          <div class="card-header custom-header p-3">
+            <h3 class="mb-0 fs-5 text-center" style="color: black;">Últimas Notificaciones Generales</h3>
+          </div>
+          <div class="card-body p-4">
+            <!-- Recorre las notificaciones y muestra cada una -->
+            <div *ngFor="let notification of notifications" class="announcement-item mb-3">
+              <h5 class="fs-5 font-weight-bold">{{ notification.subject }}</h5>
+              <p class="fs-6 text-muted">{{ notification.message }}</p>
+              <small class="fs-6 text-muted">Publicado el {{ formatDateToDDMM(notification.created_datetime) }}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card de Clima y Contactos (abajo derecha) -->
+      <div class="col-md-6 col-sm-12 p-0 ps-2">
+        <!-- Card de Clima -->
+        <div class="card border border-2 rounded-3 shadow-lg mb-4">
+          <div class="card-header custom-header p-3">
+            <h3 class="mb-0 fs-5 text-center" style="color: black;">Clima en Potrero de Garay</h3>
+          </div>
+          <div class="card-body p-4">
+            <div class="row">
+              <!-- Clima actual -->
+              <div class="col-4 text-center">
+                <div class="weather-card" *ngIf="weather">
+                  <h6 class="text-muted fs-6">Hoy</h6>
+                  <img [src]="'http://openweathermap.org/img/w/' + weather.weather[0].icon + '.png'" alt="Clima actual" style="width: 50px;">
+                  <h4 class="fs-5">{{weather.main.temp.toFixed(0)}} °C</h4>
+                  <p class="weather-description fs-6">{{weather.weather[0].description}}</p>
+                  <p class="text-muted fs-6 weather-details">
+                    <i class="bi bi-moisture"></i> Humedad: {{weather.main.humidity}}%
+                  </p>
+                </div>
+              </div>
+
+              <!-- Pronóstico próximos días -->
+              <div class="col-4" *ngFor="let day of forecast">
+                <div class="weather-card text-center">
+                  <h6 class="text-muted fs-6">{{formatDate(day.dt_txt || '')}}</h6>
+                  <img [src]="'http://openweathermap.org/img/w/' + day.weather[0].icon + '.png'" alt="Pronóstico" style="width: 50px;">
+                  <h4 class="fs-5">{{day.main.temp_min.toFixed(0)}} °C </h4>
+                  <p class="weather-description fs-6">{{day.weather[0].description}}</p>
+                  <p class="text-muted fs-6 weather-details">
+                    <i class="bi bi-moisture"></i> Humedad {{day.main.humidity}}%
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card de Contactos -->
+        <div class="card important-numbers-card border border-2 rounded-3 shadow-lg">
+          <div class="card-header custom-header p-3">
+            <h3 class="mb-0 fs-5 text-center" style="color: black;">Contactos</h3>
+          </div>
+          <div class="card-body p-4">
+            <p class="fs-6"><i class="bi bi-telephone-fill me-2"></i>(03546) 15 51 19 55</p>
+            <p class="fs-6"><i class="bi bi-telephone-fill me-2"></i>(03546) 15 51 19 54</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

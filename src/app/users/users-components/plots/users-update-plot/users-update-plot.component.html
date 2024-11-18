@@ -5,7 +5,7 @@
 
             <div class="col-lg-6 mb-3">
                 <div class="row">
-                    <label class="col-2 col-form-label">N°. de lote</label>
+                    <label class="col-2 col-form-label">N°. de Lote</label>
                     <div class="col-10">
                         <input type="number" class="form-control" formControlName="plotNumber" min="0"
                             [ngClass]="onValidate('plotNumber')">
@@ -17,7 +17,7 @@
 
             <div class="col-lg-6 mb-3">
                 <div class="row">
-                    <label class="col-2 col-form-label">N°. de manzana</label>
+                    <label class="col-2 col-form-label">N°. de Manzana</label>
                     <div class="col-10">
                         <input type="number" class="form-control" formControlName="blockNumber"
                             [ngClass]="onValidate('blockNumber')">
@@ -29,7 +29,7 @@
 
             <div class="col-lg-6 mb-3">
                 <div class="row">
-                    <label class="col-2 col-form-label">Terreno del lote (m²)</label>
+                    <label class="col-2 col-form-label">Terreno del Lote (m²)</label>
                     <div class="col-10">
                         <input type="number" class="form-control" formControlName="totalArea"
                             [ngClass]="onValidate('totalArea')">
@@ -41,7 +41,7 @@
 
             <div class="col-lg-6 mb-3">
                 <div class="row">
-                    <label class="col-2 col-form-label">Área construida (m²)</label>
+                    <label class="col-2 col-form-label">Área Construida (m²)</label>
                     <div class="col-10">
                         <input type="number" class="form-control" formControlName="totalBuild"
                             [ngClass]="onValidate('totalBuild')">
@@ -55,13 +55,10 @@
                 <div class="row">
                     <label class="col-2 col-form-label">Estado</label>
                     <div class="col-10">
-                        <select id="selectOption" class="form-select" id="stateId" formControlName="state"
-                            [ngClass]="onValidate('state')">
-                            <option value="" disabled selected>Seleccione una opción</option>
-                            @for (s of states; track $index) {
-                                <option value="{{s.id}}">{{s.name}}</option>
-                                }
-                        </select>
+                        <app-custom-select [options]="states" #stateSelect
+                         (selectedOptionsChange)="formReactivo.get('state')?.setValue($event)"
+                          [selectedOptions]="formReactivo.get('state')?.value" 
+                          [validations]="formReactivo.get('state')?.validator" />
                         <div class="invalid-feedback">{{showError('state')}}</div>
                     </div>
                 </div>
@@ -72,13 +69,10 @@
                 <div class="row">
                     <label class="col-2 col-form-label">Tipo</label>
                     <div class="col-10">
-                        <select id="selectOption" class="form-select" formControlName="type"
-                            [ngClass]="onValidate('type')">
-                            <option value="" disabled selected>Seleccione una opción</option>
-                            @for (t of types; track $index) {
-                                <option value="{{t.id}}">{{t.name}}</option>
-                                }
-                        </select>
+                        <app-custom-select [options]="types" #typeSelect
+                         (selectedOptionsChange)="formReactivo.get('type')?.setValue($event)"
+                          [selectedOptions]="formReactivo.get('type')?.value" 
+                          [validations]="formReactivo.get('type')?.validator" />
                         <div class="invalid-feedback">{{showError('type')}}</div>
                     </div>
                 </div>
@@ -111,7 +105,7 @@
 
             <div class="row mb-3 justify-content-end">
                 <div class="col-auto">
-                    <button class="btn btn-secondary me-3" type="button" (click)="confirmExit()">Cancelar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#cancelarConfirmacion">Cancelar</button>
                 </div>
                 <div class="col-auto">
                     <button class="btn btn-primary" type="submit" [disabled]="formReactivo.invalid">Guardar</button>
@@ -119,4 +113,44 @@
               </div>
         </div>
     </form>
+
+
+    <div class="modal fade" id="infoModal" role="dialog">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Información de la pantalla</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Esta sección te permite realizar cambios en la información detallada de un lote, incluyendo aspectos generales y específicos como el área y el estado del lote.</p>
+                <p>También puedes adjuntar documentos relevantes para mantener un registro completo y actualizado.</p>
+                <p>Recuerda que los cambios deben confirmarse para aplicarse. Si decides no continuar, tienes la opción de cancelar y descartar los ajustes realizados.</p>
+              </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+        <!-- Modal -->
+  <div class="modal fade" id="cancelarConfirmacion" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">Cancelar operación</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="mb-4">¿Está seguro? Los datos no guardados se perderán</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Volver</button>
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="confirmExit()">Aceptar</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
