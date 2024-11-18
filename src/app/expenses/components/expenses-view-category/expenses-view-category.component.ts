@@ -310,7 +310,7 @@ export class ExpensesViewCategoryComponent implements OnInit {
         },
       })
       this.cdRef.detectChanges();
-      const modalElement = this.modalNG.open(ExpensesEditCategoryComponent,{size:'lg',keyboard:false})
+      const modalElement = this.modalNG.open(ExpensesEditCategoryComponent,{size:'',keyboard:false})
       modalElement.componentInstance.category=this.categorySelected
       modalElement.componentInstance.eventSucces.subscribe(() => {
         this.loadAlertAndFilter('Se actualizo la categoría con éxito');
@@ -322,7 +322,7 @@ export class ExpensesViewCategoryComponent implements OnInit {
   viewSelectedCategory(rowData : any) {
     this.categorySelected=rowData
     this.cdRef.detectChanges();
-    const modalElement =this.modalNG.open(ExpensesViewCategoryDetailsComponent,{size:'lg',keyboard:false})
+    const modalElement =this.modalNG.open(ExpensesViewCategoryDetailsComponent,{size:'',keyboard:false})
     modalElement.componentInstance.category=this.categorySelected
     modalElement.result.then((result) => {
     }).catch((error) => {
