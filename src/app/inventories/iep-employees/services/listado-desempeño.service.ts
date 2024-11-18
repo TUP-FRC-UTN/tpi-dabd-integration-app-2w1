@@ -7,13 +7,15 @@ import {
   Performance,
   WakeUpCallDetail,
 } from '../Models/listado-desempeño';
+import { environment } from '../../../common/environments/environment.prod';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ListadoDesempeñoService {
-  // Base URL
-  private readonly BASE_URL: string = 'http://localhost:8080/';
+ // Base URL
+ private readonly BASE_URL: string = environment.services.employees + "/";
+
 
   // Employees endpoints
   private readonly EMPLOYEES_URL: string = `${this.BASE_URL}employees`;

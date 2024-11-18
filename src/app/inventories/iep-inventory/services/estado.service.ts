@@ -1,13 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '../../../common/environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EstadoService {
 
-  private readonly INVENTORY_BASE_URL: string = 'http://localhost:9011/';
+  private readonly INVENTORY_BASE_URL: string = environment.services.inventory + "/";
 
   private readonly ESTADO_URL: string = `${this.INVENTORY_BASE_URL}detailProductState/getAll`;  
 

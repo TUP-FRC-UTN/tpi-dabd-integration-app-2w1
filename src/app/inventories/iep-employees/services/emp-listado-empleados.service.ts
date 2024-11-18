@@ -4,12 +4,13 @@ import { Observable, Subject } from 'rxjs';
 import { EmpListadoEmpleados, Employee } from '../Models/emp-listado-empleados';
 import { EmpListadoAsistencias } from '../Models/emp-listado-asistencias';
 import { EmpPutEmployeesResponse } from '../Models/EmpPutEmployeesResponse';
+import { environment } from '../../../common/environments/environment.prod';
 
 @Injectable({
   providedIn: 'root',
 })
 export class EmpListadoEmpleadosService {
-  private readonly EMPLOYEE_BASE_URL = 'http://localhost:8080'; // URL base del servidor
+  private readonly EMPLOYEE_BASE_URL = environment.services.employees ; // URL base del servidor
   private _refresh$ = new Subject<void>();
 
   constructor(private http: HttpClient) {}

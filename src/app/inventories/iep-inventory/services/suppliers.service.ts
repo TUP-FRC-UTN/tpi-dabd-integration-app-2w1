@@ -2,19 +2,19 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Supplier } from '../models/suppliers';
+import { environment } from '../../../common/environments/environment.prod';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SuppliersService {
   
-  private readonly INVENTORY_BASE_URL: string = 'http://localhost:9011/';
-  private readonly ACCESSES_URL: string = 'http://localhost:8090/PostNewSupplier';
+  private readonly INVENTORY_BASE_URL: string = environment.services.inventory + "/";
 
   private readonly SUPPLIERS_URL: string = `${this.INVENTORY_BASE_URL}suppliers`;
   private readonly SUPPLIERS_URL_GET_BY_ID: string = `${this.SUPPLIERS_URL}/getbyId/`;
   private readonly SUPPLIERS_URL_BAJA_LOGICA: string = `${this.SUPPLIERS_URL}/bajalogica`;
-
+  private readonly ACCESSES_URL: string = environment.services.accesses+'/PostNewSupplier';
   createSupplier(formData: any) {
     return this.http.post(this.SUPPLIERS_URL, formData);
   }

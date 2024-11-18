@@ -3,13 +3,14 @@ import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { PostDecrement } from '../models/details';
+import { environment } from '../../../common/environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DetailServiceService {
 
-  private readonly INVENTORY_BASE_URL = 'http://localhost:9011'; // URL base del servidor
+  private readonly INVENTORY_BASE_URL = environment.services.inventory ; // URL base del servidor
   private _refresh$ = new Subject<void>();
   private id: number = 0;
   urlExcel: string = '';

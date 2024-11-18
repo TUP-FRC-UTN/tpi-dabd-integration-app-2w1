@@ -2,13 +2,14 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, catchError, throwError } from 'rxjs';
 import { EmpPostConfiguration, EmpPostConfigurationResponse } from '../Models/emp-post-configuration';
+import { environment } from '../../../common/environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PillowTimeLateArrivalService {
 
-  private readonly BASE_URL: string = 'http://localhost:8080/employees';
+  private readonly BASE_URL: string = environment.services.employees;
 
  
    constructor(private http: HttpClient) {}

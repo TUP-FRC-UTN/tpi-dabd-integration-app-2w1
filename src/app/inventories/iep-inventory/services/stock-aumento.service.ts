@@ -4,12 +4,13 @@ import { Observable } from 'rxjs';
 import { StockAumento } from '../models/stock-aumento';
 import { Supplier } from '../models/suppliers';
 import { BehaviorSubject } from 'rxjs';
+import { environment } from '../../../common/environments/environment.prod';
 
 @Injectable({
   providedIn: 'root',
 })
 export class StockAumentoService {
-  private readonly INVENTORY_BASE_URL: string = 'http://localhost:9011/';
+  private readonly INVENTORY_BASE_URL: string = environment.services.inventory + "/";
 
   private readonly AMOUNT_MODIFICATION_URL: string = `${this.INVENTORY_BASE_URL}amountModification`;
   private readonly AMOUNT_MODIFICATION_URL_MODIFY_STOCK: string = `${this.AMOUNT_MODIFICATION_URL}/modify-stock`; // TOMAS
