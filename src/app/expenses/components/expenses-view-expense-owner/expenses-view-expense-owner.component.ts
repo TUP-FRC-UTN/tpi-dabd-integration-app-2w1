@@ -2,7 +2,8 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import 'datatables.net';
 import 'datatables.net-bs5';
 import moment from 'moment';
-import 'bootstrap';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+// import 'bootstrap';
 import $ from 'jquery';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
@@ -23,7 +24,7 @@ import { Provider } from '../../models/provider';
 import { Bill } from '../../models/bill';
 import { ExpenseType } from '../../models/expenseType';
 
-declare let bootstrap: any;
+// declare let bootstrap: any;
 @Component({
   selector: 'app-view-owner-expense',
   standalone: true,
@@ -54,7 +55,8 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
   constructor(
     private billService: BillViewOwnerService,
     private cdRef: ChangeDetectorRef,
-    private expenseViewService: ExpenseViewService
+    private expenseViewService: ExpenseViewService,
+    private modalNG:NgbModal
   ) { }
   onSearch(event: any) {
     const searchValue = event.target.value;
@@ -356,9 +358,13 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
         this.cdRef.detectChanges();
         console.log("Detalles de la expensa:", expense);
         // Aquí puedes activar el modal más adelante si deseas
-        const modalElement = document.getElementById('expenseModal');
-        const modal = new bootstrap.Modal(modalElement);
-        modal.show();
+        const modal = this.modalNG.open(ExpenseViewComponent,{ size: 'lg' ,  keyboard: false });
+        modal.componentInstance.expense = expense;
+        modal.result.then((result) => {
+          
+         }).catch((error) => {
+           console.log('Modal dismissed with error:', error);
+         });
       },
       error: (err) => {
         console.error("Error al obtener los detalles de la expensa:", err);
@@ -367,3 +373,4 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
     });
   }
 }
+

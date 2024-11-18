@@ -3,6 +3,7 @@ import {CommonModule,registerLocaleData } from '@angular/common'
 import { ExpenseView } from '../../models/expenseView';
 import { FileService } from '../../services/expenseFileService/file.service';
 import localeEsAr from '@angular/common/locales/es-AR';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 registerLocaleData(localeEsAr, 'es-AR');
 @Component({
   selector: 'app-expense-view',
@@ -14,6 +15,13 @@ registerLocaleData(localeEsAr, 'es-AR');
 
 })
 export class ExpenseViewComponent {
+  constructor(public activeModal: NgbActiveModal){
+
+  }
+
+  cerrar() {
+    this.activeModal.close(); 
+  }
 
   @Input() expense: ExpenseView | null = null;
   private readonly fileService = inject(FileService);

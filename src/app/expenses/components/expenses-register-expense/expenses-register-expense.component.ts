@@ -589,7 +589,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
             text: 'Los cambios se guardaron correctamente', // Mensaje de confirmación
           }).then(() => {
             // Redirigir después de confirmar el alert
-            this.router.navigate(['/viewExpenseAdmin']);
+            this.router.navigate(['/main/expenses/view-expense-admin']);
           });
     
           this.clearForm();
