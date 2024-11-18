@@ -8,6 +8,8 @@ import { Subject } from 'rxjs';
 import { Fine } from '../models/Dashboard-models';
 import { ReportReasonDto } from '../models/ReportReasonDTO';
 import { AuthService } from '../../users/users-servicies/auth.service';
+import { environment } from '../../common/environments/environment';
+
 
 @Injectable({
   providedIn: 'root'
@@ -16,8 +18,8 @@ export class SanctionService {
 
   private readonly http: HttpClient = inject(HttpClient);
   private readonly authService = inject(AuthService);
-  private readonly url = 'http://localhost:8042/api/';
-  private readonly reportReasonUrl = 'http://localhost:8042/api/report-reason';
+  private readonly url = environment.services.sanctions + '/api/';
+  private readonly reportReasonUrl = environment.services.sanctions + '/api/report-reason';
 
 
   constructor() { }

@@ -6,15 +6,16 @@ import { NotificationGeneral } from '../notificationGeneral';
 import { NotificationGeneralDTO } from '../models/DTOs/NotificationGeneralDTO';
 import { AllNotifications } from '../models/all-notifications';
 import { NReadDTO } from '../models/DTOs/nread-dto';
+import { environment } from '../../common/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NotificationService {
 
-  private urlApi = 'http://host.docker.internal:8080/Notification/';
-  private urlPost = 'http://host.docker.internal:8080/general/postNotificationGeneral';
-  private urlput = 'http://host.docker.internal:8080/markNotificationRead'
+  private urlApi = environment.services.notifications + '/Notification/';
+  private urlPost = environment.services.notifications +'/postNotificationGeneral';
+  private urlput = environment.services.notifications + '/markNotificationRead';
 
   constructor(private http: HttpClient) { }
 

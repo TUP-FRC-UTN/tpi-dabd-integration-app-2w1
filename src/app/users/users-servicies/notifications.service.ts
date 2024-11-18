@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LandingNotification } from '../../common/models/Landing-notification';
 import { Observable } from 'rxjs';
+import { environment } from '../../common/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +10,7 @@ import { Observable } from 'rxjs';
 export class NotificationsService {
 
   private readonly http = inject(HttpClient);
-  private readonly url = 'http://localhost:8080/general/';
+  private readonly url = environment.services.notifications + '/general/';
   
   
   getAll(): Observable<LandingNotification[]>{
