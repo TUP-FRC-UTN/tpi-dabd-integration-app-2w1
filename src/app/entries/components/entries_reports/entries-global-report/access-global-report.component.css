@@ -1,0 +1,10 @@
+
+
+  /* Opción 1: Ajustar el contenedor principal */
+.filter-section {
+    margin: 5rem;  /* Aumenta el margen exterior */
+    padding: 5rem; /* Aumenta el padding interior */
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
