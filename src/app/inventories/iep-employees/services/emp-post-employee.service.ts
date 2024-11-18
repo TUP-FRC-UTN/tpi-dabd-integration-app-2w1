@@ -70,10 +70,7 @@ export class EmpPostEmployeeService {
       // Puedes añadir más encabezados aquí si es necesario
   });
   // Realiza la petición GET
-  return this.client.get<boolean>(`${this.EMPLOYEE_URL}/validate/cuil`, { params});
-
-  
-  }
+  return this.client.get<boolean>(`${this.EMPLOYEE_URL}/validate/cuil`, { params}); }
 
   
 

@@ -8,6 +8,7 @@
           <input 
             id="fecha" 
             formControlName="fecha" 
+            [attr.max]="fechaMaxima"
             type="date" 
             class="form-control"
             [class.is-invalid]="wakeUpCallForm.get('fecha')?.invalid && (wakeUpCallForm.get('fecha')?.touched || formSubmitted)"
