@@ -2,11 +2,12 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AccessReportNeighboorComponent } from '../entries-report_to_neighbor/access-report-neighboor/access-report-neighboor.component';
+import { AccessRegisterEmergencyComponent } from "../../access-register-emergency/access-register-emergency.component";
 
 @Component({
   selector: 'access-app-global-report',
   standalone: true,
-  imports: [CommonModule, FormsModule, AccessReportNeighboorComponent],
+  imports: [CommonModule, FormsModule, AccessReportNeighboorComponent, AccessRegisterEmergencyComponent],
   templateUrl: './access-global-report.component.html',
   styleUrl: './access-global-report.component.css'
 })

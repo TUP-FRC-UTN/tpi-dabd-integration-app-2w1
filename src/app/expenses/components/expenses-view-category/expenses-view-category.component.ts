@@ -10,13 +10,13 @@ import { CategoryService } from '../../services/expensesCategoryServices/categor
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
-import 'bootstrap';
+
 import 'jspdf-autotable';
 import { ExpensesViewCategoryDetailsComponent } from '../expenses-view-category-details/expenses-view-category-details.component';
 import { ExpensesEditCategoryComponent } from "../expenses-edit-category/expenses-edit-category.component";
 import { ExpenseRegisterCategoryComponent } from "../expenses-register-category/expenses-register-category.component";
 import { ExpensesStateCategoryNgSelectComponent } from "../expenses-state-category-ng-select/expenses-state-category-ng-select.component";
-declare let bootstrap: any;
+
 @Component({
   selector: 'app-expenses-view-category',
   standalone: true,
@@ -311,27 +311,27 @@ export class ExpensesViewCategoryComponent implements OnInit {
       this.cdRef.detectChanges();
       
       const modalElement = document.getElementById('categoryEditModal');
-      const modal = new bootstrap.Modal(modalElement);
-      modal.show();
+      // const modal = new bootstrap.Modal(modalElement);
+      // modal.show();
   }
   viewSelectedCategory(rowData : any) {
     this.categorySelected=rowData
     this.cdRef.detectChanges();
     
     const modalElement = document.getElementById('categoryViewModal');
-    const modal = new bootstrap.Modal(modalElement);
-    modal.show();
+    // const modal = new bootstrap.Modal(modalElement);
+    // modal.show();
   }
   addCategory() {
     const modalElement = document.getElementById('categoryRegisterModal');
-    const modal = new bootstrap.Modal(modalElement);
-    modal.show();
+    // const modal = new bootstrap.Modal(modalElement);
+    // modal.show();
   }
 
   handleEditSuccess() {
     const modalElement = document.getElementById('categoryEditModal');
-    const modal = bootstrap.Modal.getInstance(modalElement);
-    modal?.hide();
+    // const modal = bootstrap.Modal.getInstance(modalElement);
+    // modal?.hide();
     this.showSuccessAlert('Categoría actualizada con éxito');
     this.filterData(); 
   }

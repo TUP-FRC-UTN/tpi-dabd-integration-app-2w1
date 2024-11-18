@@ -1,4 +1,4 @@
-<button class="floating-btn btn btn-primary" (click)="redirect('/registerExpense')"><span class="bi-plus-lg"></span></button>
+<button class="floating-btn btn btn-primary" (click)="redirect('main/expenses/register-expense')"><span class="bi-plus-lg"></span></button>
 <section class="py-5">
   <div class="container p-3 border border-2 rounded shadow-lg">
 
@@ -55,7 +55,7 @@
 
 </section>
 
-<app-expense-view [expense]="selectedExpense"></app-expense-view>
+
 <app-expenses-filters 
  [(selectedCategories)]="selectedCategories"
  [(selectedProviders)]="selectedProviders"

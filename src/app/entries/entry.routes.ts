@@ -5,7 +5,7 @@ import { AccessContainerVisitorsRegistrationComponent } from "./components/acces
 import { MetricsComponent } from "./components/metrics/metrics.component";
 
 export const ENTRY_ROUTES: Routes = [
-    { path: 'reports', component: AccessGlobalReportComponent},
+    { path: 'reports', component: AccessGlobalReportComponent },
     { path: 'visitor', component: AccessContainerVisitorsRegistrationComponent }, 
     { path: 'vehicles', component: AccessVehiclesViewComponent },
     { path: 'dashboard', component: MetricsComponent },

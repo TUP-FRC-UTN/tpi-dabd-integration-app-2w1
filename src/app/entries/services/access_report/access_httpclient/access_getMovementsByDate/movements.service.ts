@@ -3,7 +3,7 @@ import { catchError, Observable, of } from 'rxjs';
 import Swal from 'sweetalert2';
 import { Movement } from '../../../../models/access-report/Types';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { API_ENDPOINTS, environment } from '../../../../entries-environment';
+import { API_ENDPOINTS, environmentEntries } from '../../../../entries-environment';
 
 @Injectable({
   providedIn: 'root'

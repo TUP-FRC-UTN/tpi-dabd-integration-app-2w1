@@ -229,7 +229,7 @@ export class ExpenseGenerationPaymentFormComponent implements OnInit {
   goBack() {
     this.expenseService.clearSelectedExpenses();
     this.status.emit(1);
-    this.router.navigate(['/expense-generation-user-view']);
+    this.router.navigate(['/main/invoices/expense-generation-user-view']);
   }
 
 

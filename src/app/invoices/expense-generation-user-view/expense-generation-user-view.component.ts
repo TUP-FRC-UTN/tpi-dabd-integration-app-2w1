@@ -11,6 +11,7 @@ import localeEsAr from '@angular/common/locales/es-AR';
 import { OwnerService } from '../expense-generation-services/expense-generation-owner-service';
 import { AuthService } from '../../users/users-servicies/auth.service';
 import { environment } from '../../common/environments/environment';
+import { RoutingService } from '../../common/services/routing.service';
 registerLocaleData(localeEsAr, 'es-AR');
 @Component({
   selector: 'app-expense-generation-user-view',
@@ -32,7 +33,7 @@ export class ExpenseGenerationUserViewComponent implements OnInit {
   constructor(
     private expenseService: ExpenseGenerationExpenseService,
     private paymentService: ExpenseGenerationPaymentService,
-    private router:Router,
+    private routingService: RoutingService,
     private datePipe:DatePipe,
     private ownerService: OwnerService,
     private authService: AuthService,
@@ -100,7 +101,7 @@ export class ExpenseGenerationUserViewComponent implements OnInit {
   }
 
   goToPaymentForm(){
-    this.router.navigateByUrl("expense-generation-payment-form")
+    this.routingService.redirect("/main/invoices/expense-generation-payment-form")
   }
 
   getExpensesByOwner() {

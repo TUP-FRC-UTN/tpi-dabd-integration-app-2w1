@@ -2,9 +2,9 @@ import { ChangeDetectorRef, Component, ElementRef, inject, OnInit, ViewChild } f
 import { Bill } from '../../models/bill';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-//Imports para el DataTable
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import moment from 'moment';
-import 'bootstrap';
+
 import $ from 'jquery';
 import 'datatables.net';
 import 'datatables.net-bs5';
@@ -25,8 +25,8 @@ import { ExpenseProvidersNgSelectComponent } from "../expense-providers-ng-selec
 import { Provider } from '../../models/provider';
 import { ExpensesFiltersComponent } from "../expenses-filters/expenses-filters.component";
 import { ExpenseType } from '../../models/expenseType';
+import { RoutingService } from '../../../common/services/routing.service';
 
-declare let bootstrap: any;
 
 @Component({
   selector: 'app-view-gastos-admin',
@@ -69,7 +69,9 @@ export class ViewGastosAdminComponent implements OnInit {
     private cdRef: ChangeDetectorRef,
     private billService: BillService,
     private expenseViewService: ExpenseViewService,
-    private router: Router
+    private router: Router,
+    private modalNG: NgbModal,
+    private routerS: RoutingService
   ) { }
 
   ngOnInit(): void {
@@ -483,7 +485,7 @@ export class ViewGastosAdminComponent implements OnInit {
   }
   editBill(id: any) {
     console.log(id); // Esto mostrará el id en la consola
-    this.router.navigate(['/registerExpense', id]); // Navega a /viewExpenseAdmin/id
+    this.routerS.redirect('/main/expenses/register-expense/'+id,"Editar Gasto"); // Navega a /viewExpenseAdmin/ida
   }
   viewBillDetails(id: any) {
     console.log("ID de la expensa:", id);
@@ -493,9 +495,13 @@ export class ViewGastosAdminComponent implements OnInit {
         this.cdRef.detectChanges();
         console.log("Detalles de la expensa:", expense);
         // Aquí puedes activar el modal más adelante si deseas
-        const modalElement = document.getElementById('expenseModal');
-        const modal = new bootstrap.Modal(modalElement);
-        modal.show();
+        const modal = this.modalNG.open(ExpenseViewComponent,{ size: 'lg' ,  keyboard: false });
+        modal.componentInstance.expense = expense;
+        modal.result.then((result) => {
+          
+         }).catch((error) => {
+           console.log('Modal dismissed with error:', error);
+         });
       },
       error: (err) => {
         console.error("Error al obtener los detalles de la expensa:", err);
@@ -503,6 +509,7 @@ export class ViewGastosAdminComponent implements OnInit {
       }
     });
   }
+
 }
 
 
