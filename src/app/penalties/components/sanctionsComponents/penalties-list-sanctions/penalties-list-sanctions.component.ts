@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, inject, OnInit, Output, ViewChild } from '@angular/core';
 import { SanctionService } from '../../../services/sanctions.service';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -23,6 +23,7 @@ import jsPDF from 'jspdf';
 import { SanctionsDTO } from '../../../models/SanctionsDTO';
 import autoTable from 'jspdf-autotable';
 import { CustomSelectComponent } from "../../../../common/components/custom-select/custom-select.component";
+import { AuthService } from '../../../../users/users-servicies/auth.service';
 
 
 @Component({
@@ -50,7 +51,7 @@ export class PenaltiesSanctionsListComponent implements OnInit {
   options: { name: string, value: any }[] = []
   @ViewChild(CustomSelectComponent) customSelect!: CustomSelectComponent;
 
-  
+
   //Init
   ngOnInit(): void {
     //Metodo para recargar la datatable desde dentro de un modal en el modal
@@ -107,7 +108,8 @@ export class PenaltiesSanctionsListComponent implements OnInit {
   constructor(
     private _modal: NgbModal,
     private sanctionService: SanctionService,
-    private routingService: RoutingService
+    private routingService: RoutingService,
+    private authService: AuthService
   ) {
     (window as any).viewFine = (id: number) => this.viewFine(id);
   }
@@ -347,12 +349,33 @@ export class PenaltiesSanctionsListComponent implements OnInit {
 
   //Actualiza todos los datos de la tabla consultando con la api
   refreshData() {
-    this.sanctionService.getAllSactions().subscribe((data) => {
-      this.sanctions = data;
-      this.sanctionsfilter = [...data];
-      this.updateDataTable();
-      this.filterDate()
-    });
+    let plotIds = this.authService.getUser().plotId;
+    
+    if (this.authService.getActualRole() === 'SuperAdmin' || 
+    this.authService.getActualRole() === 'Gerente general' || 
+    this.authService.getActualRole() === 'Gerente multas') {
+      this.sanctionService.getAllSactions().subscribe((data) => {
+        this.sanctions = [...data];
+        this.sanctionsfilter = [...this.sanctions];
+        this.updateDataTable();
+        this.filterDate();
+        console.log('Multas y advertencias cargadas:', data);
+      });
+    }
+
+    else {
+      this.sanctions = [];
+
+      plotIds.forEach(plotId => {
+        this.sanctionService.getAllSactions(plotId).subscribe((data) => {
+          this.sanctions = [...this.sanctions, ...data];
+          this.sanctionsfilter = [...this.sanctions];
+          this.updateDataTable();
+          this.filterDate();
+          console.log(`Multas y advertencias cargadas para el lote ${plotId}: `, data);
+        });
+      });
+    }
   }
 
 
