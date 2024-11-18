@@ -42,7 +42,7 @@ export class AuthService {
     localStorage.removeItem('jwtToken');
   }
 
-  //Verifica si el id existe ene l localstorage
+  //Verifica si el id existe ene llocalstorage
   isLoggedIn(): boolean {
     return localStorage.getItem('jwtToken') !== null;
   }

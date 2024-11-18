@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, Validators, ReactiveFormsModule, FormBuilder, FormsModule } from '@angular/forms';
+import { FormGroup, Validators, ReactiveFormsModule, FormBuilder, FormsModule, AbstractControl, AsyncValidatorFn, ValidationErrors } from '@angular/forms';
 import { AccessVisitorsRegisterServiceHttpClientService } from '../../../services/access_visitors/access-visitors-register/access-visitors-register-service-http-client/access-visitors-register-service-http-client.service';
-import { Subject, takeUntil } from 'rxjs';
+import { map, Observable, of, Subject, takeUntil } from 'rxjs';
 import { accessTempRegist, AccessUser, AccessVisitor3, UserType } from '../../../models/access-visitors/access-visitors-models';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { AccessUserReportService } from '../../../services/access_report/access_httpclient/access_usersApi/access-user-report.service';
@@ -51,7 +51,8 @@ export class AccesesVisitorsTempComponent implements OnInit {
     private fb: FormBuilder,
     private userService: AccessUserReportService,
     private visitorHttpService: AccessVisitorsRegisterServiceHttpClientService,
-    private authService: AuthService
+    private authService: AuthService,
+    private userApi: AccessUserReportService
 ) { 
     // Inicializa las opciones de vehículos con su traducción
     this.vehicleOptions = this.vehicleTypes.map(type => ({
@@ -107,19 +108,47 @@ initForm(): void {
       propietario: [null, Validators.required],
       firstName: ['', [Validators.required, Validators.maxLength(45)]],
       lastName: ['', [Validators.required, Validators.maxLength(45)]],
-      document: ['', [
-          Validators.required,
-          Validators.minLength(8),
-          Validators.maxLength(15),
-          Validators.pattern('^[A-Za-z0-9]{8,15}$')
-      ]],
+      document: ['', {
+        validators: [
+            Validators.required,
+            Validators.minLength(8),
+            Validators.maxLength(15),
+            Validators.pattern('^[A-Za-z0-9]{8,15}$')
+        ],
+        asyncValidators: [(control: AbstractControl): Observable<ValidationErrors | null> => {
+         
+          if (this.visitorForm?.get('documentType')?.value === '1') {
+            return this.userApi.validateDniNotPropietario(control.value).pipe(
+              map(isValid => isValid ? null : { dniAlreadyPropietario: true })
+            );
+          }
+          return of(null);
+        }],
+        updateOn: 'blur'
+      }],
       documentType:['', [Validators.required]],
       hasVehicle: [false],
       licensePlate: [''],
       vehicleType: [''],
       insurance: ['']
   });
+  this.visitorForm.get('documentType')?.valueChanges.subscribe(() => {
+    this.visitorForm.get('document')?.updateValueAndValidity();
+  });
 }
+
+validateNonPropietarioDni(): AsyncValidatorFn {
+  return (control: AbstractControl): Observable<ValidationErrors | null> => {
+    if (!control.value) {
+      return new Observable(observer => observer.next(null));
+    }
+    console.log('Validando DNI no propietario:', control.value);
+    return this.userApi.validateDniNotPropietario(control.value).pipe(
+      map(isValid => isValid ? null : { dniAlreadyPropietario: true })
+    );
+  };
+}
+
 
 // Carga tipos de vehículos del servicio
 loadVehicleTypes(): void {
@@ -218,7 +247,7 @@ sendVisitor(): void {
         Swal.fire({
           icon: 'success',
           title: 'Exito',
-          text: 'Se envio el visitante Correctamente',   
+          text: 'Se autorizó el visitante Correctamente',   
       }).then(() => {
 
         this.switchModals();

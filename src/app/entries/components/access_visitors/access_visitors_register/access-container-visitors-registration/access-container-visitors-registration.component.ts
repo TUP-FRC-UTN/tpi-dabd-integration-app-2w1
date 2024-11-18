@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AbstractControl, AsyncValidatorFn, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Observable, Subject, combineLatest } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Observable, Subject, combineLatest, of } from 'rxjs';
+import { catchError, map, takeUntil } from 'rxjs/operators';
 import { AccessVisitorsRegisterServiceHttpClientService } from '../../../../services/access_visitors/access-visitors-register/access-visitors-register-service-http-client/access-visitors-register-service-http-client.service';
 import { AccessVisitor, AccessVisitorRecord, AccessAuthRange, AccessVehicle,AccessUser, UserType } from '../../../../models/access-visitors/access-visitors-models';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -10,7 +10,10 @@ import { AccessTimeRangeVisitorsRegistrationComponent } from '../access-time-ran
 import { AccessGridVisitorsRegistrationComponent } from '../access-grid-visitors-registration/access-grid-visitors-registration.component';
 import Swal from 'sweetalert2';
 import { AccessVisitorsRegisterServiceService } from '../../../../services/access_visitors/access-visitors-register/access-visitors-register-service/access-visitors-register-service.service';
-import { AccessRegisterEmergencyComponent } from "../../../access-register-emergency/access-register-emergency.component";
+import { AccessUserServiceService } from '../../../../services/access-user/access-user-service.service';
+import { AccessUserReportService } from '../../../../services/access_report/access_httpclient/access_usersApi/access-user-report.service';
+
+
 @Component({
   selector: 'app-access-container-visitors-registration',
   standalone: true,
@@ -20,8 +23,7 @@ import { AccessRegisterEmergencyComponent } from "../../../access-register-emerg
     ReactiveFormsModule,
     AccessGridVisitorsRegistrationComponent,
     AccessTimeRangeVisitorsRegistrationComponent,
-    CommonModule,
-    AccessRegisterEmergencyComponent
+    CommonModule
 ],
 })
 export class AccessContainerVisitorsRegistrationComponent implements OnInit, OnDestroy {
@@ -81,6 +83,7 @@ export class AccessContainerVisitorsRegistrationComponent implements OnInit, OnD
     private fb: FormBuilder,
     private visitorService: AccessVisitorsRegisterServiceService,
     private visitorHttpService: AccessVisitorsRegisterServiceHttpClientService,
+    private userApi: AccessUserReportService,
   ) { 
     this.vehicleOptions = this.vehicleTypes.map(type => ({
       value: type,
@@ -262,12 +265,16 @@ sendVisitorRecord(): void {
       authorizedType: ['', Validators.required],
       firstName: ['', [Validators.required, Validators.maxLength(45)]],
       lastName: ['', [Validators.required, Validators.maxLength(45)]],
-      document: ['', [
-        Validators.required,
-        Validators.minLength(8),
-        Validators.maxLength(15),
-        Validators.pattern('^[A-Za-z0-9]{8,15}$'), 
-      ]],
+      document: ['', {
+        validators: [
+            Validators.required,
+            Validators.minLength(8),
+            Validators.maxLength(15),
+            Validators.pattern('^[A-Za-z0-9]{8,15}$')
+        ],
+        asyncValidators: [this.validateNonPropietarioDni()],
+        updateOn: 'blur'
+      }],
       documentType:['', [Validators.required]],
       email: [''],
       hasVehicle: [false],
@@ -275,10 +282,28 @@ sendVisitorRecord(): void {
       vehicleType: [''],
       insurance: ['']
     });
+    this.visitorForm.get('documentType')?.valueChanges.subscribe(() => {
+      this.visitorForm.get('document')?.updateValueAndValidity();
+    });
   }
 
 
+  validateNonPropietarioDni(): AsyncValidatorFn {
+    return (control: AbstractControl): Observable<ValidationErrors | null> => {
+      if (!control.value || this.visitorForm?.get('documentType')?.value !== '1') {
+        return of(null);
+      }
   
+      return this.userApi.validateDniNotPropietario(control.value).pipe(
+        map(isValid => {
+          const error = isValid ? null : { dniAlreadyPropietario: true };
+          console.log('Validation result:', error);
+          return error;
+        }),
+        catchError(() => of(null))
+      );
+    };
+  }
 
 loadVehicleTypes(): void {
   this.visitorHttpService.getVehicleTypes().pipe(

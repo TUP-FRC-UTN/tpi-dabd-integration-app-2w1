@@ -46,6 +46,9 @@
                                     <div *ngIf="visitorForm.get('document')?.errors?.['pattern']">
                                         El documento debe contener solo letras y números.
                                     </div>
+                                    <div *ngIf="visitorForm.get('document')?.errors?.['dniAlreadyPropietario']">
+                                        Este DNI corresponde a un propietario registrado. Los propietarios no requieren autorización adicional.
+                                    </div>
                                 </div>
                             </div>
                         </div>
