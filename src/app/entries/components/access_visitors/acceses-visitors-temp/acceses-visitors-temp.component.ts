@@ -8,6 +8,7 @@ import { AccessUserReportService } from '../../../services/access_report/access_
 import Swal from 'sweetalert2';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../../users/users-servicies/auth.service';
+import { AccessInsurancesService } from '../../../services/access-insurances/access-insurances.service';
 declare var bootstrap: any; 
 
 @Component({
@@ -29,6 +30,7 @@ export class AccesesVisitorsTempComponent implements OnInit {
   SelectedNeighborhood: { id: number; label: string } = { id: 0, label: '' };
   visitorForm!: FormGroup; 
   vehicleType: string[] = [];
+  insurances: string[] = [];
   patentePattern = '^[A-Z]{1,3}\\d{3}[A-Z]{0,3}$';
   private unsubscribe$ = new Subject<void>();
   vehicleTypes: string[] = ['Car', 'Motorbike', 'Truck', 'Van']; 
@@ -37,7 +39,18 @@ export class AccesesVisitorsTempComponent implements OnInit {
     this.userService.getPropietariosForSelect().subscribe(
       options => this.propietariosOptions = options
     );
-
+  }
+  private loadInsurances(): void {
+    this.insuranceService.getAll().pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe({
+      next: (insurances) => {
+        this.insurances = insurances;
+      },
+      error: (error) => {
+        console.error('Error al cargar los seguros:', error)
+      }
+    })
   }
   vehicleTypeMapping: { [key: string]: string } = {
     'Car': 'Auto',
@@ -52,8 +65,9 @@ export class AccesesVisitorsTempComponent implements OnInit {
     private userService: AccessUserReportService,
     private visitorHttpService: AccessVisitorsRegisterServiceHttpClientService,
     private authService: AuthService,
-    private userApi: AccessUserReportService
-) { 
+    private userApi: AccessUserReportService,
+    private insuranceService: AccessInsurancesService
+  ) { 
     // Inicializa las opciones de vehículos con su traducción
     this.vehicleOptions = this.vehicleTypes.map(type => ({
       value: type,
@@ -73,6 +87,7 @@ onPropietarioChange(selected: any) {
 ngOnInit(): void {
     this.initForm();
     this.loadVehicleTypes();
+    this.loadInsurances();
     this.listenToHasVehicleChanges();
     this.loadUsersType(); 
     const modal = document.getElementById('visitorModal');

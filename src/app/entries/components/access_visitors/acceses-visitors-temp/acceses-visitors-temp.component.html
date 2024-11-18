@@ -199,9 +199,9 @@
                             <select id="insurance" class="form-select" formControlName="insurance"
                               [class.is-valid]="visitorForm.get('insurance')?.valid && visitorForm.get('insurance')?.touched"
                               [class.is-invalid]="visitorForm.get('insurance')?.invalid && visitorForm.get('insurance')?.touched">
-                              <option value="San Cristobal">San Cristobal</option>
-                              <option value="La Nueva">La Nueva</option>
-                              <option value="La Segunda">La Segunda</option>
+                              @for (insurance of insurances; track $index) {
+                                <option [value]="insurance">{{insurance}}</option>
+                              }
                               <!-- ... resto de las opciones ... -->
                             </select>
                             <div class="invalid-feedback"
