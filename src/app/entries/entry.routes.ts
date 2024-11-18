@@ -8,5 +8,5 @@ export const ENTRY_ROUTES: Routes = [
     { path: 'reports', component: AccessGlobalReportComponent },
     { path: 'visitor', component: AccessContainerVisitorsRegistrationComponent }, 
     { path: 'vehicles', component: AccessVehiclesViewComponent },
-    { path: 'dashboards', component: MetricsComponent },
+    { path: 'dashboard', component: MetricsComponent },
 ];
