@@ -1628,7 +1628,7 @@ private prepareExitMovementEmergency(visitor: AccessUserAllowedInfoDtoOwner, pla
           }
         },
         observations: this.observations,
-        loggedUserId: 1,
+        loggedUserId: this.userId,
         neighborId: 0
       };
 
@@ -1728,7 +1728,7 @@ private prepareEntryMovementEmergency(visitor: AccessUserAllowedInfoDtoOwner, pl
         },
         observations: this.observations,
         neighborId: visitor.authRanges.at(0)?.neighbor_id ?? 0,
-        loggedUserId: 1
+        loggedUserId: this.userId
       };
 
       // Preparar mensaje del modal
