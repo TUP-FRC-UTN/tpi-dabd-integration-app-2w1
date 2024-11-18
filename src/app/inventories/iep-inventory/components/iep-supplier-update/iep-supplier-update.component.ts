@@ -7,6 +7,8 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { CommonModule } from '@angular/common';
 import { error } from 'jquery';
 import Swal from 'sweetalert2';
+import { UserService } from '../../../../users/users-servicies/user.service';
+import { AuthService } from '../../../../users/users-servicies/auth.service';
 
 @Component({
   selector: 'app-iep-supplier-update',
@@ -37,7 +39,7 @@ export class IepSupplierUpdateComponent implements OnInit{
       const supplierUpdate: Supplier = {
         id: this.id, 
         name: this.proveedorForm.value.name,
-       cuit: this.proveedorForm.value.cuit,
+        cuit: this.proveedorForm.value.cuit,
         address: this.proveedorForm.value.address,
         supplierType: this.proveedorForm.value.supplierType, 
         description: this.proveedorForm.value.description,
@@ -47,14 +49,35 @@ export class IepSupplierUpdateComponent implements OnInit{
       };
   
       this.supplierService.updateSupplier(supplierUpdate).subscribe(
-        response => {
-          //alert('Proveedor actualizado exitosamente');
-          this.router.navigate(['/suppliers'])
+          {
+        next: response=> {
+          console.log(JSON.stringify(response))
+          Swal.fire({
+            title: '¡Guardado!',
+            text: "Proveedor actualizado con exito",
+            icon: 'success',
+            confirmButtonText: 'Aceptar',
+            showCancelButton: false,
+            confirmButtonColor: '#3085d6'
+          }).then(() => {
+            this.router.navigate(['/suppliers'])});
+          console.log("PASO: ", response);
         },
-        error => {
-          console.error('Error al actualizar el proveedor', error);
-          alert('Error al actualizar el proveedor');
+        error: error => {
+          
+          Swal.fire({
+            title: 'Error',
+            text: "'Error al actualizar el proveedor'",
+            icon: 'error',
+            confirmButtonText: 'Aceptar',
+            confirmButtonColor: '#3085d6'
+          });
+       
+          console.log("error:"+error.error.message)
+          console.error(error);
+                 
         }
+      }
       );
     }
   }
@@ -111,6 +134,6 @@ export class IepSupplierUpdateComponent implements OnInit{
     return control ? control.invalid && (control.touched || control.dirty) : false;
   }
   
-constructor(private activateRoute:ActivatedRoute,private supplierService:SuppliersService,private fb: FormBuilder,private router:Router){}
+constructor(private activateRoute:ActivatedRoute,private supplierService:SuppliersService,private fb: FormBuilder,private router:Router,private userService : AuthService){}
 
 }
