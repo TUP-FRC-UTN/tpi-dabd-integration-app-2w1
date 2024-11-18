@@ -1,7 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { UserService } from '../../../users-servicies/user.service';
-import { LoginService } from '../../../users-servicies/login.service';
-import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ModalInfoUserComponent } from '../users-modal-info-user/modal-info-user.component';
@@ -11,6 +9,7 @@ import { PlotService } from '../../../users-servicies/plot.service';
 import { AuthService } from '../../../users-servicies/auth.service';
 import { OwnerService } from '../../../users-servicies/owner.service';
 import { ModalEliminarUserComponent } from '../users-modal-eliminar-user/modal-eliminar-user/modal-eliminar-user.component';
+import { RoutingService } from '../../../../common/services/routing.service';
 
 @Component({
   selector: 'app-users-familiar-group',
@@ -21,12 +20,12 @@ import { ModalEliminarUserComponent } from '../users-modal-eliminar-user/modal-e
 })
 export class UsersFamiliarGroupComponent implements OnInit {
 
-  constructor(private router: Router,private modal: NgbModal) { }
+  constructor(private modal: NgbModal) { }
 
   private readonly apiService = inject(UserService);
   private readonly plotService = inject(PlotService);
-  private readonly ownerService = inject(OwnerService);
   private readonly authService = inject(AuthService);
+  private readonly routingService = inject(RoutingService);
 
   icons = [
     {name: 'Icono 1', url:'https://i.ibb.co/DpxXd6C/icono1.png'},
@@ -90,12 +89,12 @@ export class UsersFamiliarGroupComponent implements OnInit {
   
   //Redirecciona a editar un usuario
   redirectEdit(id: number) {
-    this.router.navigate(['/main/users/edit', id]); 
+    this.routingService.redirect(`/main/users/edit/${id}`, 'Modificar usuario'); 
   }
 
   //Redirecciona  a agregar usuario
   redirectAdd() {
-    this.router.navigate(['/main/users/add']); 
+    this.routingService.redirect('/main/users/add', 'Agregar usuario'); 
   }
 
   async openModalEliminar(userId: number) {

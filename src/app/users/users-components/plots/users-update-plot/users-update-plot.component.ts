@@ -11,6 +11,7 @@ import { FileDto } from '../../../users-models/owner/FileDto';
 import { FileService } from '../../../users-servicies/file.service';
 import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
 import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
+import { RoutingService } from '../../../../common/services/routing.service';
 
 @Component({
   selector: 'app-users-update-plot',
@@ -24,6 +25,8 @@ export class UsersUpdatePlotComponent implements OnInit, OnDestroy {
   private readonly plotService = inject(PlotService);
   private readonly fileService = inject(FileService);
   private readonly suscriptionService = inject(SuscriptionManagerService);
+  private readonly routingService = inject(RoutingService);
+
   @ViewChild('stateSelect') stateSelect!: CustomSelectComponent; 
   @ViewChild('typeSelect') typeSelect!: CustomSelectComponent; 
 
@@ -34,7 +37,7 @@ export class UsersUpdatePlotComponent implements OnInit, OnDestroy {
   files: File[] = this.existingFiles;
   formReactivo: FormGroup;
 
-  constructor(private fb: FormBuilder, private router: Router, private route: ActivatedRoute) {
+  constructor(private fb: FormBuilder, private route: ActivatedRoute) {
     this.formReactivo = this.fb.group({
       plotNumber: new FormControl(0, [Validators.required, Validators.min(1)]),
       blockNumber: new FormControl(0, [Validators.required, Validators.min(1)]),
@@ -223,7 +226,7 @@ export class UsersUpdatePlotComponent implements OnInit, OnDestroy {
         });
 
         //Redirigir a la lista de lotes
-        this.redirect('main/plots/list');
+        this.redirect();
       },
       error: (error) => {
         console.log("Error al actualizar el lote" + error);
@@ -322,13 +325,8 @@ export class UsersUpdatePlotComponent implements OnInit, OnDestroy {
 
   //--------------------------------------------------Redirecciones------------------------------------------------
 
-  //Redireccionar
-  redirect(url: string) {
-    this.router.navigate([url]);
-  }
-
-  //Confirmar salida
-  confirmExit() {
-    this.redirect('/main/plots/list');
+  //Redireccionar a la lista de lotes
+  redirect() {
+    this.routingService.redirect('main/plots/list', 'Listado de lotes');
   }
 }

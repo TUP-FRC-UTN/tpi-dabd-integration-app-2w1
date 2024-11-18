@@ -18,6 +18,7 @@ import { OwnerService } from '../../../users-servicies/owner.service';
 import { Owner } from '../../../users-models/owner/Owner';
 import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
 import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
+import { RoutingService } from '../../../../common/services/routing.service';
 
 @Component({
   selector: 'app-users-list-plots',
@@ -46,8 +47,9 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
   @ViewChild('customSelectState') customSelectState!: CustomSelectComponent;
 
   private readonly suscriptionService = inject(SuscriptionManagerService);
+  private readonly routingService = inject(RoutingService);
 
-  constructor(private router: Router, private modal: NgbModal) { }
+  constructor(private modal: NgbModal) { }
 
   ngOnDestroy(): void {
     this.suscriptionService.unsubscribeAll();
@@ -495,11 +497,11 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
 
     // Redirige a la vista de agregar lote
     addPlot() {
-      this.router.navigate(['/main/plots/add'])
+      this.routingService.redirect('/main/plots/add', 'Agregar lote');
     }
-  
+
     // Redirige a la vista para editar l
     redirectEdit(id: number) {
-      this.router.navigate(['/main/plots/edit', id])
+      this.routingService.redirect(`/main/plots/edit${id}´, 'Modificar')
     }
 }

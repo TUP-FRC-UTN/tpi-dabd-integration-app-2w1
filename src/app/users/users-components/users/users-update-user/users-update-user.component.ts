@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators, FormBuilder } from '@angular/forms';
 import { UserService } from '../../../users-servicies/user.service';
 import { RolModel } from '../../../users-models/users/Rol';
@@ -11,6 +11,8 @@ import { AuthService } from '../../../users-servicies/auth.service';
 import Swal from 'sweetalert2';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component'; 
+import { RoutingService } from '../../../../common/services/routing.service';
+import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
 
 @Component({
   selector: 'app-users-update-user',
@@ -19,12 +21,12 @@ import { CustomSelectComponent } from '../../../../common/components/custom-sele
   templateUrl: './users-update-user.component.html',
   styleUrl: './users-update-user.component.css'
 })
-export class UsersUpdateUserComponent implements OnInit {
+export class UsersUpdateUserComponent implements OnInit, OnDestroy {
 mostrarRolesSeleccionados() {
 throw new Error('Method not implemented.');
 }
 
-  constructor(private router: Router, private route: ActivatedRoute, private fb : FormBuilder) { 
+  constructor(private route: ActivatedRoute, private fb : FormBuilder) { 
     this.updateForm = this.fb.group({
       name: new FormControl('', [Validators.required]),
       lastname: new FormControl('', [Validators.required]),
@@ -41,6 +43,8 @@ throw new Error('Method not implemented.');
 
   private readonly userService = inject(UserService);
   private readonly authService = inject(AuthService);
+  private readonly routingService = inject(RoutingService);
+  private readonly suscriptionService = inject(SuscriptionManagerService);
 
   updateForm : FormGroup;
   rolesInput: string[] = [];
@@ -71,8 +75,13 @@ throw new Error('Method not implemented.');
     this.updateForm.get('datebirth')?.disable();
   }
 
+  //Desuscribirse de los observables
+  ngOnDestroy(): void {
+    this.suscriptionService.unsubscribeAll();
+  }
+
   getAllRoles(){
-    this.userService.getAllRoles().subscribe({
+    const sus = this.userService.getAllRoles().subscribe({
       next: (data: RolModel[]) => {
         this.existingRoles = data.map(rol => rol.description);
         this.filteredRoles = this.filterRoles(this.existingRoles)
@@ -83,6 +92,9 @@ throw new Error('Method not implemented.');
         console.error('Error al cargar los roles:', error);
       }
     });
+
+    //Agregar suscripción
+    this.suscriptionService.addSuscription(sus);
   }
 
 
@@ -176,15 +188,6 @@ throw new Error('Method not implemented.');
     return filteredList;
   }
 
-  confirmExit() {
-    if (this.authService.getActualRole() === 'Propietario') {
-      this.router.navigate(['main/users/family']);
-    } else {
-
-      this.router.navigate(['main/users/list']);
-    }
-  }
-
   //Actualiza el usuario
   updateUser() {
     const user: UserPut = new UserPut();
@@ -207,26 +210,23 @@ throw new Error('Method not implemented.');
     user.dni_type_id = 1;
 
     user.roles = this.updateForm.get('roles')?.value;
-    user.roles.push(...this.blockedRoles);
-    console.log("Usuario a actualizar:");
-    console.log(user);
-    
-    
+    user.roles.push(...this.blockedRoles); 
 
     //Llama al servicio para actualizar el usuario
     this.userService.putUser(user, parseInt(this.id)).subscribe({
       next: (response) => {
         Swal.fire({
           icon: "success",
-          title: 'Usuario actualizado exitosamente',
-          timer: 1000,
-          showConfirmButton: false
+          title: 'Usuario actualizado exitosamente'
         });
         this.redirectList();
       },
       error: (error) => {
         console.error('Error al actualizar el usuario:', error);
-        // Manejo de errores
+        Swal.fire({
+          icon: "error",
+          title: 'Error al actualizar el usuario'
+        });
       },
     });
   }
@@ -245,11 +245,11 @@ throw new Error('Method not implemented.');
 
   //Redirige a la lista
   redirectList() {
-    if (this.authService.getActualRole() == 'Propietario') {
-      this.router.navigate(['main/users/family']);
-    }
-    else {
-      this.router.navigate(['main/users/list']);
+    if (this.authService.getActualRole() === 'Propietario') {
+      this.routingService.redirect('main/users/family', 'Mi familia');
+    } else {
+
+      this.routingService.redirect('main/users/list', 'Listado de usuarios');
     }
   }
 
@@ -266,7 +266,6 @@ throw new Error('Method not implemented.');
     this.updateForm.patchValue({
       roles: newRoles
     })
-    console.log(this.updateForm.value);
   }
 
   showError(controlName: string): string {
