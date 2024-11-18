@@ -9,7 +9,6 @@
         <input
           type="text"
           id="filterInput"
-          [attr.max]="fechaMaxima"
           class="form-control"
           placeholder="Buscar"
           (input)="applyFilters()"
@@ -22,7 +21,6 @@
         <input
           type="date"
           id="startDate"
-          [attr.max]="fechaMaxima"
           class="form-control"
           #startDateInput
           (change)="onStartDateChange(startDateInput.value)"
@@ -80,7 +78,6 @@
                         <i class="bi bi-sort-down-alt"></i>
                     </button>
                 </div> -->
-
 
         <!-- Botón para limpiar filtros -->
         <button class="btn btn-secondary me-2 filterbutton" (click)="cleanColumnFilters()">

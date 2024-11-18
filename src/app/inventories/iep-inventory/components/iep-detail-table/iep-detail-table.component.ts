@@ -18,7 +18,6 @@ import { IepCreateWarehouseMovementDTO } from '../../models/iep-create-warehouse
 import { DetailServiceService } from '../../services/detail-service.service';
 import Swal from 'sweetalert2';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { AuthService } from '../../../../users/users-servicies/auth.service';
 
 @Component({
   selector: 'app-iep-detail-table',
@@ -265,8 +264,7 @@ public applyAllFilters(): void {
   constructor(private detailService: DetailServiceService,
     private employeesService: EmpListadoEmpleadosService,
     private warehouseService: WarehouseMovementService,
-    private router: Router,
-    private userService :AuthService
+    private router: Router
   ) { }
 
   estados: string[] = [];
@@ -332,7 +330,7 @@ public applyAllFilters(): void {
     this.dtoCreate.id_details = this.selectedIds;
     this.dtoCreate.responsible = 'Encargado de Inventario';
 
-    this.warehouseService.postWarehouseMovement(this.dtoCreate, this.userService.getUser().id)
+    this.warehouseService.postWarehouseMovement(this.dtoCreate, this.idUser)
       .subscribe({
         next: (response) => {
           console.log('Movimiento de almacén registrado con éxito:', response);

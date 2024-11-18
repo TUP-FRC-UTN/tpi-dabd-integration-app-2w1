@@ -25,7 +25,6 @@ fullName: string;
 document: string;
 position: string;
 salary: number;
-active: boolean;
 }
 
 // src/app/interfaces/employee-performance.interface.ts

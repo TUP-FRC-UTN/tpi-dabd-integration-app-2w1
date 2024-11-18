@@ -16,8 +16,6 @@ import 'datatables.net-dt'; // Estilos para DataTables
 import { BrowserModule } from '@angular/platform-browser';
 import { IepAttentionCallComponent } from '../iep-attention-call/iep-attention-call.component';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { EmpListadoEmpleados, Employee } from '../../Models/emp-listado-empleados';
-import { EmpListadoEmpleadosService } from '../../services/emp-listado-empleados.service';
 declare var bootstrap: any; // Añadir esta declaración al principio
 
 @Component({
@@ -46,7 +44,6 @@ export class IepPerformancelistComponent implements OnInit {
   showConfirmationModal = false;
   showErrorModal = false;
   confirmationMessage = '';
-  active: boolean= false;
   errorMessage = '';
   selectedObservationCount: number | null = null;  // Nuevo filtro de observaciones
   performanceTypes: string[] = ['Bueno', 'Regular', 'Malo'];  // Opciones de tipo de desempeño
@@ -55,7 +52,6 @@ export class IepPerformancelistComponent implements OnInit {
   selectedYear: string = '';
   selectedMonth: string = '';
   dataTable: any;
-  selectedEmployee: Employee | null = null;
   selectedEmployeeDetails: WakeUpCallDetail[] = [];
   showDetailsModal = false;
   availableYears: number[] = [];
@@ -74,9 +70,7 @@ export class IepPerformancelistComponent implements OnInit {
   constructor(
     private employeeService: ListadoDesempeñoService,
     private router: Router,
-    private route: ActivatedRoute,
-    private employeeServices: EmpListadoEmpleadosService
-    
+    private route: ActivatedRoute
   ) {
     // Inicializar los arrays
     this.selectedYears = [];
@@ -221,20 +215,6 @@ onPeriodChange(selected: any): void {
   }
   
 
-  // Método para cargar el empleado seleccionado y verificar si está activo
-  setSelectedEmployee(employeeId: number): void {
-    this.employeeServices.getEmployeeById(employeeId).subscribe({
-      next: (employee) => {
-        this.selectedEmployee = employee;
-        console.log('Estado del empleado seleccionado:', this.selectedEmployee.active);
-      },
-      error: (error) => {
-        console.error('Error al cargar el empleado:', error);
-      }
-    });
-  }
-  
-
   // Método para establecer el ID de empleado, obtener su nombre y cargar sus datos de desempeño
   // Dentro de tu componente principal (ej. IepPerformancelistComponent)
   setEmployeeById(employeeId: number): void {
@@ -246,7 +226,6 @@ onPeriodChange(selected: any): void {
       if (employee) {
         this.selectedEmployeeName = employee.fullName;
         this.searchTerm = employee.fullName; // Establece el término de búsqueda con el nombre
-        this.active = employee.active;// Actualiza el estado de actividad del empleado
         this.loadData(); // Carga los datos del desempeño del empleado
       }
     });

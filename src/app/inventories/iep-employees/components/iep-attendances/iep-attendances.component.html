@@ -22,7 +22,6 @@
         <input
           type="date"
           id="startDate"
-          [attr.max]="fechaMaxima"
           class="form-control"
           [(ngModel)]="startDate"
           (change)="onStartDateChange()"
@@ -32,7 +31,6 @@
         <input
           type="date"
           id="endDate"
-          [attr.max]="fechaMaxima"
           class="form-control"
           [(ngModel)]="endDate"
           (change)="onEndDateChange()"
@@ -87,7 +85,7 @@
       id="empleadosTable"
       class="table table-striped table-hover border border-4 rounded"
     >
-        <thead class="table-light border border-4">
+      <thead class="table-light border border-4">
         <tr>
           <th></th>
           <th></th>
@@ -205,40 +203,3 @@
     </div>
   </div>
 </section>
-
-<div class="modal fade" id="infoModal" role="dialog">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Asistencias</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <ul>
-          <p>
-            En esta ventana podras visualizar el registro de las asistencias del empleado seleccionado.
-          </p>
-          <li>
-            <p>
-              Por cada registro figura la fecha, el horario de entrada y de salida y el estado en el que se encuentra la misma.
-          </p>
-        </li>
-        <li>
-
-          <p>
-            Si una asistencia cuenta con el estado "Ausente" podrá con el boton al final de la tabla justificarla. (ESTA ACCION NO ES REVERSIBLE).
-          </p>
-        </li>
-        <li>
-          <p>
-            Si una asistencia cuenta con el estado "Justicado" podrá con el boton al final de la tabla ver en detalle la justificacion.
-          </p>
-        </li>
-        </ul>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
-      </div>
-    </div>
-  </div>
-</div>

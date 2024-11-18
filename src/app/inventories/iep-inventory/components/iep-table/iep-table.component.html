@@ -1,15 +1,4 @@
 <section class="py-5">
-  
-
-  <button
-      class="floating-btn btn btn-primary"
-      style="right: 75px;"
-      (click)="goTo('main/inventories/stock-increase')"
-    >
-      <span class="m-icon">M</span>
-    </button>
-
-
   <div class="container p-3 border border-2 rounded shadow-lg">
     <!-- Sección de filtros y botones de exportación -->
     <div
@@ -33,7 +22,6 @@
         <input
           type="date"
           id="startDate"
-          [attr.max]="fechaMaxima"
           class="form-control"
           #startDateInput
           [(ngModel)]="startDate"
@@ -47,7 +35,6 @@
         <input
           type="date"
           id="endDate"
-          [attr.max]="fechaMaxima"
           class="form-control"
           #endDateInput
           [(ngModel)]="endDate"
@@ -64,7 +51,7 @@
           bindLabel="label"
           bindValue="value"
           [multiple]="true"
-          placeholder="Seleccionar Tipo de Movimiento"
+          placeholder="Seleccionar Tipo"
           (change)="applyAllFilters()"
           class="w-100"
         >
@@ -116,11 +103,9 @@
           <i class="fas bi-file-earmark-pdf"></i>
         </button>
       </div>
-    
-  <!--piso del formulario-->
     </div>
 
-    
+    <!-- Tabla que muestra el historial de movimientos de productos -->
     <div class="table-responsive mt-4">
       <table
         id="historialTable"
@@ -129,9 +114,9 @@
         <thead class="table-light border border-4">
           <tr>
             <th>Fecha</th>
-            <th>Articulo</th>
+            <th>Producto</th>
             <th>Tipo movimiento</th>
-           
+            <th>Proveedor</th>
             <th>Cantidad</th>
             <th>Justificativo</th>
             <th>Stock resultante</th>
@@ -142,10 +127,8 @@
           <!-- Los datos se llenarán dinámicamente con DataTables -->
         </tbody>
       </table>
-
     </div>
 
-      
     <!-- Modal de Información que se despliega al hacer clic en el botón de información -->
     <div
       class="modal fade"
@@ -211,10 +194,8 @@
       </div>
     </div>
   </div>
- 
-  <!-- Advanced Filters Modal -->
 
-  
+  <!-- Advanced Filters Modal -->
   <div
     class="modal fade"
     id="filtrosAvanzados"
@@ -338,5 +319,4 @@
       </div>
     </div>
   </div>
-
 </section>

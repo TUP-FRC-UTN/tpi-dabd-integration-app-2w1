@@ -39,7 +39,14 @@ export class IepSuppliersFormComponent {
 
   onSubmit() {
 
-   
+    Swal.fire({
+      icon: "success",
+      title: "Proveedor registrado",
+      text: "El nuevo proveedor se ha registrado correctamente.",
+      confirmButtonText: "Aceptar" 
+    }).then(() => {
+      this.router.navigate(['/home/suppliers']);
+    });
     
 
     if (this.proveedorForm.valid) {
@@ -50,45 +57,6 @@ export class IepSuppliersFormComponent {
         this.router.navigate(['/suppliers']);
         
       });
-
-      const formAccess = {
-        name: formData.name,
-        cuil: formData.cuit,
-        email: formData.email,
-        
-      }
-
-      this.supplierService.createSupplierAccess(formAccess).subscribe( {
-
-        next: response => {
-          console.log(JSON.stringify(response))
-          Swal.fire({
-            title: '¡Guardado!',
-            text: "Proveedor guardado con exito",
-            icon: 'success',
-            confirmButtonText: 'Aceptar',
-            showCancelButton: false,
-            confirmButtonColor: '#3085d6'
-          }).then(() => {
-            this.router.navigate(['/suppliers'])});
-          ;
-          console.log("PASO: ", response);
-        },
-        error: error => {
-          
-          Swal.fire({
-            title: 'Error',
-            text: "Error en el servidor intente nuevamente mas tarde",
-            icon: 'error',
-            confirmButtonText: 'Aceptar',
-            confirmButtonColor: '#3085d6'
-          });
-       
-          console.log("error:"+error.error.message)
-          console.error(error);
-                 
-        }
-      })
     }
   }
 
@@ -99,7 +67,7 @@ export class IepSuppliersFormComponent {
     return control ? control.invalid && (control.touched || control.dirty) : false;
   }
   goBack() {
-    window.history.back();
+    this.router.navigate(['/home/suppliers']);
   }
 
   cuitExists: boolean = false;
