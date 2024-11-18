@@ -329,12 +329,17 @@ export class ListUsersComponent implements OnInit {
   
 
   fillOptionsSelected(options: any) {
-    var optiones = options.map((option: any) => option).join(' ');
-    
-    const table = $('#myTable').DataTable();
-    table.order([[0, 'desc']]).draw();  // Asumiendo que la fecha está en la primera columna (índice 0) y deseas ordenarla de manera
+    console.log(options);
 
-    table.column(2).search(optiones).draw();
+    // Convertir las opciones seleccionadas en una expresión regular para la búsqueda
+    const optionesRegex = options.map((option: any) => option).join('|');
+    console.log(optionesRegex);
+
+    const table = $('#myTable').DataTable();
+    table.order([[0, 'desc']]).draw();  // Asumiendo que la fecha está en la primera columna (índice 0) y deseas ordenarla de manera descendente
+
+    // Filtrar la columna de roles (índice 2) usando la expresión regular
+    table.column(2).search(optionesRegex, true, false).draw();
   }
 
   //Metodo para filtrar la tabla en base a las 2 fechas

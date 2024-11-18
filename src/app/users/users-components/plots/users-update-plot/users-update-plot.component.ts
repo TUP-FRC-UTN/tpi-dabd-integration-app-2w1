@@ -11,6 +11,7 @@ import { FileDto } from '../../../users-models/owner/FileDto';
 import { FileService } from '../../../users-servicies/file.service';
 import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
 import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
+import { AuthService } from '../../../users-servicies/auth.service';
 
 @Component({
   selector: 'app-users-update-plot',
@@ -24,6 +25,7 @@ export class UsersUpdatePlotComponent implements OnInit, OnDestroy {
   private readonly plotService = inject(PlotService);
   private readonly fileService = inject(FileService);
   private readonly suscriptionService = inject(SuscriptionManagerService);
+  private readonly authService = inject(AuthService);
   @ViewChild('stateSelect') stateSelect!: CustomSelectComponent; 
   @ViewChild('typeSelect') typeSelect!: CustomSelectComponent; 
 
@@ -49,8 +51,10 @@ export class UsersUpdatePlotComponent implements OnInit, OnDestroy {
 
     var id = Number(this.route.snapshot.paramMap.get('id')) || 0;
 
-    this.formReactivo.get('plotNumber')?.disable();
-    this.formReactivo.get('blockNumber')?.disable();
+    if(this.authService.getActualRole() != "SuperAdmin"){
+      this.formReactivo.get('plotNumber')?.disable();
+      this.formReactivo.get('blockNumber')?.disable();
+    }
     
     // Después de cargar los tipos y estados, encontrar el ID correcto
     const loadTypesAndStates = new Promise<void>((resolve, reject) => {
@@ -207,9 +211,8 @@ export class UsersUpdatePlotComponent implements OnInit, OnDestroy {
 
     console.log(plot);
     console.log(id);
-    
-    
-
+    alert("Se ha actualizado el lote");
+  
     const sus = this.plotService.putPlot(id, plot).subscribe({
       next: () => {
         Swal.fire({
