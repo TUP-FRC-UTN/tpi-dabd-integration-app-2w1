@@ -207,7 +207,6 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       
       // Determinar el número de cuotas basado en installmentList
       const installments = data.installmentList?.length || 1;
-      debugger
       // Mapear al modelo Expense con validaciones para cada campo
       this.expense = {
         id: data.id ?? 0,
@@ -559,7 +558,6 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   }
   isLoading = false;
   save(): void {
-    debugger
     if (!this.validateForm()) {
       return; 
     }
@@ -584,7 +582,6 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
 
     serviceCall.subscribe({
       next: (response) => {
-        debugger
         if (response && response.status === 200) {
           // Mensaje de éxito estándar
           Swal.fire({
