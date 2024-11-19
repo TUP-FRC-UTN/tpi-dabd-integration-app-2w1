@@ -190,9 +190,12 @@ export class PenaltiesSanctionsListComponent implements OnInit {
                           <button type="button" class="btn btn-light border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
                           <ul class="dropdown-menu">
                             <li><a class="dropdown-item" onclick="viewFine(${data.id})">Ver más</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" data-action="updateFine" data-id="${data.id}"'>Editar</a></li>
-                            ${data.fineState == "Pendiente" ? `<li><a class="dropdown-item" data-action="newDisclaimer" data-id="${data.id}">Descargo</a></li>` : ``}
+                            ${this.getPermisionsToEdit() ? `
+                              <li><hr class="dropdown-divider"></li>
+                              <li><a class="dropdown-item" data-action="updateFine" data-id="${data.id}"'>Editar</a></li>` : ``}
+                            ${data.fineState == "Pendiente" && (this.getPermisionsToEdit() || this.getPermissionsToDischarge())  ? 
+                            `<li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" data-action="newDisclaimer" data-id="${data.id}">Descargo</a></li>` : ``}
                           </ul>
                         </div>
                       </div>
@@ -214,6 +217,23 @@ export class PenaltiesSanctionsListComponent implements OnInit {
         processing: "Procesando..."
       },
     });
+  }
+
+  permisionToEdit : boolean = false
+  getPermisionsToEdit(){
+    if(this.authService.getActualRole() === 'SuperAdmin' ||  
+    this.authService.getActualRole() === 'Gerente multas'){
+      this.permisionToEdit = true
+    }
+    return this.permisionToEdit;
+  }
+  permisionToDischarge: boolean = false
+  getPermissionsToDischarge(){
+    if(this.authService.getActualRole() === 'Propietario' ||
+      this.authService.getActualRole() === 'Inquilino'){
+      this.permisionToDischarge = true
+    }
+    return this.permisionToDischarge;
   }
 
 
@@ -352,7 +372,6 @@ export class PenaltiesSanctionsListComponent implements OnInit {
     let plotIds = this.authService.getUser().plotId;
     
     if (this.authService.getActualRole() === 'SuperAdmin' || 
-    this.authService.getActualRole() === 'Gerente general' || 
     this.authService.getActualRole() === 'Gerente multas') {
       this.sanctionService.getAllSactions().subscribe((data) => {
         this.sanctions = [...data];

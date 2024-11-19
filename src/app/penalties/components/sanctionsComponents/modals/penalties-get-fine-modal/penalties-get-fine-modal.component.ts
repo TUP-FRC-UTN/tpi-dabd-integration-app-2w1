@@ -3,6 +3,7 @@ import { NgbActiveModal, NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { SanctionService } from '../../../../services/sanctions.service';
 import { PenaltiesUpdateStateReasonModalComponent } from '../penalties-update-state-reason-modal/penalties-update-state-reason-modal.component';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../../../../users/users-servicies/auth.service';
 
 @Component({
   selector: 'app-penalties-modal-fine',
@@ -25,6 +26,7 @@ export class PenaltiesModalFineComponent implements OnInit {
     public activeModal: NgbActiveModal,
     private _modal: NgbModal,
     public sanctionsService: SanctionService,
+    private authService: AuthService
   ) { }
 
 
@@ -77,6 +79,15 @@ export class PenaltiesModalFineComponent implements OnInit {
   // provide a reason for the state change.
   changeState(state:string) {
     this.openModalStateReason(state);
+  }
+
+  permisionToEdit : boolean = false
+  getPermisionsToEdit(){
+    if(this.authService.getActualRole() === 'SuperAdmin' || 
+    this.authService.getActualRole() === 'Gerente multas'){
+      this.permisionToEdit = true
+    }
+    return this.permisionToEdit;
   }
 
   
