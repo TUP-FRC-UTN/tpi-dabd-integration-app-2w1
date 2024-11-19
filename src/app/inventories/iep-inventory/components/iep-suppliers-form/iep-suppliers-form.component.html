@@ -137,13 +137,16 @@
             }"
           />
           <div
-            *ngIf="isFieldInvalid('cuit') && !cuitExists"
+            *ngIf="proveedorForm.get('cuit')?.hasError('required') && proveedorForm.get('cuit')?.touched"
             class="invalid-feedback"
           >
             Este campo es requerido.
           </div>
           <div *ngIf="cuitExists" class="invalid-feedback">
             Este CUIT ya está en uso.
+          </div>
+          <div class="invalid-feedback" *ngIf="proveedorForm.get('cuit')?.hasError('cuilInvalido') && proveedorForm.get('cuit')?.touched">
+            El CUIL no es válido.
           </div>
         </div>
       </div>

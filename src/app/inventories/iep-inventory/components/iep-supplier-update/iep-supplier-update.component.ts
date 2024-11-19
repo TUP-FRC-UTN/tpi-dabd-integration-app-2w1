@@ -60,7 +60,7 @@ export class IepSupplierUpdateComponent implements OnInit{
             showCancelButton: false,
             confirmButtonColor: '#3085d6'
           }).then(() => {
-            this.router.navigate(['/suppliers'])});
+            this.router.navigate(['/main/providers/suppliers'])});
           console.log("PASO: ", response);
         },
         error: error => {

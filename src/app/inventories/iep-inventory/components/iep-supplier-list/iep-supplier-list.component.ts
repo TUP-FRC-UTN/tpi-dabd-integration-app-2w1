@@ -489,7 +489,7 @@ export class IepSupplierListComponent implements AfterViewInit {
   updateSupplier(id: number) {
     //const confirmUpdate = window.confirm('¿Está seguro de que desea modificar este proveedor?');
     //if (confirmUpdate) {
-    this.router.navigate(['/home/supplier-update', id]);
+    this.router.navigate(['/main/providers/supplier-update', id]);
     //}
   }
 

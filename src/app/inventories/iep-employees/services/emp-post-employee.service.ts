@@ -21,7 +21,7 @@ export class EmpPostEmployeeService {
   private readonly EMPLOYEE_POST_URL: string = `${this.EMPLOYEE_URL}/post`;
 
   private baseUrlProvinces: string =
-    'https://mocki.io/v1/555e5ed8-37c8-480b-8452-7affe6f6f833';
+    'https://mocki.io/v1/e7d43042-d186-49a4-94cc-b2a4db9ac5c0';
 
   constructor(private client: HttpClient) { }
 

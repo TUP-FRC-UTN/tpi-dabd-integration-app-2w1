@@ -24,7 +24,7 @@ export class IepSuppliersFormComponent {
     this.proveedorForm = this.fb.group({
       name: ['', Validators.required],
       cuit: ['', [
-        Validators.required]],
+        Validators.required, this.validarCUIT()]],
       phoneNumber: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
       email: ['', [Validators.required, Validators.email]],
       supplierType: ['OTHER', Validators.required],
@@ -111,7 +111,7 @@ export class IepSuppliersFormComponent {
       .pipe(
         debounceTime(500),
         distinctUntilChanged(),
-        switchMap(cuit => {
+        switchMap((cuit) => {
           this.cuitExists = false;
           return this.supplierService.getSupplierByCuit(cuit);
         })
@@ -195,7 +195,7 @@ export class IepSuppliersFormComponent {
       .pipe(
         debounceTime(500),
         distinctUntilChanged(),
-        switchMap(email => {
+        switchMap((email) => {
           this.emailExists = false;
           return this.supplierService.getSupplierByEmail(email);
         })
@@ -224,7 +224,7 @@ export class IepSuppliersFormComponent {
       .pipe(
         debounceTime(500),
         distinctUntilChanged(),
-        switchMap(name => {
+        switchMap((name) => {
           this.nameExists = false;
           return this.supplierService.getSupplierByName(name);
         })
@@ -247,4 +247,38 @@ export class IepSuppliersFormComponent {
 
   }
 
+  validarCUIT(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (control.value) {
+        // Elimina guiones o espacios del CUIT
+        const cuilLimpio = control.value.replace(/[-\s]/g, "");
+  
+        // Verifica que tenga exactamente 11 dígitos
+        if (!/^\d{11}$/.test(cuilLimpio)) {
+          return { cuilInvalido: true };
+        }
+  
+        // Verifica que los primeros 2 dígitos sean un tipo válido (20, 23, 24, 27, 30, 33, 34)
+        const tipo = parseInt(cuilLimpio.substring(0, 2), 10);
+        const tiposValidos = [20, 23, 24, 27, 30, 33, 34];
+        if (!tiposValidos.includes(tipo)) {
+          return { cuilInvalido: true };
+        }
+        // Calcula el dígito verificador
+        const multiplicadores = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2]; // Coeficientes para el cálculo
+        let suma = 0;
+        for (let i = 0; i < multiplicadores.length; i++) {
+          suma += parseInt(cuilLimpio[i], 10) * multiplicadores[i];
+        }
+        const resto = suma % 11;
+        const digitoCalculado = resto === 0 ? 0 : 11 - resto;
+        const digitoVerificador = parseInt(cuilLimpio[10], 10);
+        // Verifica si el dígito verificador es correcto
+        if (digitoCalculado !== digitoVerificador) {
+          return { cuilInvalido: true };
+        }
+      }
+      return null; 
+    };
+  }
 }
