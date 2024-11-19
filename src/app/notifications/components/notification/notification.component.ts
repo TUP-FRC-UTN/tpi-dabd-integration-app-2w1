@@ -27,6 +27,7 @@ import { Inventory } from "../../models/inventory";
 import { NgSelectComponent } from "@ng-select/ng-select";
 import { single, Subscription } from "rxjs";
 import { SelectMultipleComponent } from "../../select-multiple/select-multiple.component";
+import { AuthService } from "../../../users/users-servicies/auth.service";
 
 
 @Component({
@@ -49,7 +50,7 @@ import { SelectMultipleComponent } from "../../select-multiple/select-multiple.c
 export class NotificationComponent implements OnInit {
   //Titulo de la pagina
   @Output() sendTitle = new EventEmitter<string>();
-  userId = 1;
+  userId : number = 0;
   rolactual: string = "";
   accessList: Access[] = [];
   finesList: Fine[] = [];
@@ -97,7 +98,8 @@ export class NotificationComponent implements OnInit {
   constructor(
     private service: NotificationService,
     private datePipe: DatePipe,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private authservice : AuthService
   ) {
     this.dateFilterForm = new FormGroup({
       startDate: new FormControl(new Date(), [Validators.required]),
@@ -110,7 +112,7 @@ export class NotificationComponent implements OnInit {
 
   ngOnInit(): void {
     this.getNotificationsFromAPI(this.userId);
-    
+    this.userId = this.authservice.getUser().id;
 
     $(document).on("click", ".mark-read-btn", (event) => {
       console.log("CLICK EN MARCAR LEIDA");
