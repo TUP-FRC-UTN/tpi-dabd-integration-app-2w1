@@ -24,6 +24,57 @@
     background-color: #6610f2 !important; /* Color indigo de Bootstrap 5.3 */
     color: #fff !important;
   }
+  .text-bg-red {
+    background-color: #d1888f !important; /* Bootstrap red */
+    color: #fff !important;
+  }
+
+  .text-bg-green {
+    background-color: #28a745 !important; /* Bootstrap green */
+    color: #fff !important;
+  }
+
+  .text-bg-blue {
+    background-color: #74af7d !important; /* Bootstrap blue */
+    color: #ffffff !important;
+  }
+
+  .text-bg-salmon {
+    background-color: #dc3545 !important; /* Bootstrap blue */
+    color: #ffffff !important;
+  }
+
+  .text-bg-menor {
+    background-color: #0dcaf0 !important; /* Bootstrap blue */
+    color: #ffffff !important;
+  }
+
+  .text-bg-orange {
+    background-color: #fd7e14 !important; /* Bootstrap yellow */
+    color: #ffffff !important;
+  }
+
+  .text-bg-purple {
+    background-color: #6f42c1 !important; /* Bootstrap purple */
+    color: #fff !important;
+  }
+
+  .text-bg-teal {
+    background-color: #20c997 !important; /* Bootstrap teal */
+    color: #ffffff !important;
+  }
+
+  .text-bg-pink {
+    background-color: #e83e8c !important; /* Bootstrap pink */
+    color: #fff !important;
+  }
+
+  .text-bg-cyan {
+    background-color: #17a2b8 !important; /* Bootstrap cyan */
+    color: #fff !important;
+  }
+
+
   .floating-btn {
     position: fixed;             /* Fija el botón en una posición relativa a la ventana del navegador, manteniéndolo siempre visible en el mismo lugar */
     bottom: 20px;                /* Coloca el botón a 20 píxeles desde la parte inferior de la pantalla */
