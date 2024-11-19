@@ -1,0 +1,109 @@
+.radio-button-label {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 10px;
+    transition: all 0.3s ease;
+}
+
+.btn-check:checked + .radio-button-label {
+    
+    color: white;
+    transform: scale(1.05);
+}
+.btn-check:focus + .btn {
+    box-shadow: none; /* Elimina el resplandor */
+}
+
+.btn-check:checked + .btn {
+    box-shadow: none; /* Elimina el resplandor cuando está seleccionado */
+}
+
+/* Contenedor principal */
+.col-6.text-start.mb-4 {
+    padding: 1rem;
+  }
+  
+  /* Grupo de botones */
+  .btn-group {
+    background: #f8f9fa;
+    padding: 0.25rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+  
+  /* Estilos para los botones de radio ocultos */
+  .btn-check {
+    position: absolute;
+    clip: rect(0,0,0,0);
+  }
+  
+  /* Estilos para las etiquetas de los botones */
+  .btn-check + .btn {
+    padding: 0.5rem 1.25rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    border: none;
+    transition: all 0.2s ease-in-out;
+    border-radius: 0.5rem;
+    margin: 0 0.125rem;
+  }
+  
+  /* Botón de Ingreso */
+  .btn-check + .btn-outline-success {
+    color: #198754;
+  }
+  
+  .btn-check:checked + .btn-outline-success {
+    background-color: #198754;
+    color: white;
+    box-shadow: 0 2px 4px rgba(25, 135, 84, 0.2);
+  }
+  
+  .btn-check:not(:checked) + .btn-outline-success:hover {
+    background-color: rgba(25, 135, 84, 0.1);
+  }
+  
+  /* Botón de Egreso */
+  .btn-check + .btn-outline-danger {
+    color: #dc3545;
+  }
+  
+  .btn-check:checked + .btn-outline-danger {
+    background-color: #dc3545;
+    color: white;
+    box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2);
+  }
+  
+  .btn-check:not(:checked) + .btn-outline-danger:hover {
+    background-color: rgba(220, 53, 69, 0.1);
+  }
+  
+  /* Efecto focus */
+  .btn-check:focus + .btn {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.25);
+  }
+  
+  /* Efecto disabled si lo necesitas */
+  .btn-check:disabled + .btn,
+  .btn-check[disabled] + .btn {
+    opacity: 0.65;
+    pointer-events: none;
+  }
+  /* Efecto de escala sutil al hacer hover */
+.btn-check + .btn:hover {
+    transform: translateY(-1px);
+  }
+  
+  /* Efecto de presión al hacer click */
+  .btn-check + .btn:active {
+    transform: translateY(1px);
+  }
+  
+  /* Efecto de brillo en el borde cuando está seleccionado */
+  .btn-check:checked + .btn {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }

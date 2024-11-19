@@ -12,6 +12,7 @@ import { UsersMockIdService } from '../../../common-services/users-mock-id.servi
 import { ProductService } from '../../services/product.service';
 import * as XLSX from 'xlsx';
 import { NgSelectModule } from '@ng-select/ng-select';
+import $ from 'jquery';
 
 declare var bootstrap: any; // Añadir esta declaración al principio
 @Component({
@@ -148,7 +149,6 @@ exportToExcel(): void {
     if (this.table) {
       this.table.destroy();
     }
-
     this.table = $('#categoryTable').DataTable({
        //Atributos de la tabla
        paging: true,
@@ -186,27 +186,30 @@ exportToExcel(): void {
                   className: 'align-middle'
                 }
           ,
-        {
-          data: null,
-          title: 'Acciones',
-          className: 'align-middle text-center', // Alinea el título al centro          orderable: false,
-          render: (data: any) => {
-            return `
-              <div class="text-center">
-                <div class="btn-group">
-                  <div class="dropdown">
-                    <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
-                    <ul class="dropdown-menu">
-                      <li><a class="dropdown-item edit-btn" href="#" data-id="${data.id}" 
-                         data-bs-toggle="modal" data-bs-target="#categoriaModal">Editar</a></li>
-                      <li><hr class="dropdown-divider"></li>
-                      <li><a class="dropdown-item delete-btn" href="#" data-id="${data.id}">Eliminar</a></li>
-                    </ul>
+          {
+            data: null,
+            title: 'Acciones',
+            className: 'align-middle text-center', // Alinea el título al centro          orderable: false,
+            render: (data: any) => {
+              let deleteButtonClass = '';
+              if (data.discontinued) {
+                deleteButtonClass = 'disabled'; // Agregar clase "disabled" al botón de eliminar
+              }
+              return `
+                <div class="text-center">
+                  <div class="btn-group">
+                    <div class="dropdown">
+                      <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
+                      <ul class="dropdown-menu">
+                        <li><a class="dropdown-item edit-btn" href="#" data-id="${data.id}" 
+                           data-bs-toggle="modal" data-bs-target="#categoriaModal">Editar</a></li>
+                        <li><a class="dropdown-item delete-btn ${deleteButtonClass}" href="#" data-id="${data.id}">Eliminar</a></li>
+                      </ul>
+                    </div>
                   </div>
-                </div>
-              </div>`;
+                </div>`;
+            }
           }
-        }
       ],
       dom:
         '<"mb-3"t>' +                           //Tabla

@@ -16,11 +16,15 @@ import { ExpensesViewCategoryDetailsComponent } from '../expenses-view-category-
 import { ExpensesEditCategoryComponent } from "../expenses-edit-category/expenses-edit-category.component";
 import { ExpenseRegisterCategoryComponent } from "../expenses-register-category/expenses-register-category.component";
 import { ExpensesStateCategoryNgSelectComponent } from "../expenses-state-category-ng-select/expenses-state-category-ng-select.component";
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-expenses-view-category',
   standalone: true,
-  imports: [CommonModule, FormsModule, ExpensesViewCategoryDetailsComponent, ExpensesEditCategoryComponent, ExpenseRegisterCategoryComponent, ExpensesStateCategoryNgSelectComponent],
+  imports: [CommonModule, FormsModule, 
+    ExpensesViewCategoryDetailsComponent,
+     ExpensesEditCategoryComponent, 
+     ExpenseRegisterCategoryComponent, ExpensesStateCategoryNgSelectComponent],
   providers: [CategoryService],
   templateUrl: './expenses-view-category.component.html',
   styleUrl: './expenses-view-category.component.scss',
@@ -29,7 +33,7 @@ export class ExpensesViewCategoryComponent implements OnInit {
   searchTerm: any;
   table: any;
 
-  constructor(private cdRef: ChangeDetectorRef) {}
+  constructor(private cdRef: ChangeDetectorRef, private modalNG: NgbModal) {}
   private readonly categoryService = inject(CategoryService);
 
   selectedStates: any[]=[]
@@ -43,9 +47,6 @@ export class ExpensesViewCategoryComponent implements OnInit {
     categoryOrProviderOrExpenseType: '',
     expenseTypes: '',
   };
-  handleEditCancel() {
-    throw new Error('Method not implemented.');
-    }
     
   ngOnInit(): void {
     
@@ -309,29 +310,36 @@ export class ExpensesViewCategoryComponent implements OnInit {
         },
       })
       this.cdRef.detectChanges();
-      
-      const modalElement = document.getElementById('categoryEditModal');
-      // const modal = new bootstrap.Modal(modalElement);
-      // modal.show();
+      const modalElement = this.modalNG.open(ExpensesEditCategoryComponent,{size:'',keyboard:false})
+      modalElement.componentInstance.category=this.categorySelected
+      modalElement.componentInstance.eventSucces.subscribe(() => {
+        this.loadAlertAndFilter('Se actualizo la categoría con éxito');
+      });
+      modalElement.componentInstance.eventError.subscribe((errorMessage: string) => {
+        this.showErrorAlert(errorMessage);
+      });
   }
   viewSelectedCategory(rowData : any) {
     this.categorySelected=rowData
     this.cdRef.detectChanges();
-    
-    const modalElement = document.getElementById('categoryViewModal');
-    // const modal = new bootstrap.Modal(modalElement);
-    // modal.show();
+    const modalElement =this.modalNG.open(ExpensesViewCategoryDetailsComponent,{size:'',keyboard:false})
+    modalElement.componentInstance.category=this.categorySelected
+    modalElement.result.then((result) => {
+    }).catch((error) => {
+      console.log('Modal dismissed with error:', error);
+    });
   }
   addCategory() {
-    const modalElement = document.getElementById('categoryRegisterModal');
-    // const modal = new bootstrap.Modal(modalElement);
-    // modal.show();
+    const modalElement = this.modalNG.open(ExpenseRegisterCategoryComponent);
+    modalElement.componentInstance.eventSucces.subscribe(() => {
+      this.loadAlertAndFilter('Se registró la categoría con éxito');
+    });
+    modalElement.componentInstance.eventError.subscribe((errorMessage: string) => {
+      this.showErrorAlert(errorMessage);
+    });
   }
 
   handleEditSuccess() {
-    const modalElement = document.getElementById('categoryEditModal');
-    // const modal = bootstrap.Modal.getInstance(modalElement);
-    // modal?.hide();
     this.showSuccessAlert('Categoría actualizada con éxito');
     this.filterData(); 
   }
