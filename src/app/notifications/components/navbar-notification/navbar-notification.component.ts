@@ -119,7 +119,7 @@ export class NavbarNotificationComponent implements OnInit, OnDestroy {
 
   showNotifications(): void {
     this.sendTitle.emit('Notificaciones');
-    this.router.navigate(['/home/notifications']);
+    this.router.navigate(['/main/notifications/show']);
     this.toggleNotifications();
   }
 
