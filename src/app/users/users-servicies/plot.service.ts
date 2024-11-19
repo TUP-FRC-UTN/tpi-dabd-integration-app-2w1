@@ -74,6 +74,7 @@ export class PlotService {
     formData.append('ownerId', ownerId.toString());
     formData.append('userId', userId.toString());    
 
+
     return this.http.post<GetPlotModel>(`${environment.services.ownersAndPlots}/plotOwners/transfer`, formData);
   }
 
