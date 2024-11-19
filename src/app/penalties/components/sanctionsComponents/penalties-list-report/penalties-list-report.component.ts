@@ -20,6 +20,7 @@ import autoTable from 'jspdf-autotable';
 import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
 import { PenaltiesUpdateStateReasonModalComponent } from '../modals/penalties-update-state-reason-modal/penalties-update-state-reason-modal.component';
 import { PenaltiesUpdateStateReasonReportModalComponent } from '../modals/penalties-update-state-reason-report-modal/penalties-update-state-reason-report-modal.component';
+import { PlotService } from '../../../../users/users-servicies/plot.service';
 
 
 
@@ -34,8 +35,6 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
   //Variables
   report: ReportDTO[] = [];                       //
   reportfilter: ReportDTO[] = [];                 //
-  // filterDateStart: Date = new Date();             //
-  // filterDateEnd: Date = new Date();               //
   states: { key: string; value: string }[] = [];  //
   table: any;                                     //Tabla base
   searchTerm: string = '';                        //Valor de la barra de busqueda
@@ -45,6 +44,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
   selectedState: string = '';
   selectedStates: string[] = [];   //Valor select
   today: string = '';
+  plots: any[] = [];
 
   options: { value: string, name: string }[] = []
   @ViewChild(CustomSelectComponent) customSelect!: CustomSelectComponent;
@@ -54,7 +54,8 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
     private reportServices: SanctionService,
     private _modal: NgbModal,
     private router: Router,
-    private routingService: RoutingService
+    private routingService: RoutingService,
+    private plotService: PlotService
 
   ) {
     (window as any).viewReport = (id: number) => this.viewReport(id);
@@ -68,9 +69,10 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
     this.reportServices.refreshTable$.subscribe(() => {
       this.refreshData();
     });
-    this.refreshData()
+    this.refreshData();
+    this.loadPlots();
 
-    this.getTypes()
+    this.getTypes();
 
     const that = this; // para referenciar metodos afuera de la datatable
 
@@ -103,6 +105,18 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
   }
 
 
+  loadPlots() {
+    this.plotService.getAllPlots().subscribe({
+      next: (data) => {
+        this.plots = data;
+        console.log('Lotes cargados:', data);
+      },
+      error: (error) => {
+        console.error('error: ', error);
+      }
+    })
+  }
+
 
   // Función para convertir la fecha al formato `YYYY-MM-DD`
   private formatDateToString(date: Date): string {
@@ -111,6 +125,11 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
     return adjustedDate.toLocaleDateString('en-CA'); // Formato estándar `YYYY-MM-DD`
   }
 
+
+  getPlotData(plotId: number) {
+    let plot = this.plots.find((plot) => plot.id === plotId);
+    return `Nro: ${plot?.plot_number} - Manzana: ${plot?.block_number}`;
+  }
 
   // Configures the DataTable display properties and loads data.
   updateDataTable() {
@@ -150,8 +169,10 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
         {
           data: 'plotId',
           className: 'align-middle',
-          render: (data) =>
-            `<div class="text-end">${data}</div>`
+          render: (data) => {
+            console.log("datos" + data)
+            return `<div class="text-end">${data}</div>`
+          }
         },
         {
           data: 'description',
