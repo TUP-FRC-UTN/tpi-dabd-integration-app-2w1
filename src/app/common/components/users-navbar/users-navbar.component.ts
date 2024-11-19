@@ -65,7 +65,7 @@ export class UsersNavbarComponent implements OnInit {
   selectRole(role: string) {
     this.authService.saveActualRole(role);
     this.actualRole = role;
-    this.routingService.redirect('/main/home')
+    this.routingService.redirect('/main/home', 'Página principal');
   }
 
 }
