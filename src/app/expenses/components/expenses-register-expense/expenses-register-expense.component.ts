@@ -558,8 +558,6 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   }
   isLoading = false;
   save(): void {
-
-
     if (!this.validateForm()) {
       return; 
     }
