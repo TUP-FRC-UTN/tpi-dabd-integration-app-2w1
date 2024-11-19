@@ -74,7 +74,7 @@ export class PlotService {
     formData.append('ownerId', ownerId.toString());
     formData.append('userId', userId.toString());    
 
-    return this.http.post<GetPlotModel>('http://localhost:9062/plotOwners/transfer', formData);
+    return this.http.post<GetPlotModel>(`${environment.services.ownersAndPlots}/plotOwners/transfer`, formData);
   }
 
   putPlot(id: number,  plot: PutPlot): Observable<PutPlot>{
