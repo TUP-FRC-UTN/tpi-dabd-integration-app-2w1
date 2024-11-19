@@ -108,9 +108,9 @@ export class AccessGridVisitorsRegistrationComponent implements OnInit, OnDestro
 
       $('#tablaconsulta tbody').on('click', '.view-more-btn', (event: any) => {
         const index = $(event.currentTarget).data('index');
-        //const selectedUser = this.movements[index].user_allowed;
+        // const selectedUser = this.movements[index].user_allowed;
   
-        //this.viewuser(selectedUser);
+        // this.viewuser(selectedUser);
       });
     });
 
