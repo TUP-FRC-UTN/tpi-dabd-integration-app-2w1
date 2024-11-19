@@ -24,7 +24,6 @@ export class CategoryService {
     return this.http.post<Category>(url, expenseCategory);
   }
 updateCategory(category: Category): Observable<any> {
-
   const url = `${this.url}/categories/putById?id=${category.id}&description=${category.description}&enabled=${category.state}&userId=${this.userService.getUserId()}`;
   return this.http.put(url, null);
 }
