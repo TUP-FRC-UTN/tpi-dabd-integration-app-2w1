@@ -34,7 +34,7 @@
                             <li>
                                 <strong>Datos de contrato:</strong> Se piden los datos para constatar la modalidad de
                                 trabajo, puede ser
-                                <em>Tercerizado <button class="btn btn-success" >SI</button>   o no Tercerizado <button class="btn btn-danger">NO</button></em>      la fecha de inicio de contrato debe ser igual o
+                                <em>Tercerizado "SI" o no Tercerizado "NO",</em> la fecha de inicio de contrato debe ser igual o
                                 posterior a la fecha actual
                             </li>
                             <li>
@@ -139,7 +139,7 @@
                             <div class="form-group col-md-9">
                                 <input type="text" class="form-control" id="cuil" name="cuil" [(ngModel)]="cuil"
                                     #cuilModel="ngModel" required pattern="^([0-9]{2}-)?[0-9]{8}-[0-9]$" [ngClass]="{
-                    'is-invalid': (cuilModel.invalid && cuilModel.touched)||(!isValidCuil), 
+                    'is-invalid': (cuilModel.invalid && cuilModel.touched)||(!isValidCuil)||(!isValidCuilFinish), 
                     'is-valid': (cuilModel.valid && cuilModel.touched)||(isValidCuil)
                 }" (input)="cuilModel.valid ? validateCuil() : null">
                                 <div *ngIf="cuilModel.invalid && cuilModel.touched" class="invalid-feedback">
@@ -147,6 +147,9 @@
                                 </div>
                                 <div *ngIf=" !isValidCuil" class="invalid-feedback">
                                     "El CUIL ingresado ya existe en el sistema."
+                                </div>
+                                <div *ngIf=" !isValidCuilFinish" class="invalid-feedback">
+                                    "El CUIL ingresado no cumple con las normativas de un numero cuil."
                                 </div>
                             </div>
                         </div>
@@ -194,7 +197,7 @@
                             <div class="col-md-9">
                                 <input type="text" class="form-control" id="telefono" name="telefono"
                                     [(ngModel)]="telefono" #telefonoModel="ngModel" required
-                                    pattern='^(0?15)?[1-9]\d{8}$' [ngClass]="{
+                                    pattern='^(0?15)?[1-10]\d{9}$' [ngClass]="{
                    'is-invalid': telefonoModel.invalid && telefonoModel.touched, 
                    'is-valid': telefonoModel.valid && telefonoModel.touched
                }">
@@ -492,7 +495,7 @@
                         <div class="row text-end">
                             <label for="start-time-contract" class="col-form-label col-md-3">Inicio</label>
                             <div class="col-md-9">
-                                <input type="date" id="startTimeContract" id="startTimeContract" class="form-control"
+                                <input type="date" id="startTimeContract"  id="startTimeContract" class="form-control"
                                     name="startTimeContract" [(ngModel)]="startTimeContract"
                                     #startTimeContractModel="ngModel" required (ngModelChange)="validateDate()"
                                     [ngClass]="{
@@ -603,18 +606,13 @@
           
             <div class="row mt-5">
                 <div class="col-md-10 text-end">
-                    <button  type="submit" link class="btn btn-secondary" (click)="goTo('home/employee-list')">Cancelar</button>
+                    <button  type="submit" link class="btn btn-secondary" routerLink="/main/employees/employees">Cancelar</button>
 
                 </div>
                 <div class="col-md-2  d-flex justify-content-end">
                     <button [disabled]="!form.valid" type="submit" class="btn btn-success">Registrar</button>
                 </div>
-            </div>
-
-
-
-           
+            </div> 
         </form>
     </div>
-
 </section>

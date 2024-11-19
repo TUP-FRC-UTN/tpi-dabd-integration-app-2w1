@@ -30,8 +30,8 @@ export class SanctionService {
   }
 
   //sanction/all
-  getAllSactions() {
-    return this.http.get<SanctionsDTO[]>(this.url + "sanction/all")
+  getAllSactions(plotId?: number) {
+    return this.http.get<SanctionsDTO[]>(this.url + "sanction/all" + (plotId ? `?plotId=${plotId}` : ''))
   }
 
   ///report/states

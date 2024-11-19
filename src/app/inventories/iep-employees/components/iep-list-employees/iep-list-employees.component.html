@@ -2,81 +2,88 @@
   <div class="container p-3 border border-2 rounded shadow-lg">
     <!-- Modal de Información -->
     <div
-      class="modal fade"
-      id="infoModal"
-      tabindex="-1"
-      aria-labelledby="infoModalLabel"
-      aria-hidden="true"
+    class="modal fade"
+    id="infoModal"
+    tabindex="-1"
+    aria-labelledby="infoModalLabel"
+    aria-hidden="true"
     >
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="infoModalLabel">
-              Información sobre la Página
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-            <div class="modal-body">
-              <p>
-                En esta página, puedes gestionar el listado de empleados del
-                sistema. A continuación, se detallan las secciones y
-                funcionalidades disponibles:
-              </p>
-              <ul>
-                <li>
-                  <strong>Botones de navegación:</strong> Cambia entre las
-                  secciones <em>Información</em>, <em>Asistencias</em> y
-                  <em>Desempeño</em> para acceder a diferentes datos
-                  relacionados con los empleados.
-                </li>
-                <li>
-                  <strong>Filtros de fecha:</strong> En la sección de
-                  <em>Desempeño</em>, puedes seleccionar un rango de fechas para
-                  filtrar el rendimiento de los empleados.
-                </li>
-                <li>
-                  <strong>Tabla de empleados:</strong> Muestra una lista de
-                  empleados con columnas para <em>Apellido y Nombre</em>,
-                  <em>Documento</em>, <em>Posición</em>, <em>Salario</em>, y
-                  <em>Acciones</em>.
-                </li>
-                <li>
-                  <strong>Detalles del empleado:</strong> Haz clic en un
-                  empleado para ver más información en un modal emergente.
-                </li>
-                <li>
-                  <strong>Registrar observaciones:</strong> En la sección de
-                  <em>Desempeño</em>, puedes añadir observaciones sobre el
-                  rendimiento de los empleados.
-                </li>
-                <li>
-                  <strong>Exportar datos:</strong> Descarga la lista de
-                  empleados en formatos PDF y Excel desde los botones
-                  disponibles en la parte superior de la lista.
-                </li>
-              </ul>
-              <p>
-                Asegúrate de utilizar correctamente las funcionalidades para
-                gestionar eficazmente la información y el rendimiento de los
-                empleados.
-              </p>
-            </div>
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
-                Cerrar
-              </button>
-            </div>
-          </div>
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <!-- Encabezado del Modal -->
+        <div class="modal-header">
+          <h5 class="modal-title" id="infoModalLabel">
+            Información sobre la Página
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Cerrar"
+          ></button>
+        </div>
+
+        <!-- Cuerpo del Modal -->
+        <div class="modal-body">
+          <p>
+            En esta página, puedes gestionar el listado de empleados del
+            sistema. A continuación, se detallan las secciones y
+            funcionalidades disponibles:
+          </p>
+          <ul>
+            <li>
+              <strong>Botones de navegación:</strong> Cambia entre las
+              secciones <em>Información</em>, <em>Asistencias</em> y
+              <em>Desempeño</em> para acceder a diferentes datos
+              relacionados con los empleados.
+            </li>
+            <li>
+              <strong>Filtros de fecha:</strong> En la sección de
+              <em>Desempeño</em>, puedes seleccionar un rango de fechas para
+              filtrar el rendimiento de los empleados.
+            </li>
+            <li>
+              <strong>Tabla de empleados:</strong> Muestra una lista de
+              empleados con columnas para <em>Apellido y Nombre</em>,
+              <em>Documento</em>, <em>Posición</em>, <em>Salario</em>, y
+              <em>Acciones</em>.
+            </li>
+            <li>
+              <strong>Detalles del empleado:</strong> Haz clic en un
+              empleado para ver más información en un modal emergente.
+            </li>
+            <li>
+              <strong>Registrar observaciones:</strong> En la sección de
+              <em>Desempeño</em>, puedes añadir observaciones sobre el
+              rendimiento de los empleados.
+            </li>
+            <li>
+              <strong>Exportar datos:</strong> Descarga la lista de
+              empleados en formatos PDF y Excel desde los botones
+              disponibles en la parte superior de la lista.
+            </li>
+          </ul>
+          <p>
+            Asegúrate de utilizar correctamente las funcionalidades para
+            gestionar eficazmente la información y el rendimiento de los
+            empleados.
+          </p>
+        </div>
+
+        <!-- Pie de página del Modal -->
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cerrar
+          </button>
         </div>
       </div>
+    </div>
+
+
 
       <div class="col"></div>
     </div>
@@ -144,13 +151,13 @@
         >
           <i class="bi bi-funnel-fill"></i>
         </button>
-        <button class="btn btn-secondary me-2 filterbutton" (click)="cleanColumnFilters()">
+        <button title="Limpiear Filtros" class="btn btn-secondary me-2 filterbutton" (click)="cleanColumnFilters()">
           <i class="bi bi-trash"></i>
         </button>
-        <button class="btn btn-success me-2 filterbutton" (click)="exportToExcel()">
+        <button title="Exportar a Excel" class="btn btn-success me-2 filterbutton" (click)="exportToExcel()">
           <i class="fa-solid bi-file-earmark-excel"></i>
         </button>
-        <button class="btn btn-danger filterbutton" (click)="exportToPdf()">
+        <button title="Exportar a PDF" class="btn btn-danger filterbutton" (click)="exportToPdf()">
           <i class="fas bi-file-earmark-pdf"></i>
         </button>
       </div>
@@ -278,12 +285,23 @@
       </div>
     </div>
   </div>
-  <button
-    class="floating-btn btn btn-primary"
-    (click)="goTo('home/employee-post')"
-  >
-    <span class="bi-plus-lg"></span>
-  </button>
+
+<button
+  style=" position: fixed; top: calc(100% - 120px);  right: 20px; z-index: 9999;"
+  class="floating-btn btn btn-secondary"
+  routerLink="/main/employees/pillow-late-arrival"
+>
+<i class="fas fa-cogs" style="color: white; font-size: 24px;"></i>
+</button>
+
+<!-- Segundo botón flotante, posicionado debajo del primero -->
+<button
+  style="position: fixed; top: calc(100% - 60px); right: 20px; z-index: 9999;"
+  class="floating-btn btn btn-primary"
+  (click)="goTo('register-employee')"
+>
+  <span class="bi-plus-lg"></span>
+</button>
 
   <div
     class="modal fade"

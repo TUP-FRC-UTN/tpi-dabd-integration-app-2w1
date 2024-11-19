@@ -105,48 +105,61 @@
                 id="filterInput"
                 class="form-control"
                 placeholder="Buscar"
-                [(ngModel)]="globalFilter"
-                name="globalFilter"
+                [(ngModel)]="filters.nombre"
+                name="nombre"
                 (input)="applyFilter()"
               />
             </div>
 
-            <!-- Campo Desde para seleccionar la fecha de inicio -->
-            <div class="me-3" style="min-width: 160px">
+            <div class="me-3" style="min-width: 200px">
               <input
                 type="date"
-                id="startDate"
+                id="filterDateStart"
+                [attr.max]="fechaMaxima"
                 class="form-control"
-                #startDateInput
-                [(ngModel)]="startDate"
-                name="startDate"
-                (ngModelChange)="applyFilter()"
+                placeholder="Desde"
+                name="dateStarts"
+                [formControl]="dateStartFilter"
+                (input)="applyFilter()"
               />
             </div>
 
-            <!-- Campo Hasta para seleccionar la fecha de fin -->
-            <div class="me-3" style="min-width: 160px">
+            <div class="me-3" style="min-width: 200px">
               <input
                 type="date"
-                id="endDate"
+                id="filterDateEnd"
+                [attr.max]="fechaMaxima"
                 class="form-control"
-                #endDateInput
-                [(ngModel)]="endDate"
-                name="endDate"
-                (ngModelChange)="applyFilter()"
+                placeholder="Hasta"
+                name="dateEnd"
+                [formControl]="dateEndFilter"
+                (input)="applyFilter()"
               />
             </div>
+            
+            
+            <!-- Filtro de Estado -->
+             <div div style="" class="">
+              <ng-select
+              multiple="true"
+              [formControl]="estadoFilter"
+              [items]="estadosCombo"
+              bindLabel="label"
+              bindValue="value"
+              placeholder="Seleccionar Estado"
+              (change)="applyFilter()">
 
-            <!-- Dropdown para Categorías -->
+              <ng-template ng-multi-label-tmp let-items="items">
+                Seleccionar Estado
+                <span *ngIf="items.length > 0">({{ items.length }})</span>
+              </ng-template>
+              </ng-select>
 
-            <!-- Botón para mostrar/ocultar filtros -->
-            <!-- <div class="ms-2">
-            </div> -->
+            </div>
 
-            <!-- Botón para limpiar filtros -->
-            <!-- <div class="ms-2">
-            </div> -->
-          </div>
+            
+            </div>
+            
 
           <!-- Botones para mostrar/ocultar y limpiar filtros, exportar datos a PDF y Excel -->
           <div class="d-flex align-items-center ms-2">
@@ -158,7 +171,7 @@
             >
               <i class="bi bi-funnel-fill"></i>
             </button>
-            <button class="btn btn-secondary ms-2 filterbutton" (click)="cleanFilters()">
+            <button title="Limpiar Filtros" class="btn btn-secondary ms-2 filterbutton" (click)="cleanFilters()">
               <i class="bi bi-trash"></i>
             </button>
             <button
@@ -192,7 +205,7 @@
               <th></th>
               <th></th>
               <th></th>
-              <th scope="col" class="text-center">Acción</th>
+              <th></th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -201,9 +214,10 @@
 
       <!-- Botones de navegación: Volver y agregar nuevo producto -->
     </form>
+
     <button
       class="floating-btn btn btn-primary"
-      (click)="goTo('home/new-product')"
+      (click)="goTo('main/inventories/new-product')"
     >
       <span class="bi-plus-lg"></span>
     </button>
@@ -233,98 +247,74 @@
           ></button>
         </div>
 
-        <!-- Modal Body -->
         <div class="modal-body">
-          <!-- Filtro por nombre -->
-          <!-- <div class="mb-3">
-            <label for="Nombre" class="form-label">Nombre</label>
-            <input type="text" id="Nombre" name="Nombre" class="form-control" [(ngModel)]="nombre" #Nombre="ngModel"
-              placeholder="" />
-          </div> -->
+<!-- Cantidad mínima -->
+<div class="row mb-3">
+  <label for="CantMinima" class="col-sm-3 col-form-label">Cantidad Mínima</label>
+  <div class="col-sm-9">
+    <input
+      type="number"
+      id="CantMinima"
+      name="CantMinima"
+      class="form-control text-end"
+      pattern="^(0|[1-9]\d*)$"
+      [(ngModel)]="filters.cantMinima"
+      (ngModelChange)="applyFilter()"
+      min="0"
+      placeholder=""
+    />
+    <div *ngIf="filters.cantMinima < 0" class="text-danger small mt-1">
+      La cantidad mínima no puede ser menor a 0
+    </div>
+    <div *ngIf="filters.cantMinima > filters.cantMaxima && filters.cantMaxima > 0" class="text-danger small mt-1">
+      La cantidad mínima no puede ser mayor a la cantidad máxima
+    </div>
+  </div>
+</div>
 
-          <!-- Selector de reutilizables -->
-          <!-- <div class="mb-3">
-            <label for="dropdownReusable" class="form-label">Reutilizables</label>
-            <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button"
-              id="dropdownReusable" data-bs-toggle="dropdown" aria-expanded="false">
-              Seleccionar reutilizables
-              <span
-                *ngIf="filters.reutilizableSeleccionado.length > 0">({{filters.reutilizableSeleccionado.length}})</span>
-            </button>
-            <ul class="dropdown-menu w-100" aria-labelledby="dropdownReusable">
-              <li>
-                <label class="dropdown-item">
-                  <input type="checkbox" class="form-check-input me-2" name="reusable" [value]="1"
-                    (change)="onReutilizableChange($event, 1)">
-                  Sí
-                </label>
-              </li>
-              <li>
-                <label class="dropdown-item">
-                  <input type="checkbox" class="form-check-input me-2" name="reusable" [value]="2"
-                    (change)="onReutilizableChange($event, 2)">
-                  No
-                </label>
-              </li>
-            </ul>
-          </div> -->
+<!-- Cantidad máxima -->
+<div class="row mb-3">
+  <label for="CantMaxima" class="col-sm-3 col-form-label">Cantidad Máxima</label>
+  <div class="col-sm-9">
+    <input
+      type="number"
+      id="CantMaxima"
+      name="CantMaxima"
+      class="form-control text-end"
+      pattern="^(0|[1-9]\d*)$"
+      [(ngModel)]="filters.cantMaxima"
+      (ngModelChange)="applyFilter()"
+      min="0"
+      placeholder=""
+    />
+    <div *ngIf="filters.cantMaxima < 0" class="text-danger small mt-1">
+      La cantidad máxima no puede ser menor a 0
+    </div>
+  </div>
+</div>
 
-          <!-- Cantidad mínima -->
-          <div class="row mb-3">
-            <label for="CantMinima" class="col-sm-3 col-form-label"
-              >Cantidad Mínima</label
-            >
-            <div class="col-sm-9">
-              <input
-                type="number"
-                id="CantMinima"
-                name="CantMinima"
-                class="form-control text-end"
-                pattern="^(0|[1-9]\d*)$"
-                [(ngModel)]="cantMinima"
-                (ngModelChange)="validarCantidades()"
-                #CantMinima="ngModel"
-                min="0"
-                placeholder=""
-              />
-              @if (cantMinima) { @if(cantMinima < 0) {
-              <div class="text-danger small mt-1">
-                La cantidad mínima no puede ser menor a 0
-              </div>
-              } @else if (!validoMin) {
-              <div class="text-danger small mt-1">
-                La cantidad mínima no puede ser mayor a la cantidad máxima
-              </div>
-              } }
-            </div>
-          </div>
+  <!-- Filtro de Reutilizable -->
 
-          <!-- Cantidad máxima -->
-          <div class="row mb-3">
-            <label for="CantMaxima" class="col-sm-3 col-form-label"
-              >Cantidad Máxima</label
-            >
-            <div class="col-sm-9">
-              <input
-                type="number"
-                id="CantMaxima"
-                name="CantMaxima"
-                class="form-control text-end"
-                pattern="^(0|[1-9]\d*)$"
-                [(ngModel)]="cantMaxima"
-                (ngModelChange)="validarCantidades()"
-                #CantMaxima="ngModel"
-                min="0"
-                placeholder=""
-              />
-              @if (cantMaxima) {
-              @if(cantMaxima < 0) {
-              <div class="text-danger small mt-1">
-                La cantidad máxima no puede ser menor a 0
-              </div>
-              } }
-            </div>
-          </div>
+  <div class="row mb-3">
+  <label for="" class="col-sm-3 col-form-label">Reutilizable</label>
+    <div class="col-sm-9">
+      <ng-select
+    multiple="true"
+    [formControl]="reutilizableFilter"
+    [items]="reutilizablesCombo"
+    bindLabel="label"
+    bindValue="value"
+    placeholder="Seleccionar Reutilizable"
+    (change)="applyFilter()">
+    <ng-template ng-multi-label-tmp let-items="items">
+      Seleccionar Reutilizable
+      <span *ngIf="items.length > 0">({{ items.length }})</span>
+    </ng-template>
+    </ng-select>
+    </div>
+  </div>
+
+
 
           <!-- Modal Footer -->
           <div class="modal-footer">
@@ -342,34 +332,30 @@
   </div>
 </section>
 
-<!-- Modal para Aumento de Stock -->
-<div
-  class="modal fade"
-  id="aumentoStock"
-  tabindex="-1"
-  data-bs-backdrop="static"
->
+
+<!-- Modal para Confirmar Eliminación -->
+<div class="modal fade" id="eliminarProductoModal" tabindex="-1" aria-labelledby="eliminarProductoModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <!-- Título del modal con el nombre del producto dinámico -->
-        <h5 class="modal-title">Agregar productos a STOCK</h5>
-
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        ></button>
+        <h5 class="modal-title" id="eliminarProductoModalLabel">
+          Confirmar Eliminación
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <!-- Componente de aumento de stock -->
-        <app-iep-stock-increase
-          *ngIf="showAumentoStockModal"
-          (closeModal)="closeAumentoStockModal()"
-        >
-          <!-- Llama al método de éxito aquí -->
-        </app-iep-stock-increase>
+        <p>
+          ¿Estás seguro de que deseas eliminar el producto
+          <strong>{{ productoSeleccionado?.name }}</strong>?
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" (click)="deleteProduct()" data-bs-dismiss="modal">
+          Eliminar
+        </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancelar
+        </button>
       </div>
     </div>
   </div>
