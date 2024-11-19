@@ -4,6 +4,7 @@ import { Router, RouterOutlet } from '@angular/router';
 import { PlotService } from '../../../users/users-servicies/plot.service';
 import { GetPlotModel } from '../../../users/users-models/plot/GetPlot';
 import { CommonModule } from '@angular/common';
+import { RoutingService } from '../../services/routing.service';
 
 @Component({
   selector: 'app-landing-page',
@@ -23,7 +24,7 @@ export class LandingPageComponent implements OnInit {
   plotsCard : {number : number, blockNumber : number, totalArea : number, type : string, status : string}[] = [];
 
   //Formulario para hacer consultas
-  constructor(private fb : FormBuilder){
+  constructor(private fb : FormBuilder, private routingService : RoutingService) {
     this.formMessage = this.fb.group({
       name: new FormControl('', [Validators.required]),
       email: new FormControl('', [Validators.required, Validators.email]),
@@ -57,7 +58,7 @@ export class LandingPageComponent implements OnInit {
 
   //Método para redireccionar
   redirect(path : string){
-    this.router.navigate([path]);
+    this.routingService.redirect('/login')
   }
 
   //Enviar el formulario con la consulta

@@ -23,7 +23,7 @@ export class AuthService {
       user.name = decodedToken.payloadObj.name;
       user.lastname = decodedToken.payloadObj.lastname;
       user.plotId = decodedToken.payloadObj.plot_id;
-
+      
       return user;
   }
 

@@ -68,4 +68,15 @@ export class UsersNavbarComponent implements OnInit {
     this.routingService.redirect('/main/home')
   }
 
+  //Cerrar sesión
+  logOut(){
+    this.authService.logOut();
+    this.routingService.redirect('/login');
+  }
+
+  //Comprobar si el rol actual puede acceder a los dashboards
+  showDashboard(){
+    const rolesPermited = ['SuperAdmin', 'Gerente general', 'Gerente multas', 'Gerente finanzas', 'Gerente inventario', 'Gerente empleados'];
+    return rolesPermited.includes(this.actualRole);
+  }
 }
