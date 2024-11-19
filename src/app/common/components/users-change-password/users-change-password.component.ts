@@ -25,8 +25,7 @@ export class ChangePasswordComponent implements OnInit {
     newPassword: new FormControl('', [
       Validators.required,
       Validators.minLength(6),
-      Validators.maxLength(30),
-    ]),
+      Validators.maxLength(30)]),
     confirmNewPassword: new FormControl('', [Validators.required, this.passwordValidator()])
   });
 
@@ -34,17 +33,28 @@ export class ChangePasswordComponent implements OnInit {
     console.log(this.email);
   }
 
-  passwordValidator() : ValidatorFn {
+  passwordValidator(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
-
       const form = control.parent;
-      if(!form){
+      if (!form) {
         return null;
       }
-      
-      return form.get('newPassword')?.value === form.get('confirmNewPassword')?.value
-      ? null : { passwordsDifferent: true };
-    }
+
+      const newPasswordControl = form.get('newPassword');
+      const confirmNewPasswordControl = form.get('confirmNewPassword');
+
+      if (!newPasswordControl || !confirmNewPasswordControl) {
+        return null;
+      }
+
+      newPasswordControl.valueChanges.subscribe(() => {
+        confirmNewPasswordControl.updateValueAndValidity({ onlySelf: true, emitEvent: false });
+      });
+
+      return newPasswordControl.value === confirmNewPasswordControl.value
+        ? null
+        : { passwordsDifferent: true };
+    };
   }
 
   toggleCurrentPassword() {

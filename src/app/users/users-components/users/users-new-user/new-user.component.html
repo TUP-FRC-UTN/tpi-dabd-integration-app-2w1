@@ -139,10 +139,16 @@
         <div class="row">
           <label class="col-2 col-form-label">Contraseña</label>
           <div class="col-10 position: relative">
-            <input [type]="passwordVisible ? 'text' : 'password'" class="form-control" formControlName="password"
-              autocomplete="current-password" [ngClass]="onValidate('password')">
-            <i class="bi" [ngClass]="passwordVisible ? 'bi-eye-slash' : 'bi-eye'" (click)="togglePasswordVisibility()"
-              style="cursor: pointer; position: absolute; right: 270px; top: auto; transform: translateY(-125%);"></i>
+            <div class="input-group">
+              <input [type]="passwordVisible ? 'text' : 'password'" 
+                     class="form-control custom-input" 
+                     formControlName="password" 
+                     autocomplete="current-password" 
+                     [ngClass]="onValidate('password')">
+              <span class="input-group-text" (click)="togglePasswordVisibility()" style="cursor: pointer;">
+                <i class="bi" [ngClass]="passwordVisible ? 'bi-eye-slash' : 'bi-eye'"></i>
+              </span>
+            </div>
             <div class="invalid-feedback">{{showError('password')}}</div>
           </div>
         </div>
@@ -154,7 +160,7 @@
           <button type="button" class="btn btn-secondary" (click)="redirect()">Cancelar</button>
         </div>
         <div class="col-auto">
-          <button type="submit" class="btn btn-success" (click)="showFormErrors()" [disabled]="reactiveForm.invalid">
+          <button type="submit" class="btn btn-success" [disabled]="reactiveForm.invalid">
             Registrar
           </button>
         </div>

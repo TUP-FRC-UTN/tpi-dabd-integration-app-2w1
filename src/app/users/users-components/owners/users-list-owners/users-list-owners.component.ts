@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { inject } from '@angular/core';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -35,6 +35,8 @@ export class UsersListOwnersComponent implements OnDestroy {
   private readonly apiService = inject(OwnerService);
   private readonly plotService = inject(PlotService);
   private readonly suscriptionService = inject(SuscriptionManagerService);
+
+  @ViewChild(CustomSelectComponent) customSelect!: CustomSelectComponent;
 
   showDeactivateModal: boolean = false;
   userToDeactivate: number = 0;
@@ -317,6 +319,10 @@ export class UsersListOwnersComponent implements OnDestroy {
     table.search('').draw();          // Limpiar búsqueda general
     table.column(3).search('').draw(); // Limpiar filtro de tipo
     table.column(0).search('').draw(); // Limpiar filtro de fecha
+
+    if (this.customSelect) {
+      this.customSelect.setData([]); // Reiniciar datos del custom select
+    }
   
     // Eliminar la función de filtro personalizada de fechas
     $.fn.dataTable.ext.search.splice(0, $.fn.dataTable.ext.search.length);
