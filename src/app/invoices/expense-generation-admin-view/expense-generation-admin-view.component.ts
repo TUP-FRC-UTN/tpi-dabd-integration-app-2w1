@@ -127,6 +127,8 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
   totalPages: number = 0;
   observation: string = '';
 
+  todayNow: Date = new Date; 
+
   startDate: string = '';
   endDate: string = '';
 
@@ -169,7 +171,7 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
     { value: 12, label: '12 - Diciembre' },
   ];
   listStatus: string[] = ['Pendiente', 'Pago', 'Exceptuado'];
-  typedoc = ['DNI', 'PASAPORTE'];
+  typedoc = ['DNI', 'PASAPORTE', 'CUIT/CUIL'];
   filter = {
     from: '',
     until: '',
@@ -573,6 +575,8 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
       document.getElementById('observationModalExpenses')
     );
   }
+
+  
 
     // Método para abrir el modal de observación
     
@@ -1033,7 +1037,7 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
   cleanFilters() {
     const today = new Date();
     const lastMonth = new Date();
-    lastMonth.setMonth(lastMonth.getMonth() - 3);
+    lastMonth.setMonth(lastMonth.getMonth() - 1);
 
     this.filter = {
       from: lastMonth.toISOString().split('T')[0],
@@ -1052,11 +1056,11 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
   }
 
   getPlotNumbers(owner: Owner): string {
-    if (!owner.plots || owner.plots.length === 0) return 'Sin lotes';
-    const plotNumbers = owner.plots
+    if (!owner.plot || owner.plot.length === 0) return 'Sin lotes';
+    const plotNumbers = owner.plot
       .map((plot) => `${plot.plot_number}`)
       .join(', ');
-    return owner.plots.length > 1 ? `${plotNumbers}` : `${plotNumbers}`;
+    return owner.plot.length > 1 ? `${plotNumbers}` : `${plotNumbers}`;
   }
 
   searchUsers() {
@@ -1292,6 +1296,8 @@ applyPagination(data: any[]) {
           ? 'D'
           : owner.dni_type === 'Pasaporte'
           ? 'P'
+          : owner.dni_type === 'CUIT/CUIL'
+          ? 'C'
           : 'N/A';
       return `${initial}- ${owner.dni}`;
     }
