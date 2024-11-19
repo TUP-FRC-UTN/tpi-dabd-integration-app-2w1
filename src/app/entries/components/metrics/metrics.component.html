@@ -510,6 +510,26 @@
 
     <div class="col-md-10" *ngIf="status === 0" style="height: 100%">
       <div class="row">
+        <!-- Gráfico comparacion Ingreso/Egreso -->
+        <div class="col-md-6" *ngIf="status === 0">
+          <div class="mb-3">
+            <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover-scale" (click)="makeBig(1)">
+              <div class="card-body mt-1">
+                <h4 class="card-title align-items-center">Comparación de {{ capitalizeFirstLetter(chartType) }}
+                  <button type="button" class="btn btn-sm btn-link text-muted bi bi-arrows-angle-expand fs-5 float-end" title="Expandir" (click)="makeBig(1)"></button>
+                </h4>
+                <hr class="mb-0 mt-4">
+                <google-chart class="mt-0"
+                  style="width: 100%; height: 247px"
+                  [type]="columnChartType"
+                  [data]="columnChartData"
+                  [options]="columnChartOptions">
+                </google-chart>
+              </div>
+            </div>
+          </div>
+        </div>
+    
         <!-- Grafico top 5 -->
         <div class="col-md-6">
           <div class="card border-0 shadow-lg rounded-4 transition-all hover-scale" (click)="makeBig(2)">
@@ -520,7 +540,7 @@
                   <h6 class="fw-medium">Ingresantes con más Ingresos/Egresos</h6>
                 </div>
               </div>
-
+    
               <table class="table table-striped table-bordered mb-0">
                 <thead>
                   <tr>
@@ -542,28 +562,7 @@
             </div>
           </div>
         </div>
-
-        <!-- Gráfico comparacion Ingreso/Egreso -->
-        <div class="col-md-6" *ngIf="status === 0">
-          <div class="mb-3">
-            <!--  -->
-            <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover-scale" (click)="makeBig(1)">
-              <div class="card-body mt-1">
-                <h4 class="card-title align-items-center">Comparación de {{ capitalizeFirstLetter(chartType) }}
-                  <button type="button" class="btn btn-sm btn-link text-muted bi bi-arrows-angle-expand fs-5 float-end" title="Expandir" (click)="makeBig(1)"></button>
-                </h4>
-                <hr class="mb-0 mt-4">
-                <google-chart class="mt-0"
-                  style="width: 100%; height: 247px"
-                  [type]="columnChartType"
-                  [data]="columnChartData"
-                  [options]="columnChartOptions">
-                </google-chart>
-              </div>
-            </div>
-          </div>
-        </div>
-
+    
         <!-- Gráfico de columnas -->
         <div class="col-md-12 align-items-end justify-content-end">
           <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover-scale" (click)="makeBig(2)">
@@ -574,25 +573,22 @@
                   (click)="makeBig(2)">
                 </button>
               </h4>
-                <div class="d-flex my-0">
-                  <h6 class="">Según Tipo de Ingresante</h6>
-                </div>
-                <hr class="mt-1 mb-3">
-                <google-chart 
-                    style="width: 100%; height: 380px"
-                    [type]="barChartType"
-                    [data]="barChartData"
-                    [options]="barChartOptions"
-                    [height]="barChartOptions.height">
-                </google-chart>
+              <div class="d-flex my-0">
+                <h6 class="">Según Tipo de Ingresante</h6>
               </div>
+              <hr class="mt-1 mb-3">
+              <google-chart 
+                style="width: 100%; height: 380px"
+                [type]="barChartType"
+                [data]="barChartData"
+                [options]="barChartOptions"
+                [height]="barChartOptions.height">
+              </google-chart>
             </div>
           </div>
-
+        </div>
       </div>
     </div>
-  </div>
-</div>
 
 <!-- Modal de info -->
 <div class="modal fade" id="infoModal" role="dialog">
