@@ -116,7 +116,7 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item edit-plot" data-id="${plotId}">Editar</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item transfer-plot" data-id="${plotId}" data-bs-toggle="modal" data-bs-target="#transfer-plot">Transferir</a></li>
+            <li><a class="dropdown-item transfer-plot" data-id="${plotId}" >Transferir</a></li>
                 </ul>
               </div>
             `;
@@ -167,16 +167,12 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
             const plotId = $(event.currentTarget).data('id');
             console.log('Transferir lote:', plotId);
 
-            const modalRef = this.modal.open(UsersTransferPlotComponent, { size: 'lg', keyboard: false });
+            const modalRef = this.modal.open(UsersTransferPlotComponent, { size: 'xs', keyboard: false });
             modalRef.componentInstance.plotId = plotId;
 
             modalRef.result.then((result) => {
-              if (result === 'success') {
-            $('#myTablePlot').DataTable().ajax.reload();
-                }
-              }).catch((error) => {
-                console.error('Error al transferir el lote:', error);
-              });
+              $('#myTablePlot').DataTable().ajax.reload();
+            });
             });
 
         }, 0);

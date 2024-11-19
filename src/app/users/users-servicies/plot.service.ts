@@ -67,6 +67,16 @@ export class PlotService {
     return this.http.get<PlotStateModel[]>(this.url + '/plots/states');
   }
 
+  transferPlot(plotId: number, ownerId: number, userId: number): Observable<GetPlotModel>{
+    const formData: FormData = new FormData();
+
+    formData.append('plotId', plotId.toString());
+    formData.append('ownerId', ownerId.toString());
+    formData.append('userId', userId.toString());    
+
+    return this.http.post<GetPlotModel>('http://localhost:9062/plotOwners/transfer', formData);
+  }
+
   putPlot(id: number,  plot: PutPlot): Observable<PutPlot>{
 
     const formData: FormData = new FormData();

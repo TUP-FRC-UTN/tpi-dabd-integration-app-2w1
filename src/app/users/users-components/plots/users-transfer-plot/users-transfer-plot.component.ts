@@ -1,4 +1,4 @@
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
 import { OwnerService } from '../../../users-servicies/owner.service';
 import { Owner } from '../../../users-models/owner/Owner';
@@ -6,50 +6,88 @@ import { PlotService } from '../../../users-servicies/plot.service';
 import { GetPlotModel } from '../../../users-models/plot/GetPlot';
 import { AuthService } from '../../../users-servicies/auth.service';
 import { ActivatedRoute } from '@angular/router';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { CustomSelectComponent } from "../../../../common/components/custom-select/custom-select.component";
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-users-transfer-plot',
   standalone: true,
-  imports: [],
+  imports: [CustomSelectComponent, ReactiveFormsModule],
   templateUrl: './users-transfer-plot.component.html'
 })
-export class UsersTransferPlotComponent {
+export class UsersTransferPlotComponent implements OnInit {
 
-  owners : Owner[] = []
-  plot : GetPlotModel = new GetPlotModel();
+  constructor(private fb: FormBuilder ){
+    this.reactiveForm = this.fb.group({
+      actualOwner: [''],
+      newOwner: ['', [Validators.required]]
+    });
+  }
 
-  constructor(private route : ActivatedRoute){}
-
+  owners: any[] = [];
+  actualOwner: Owner = new Owner();
+  plot: GetPlotModel = new GetPlotModel();
+  reactiveForm: FormGroup;
+  @Input() plotId: number = 0;
   private readonly ownersService = inject(OwnerService);
   private readonly plotService = inject(PlotService);
-  private readonly suscriptionService = inject(SuscriptionManagerService);
   private readonly authService = inject(AuthService);
 
+  ngOnInit(): void {
+    this.reactiveForm.get('actualOwner')?.disable();
+    this.loadAllOwners();
+    this.loadActualOwner();    
+  }
+
   //Cargar todos los propietarios
-  loadAllOwners(){
+  loadAllOwners() {
     this.ownersService.getAll().subscribe({
-      next: (data: Owner[]) =>{
-        this.owners = data;
+      next: (data: Owner[]) => {
+        this.owners = data.map(owner => ({
+          value: owner.id,
+          name: `${owner.name}, ${owner.lastname}`
+        }));
+        console.log(this.owners);
+        
       },
-      error: (error) =>{
-        console.log('No se pudo cargar los usuarios')
+      error: (error) => {
+        console.log('No se pudo cargar los propietarios');
       }
-    })
+    });
   }
 
-  loadPlotInfo(){
-    this.plotService.getPlotById(this.getPlotId()).subscribe({
-      next: (data: GetPlotModel) =>{
-        this.plot = data;
+  loadActualOwner() {
+    this.ownersService.getOwnerByPlotId(this.plotId).subscribe({
+      next: (data: Owner[]) => {
+        this.actualOwner = data.find(owner => owner.active == true)!;        
+        this.reactiveForm.get('actualOwner')?.setValue(this.actualOwner.name + ' ' + this.actualOwner.lastname);
       },
-      error: (error) =>{
-        console.log('No se pudo cargar la información de la parcela')
+      error: (error) => {
+        console.log('No se pudo cargar la información del propietario');
       }
-    })
+    });
   }
 
-  getPlotId() : number{
-    var id = Number(this.route.snapshot.paramMap.get('id')) || 0;
-    return id;
-  }
-}
+  transferPlot(){
+    this.plotService.transferPlot(this.plotId,
+       this.reactiveForm.get('newOwner')?.value,
+       this.authService.getUser().id).subscribe({
+        next: () => {
+          Swal.fire({
+            icon: "success",
+            title: "Lote transferido",
+            showConfirmButton: true,
+            confirmButtonText: "Aceptar",
+            timer: undefined,
+            allowEscapeKey: false,
+            allowOutsideClick: false
+
+          });
+          this.ngOnInit();
+        },
+        error: (error) => {
+          console.error('Error al trasnferir el lote:', error);
+        }
+      });
+}}

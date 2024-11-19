@@ -1,58 +1,42 @@
-<!-- <div class="modal-header">
+<div class="modal-header">
     <h4 class="modal-title" id="modal-basic-title">Información del Lote</h4>
-    <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
+    <button type="button" class="btn-close" aria-label="Close"></button>
 </div>
-<div class="modal-body"> -->
+<div class="modal-body">
+    <form class="d-flex flex-column justify-content-center align-items-center"
+     [formGroup]="reactiveForm" (ngSubmit)="transferPlot()">
 
-    
-<div class="modal fade" id="transfer-plot" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="staticBackdropLabel">Transferir Lote</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form action="">
-
-            <!-- Mostrar Nombre de propietario actual -->
-            <div class="col-lg-6 mb-3">
-                <div class="row">
-                    <label class="col-2 col-form-label">Propietario Actual</label>
-                    <div class="col-10">
-                        <input type="text" class="form-control" formControlName="actualOwner"/>
-                    </div>
+        <div class="mb-3">
+            <div class="d-flex justify-content-center align-items-center">
+                <label class="col-form-label me-3" style="min-width: 100px;" >Propietario Actual</label>
+                <div class="">
+                    <input type="text" class="form-control w-100" formControlName="actualOwner" style="min-width: 200px; max-width: 200px;"/>
                 </div>
             </div>
+        </div>
 
-            <!-- Mostrar info basica del lote -->
-            <!-- <div class="col-lg-6 mb-3">
-                <div class="row">
-                    <label class="col-2 col-form-label">Lote</label>
-                    <div class="col-10">
-                        <input type="text" class="form-control" formControlName="plotNumber"/>
-                    </div>
+        <div class="align-self-center">
+            <i class="bi bi-arrow-right fs-1"></i>
+        </div>
+
+        <div class="m-3">
+            <div class="d-flex justify-content-center align-items-center">
+                <label class=" col-form-label me-3"  style="min-width: 100px;">Nuevo Propietario</label>
+                <div class="">
+                    <app-custom-select  style="min-width: 200px; max-width: 200px;" class="w-100" 
+                    [options]="owners" [selectedOptions]="reactiveForm.get('newOwner')?.value"
+                    (selectedOptionsChange)="reactiveForm.get('newOwner')?.setValue($event)" />
                 </div>
             </div>
-            <div class="col-lg-6 mb-3">
-                <div class="row">
-                    <label class="col-2 col-form-label">Manzana</label>
-                    <div class="col-10">
-                        <input type="text" class="form-control" formControlName="blockNumber"/>
-                    </div>
-                </div>
-            </div> -->
-
-            <!-- Combo para elegir a que propietario -->
-
-
-            <!-- Botn aceptar o cancelar -->
-          </form>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Understood</button>
-        </div>
-      </div>
-    </div>
-  </div>
+
+        <div class="row mb-3 align-self-end mt-3">
+            <div class="col-auto">
+              <button type="button" class="btn btn-secondary">Cancelar</button>
+            </div>
+            <div class="col-auto">
+              <button type="submit" class="btn btn-success" [disabled]="reactiveForm.invalid"> Guardar </button>
+            </div>
+          </div>
+    </form>
+</div>
