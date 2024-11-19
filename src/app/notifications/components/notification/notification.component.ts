@@ -171,6 +171,18 @@ export class NotificationComponent implements OnInit {
       columnDefs: [
         { targets: 0, className: "text-center align-middle" },
         { targets: 4, className: "text-center" },
+        {
+          // Truncar la descripción (columna 3, índice 3)
+          targets: 3, 
+          render: function (data: string) {
+            const maxLength = 80; // Máxima longitud de caracteres
+            if (data && data.length > maxLength) {
+              return data.substring(0, maxLength) + '...'; // Truncar y añadir '...'
+            }
+            return data; // Si el texto no es largo, devolverlo tal cual
+          }
+        },
+
       ],
       dom: '<"mb-3"t>' + '<"d-flex justify-content-between"lp>',
       select: { style: "os" },
