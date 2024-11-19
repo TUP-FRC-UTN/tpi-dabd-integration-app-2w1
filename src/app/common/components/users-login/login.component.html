@@ -10,6 +10,7 @@
                         <label for="inputCorreo" class="form-label m-0 me-3 mt-2">Email o Usuario</label>
                         <div class="d-flex flex-column justify-content-start">
                             <input type="text" class="form-control custom-input" 
+                            style="min-width: 350px; max-width: 350px"
                                 formControlName="email" autocomplete="email" [ngClass]="onValidate('email')">
                                 <div class="invalid-feedback d-block mt-1 text-start">{{showError('email')}}</div>
                         </div>
@@ -21,7 +22,8 @@
                         <div class="d-flex flex-column justify-content-start" style="position: relative;">
                             <div class="input-group">
                                 <input [type]="passwordVisible ? 'text' : 'password'" 
-                                       class="form-control custom-input" 
+                                style="min-width: 309px; max-width: 309px"
+                                       class="custom-input form-control"
                                        formControlName="password" 
                                        autocomplete="current-password" 
                                        [ngClass]="onValidate('password')">

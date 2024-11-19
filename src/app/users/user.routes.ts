@@ -31,7 +31,7 @@ export const USER_ROUTES: Routes = [
   { path: 'list', component: ListUsersComponent, data: { roles: ['Gerente', 'SuperAdmin'] } },
   { path: 'add', component: NewUserComponent },
   { path: 'edit/:id', component: UsersUpdateUserComponent },
-  { path: 'dashboard', component: UsersReportComponent}, 
+  { path: 'dashboard', component: UsersReportComponent},
   { path: 'dashboard/user-histogram', component: UsersGraphicHistogramComponent }
   
 ];
