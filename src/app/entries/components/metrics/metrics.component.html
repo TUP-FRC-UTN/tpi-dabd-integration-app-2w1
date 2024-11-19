@@ -480,7 +480,7 @@
             
           <!--* KPI para guardia con más egresos *-->
           <div class="col mt-0" *ngIf="chartType !== 'ingresos'">
-            <div class="card border-0 shadow-lg rounded-4 mb-4 hover-scale" (click)="redirect(redirectKpis.guardExits, 'guardExits')">
+            <div class="card border-0 shadow-lg rounded-4 mb-3 hover-scale" (click)="redirect(redirectKpis.guardExits, 'guardExits')">
               <div class="card-body px-0 py-1">
                 <!-- Contenedor para el primer h5 e ícono -->
                 <div class="d-flex justify-content-center align-items-center mb-0">
@@ -502,6 +502,34 @@
             </div>
           </div>
         </div>
+
+          <!-- KPI para vecino con más autorizaciones -->
+          <div class="row mt-0">
+            <div class="col">
+              <div class="card border-0 shadow-lg rounded-4 mb-3 hover-scale" (click)="redirect(redirectKpis.neighborAuthorizations, 'neighborAuthorizations')">
+                <div class="card-body px-0 py-1">
+                  <!-- Contenedor para el primer h5 e ícono -->
+                  <div class="d-flex justify-content-center align-items-center mb-0">
+                    <h5 class="mb-1 fw-medium me-2">Vecino</h5>
+                    <i class="bi bi-house mb-1" style="font-size: 1.2rem;"></i>
+                  </div>
+                  <!-- Segundo h5 debajo, centrado -->
+                  <div class="text-center p-1">
+                    <h6 class="mb-1 fw-medium">con más personas autorizadas</h6>
+                  </div>
+                  <!-- Contador e ícono en la misma fila -->
+                  <div class="text-center align-items-center">
+                    @if(redirectKpis.neighborAuthorizations && redirectKpis.neighborAuthorizations.count){
+                      <h5 class="mt-2 fw-medium">{{ redirectKpis.neighborAuthorizations.name }} | {{ redirectKpis.neighborAuthorizations.count }}</h5>
+                    } @else {
+                      <h5 class=""><i class="bi bi-dash-lg"></i></h5>
+                    }
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
 
     </div>
 
@@ -528,29 +556,7 @@
           </google-chart>
         </div>
       </div>
-      <!-- KPI para vecino con más autorizaciones -->
-      <div class="row mt-3">
-        <div class="col">
-          <div class="card border-0 shadow-lg rounded-4 mb-3 hover-scale" (click)="redirect(redirectKpis.neighborAuthorizations, 'neighborAuthorizations')">
-            <div class="card-body px-0 py-1">
-              <!-- Contenedor para el primer h5 e ícono -->
-              <div class="d-flex justify-content-center align-items-center mb-0">
-                <h5 class="mb-1 fw-medium me-2">Vecino con más personas autorizadas</h5>
-                <i class="bi bi-house mb-1" style="font-size: 1.2rem;"></i>
-              </div>
-              <!-- Contador e ícono en la misma fila -->
-              <div class="text-center align-items-center">
-                @if(redirectKpis.neighborAuthorizations && redirectKpis.neighborAuthorizations.count){
-                  <h5 class="mt-2 fw-medium">{{ redirectKpis.neighborAuthorizations.name }} | {{ redirectKpis.neighborAuthorizations.count }}</h5>
-                } @else {
-                  <h5 class=""><i class="bi bi-dash-lg"></i></h5>
-                }
-              </div>
-            </div>
 
-          </div>
-        </div>
-      </div>
     </div>
     <!-- Gráfico top 5 -->
     <div class="col-12 col-lg-5" *ngIf="status === 0">
