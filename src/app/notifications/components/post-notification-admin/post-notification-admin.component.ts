@@ -56,7 +56,7 @@ export class PostNotificationAdminComponent implements AfterViewInit, OnInit{
   ngOnInit(): void {
     
       const users = this.httpClient.get<UserApiDTO[]>
-      ("http://localhost:8080" + "/general/getUsers")
+      (environment.services.notifications + "/general/getUsers") 
       .subscribe(response =>
         {this.users = response;
           this.fillTable();
