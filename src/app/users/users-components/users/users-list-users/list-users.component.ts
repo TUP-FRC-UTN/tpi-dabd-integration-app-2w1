@@ -445,19 +445,11 @@ export class ListUsersComponent implements OnInit, OnDestroy {
 
   //Filtrar por rol
   fillOptionsSelected(options: any) {
+    var optionsFilter = options.map((option: any) => option).join('|'); // Usar '|' para permitir múltiples filtros
     const table = $('#myTable').DataTable();
-    table.order([[0, 'desc']]).draw();
 
-    // Clear previous search
-    $.fn.dataTable.ext.search.splice(0, $.fn.dataTable.ext.search.length);
-
-    // Add new search function
-    $.fn.dataTable.ext.search.push((settings: any, data: any, dataIndex: any) => {
-      const roles = data[2].split(',').map((role: string) => role.trim());
-      return options.some((option: any) => roles.includes(option));
-    });
-
-    table.draw();
+    // Filtrar por el contenido de la columna de tipo de lote, teniendo en cuenta que puede tener unicamente 1 valor, pero se tiene que filtrar x varios
+    table.column(2).search(optionsFilter, true, false).draw(); 
   }
 
   //Metodo para filtrar la tabla en base a las 2 fechas

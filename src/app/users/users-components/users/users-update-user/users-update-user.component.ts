@@ -33,7 +33,7 @@ throw new Error('Method not implemented.');
       phoneNumber: new FormControl('', [Validators.required, Validators.pattern(/^\d+$/), Validators.minLength(10), Validators.maxLength(20)]),
       telegram_id: new FormControl(0),
       dni: new FormControl(''),
-      email: new FormControl(''),
+      email: new FormControl('', [Validators.email]),
       avatar_url: new FormControl(''),
       datebirth: new FormControl(''),
       roles: new FormControl([], [Validators.required])
@@ -89,7 +89,14 @@ throw new Error('Method not implemented.');
       next: (data: RolModel[]) => {
         this.existingRoles = data.map(rol => rol.description);
         this.filteredRoles = this.filterRoles(this.existingRoles)
-        this.optionRoles = this.filteredRoles.map(o => ({ value: o, name: o }));
+        if(this.authService.getActualRole() == 'SuperAdmin'){
+          // traer todos menos el rol propietario
+          //data = data.filter(o => o.description != 'Propietario');
+          
+          this.optionRoles = data.map(o => ({ value: o.description, name: o.description}));
+        }else{
+          this.optionRoles = this.filteredRoles.map(o => ({ value: o, name: o }));
+        }
       },
       error: (error) => {
         console.error('Error al cargar los roles:', error);
@@ -112,15 +119,19 @@ throw new Error('Method not implemented.');
           this.updateForm.get('avatar_url')?.setValue(data.avatar_url);
           const formattedDate = DateService.parseDateString(data.datebirth);
 
+
           this.userRoles = data.roles;
-          this.filteredUserRoles = this.filterUserRoles(this.userRoles);
-
-          console.log("Roles del usuario:", this.userRoles);
+          console.log(this.userRoles);
           
+          this.filteredUserRoles = this.filterUserRoles(this.userRoles);          
           
-          this.updateForm.get('roles')?.setValue(this.userRoles);
-          this.rolesComponent.setData(this.userRoles);
-
+          if(this.authService.getActualRole() != 'SuperAdmin'){
+            this.updateForm.get('roles')?.setValue(this.filteredUserRoles);
+            this.rolesComponent.setData(this.filteredUserRoles);
+          }else{
+            this.updateForm.get('roles')?.setValue(this.userRoles);     
+            this.rolesComponent.setData(this.userRoles);
+          }
           if (formattedDate) {
             // Formatea la fecha a 'yyyy-MM-dd' para un input de tipo date
             const formattedDateString = formattedDate.toISOString().split('T')[0];
@@ -140,7 +151,7 @@ throw new Error('Method not implemented.');
           // Asigna `rolesSelected` después de obtener `data.roles`
           
           
-          this.updateForm.get('roles')?.setValue([...this.filteredUserRoles])
+          //this.updateForm.get('roles')?.setValue([...this.filteredUserRoles])
         },
         error: (error) => {
           console.error('Error al cargar el usuario:', error);
@@ -156,12 +167,9 @@ throw new Error('Method not implemented.');
   //-----------------------------------------------------Funciones-----------------------------------------------------
 
   filterRoles(list : any[]){
-    let blockOptionsForOwner: string[] = ["Propietario", "SuperAdmin", "Gerente"];
+    let blockOptionsForOwner: string[] = ["Propietario", "SuperAdmin", "Gerente general"];
     let blockOptionsForManager: string[] = ["Propietario", "SuperAdmin", "Familiar mayor", "Familiar menor"];
     this.blockedRoles = [];
-
-    console.log("Lista inicial:");
-    console.log(list);
 
     let blockOptions: any[] = [];
     blockOptions = ((this.authService.getActualRole() == "Propietario") ? blockOptionsForOwner : blockOptionsForManager)
@@ -178,12 +186,9 @@ throw new Error('Method not implemented.');
   }
 
   filterUserRoles(list : any[]){
-    let blockOptionsForOwner: string[] = ["Propietario", "SuperAdmin", "Gerente"];
+    let blockOptionsForOwner: string[] = ["Propietario", "SuperAdmin", "Gerente general"];
     let blockOptionsForManager: string[] = ["Propietario", "SuperAdmin", "Familiar mayor", "Familiar menor"];
     this.blockedRoles = [];
-
-    console.log("Lista inicial:");
-    console.log(list);
 
     let blockOptions: any[] = [];
     blockOptions = ((this.authService.getActualRole() == "Propietario") ? blockOptionsForOwner : blockOptionsForManager)
@@ -239,7 +244,9 @@ throw new Error('Method not implemented.');
       user.dni_type_id = 1;
   
       user.roles = this.updateForm.get('roles')?.value;
-      user.roles.push(...this.blockedRoles); 
+      if(this.authService.getActualRole() != 'SuperAdmin'){
+        user.roles.push(...this.blockedRoles); 
+      }
   
       //Llama al servicio para actualizar el usuario
       this.userService.putUser(user, parseInt(this.id)).subscribe({
@@ -312,6 +319,23 @@ throw new Error('Method not implemented.');
       }
     }
     return ''; // Retorna cadena vacía si no hay errores.
+  }
+
+  showFormErrors() {
+    // Verificar si el formulario tiene errores generales
+    if (this.updateForm.errors) {
+      console.log('Errores del formulario:', this.updateForm.errors);
+    }
+  
+    // Recorrer todos los controles del formulario
+    Object.keys(this.updateForm.controls).forEach((controlName) => {
+      const control = this.updateForm.get(controlName);
+  
+      // Verificar si el control tiene errores
+      if (control?.errors) {
+        console.log(`Errores en el control "${controlName}":`, control.errors);
+      }
+    });
   }
 }
 

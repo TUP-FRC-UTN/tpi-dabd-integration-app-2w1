@@ -1,0 +1,58 @@
+<!-- <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Información del Lote</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
+</div>
+<div class="modal-body"> -->
+
+    
+<div class="modal fade" id="transfer-plot" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">Transferir Lote</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="">
+
+            <!-- Mostrar Nombre de propietario actual -->
+            <div class="col-lg-6 mb-3">
+                <div class="row">
+                    <label class="col-2 col-form-label">Propietario Actual</label>
+                    <div class="col-10">
+                        <input type="text" class="form-control" formControlName="actualOwner"/>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mostrar info basica del lote -->
+            <!-- <div class="col-lg-6 mb-3">
+                <div class="row">
+                    <label class="col-2 col-form-label">Lote</label>
+                    <div class="col-10">
+                        <input type="text" class="form-control" formControlName="plotNumber"/>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 mb-3">
+                <div class="row">
+                    <label class="col-2 col-form-label">Manzana</label>
+                    <div class="col-10">
+                        <input type="text" class="form-control" formControlName="blockNumber"/>
+                    </div>
+                </div>
+            </div> -->
+
+            <!-- Combo para elegir a que propietario -->
+
+
+            <!-- Botn aceptar o cancelar -->
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Understood</button>
+        </div>
+      </div>
+    </div>
+  </div>

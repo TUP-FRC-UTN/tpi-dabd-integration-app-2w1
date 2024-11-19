@@ -21,14 +21,14 @@
       </div>
 
       <!-- Resetear Filtros -->
+    </div>
+
+    <div class="d-flex">
       <div>
-        <button class="btn btn-secondary" (click)="resetFilters()">
+        <button class="btn btn-secondary me-2" (click)="resetFilters()">
           <i class="bi bi-trash"></i>
         </button>
       </div>
-    </div>
-
-    <div>
       <!-- Exportar a Excel -->
       <button class="btn btn-success me-2" (click)="exportExcel()">
         <i class="bi bi-file-earmark-excel"></i>
@@ -48,6 +48,10 @@
   <button class="floating-btn btn btn-primary" (click)="addPlot()">
     <span class="bi-plus-lg"></span>
   </button>
+
+
+<!-- Modal -->
+ <app-users-transfer-plot />
 
   <!-- Modal de info -->
   <div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="infoModalLabel"

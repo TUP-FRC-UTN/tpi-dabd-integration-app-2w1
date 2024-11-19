@@ -19,11 +19,12 @@ import { Owner } from '../../../users-models/owner/Owner';
 import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
 import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
 import { RoutingService } from '../../../../common/services/routing.service';
+import { UsersTransferPlotComponent } from "../users-transfer-plot/users-transfer-plot.component";
 
 @Component({
   selector: 'app-users-list-plots',
   standalone: true,
-  imports: [ReactiveFormsModule, CustomSelectComponent],
+  imports: [ReactiveFormsModule, CustomSelectComponent, UsersTransferPlotComponent],
   templateUrl: './users-list-plots.component.html',
   styleUrl: './users-list-plots.component.css'
 })
@@ -91,7 +92,7 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
               owners[index] // Usar el nombre del propietario cargado
             ]),
             columns: [
-              { title: 'Lote', width: '10%', className: 'text-center' },
+              { title: 'Lote', width: '10%', className: 'text-start' },
               { title: 'Manzana', width: '10%', className: 'text-start' },
               { title: 'Mts.2 Terreno', width: '15%', className: 'text-start' },
               { title: 'Mts.2 Construidos', width: '15%', className: 'text-start' },
@@ -99,25 +100,27 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
               { title: 'Estado', width: '15%', className: 'text-start' },
               { title: 'Propietario', width: '15%', className: 'text-start' }, // Nueva columna
               {
-                title: 'Acciones',
-                orderable: false,
-                width: '15%',
-                className: 'text-center',
-                render: (data, type, row, meta) => {
-                  const plotId = this.plots[meta.row].id;
-                  return `
-                    <div class="dropdown-center d-flex align-items-center justify-content-center">
-                      <button class="btn btn-light border border-1" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-three-dots-vertical"></i>
-                      </button>
-                      <ul class="dropdown-menu">
-                        <li><a class="dropdown-item view-plot" data-id="${plotId}">Ver más</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item edit-plot" data-id="${plotId}">Editar</a></li>
-                      </ul>
-                    </div>
-                  `;
-                }
+          title: 'Acciones',
+          orderable: false,
+          width: '15%',
+          className: 'text-center',
+          render: (data, type, row, meta) => {
+            const plotId = this.plots[meta.row].id;
+            return `
+              <div class="dropdown-center d-flex align-items-center justify-content-center">
+                <button class="btn btn-light border border-1" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-three-dots-vertical"></i>
+                </button>
+                <ul class="dropdown-menu">
+            <li><a class="dropdown-item view-plot" data-id="${plotId}">Ver más</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item edit-plot" data-id="${plotId}">Editar</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item transfer-plot" data-id="${plotId}" data-bs-toggle="modal" data-bs-target="#transfer-plot">Transferir</a></li>
+                </ul>
+              </div>
+            `;
+          }
               }
             ],
             dom: '<"mb-3"t>' + '<"d-flex justify-content-between"lp>',
@@ -159,6 +162,22 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
             const plotId = $(event.currentTarget).data('id');
             this.redirectEdit(plotId);
           });
+          
+          $('#myTablePlot').on('click', '.transfer-plot', (event) => {
+            const plotId = $(event.currentTarget).data('id');
+            console.log('Transferir lote:', plotId);
+
+            const modalRef = this.modal.open(UsersTransferPlotComponent, { size: 'lg', keyboard: false });
+            modalRef.componentInstance.plotId = plotId;
+
+            modalRef.result.then((result) => {
+              if (result === 'success') {
+            $('#myTablePlot').DataTable().ajax.reload();
+                }
+              }).catch((error) => {
+                console.error('Error al transferir el lote:', error);
+              });
+            });
 
         }, 0);
       },
