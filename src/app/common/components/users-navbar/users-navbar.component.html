@@ -56,10 +56,12 @@
 
             <div class="nav-item mt-auto">
                 <hr class="m-0">
-                <button class="nav-link d-flex text-light w-100 px-3 py-2" title="Dashboard" (click)="redirectDashboard()">
-                    <i class="bi-bar-chart-line"></i>
-                    @if (expand) {<span class="ms-2">Dashboard</span>}
-                </button>
+                @if(showDashboard()) {
+                    <button class="nav-link d-flex text-light w-100 px-3 py-2" title="Dashboard" (click)="redirectDashboard()">
+                        <i class="bi-bar-chart-line"></i>
+                        @if (expand) {<span class="ms-2">Dashboard</span>}
+                    </button>
+                }
                 <button class="nav-link d-flex text-light w-100 px-3 py-2" data-bs-toggle="modal"
                     data-bs-target="#infoModal" title="Información">
                     <i class="bi-info-circle"></i>
