@@ -711,7 +711,7 @@ applyFilter(): void {
 
   irAgregarProducto() {
     /* this.modalVisible = true; // Muestra el modal */
-    this.router.navigate(['home/new-product']);
+    this.router.navigate(['main/inventories/new-product']);
   }
 
   verificarMin(): boolean {
