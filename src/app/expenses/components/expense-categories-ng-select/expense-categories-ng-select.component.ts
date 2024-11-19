@@ -14,66 +14,80 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './expense-categories-ng-select.component.scss'
 })
 export class ExpenseCategoriesNgSelectComponent implements OnInit, OnDestroy {
-  
-  @Input() selectedCategories: Category[] =[];
-  @Input() selectedCategory: number =0;
-  @Input() multiple:Boolean=true;
-  @Input() viewInactive : Boolean = false;
+  @Input() selectedCategories: Category[] = [];
+  @Input() selectedCategory: number = 0;
+  @Input() multiple: Boolean = true;
+  @Input() viewInactive: Boolean = false;
   @Output() selectedCategoriesChange = new EventEmitter<Category[]>();
   @Output() selectedCategoryChange = new EventEmitter<number>();
-
-  categoryList : Category[]=[];
+  @Input() showValidBorder: boolean = false;
+  categoryList: Category[] = [];
   private destroy$ = new Subject<void>();
- 
-  constructor(private categoryService:CategoryService){
-  }
+  isBlurred: boolean = false;
+  
+  constructor(private categoryService: CategoryService) {}
+
   ngOnInit(): void {
     this.loadCategories();
-    
   }
+
   ngOnDestroy(): void {
     this.destroy$.next(); 
     this.destroy$.complete(); 
   }
+
   loadCategories(): void {
-    if(this.viewInactive){
+    if(this.viewInactive) {
       this.categoryService.getCategory()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((categories) => {
-        this.categoryList = categories;
-        }
-      );
-    }else{
+        .pipe(takeUntil(this.destroy$))
+        .subscribe((categories) => {
+          this.categoryList = categories;
+        });
+    } else {
       this.categoryService.getCategory()
-      .pipe(
-        takeUntil(this.destroy$),
-        map((categories) => 
-          categories.filter(category => category.state === 'Activo')
+        .pipe(
+          takeUntil(this.destroy$),
+          map((categories) => 
+            categories.filter(category => category.state === 'Activo')
+          )
         )
-      )
-      .subscribe((categories) => {
-        this.categoryList = categories;
-        }
-      );
+        .subscribe((categories) => {
+          this.categoryList = categories;
+        });
     }
-    
   }
+
   onCategoryChange(): void {
-    if(this.multiple){
+    if(this.multiple) {
       this.selectedCategoriesChange.emit(this.selectedCategories);
-    }else{
+    } else {
       this.selectedCategoryChange.emit(this.selectedCategory);
     }
   }
+
+  onBlur(): void {
+    this.isBlurred = true;
+  }
+
+  isValid(): boolean {
+    if (!this.isBlurred) return false;
+    
+    if (this.multiple) {
+      return this.selectedCategories && this.selectedCategories.length > 0;
+    } else {
+      return this.selectedCategory !== 0;
+    }
+  }
   
-  set selectValue(value:any){
-    if(this.multiple){
+  set selectValue(value: any) {
+    if(this.multiple) {
       this.selectedCategories = value;
-    }else{
+    } else {
       this.selectedCategory = value;
     }
   }
-  get selectValue(){
-    return this.multiple ? this.selectedCategories : this.selectedCategory
+
+  get selectValue() {
+    return this.multiple ? this.selectedCategories : this.selectedCategory;
   }
 }
