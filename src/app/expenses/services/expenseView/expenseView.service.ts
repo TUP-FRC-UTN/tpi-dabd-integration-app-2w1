@@ -15,32 +15,39 @@ import { environment } from '../../../common/environments/environment.prod';
 
     }
     getById(id: number): Observable<ExpenseView> {
-        return this.http.get<any>(`${this.apiUrl}${id}`).pipe(
-          map((data: any) => ({
+      return this.http.get<any>(`${this.apiUrl}${id}`).pipe(
+        map((data: any) => {
+          const transformedDistributionList = data.distributionList?.map((dist: any) => ({
+            ownerId: dist.ownerId,
+            owenerFullName: dist.ownerFullName,
+            amount: parseFloat(dist.amount.toFixed(4)), 
+            proportion: parseFloat(dist.proportion.toFixed(2)), 
+          } as DistributionList)) || [];
+          const transformedInstallmentList = data.installmentList?.map((inst: any) => ({
+            paymentDate: new Date(inst.paymentDate),
+            installmentNumber: inst.installmentNumber,
+          } as Instalmentlist)) || [];
+          console.log("Transformed Distribution List:", transformedDistributionList);
+          console.log("Transformed Installment List:", transformedInstallmentList);
+    
+          return {
             id: data.id,
             description: data.description,
-            providerId: 0, 
+            providerId: 0,
             providerName: data.provider,
             expenseDate: data.expenseDate,
             invoiceNumber: data.invoiceNumber,
             typeExpense: data.expenseType,
-            categoryId: 0, 
+            categoryId: 0,
             categoryName: data.category,
             fileId: data.fileId,
-            amount: data.amount,
+            amount: parseFloat(data.amount), 
             installments: data.installmentList?.length || 0,
-            distributions: [],
-            distributionList: data.distributionList?.map((dist: any) => ({
-              ownerId: dist.ownerId,
-              owenerFullName: dist.ownerFullName,
-              amount: dist.amount,
-              proportion: dist.proportion
-            } as DistributionList)) || [],
-            installmentList: data.installmentList?.map((inst: any) => ({
-              paymentDate: new Date(inst.paymentDate),
-              installmentNumber: inst.installmentNumber,
-            } as Instalmentlist)) || [],
-          } as ExpenseView))
-        );
-      }
+            distributions: [], 
+            distributionList: transformedDistributionList,
+            installmentList: transformedInstallmentList,
+          } as ExpenseView;
+        })
+      );
+    }
   }

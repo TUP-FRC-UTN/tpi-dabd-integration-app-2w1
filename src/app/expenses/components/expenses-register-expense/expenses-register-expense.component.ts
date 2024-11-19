@@ -124,6 +124,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   }
 
   isFieldValid(fieldName: string, control: any): boolean {
+
     return !control.errors && control.touched;
   }
 
@@ -470,7 +471,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       (sum, distribution) => sum + distribution.proportion,
       0
     );
-    console.log(total)
+  
     return total === 100;
   }
   validateNoZeroProportion(): boolean {

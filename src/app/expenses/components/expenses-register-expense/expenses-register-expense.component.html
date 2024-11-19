@@ -20,13 +20,9 @@
                     <app-expenses-type-expense-ng-select 
                       [(selectedType)]="expense.typeExpense" 
                       [multiple]="false" 
-                      [noteCredit]="false">
+                      [noteCredit]="false" [showValidBorder]="true">
                     </app-expenses-type-expense-ng-select>
-                    @if(formSubmitted && !expense.typeExpense) {
-                      <div class="invalid-feedback d-block">
-                        El tipo es requerido
-                      </div>
-                    }
+                  
                     
                   </div>
                 </div>
@@ -74,7 +70,9 @@
                     <app-expense-providers-ng-select 
                       [(selectedProvider)]="expense.providerId" 
                       [emptyValue]="true" 
-                      [multiple]="false">
+                      [multiple]="false"
+                      [showValidBorder]="true"
+                      >
                     </app-expense-providers-ng-select>
                   </div>
                 </div>
@@ -87,13 +85,10 @@
                   <div class="position-relative flex-grow-1">
                     <app-expense-categories-ng-select 
                       [(selectedCategory)]="expense.categoryId" 
-                      [multiple]="false">
+                      [multiple]="false"
+                      [showValidBorder]="true"
+                      >
                     </app-expense-categories-ng-select>
-                    @if(formSubmitted && !isCategoryValid()) {
-                      <div class="invalid-feedback d-block">
-                        La categoría es requerida
-                      </div>
-                    }
                   </div>
                 </div>
               </div>
