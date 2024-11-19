@@ -12,15 +12,13 @@
       <div class="d-flex justify-content-between align-items-center">
         <div class="form-check">
           <label class="form-check-label" for="checkbox1">
-            <span class="fs-5"
-              >Periodo: {{ expense.period | date : "MM/yyyy" }}</span
-            >
+            <span class="fs-5">Periodo: {{ expense.period }}</span>
             <br />
             <span class="fs-5 mt-3" [ngClass]="{ 'text-danger': overdue }">
-              Vencimiento:
-              {{ expense.second_expiration_date | date : "dd/MM/yyyy" }}
+                Vencimiento:
+                {{ expense.second_expiration_date | date : "dd/MM/yyyy" }}
             </span>
-          </label>
+        </label>
         </div>
         <div class="text-end mx-3 mt-3">
           <span class="amount">${{ expense.actual_amount }}</span>

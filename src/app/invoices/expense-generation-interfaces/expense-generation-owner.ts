@@ -4,9 +4,8 @@ export interface Owner {
   lastname: string;
   dni_type : string;
   dni: string;
-
   active?: boolean;
-  plots?: Plot[];
+  plot?: Plot[];
   username?: string;
   email?: string;
   contactId?: number;
