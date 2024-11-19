@@ -171,8 +171,8 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
             modalRef.componentInstance.plotId = plotId;
 
             modalRef.result.then((result) => {
-              $('#myTablePlot').DataTable().ajax.reload();
-            });
+              this.loadPlots();
+              });
             });
 
         }, 0);
@@ -187,6 +187,38 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
 
   }
   //--------------------------------------------------Carga de datos--------------------------------------------------
+
+  loadPlots() {
+    const sus = this.plotService.getAllPlots().subscribe({
+      next: async (data: GetPlotModel[]) => {
+        this.plots = data;
+        const dataTable = $('#myTablePlot').DataTable();
+        const ownerPromises = this.plots.map(async plot => {
+          return await this.showOwner(plot.id); // Esperar el nombre del propietario
+        });
+
+        // Esperar a que todas las promesas se resuelvan 
+        const owners = await Promise.all(ownerPromises);
+        const algo = this.plots.map((plot, index) => [ 
+          `<p class="text-end">${plot.plot_number}<p/>`,
+          `<p class="text-end">${plot.block_number}<p/>`,
+          ` <p class="text-end">${plot.total_area_in_m2} m²<p/>`,
+          `<p class="text-end">${plot.built_area_in_m2} m²<p/>`,
+          this.showPlotType(plot.plot_type),
+          this.showPlotState(plot.plot_state),
+          owners[index] // Usar el nombre del propietario cargado
+        ])
+        dataTable.clear().rows.add(algo).draw();
+      },
+      error: (error) => {
+        console.error('Error al cargar los estados:', error);
+      }
+    });
+
+    //Agregar servicio
+    this.suscriptionService.addSuscription(sus);
+  }
+
 
   //Cargar estados de los lotes
   loadAllPlotsStates() {

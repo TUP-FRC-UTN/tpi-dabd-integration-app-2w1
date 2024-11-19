@@ -13,5 +13,8 @@ export const PLOT_ROUTES: Routes = [
   { path: 'list', component: UsersListPlotsComponent },
   { path: 'add', component: UsersNewPlotComponent },
   { path: 'edit/:id', component: UsersUpdatePlotComponent },
-  { path: 'dashboard', component: UsersReportComponent, children: [{ path: 'plot-blocks', component: UsersGraphicBlocksComponent}, { path: 'plot-info', component: UsersGraphicPlotsStatsComponent}, { path: 'plot', component: UsersGraphicPlotComponent}]},
+  { path: 'dashboard', component: UsersReportComponent},
+  { path: 'dashboard/plot-blocks', component: UsersGraphicBlocksComponent},
+  { path: 'dashboard/plot-info', component: UsersGraphicPlotsStatsComponent},
+  { path: 'dashboard/plot', component: UsersGraphicPlotComponent}
 ];

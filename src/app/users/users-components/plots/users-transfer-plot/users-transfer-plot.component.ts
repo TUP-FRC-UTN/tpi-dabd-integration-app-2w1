@@ -9,6 +9,7 @@ import { ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CustomSelectComponent } from "../../../../common/components/custom-select/custom-select.component";
 import Swal from 'sweetalert2';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-users-transfer-plot',
@@ -18,7 +19,7 @@ import Swal from 'sweetalert2';
 })
 export class UsersTransferPlotComponent implements OnInit {
 
-  constructor(private fb: FormBuilder ){
+  constructor(public activeModal: NgbActiveModal ,private fb: FormBuilder ){
     this.reactiveForm = this.fb.group({
       actualOwner: [''],
       newOwner: ['', [Validators.required]]
@@ -84,7 +85,7 @@ export class UsersTransferPlotComponent implements OnInit {
             allowOutsideClick: false
 
           });
-          this.ngOnInit();
+          this.activeModal.close();
         },
         error: (error) => {
           console.error('Error al trasnferir el lote:', error);
