@@ -301,7 +301,6 @@ export class ViewGastosAdminComponent implements OnInit {
     return bills;
   }
   filteredbyType(bills :Bill[]):Bill[]{
-    debugger;
     if (this.selectedType && this.selectedType.length>0){
       const selectedTypeIds = this.selectedType.map(type => type.id);
     return bills.filter(bill => selectedTypeIds.includes(bill.expenseType)); // Filtrar solo los que tienen un id que coincida
