@@ -93,7 +93,7 @@ export class RoutingService {
           name: 'Denunciar',
           title: 'Registrar Denuncia',
           route: 'main/complaints/post-complaint',
-          roles: ['SuperAdmin', 'Propietario', 'Inquilino'],
+          roles: ['Propietario', 'Inquilino', 'Familiar mayor'],
         },
         {
           //botón listado denuncia
@@ -101,21 +101,7 @@ export class RoutingService {
           name: 'Denuncias',
           title: 'Listado de Denuncias',
           route: 'main/complaints/list-complaint',
-          roles: ['SuperAdmin', 'Gerente general', 'Gerente multas'],
-        },
-        {
-          //Listado multas y advertencias
-          icon: 'bi-receipt',
-          name: 'Multas/Advertencias',
-          title: 'Listado de Multas y Advertencias',
-          route: 'main/sanctions/sanctions-list',
-          roles: [
-            'SuperAdmin',
-            'Gerente general',
-            'Gerente multas',
-            'Propietario',
-            'Inquilino',
-          ],
+          roles: ['SuperAdmin', 'Gerente multas'],
         },
         {
           //Listado Informes
@@ -125,14 +111,14 @@ export class RoutingService {
           route: 'main/sanctions/report-list',
           roles: ['SuperAdmin', 'Gerente general', 'Gerente multas'],
         },
-        // {
-        //   //Listado de motivos de infracciones
-        //   icon: "bi-slash-circle",
-        //   name: "Motivos",
-        //   title: "Listado de Motivos",
-        //   route: "main/sanctions/report-list",
-        //   roles: ["SuperAdmin", "Gerente general", "Gerente multas"]
-        // }
+        {
+          //Listado multas y advertencias
+          icon: 'bi-receipt',
+          name: 'Multas/Advertencias',
+          title: 'Listado de Multas y Advertencias',
+          route: 'main/sanctions/sanctions-list',
+          roles: ['SuperAdmin', 'Gerente multas', 'Propietario', 'Inquilino'],
+        }
       ],
     },
     ///////////////////////////////////////////////////////////////////////////////
@@ -224,13 +210,6 @@ export class RoutingService {
           roles: ['SuperAdmin', 'Gerente general', 'Gerente inventario'],
         },
         {
-          icon: 'bi-arrow-left-right',
-          name: 'Movimientos',
-          title: 'Movimientos de Inventario',
-          route: 'main/inventories/warehouse-movements',
-          roles: ['SuperAdmin', 'Gerente general', 'Gerente inventario'],
-        },
-        {
           icon: 'bi-truck',
           name: 'Proveedores',
           title: 'Listado de Proveedores',
@@ -258,13 +237,6 @@ export class RoutingService {
           name: 'Listado',
           title: 'Listado de Empleados',
           route: 'main/employees/employees',
-          roles: ['SuperAdmin', 'Gerente general', 'Gerente empleados'],
-        },
-        {
-          icon: 'bi-card-checklist',
-          name: 'Desempeño',
-          title: 'Historial de Desempeño',
-          route: 'main/employees/performance',
           roles: ['SuperAdmin', 'Gerente general', 'Gerente empleados'],
         },
         {

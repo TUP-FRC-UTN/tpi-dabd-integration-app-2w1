@@ -1,9 +1,9 @@
 <button 
-  type="button" 
-  class="btn btn-danger rounded-circle position-fixed d-flex align-items-center justify-content-center emergency-button"
-  data-bs-toggle="modal" 
-  data-bs-target="#emergencyModal">
-  <i class="bi bi-hospital fs-4"></i>
+    type="button" 
+    class="btn btn-danger rounded-circle position-fixed d-flex align-items-center justify-content-center emergency-button"
+    data-bs-toggle="modal" 
+    data-bs-target="#emergencyModal">
+    <i class="bi bi-hospital fs-4"></i>
 </button>
 
 <div class="modal fade text-start" id="emergencyModal" tabindex="-1">
@@ -31,10 +31,9 @@
                                         formControlName="type"
                                         (change)="vehicleTypeChanged()">
                                         <option value="">Ninguno</option>
-                                        <option value="Car">Auto</option>
-                                        <option value="Motorcycle">Moto</option>
-                                        <option value="Truck">Camión</option>
-                                        <option value="Van">Camioneta</option>
+                                        @for (option of vehicleOptions; track $index) {
+                                            <option [value]="option.value">{{option.label}}</option>
+                                        }
                                     </select>
                                 </div>
                             </div>
