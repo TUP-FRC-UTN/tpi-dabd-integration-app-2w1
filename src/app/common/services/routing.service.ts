@@ -93,7 +93,7 @@ export class RoutingService {
           name: 'Denunciar',
           title: 'Registrar Denuncia',
           route: 'main/complaints/post-complaint',
-          roles: ['SuperAdmin', 'Propietario', 'Inquilino'],
+          roles: ['Propietario', 'Inquilino', 'Familiar mayor'],
         },
         {
           //botón listado denuncia
@@ -101,21 +101,7 @@ export class RoutingService {
           name: 'Denuncias',
           title: 'Listado de Denuncias',
           route: 'main/complaints/list-complaint',
-          roles: ['SuperAdmin', 'Gerente general', 'Gerente multas'],
-        },
-        {
-          //Listado multas y advertencias
-          icon: 'bi-receipt',
-          name: 'Multas/Advertencias',
-          title: 'Listado de Multas y Advertencias',
-          route: 'main/sanctions/sanctions-list',
-          roles: [
-            'SuperAdmin',
-            'Gerente general',
-            'Gerente multas',
-            'Propietario',
-            'Inquilino',
-          ],
+          roles: ['SuperAdmin', 'Gerente multas'],
         },
         {
           //Listado Informes
@@ -125,14 +111,14 @@ export class RoutingService {
           route: 'main/sanctions/report-list',
           roles: ['SuperAdmin', 'Gerente general', 'Gerente multas'],
         },
-        // {
-        //   //Listado de motivos de infracciones
-        //   icon: "bi-slash-circle",
-        //   name: "Motivos",
-        //   title: "Listado de Motivos",
-        //   route: "main/sanctions/report-list",
-        //   roles: ["SuperAdmin", "Gerente general", "Gerente multas"]
-        // }
+        {
+          //Listado multas y advertencias
+          icon: 'bi-receipt',
+          name: 'Multas/Advertencias',
+          title: 'Listado de Multas y Advertencias',
+          route: 'main/sanctions/sanctions-list',
+          roles: ['SuperAdmin', 'Gerente multas', 'Propietario', 'Inquilino'],
+        }
       ],
     },
     ///////////////////////////////////////////////////////////////////////////////
@@ -183,14 +169,14 @@ export class RoutingService {
     {
       icon: 'bi-wallet',
       name: 'Boletas',
-      title: 'Mis Boletas (owner)',
+      title: 'Mis Boletas',
       route: 'main/invoices/expense-generation-user-view',
       roles: ['SuperAdmin', 'Propietario', 'Inquilino'],
     },
     {
       icon: 'bi-person-lines-fill',
       name: 'Boletas',
-      title: 'Lista de Boletas (Gerente)',
+      title: 'Lista de Boletas',
       route: 'main/invoices/expense-generation-admin-view',
       roles: ['SuperAdmin', 'Gerente general', 'Gerente finanzas'],
     },

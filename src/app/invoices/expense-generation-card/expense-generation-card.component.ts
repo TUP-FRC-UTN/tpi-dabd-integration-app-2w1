@@ -25,6 +25,7 @@ export class ExpenseGenerationCardComponent implements OnInit {
   constructor(public expenses: ExpenseGenerationExpenseService) {}
 
   ngOnInit() {
+    
     // SI LA FECHA DE VENCIMIENTO ES MENOR A LA FECHA ACTUAL, LA BOLETA ESTA VENCIDA
     if (
       this.expense.first_expiration_date !== null &&
