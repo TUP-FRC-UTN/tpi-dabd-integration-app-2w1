@@ -26,7 +26,7 @@ type FilterColumn = 'general' | 'applicant' | 'detailProducts' | 'movement_type'
   styleUrls: ['./iep-warehouse-movement-search.component.css']
 })
 export class IepWarehouseMovementSearchComponent implements AfterViewInit, AfterViewChecked {
-  
+  fechaMaxima: string;
   movements: WarehouseMovementByProduct[] = [];
   filteredMovements: WarehouseMovementByProduct[] = [];
   products: DtoProducto[] = [];
@@ -129,6 +129,7 @@ onEndDateChange(value: string): void {
   ngOnInit() {
     // Cargar los datos con los filtros ya configurados
     this.warehouseMovementService.getWarehouseMovements().subscribe((movements) => {
+      console.log(movements);
       this.movements = movements;
       this.filteredMovements = this.movements;
       this.initializeDataTable()
@@ -146,7 +147,10 @@ onEndDateChange(value: string): void {
   constructor(
     private warehouseMovementService: WarehouseMovementService,
     private productService: ProductService
-  ) { }
+  ) { 
+    const hoy = new Date();
+    this.fechaMaxima = hoy.toISOString().split('T')[0];
+  }
   ngAfterViewInit() {
     
   }

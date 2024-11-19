@@ -1,13 +1,13 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { PlotStateCount } from '../../users-models/dashboard/PlotStateCount';
+import { PlotStateCount } from '../../../users-models/dashboard/PlotStateCount';
 import { CommonModule } from '@angular/common';
 import { ChartType, GoogleChartComponent, GoogleChartsModule } from 'angular-google-charts';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { DashboardService } from '../../users-servicies/dashboard.service';
+import { DashboardService } from '../../../users-servicies/dashboard.service';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { PlotTypeCount } from '../../users-models/dashboard/PlotTypeCount';
+import { PlotTypeCount } from '../../../users-models/dashboard/PlotTypeCount';
 import { UsersKpiComponent } from "../users-kpi/users-kpi.component";
 
 @Component({
@@ -197,7 +197,7 @@ export class UsersGraphicPlotComponent implements OnInit {
     this.loadPlotTypeData();
   }
 
-  changeView(view: string){
-    this.router.navigate(['home/charts/users' + view]);
+  changeView(){
+    this.router.navigate(['/main/plots/dashboard']);
   }
 }

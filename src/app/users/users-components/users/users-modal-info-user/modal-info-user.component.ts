@@ -1,6 +1,6 @@
-import { CommonModule, formatDate } from '@angular/common';
-import { Component, ElementRef, EventEmitter, inject, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { UserGet } from '../../../users-models/users/UserGet';
 import { UserService } from '../../../users-servicies/user.service';
 import Swal from 'sweetalert2';
@@ -8,6 +8,8 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { DeleteUser } from '../../../users-models/owner/DeleteUser';
 import { DateService } from '../../../users-servicies/date.service';
 import { GetPlotDto } from '../../../users-models/plot/GetPlotDto';
+import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
+import { AuthService } from '../../../users-servicies/auth.service';
 
 
 @Component({
@@ -17,7 +19,7 @@ import { GetPlotDto } from '../../../users-models/plot/GetPlotDto';
   templateUrl: './modal-info-user.component.html',
   styleUrl: './modal-info-user.component.css'
 })
-export class ModalInfoUserComponent implements OnInit {
+export class ModalInfoUserComponent implements OnInit, OnDestroy {
 
   constructor(public activeModal: NgbActiveModal, private fb: FormBuilder) {
     this.editUser = this.fb.group({
@@ -41,6 +43,8 @@ export class ModalInfoUserComponent implements OnInit {
 
   //activeModal = inject(NgbActiveModal);
   private readonly apiService = inject(UserService);
+  private readonly suscriptionService = inject(SuscriptionManagerService);
+  private readonly authService = inject(AuthService);
   
   rolesInput: string[] = [];
   editUser: FormGroup;
@@ -82,13 +86,18 @@ export class ModalInfoUserComponent implements OnInit {
 
       this.editUser.disable();
   }
-  
 
+  //Desuscribirse de los observables
+  ngOnDestroy(): void {
+    this.suscriptionService.unsubscribeAll();
+  }
+
+  //Eliminar usuario
   confirmDesactivate() {
     var user = new DeleteUser();
     user.id = this.userModal.id;
-    user.userIdUpdate = 1; // Cambiar por el id del usuario logueado
-    this.apiService.deleteUser(user).subscribe({
+    user.userIdUpdate = this.authService.getUser().id;
+    const sus = this.apiService.deleteUser(user).subscribe({
       next: () => {
         console.log('Usuario eliminado correctamente');
         this.activeModal.close();
@@ -96,16 +105,21 @@ export class ModalInfoUserComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error al eliminar el usuario:', error);
-        // Poner un sweetAlert
       }
     });
+
+    //Agregar suscripción
+    this.suscriptionService.addSuscription(sus);
   }
 
+  //--------------------------------------------------------Modal--------------------------------------------------------
+
+  //Cerrar modal
   closeModal(){
     this.activeModal.close();
   }
 
-
+  //Confirmar eliminación
   confirmDelete() {
     Swal.fire({
       title: '¿Seguro que desea eliminar el usuario?',
@@ -140,5 +154,4 @@ export class ModalInfoUserComponent implements OnInit {
       }
     });
   } 
-  
 }

@@ -1,54 +1,170 @@
-<div class="container mt-5">
+<div class="row mb-2">-</div>
+
+<!-- Filtors -->
+<div class="container my-2 p-2 border border-2 rounded shadow-lg">
     <div class="row">
-        <div class="col-6">
-            <google-chart
-                [type]="chartTypeAsistencias" 
-                [data]="dataAsistencias" 
-                [columns]="columnNamesAsistencias"
-                [options]="chartOptionsAsistencias"
-                [width]="width"
-                [height]="height">
-            </google-chart>
-            <select [(ngModel)]="empleado" (ngModelChange)="loadAsistencias()">
-                <option value="" selected>Empleado</option>
-                @for (em of empleados; track $index) {
-                    <option [value]="em.fullName">{{em.fullName}}</option>
-                }
-            </select>
-            <input id="fechaInicio" type="date" [(ngModel)]="fechaInicio" (ngModelChange)="loadAsistencias()">
-            <input type="date" [(ngModel)]="fechaFin" (ngModelChange)="loadAsistencias()">
-            <button class="btn btn-primary ms-auto" (click)="limpiarFiltro()">
-                <i class="bi bi-trash"></i>
-            </button>
-            <select class="form-select">
-                <option value="">Seleccionar periodo</option>
-                <option value="1">Ultimo mes</option>
-                <option value="3">Ultimo 3 meses</option>
-                <option value="6">Ultimo 6 meses</option>
-                <option value="12">Ultimo año</option>
-            </select>
+        <!-- Filtro de fechas -->
+        <div class="col d-flex gap-3">
+            <div class="col">
+                <input id="fechaInicio" type="date" class="form-control border-1 bg-light" [(ngModel)]="fechaInicio" 
+                (change)="onStartDateChange()">
+            </div>
+            <div class="col">
+                <input id="fechaFin" type="date" class="form-control border-1 bg-light" [(ngModel)]="fechaFin"
+                (change)="onEndDateChange()">
+            </div>
         </div>
-        <div class="col-6">
-            <google-chart
-                [type]="chartTypeLlamados" 
-                [data]="dataLlamados" 
-                [columns]="columnNamesLlamados"
-                [options]="chartOptionsLlamados"
-                [width]="width"
-                [height]="height">
-            </google-chart>
+            <!-- Botones de exportar -->
+        <div class="col-auto d-flex gap-1 ms-auto">
+            <button class="btn btn-primary filterbutton" data-bs-toggle="modal" title="Filtros Avanzados"
+            data-bs-target="#filtrosAvanzados">
+                <i class="bi bi-funnel-fill"></i>
+            </button>
+            <button type="button" class="btn btn-secondary bi bi-trash filterbutton"
+                title="Limpiar Filtros" (click)="limpiarFiltro()">
+            </button>
         </div>
     </div>
-    <div class="row">
-        <div class="col-6">
-            <google-chart
-                [type]="chartTypeCargos" 
-                [data]="dataCargos" 
-                [columns]="columnNamesCargos"
-                [options]="chartOptionsCargos"
-                [width]="width"
-                [height]="height">
-            </google-chart>
+</div>
+
+<div class="modal fade" id="filtrosAvanzados" tabindex="-1" aria-labelledby="filtrosAvanzadosLabel" aria-hidden="true" data-bs-keyboard="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="filtrosAvanzadosLabel">Filtros Avanzados</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class=" row d-flex justify-content-start align-items-center mb-3">
+                    <div class="col-4">
+                        <label for="tipo" class="form-label Text Start">Empleados</label>
+                    </div>
+                    <div class="col">
+                        <ng-select [items]="optionsEmpleados" [(ngModel)]="empleadosFiltrados" bindLabel="label"
+                            bindValue="value" [multiple]="true" (ngModelChange)="loadData()" class="w-100">
+                            <ng-template ng-multi-label-tmp let-items="items">
+                                Seleccionar Empleados
+                                <span *ngIf="items.length > 0">({{ items.length }})</span>
+                            </ng-template>
+            
+                            <!-- Template para las opciones del dropdown -->
+                            <ng-template ng-option-tmp let-item="item" let-item$="item$">
+                                <input type="checkbox" [checked]="item$.selected" />
+                                {{ item.label }}
+                            </ng-template>
+                        </ng-select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
         </div>
+    </div>
+</div>
+
+<div class="container">
+    
+    <!-- Grilla del dashboard -->
+    <div class="row">
+
+        <!-- KPI LIMITE 5-->
+        <div class="col-2 gap-2 d-flex flex-column justify-content-center">
+            <!-- KPI 1 -->
+            <app-custom-kpi [amount]="kpiPresente" title="Asistencias"
+            [customStyles]="{ 'background-color': '#b3f5bc' }" icon="bi-person-check"
+            ></app-custom-kpi>
+            <!-- KPI 2 -->
+            <app-custom-kpi [amount]="kpiTarde" title="Llegadas tarde"
+            [customStyles]="{ 'background-color': '#f9ffb5' }" icon="bi-clock-history"></app-custom-kpi>
+            <!-- KPI 3 -->
+            <app-custom-kpi [amount]="kpiAusente" title="Inasistencias" subTitle="injustificadas"
+            [customStyles]="{ 'background-color': '#fa9189' }" icon="bi-x-circle"></app-custom-kpi>
+            <!-- KPI 4 -->
+            <app-custom-kpi [amount]="kpiJustificado" title="Inasistencias" subTitle="justificadas"
+            [customStyles]="{ 'background-color': '#d1bdff' }" icon="bi-file-earmark-check"></app-custom-kpi>
+        </div>
+        <div class="col-10">
+            <div class="row mb-2">
+                <!-- Grafico pie asistencias -->
+                <div class="col-6">
+                    <div class="card border-0 shadow-lg  rounded-4 h-100">
+                      <div class="card-body">
+                        <h4 class="card-title align-items-center">Porcentaje asistencias</h4>       
+                        <hr>
+                        <div class="row justify-content-center text-center align-items-center">
+                          @if (dataAsistencias.length > 0) {
+                          <div class="col-12 hover-scale flex-grow-1 d-flex align-items-center ">
+                            <google-chart [type]="chartTypeCirculo" [data]="dataAsistencias" [options]="chartOptionsAsistencias"
+                            class="w-100 expanded-chart-content" style="width: 100%; height:210px;">
+                            </google-chart>
+                          </div>
+                        }
+                        </div>
+                      </div>
+          
+                    </div>
+                  </div>
+            </div>
+            <div class="row">
+                <!-- Grafico barra llamados -->
+                <div class="col ">
+                    <div class="card border-0 shadow-lg  rounded-4 h-100">
+                        <div class="card-body">
+                            <h4 class="card-title align-items-center">Llamados de atención</h4>
+                            <hr>
+                            @if (dataLlamados.length > 0 ) {
+                            <div class="col-12 hover-scale flex-grow-1 d-flex align-items-center justify-content-center">
+                                <google-chart [type]="chartTypeColumnas" [columns]="columnsLlamados" [data]="dataLlamados" [options]="chartOptionsLlamados"
+                                class="w-100 expanded-chart-content" style="width: 100%; height:210px;">
+                                </google-chart>
+                            </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="infoModal" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Graficos empleados</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <ul>
+            <li>
+              <p>
+                <strong>Graficos</strong>: Muestra informacion relacionada a los empleados del consorcio.
+                Incluye cuatro KPI que indican la cantidad de asistencias, llegadas tarde e inasistencias tanto las justificadas como las que no
+                en base a los filtros aplicados.
+              </p>
+              <p>
+                El gráfico circular muestra el porcentaje correspondiente a cada posible estado del total de asistencias.
+              </p>
+              <p>
+                El gráfico de columnas muestra el total de llamados de atencion realizado por periodo (mes-año).
+              </p>
+            </li>
+            <li>
+              <strong>Botones</strong>:
+              <ul>
+                <li><button class="btn btn-primary bi bi-funnel-fill mb-2"></button> Permite aplicar filtros avanzados. Te permite filtrar por uno 
+                    o varios empleados la informacion de los graficos.
+                </li>
+                <li><button class="btn btn-secondary bi bi-trash mb-2"></button> Elimina los filtros avanzados aplicados.
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+        </div>
+      </div>
     </div>
 </div>
