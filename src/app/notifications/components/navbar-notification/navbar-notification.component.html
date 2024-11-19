@@ -1,6 +1,18 @@
 <div class="notification-icons" style="display: flex; gap: 40px">
   <div class="dropdown">
-    <i class="bi bi-bell-fill" style="cursor: pointer;" (click)="toggleNotificationsAndFetch()"></i>
+    <i class="bi bi-bell-fill" style="cursor: pointer;" (click)="toggleNotificationsAndFetch()">
+      <!-- Punto rojo para notificaciones no leídas -->
+      <span 
+        *ngIf="counterNotificationsNoRead > 0" 
+        class="badge rounded-pill bg-danger"
+        style="position: absolute; top: 0; right: 0; font-size: 2px; padding: 0.3rem ;"
+      >
+        &nbsp;
+      </span>
+    </i>
+
+
+
     <div
       *ngIf="showNotificationsDropdown"
       class="dropdown-menu dropdown-menu-end"
@@ -25,7 +37,7 @@
             <h6>
               <b>{{ notification.subject }}</b>
             </h6>
-            <p style="margin-bottom: 0; white-space: normal">
+            <p style="margin-bottom: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 500px;">
               {{ getMessage(notification) }}
             </p>
           </div>
