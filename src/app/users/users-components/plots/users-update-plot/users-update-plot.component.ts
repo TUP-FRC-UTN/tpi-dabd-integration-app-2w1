@@ -206,6 +206,8 @@ export class UsersUpdatePlotComponent implements OnInit, OnDestroy {
   updatePlot() {
     var id = Number(this.route.snapshot.paramMap.get('id')) || 0;
     const plot: PutPlot = {
+      plot_number: this.formReactivo.get('plotNumber')?.value || 0,
+      block_number: this.formReactivo.get('blockNumber')?.value || 0,
       total_area_in_m2: this.formReactivo.get('totalArea')?.value || 0,
       built_area_in_m2: this.formReactivo.get('totalBuild')?.value || 0,
       plot_state_id: Number(this.formReactivo.get('state')?.value) || 0,
@@ -213,10 +215,6 @@ export class UsersUpdatePlotComponent implements OnInit, OnDestroy {
       userUpdateId: 1,
       files: this.files
     }
-
-    console.log(plot);
-    console.log(id);
-    alert("Se ha actualizado el lote");
   
     const sus = this.plotService.putPlot(id, plot).subscribe({
       next: () => {

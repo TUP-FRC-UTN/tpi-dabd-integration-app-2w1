@@ -35,10 +35,9 @@ export class UsersTransferPlotComponent implements OnInit {
   private readonly plotService = inject(PlotService);
   private readonly authService = inject(AuthService);
 
-  ngOnInit(): void {
+   ngOnInit() {
     this.reactiveForm.get('actualOwner')?.disable();
-    this.loadAllOwners();
-    this.loadActualOwner();    
+     this.loadAllOwners(); 
   }
 
   //Cargar todos los propietarios
@@ -49,8 +48,8 @@ export class UsersTransferPlotComponent implements OnInit {
           value: owner.id,
           name: `${owner.name}, ${owner.lastname}`
         }));
-        console.log(this.owners);
         
+        this.loadActualOwner();   
       },
       error: (error) => {
         console.log('No se pudo cargar los propietarios');
@@ -61,7 +60,8 @@ export class UsersTransferPlotComponent implements OnInit {
   loadActualOwner() {
     this.ownersService.getOwnerByPlotId(this.plotId).subscribe({
       next: (data: Owner[]) => {
-        this.actualOwner = data.find(owner => owner.active == true)!;        
+        this.actualOwner = data.find(owner => owner.active == true)!;               
+        this.owners = this.owners.filter(owner => owner.value != this.actualOwner.id);    
         this.reactiveForm.get('actualOwner')?.setValue(this.actualOwner.name + ' ' + this.actualOwner.lastname);
       },
       error: (error) => {

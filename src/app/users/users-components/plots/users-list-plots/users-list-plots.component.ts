@@ -165,7 +165,6 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
           
           $('#myTablePlot').on('click', '.transfer-plot', (event) => {
             const plotId = $(event.currentTarget).data('id');
-            console.log('Transferir lote:', plotId);
 
             const modalRef = this.modal.open(UsersTransferPlotComponent, { size: 'xs', keyboard: false });
             modalRef.componentInstance.plotId = plotId;

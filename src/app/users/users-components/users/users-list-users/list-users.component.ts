@@ -539,20 +539,41 @@ export class ListUsersComponent implements OnInit, OnDestroy {
       for (let i = 0; i < max; i++) {
         let color: string = "";
         switch (roles[i]) {
-          case "Gerente":
-            color = "text-bg-danger";
+          case "Gerente general":
+            color = "text-bg-salmon";
             break;
           case "Propietario":
             color = "text-bg-primary";
             break;
           case "Familiar mayor":
-            color = "text-bg-secondary";
+            color = "bg-secondary";
             break;
           case "Familiar menor":
-            color = "text-bg-secondary";
+            color = "text-bg-menor";
             break;
           case "SuperAdmin":
             color = "text-bg-dark";
+            break;
+          case "Inquilino":
+            color = "text-bg-cyan";
+            break;
+          case "Gerente finanzas":
+            color = "text-bg-pink";
+            break;
+          case "Contador":
+            color = "text-bg-teal text-dark";
+            break;
+          case "Seguridad":
+            color = "text-bg-orange";
+            break;
+          case "Gerente inventario":
+            color = "text-bg-blue";
+            break;
+          case "Gerente empleados":
+            color = "text-bg-red";
+            break;
+          case "Gerente multas":
+            color = "text-bg-indigo";
             break;
           default:
             color = "badge bg-info text-dark";
@@ -560,33 +581,54 @@ export class ListUsersComponent implements OnInit, OnDestroy {
         }
 
         rolesA += `
-                     <span class="badge rounded-pill50 ${color}">${roles[i]}</span> `;
+                     <span class="badge rounded-pill ${color}">${roles[i]}</span> `;
       }
     } else {
       let color: string = "";
       switch (roles[0]) {
-        case "Gerente":
-          color = "text-bg-danger";
-          break;
-        case "Propietario":
-          color = "text-bg-primary";
-          break;
-        case "Familiar mayor":
-          color = "text-bg-secondary";
-          break;
-        case "Familiar menor":
-          color = "text-bg-secondary";
-          break;
-        case "SuperAdmin":
-          color = "text-bg-dark";
-          break;
-        default:
-          color = "badge bg-info text-dark";
-          break;
+        case "Gerente general":
+            color = "text-bg-salmon";
+            break;
+          case "Propietario":
+            color = "text-bg-primary";
+            break;
+          case "Familiar mayor":
+            color = "bg-secondary";
+            break;
+          case "Familiar menor":
+            color = "text-bg-menor";
+            break;
+          case "SuperAdmin":
+            color = "text-bg-dark";
+            break;
+          case "Inquilino":
+            color = "text-bg-cyan";
+            break;
+          case "Gerente finanzas":
+            color = "text-bg-pink";
+            break;
+          case "Contador":
+            color = "text-bg-teal text-dark";
+            break;
+          case "Seguridad":
+            color = "text-bg-orange";
+            break;
+          case "Gerente inventario":
+            color = "text-bg-blue";
+            break;
+          case "Gerente empleados":
+            color = "text-bg-red";
+            break;
+          case "Gerente multas":
+            color = "text-bg-indigo";
+            break;
+          default:
+            color = "badge bg-info text-dark";
+            break;
       }
 
       rolesA += `
-                     <span class="badge rounded-pill50 ${color}">${roles[0]}</span> `;
+                     <span class="badge rounded-pill ${color}">${roles[0]}</span> `;
     }
 
 
@@ -597,20 +639,41 @@ export class ListUsersComponent implements OnInit, OnDestroy {
       rolesExtra.forEach((role: string) => {
         let color: string = "";
         switch (role) {
-          case "Gerente":
-            color = "text-bg-danger";
+          case "Gerente general":
+            color = "text-bg-salmon";
             break;
           case "Propietario":
             color = "text-bg-primary";
             break;
           case "Familiar mayor":
-            color = "text-bg-secondary";
+            color = "bg-secondary";
             break;
           case "Familiar menor":
-            color = "text-bg-secondary";
+            color = "text-bg-menor";
             break;
           case "SuperAdmin":
             color = "text-bg-dark";
+            break;
+          case "Inquilino":
+            color = "text-bg-cyan";
+            break;
+          case "Gerente finanzas":
+            color = "text-bg-pink";
+            break;
+          case "Contador":
+            color = "text-bg-teal text-dark";
+            break;
+          case "Seguridad":
+            color = "text-bg-orange";
+            break;
+          case "Gerente inventario":
+            color = "text-bg-blue";
+            break;
+          case "Gerente empleados":
+            color = "text-bg-red";
+            break;
+          case "Gerente multas":
+            color = "text-bg-indigo";
             break;
           default:
             color = "badge bg-info text-dark";

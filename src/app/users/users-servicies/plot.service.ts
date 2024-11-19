@@ -80,7 +80,8 @@ export class PlotService {
   putPlot(id: number,  plot: PutPlot): Observable<PutPlot>{
 
     const formData: FormData = new FormData();
-  
+    formData.append('plot_number', plot.plot_number.toString());
+    formData.append('block_number', plot.block_number.toString());
     formData.append('total_area_in_m2', plot.total_area_in_m2.toString());
     formData.append('built_area_in_m2', plot.built_area_in_m2.toString());
     formData.append('plot_state_id', plot.plot_state_id.toString());
