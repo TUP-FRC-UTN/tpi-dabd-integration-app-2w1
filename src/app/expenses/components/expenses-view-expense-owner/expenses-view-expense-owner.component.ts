@@ -80,7 +80,6 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
   }
   // loadBillsFilter() {
   //   const dataTable = $('#myTable').DataTable();
-  //   debugger
   //   let billsFiltered = this.fileredByCategiries(this.bills.slice());
   //   billsFiltered = this.fileredByProviders(billsFiltered);
   //   dataTable.clear().rows.add(billsFiltered).draw();
