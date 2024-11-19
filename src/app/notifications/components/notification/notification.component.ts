@@ -267,7 +267,7 @@ export class NotificationComponent implements OnInit {
         this.fillTable();
       },
       error: () => {
-        alert("Error al obtener las notificaciones del back-end");
+        console.log("Error al obtener las notificaciones del back-end");
       },
     });
     this.subscription.add(getNotifications)
