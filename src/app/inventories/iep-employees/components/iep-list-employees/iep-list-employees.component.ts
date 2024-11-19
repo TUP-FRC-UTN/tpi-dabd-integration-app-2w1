@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Subscription } from 'rxjs';
 import { FormsModule, NgSelectOption } from '@angular/forms';
@@ -31,7 +31,7 @@ interface EmployeeFilters {
 @Component({
   selector: 'app-iep-list-employees',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgSelectModule],
+  imports: [CommonModule, FormsModule, NgSelectModule, RouterLink],
   templateUrl: './iep-list-employees.component.html',
   styleUrls: ['./iep-list-employees.component.css'],
 })

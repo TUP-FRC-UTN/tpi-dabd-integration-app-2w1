@@ -25,16 +25,6 @@ export class IepSupplierUpdateComponent implements OnInit{
 
   onSubmit() {
 
-    Swal.fire({
-      icon: "success",
-      title: "Actualización Exitosa",
-      text: "Los datos se han actualizado correctamente.",
-      confirmButtonText: "Aceptar" 
-    }).then(() => {
-      this.router.navigate(['/home/suppliers']);
-    });
-
-
     if (this.proveedorForm.valid) {
       const supplierUpdate: Supplier = {
         id: this.id, 

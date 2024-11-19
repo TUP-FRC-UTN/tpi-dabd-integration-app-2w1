@@ -9,7 +9,7 @@ import { AddressDto, Charge, DocumentTypeEnum, PostEmployeeDto } from '../../Mod
 import { post } from 'jquery';
 import { EmpPostEmployeeService } from '../../services/emp-post-employee.service';
 import Swal from 'sweetalert2';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { AuthService } from '../../../../users/users-servicies/auth.service';
 
@@ -17,7 +17,7 @@ import { AuthService } from '../../../../users/users-servicies/auth.service';
 @Component({
   selector: 'app-iep-form-post-employees',
   standalone: true,
-  imports: [FormsModule, CommonModule,NgSelectModule],
+  imports: [FormsModule, CommonModule, NgSelectModule, RouterLink],
   templateUrl: './iep-form-post-employees.component.html',
   styleUrl: './iep-form-post-employees.component.css',
 })
