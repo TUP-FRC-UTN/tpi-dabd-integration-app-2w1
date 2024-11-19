@@ -19,7 +19,7 @@
             id="inputSubject"
             name="subject"
             required
-            maxlength="20"
+            maxlength="30"
             #subject="ngModel"
             [(ngModel)]="newNotification.subject"
             [ngClass]="{
@@ -31,7 +31,7 @@
         @if ((subject.invalid && (subject.dirty || subject.touched)) ||
         (subject.invalid && form.submitted)) {
         <div style="color: red; margin-left: 7em">
-          El asunto es requerido y debe tener máximo 20 caracteres.
+          El asunto es requerido y debe tener máximo 30 caracteres.
         </div>
         }
 
@@ -60,8 +60,8 @@
         </div>
         }
 
+        <h6>Notificar a:</h6>
         <div class="col-md-12 mb-3">
-          <h6>Notificar a:</h6>
           <div class="row justify-content-center d-flex">
             <div class="col-auto mt-2">
               <div class="form-check form-check-inline">
@@ -167,14 +167,7 @@
         </div>
 
         <div class="col-12 d-flex justify-content-end g-4">
-          <button
-            class="btn btn-secondary"
-            type="button"
-            style="width: 5.5em; margin-right: 2em"
-            (click)="clearForm(form)"
-          >
-            Cancelar
-          </button>
+      
           <button class="btn btn-success" type="submit" style="width: 5.5em">
             Enviar
           </button>
