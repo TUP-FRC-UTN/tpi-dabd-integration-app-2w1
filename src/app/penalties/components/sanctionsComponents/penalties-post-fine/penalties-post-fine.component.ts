@@ -8,6 +8,8 @@ import Swal from 'sweetalert2';
 import { RoutingService } from '../../../../common/services/routing.service';
 import { PlotService } from '../../../../users/users-servicies/plot.service';
 import { ReportService } from '../../../services/report.service';
+import { UserService } from '../../../../users/users-servicies/user.service';
+import { UserGet } from '../../../../users/users-models/users/UserGet';
 @Component({
   selector: 'app-penalties-post-fine',
   standalone: true,
@@ -17,6 +19,7 @@ import { ReportService } from '../../../services/report.service';
 })
 export class PenaltiesPostFineComponent implements OnInit {
   private readonly plotService = inject(PlotService);
+  private readonly userService = inject(UserService);
   //Variables
   report: any
   formattedDate: any;
@@ -227,5 +230,20 @@ export class PenaltiesPostFineComponent implements OnInit {
     };
 
     return errorMessages[errorKey]?.(errorValue) ?? 'Error no identificado en el campo.';
+  }
+
+  getOwnersIdByPlotId(plotId: number): number[] {
+    let ownersIds: number[] = [];
+    let users: UserGet[] = [];
+    this.userService.getUsersByPlotID(plotId).subscribe({
+      next: (data) => { users = data },
+      error: (e) => { console.log("Error al cargar usuarios: ", e) }
+    });
+    users.forEach((user: UserGet) => {
+      if (user.roles.includes('Propietario')) {
+        ownersIds.push(user.id);
+      }
+    });
+    return ownersIds;
   }
 }
