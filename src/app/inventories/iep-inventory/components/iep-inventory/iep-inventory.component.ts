@@ -458,6 +458,7 @@ applyFilter(): void {
         {
           data: 'minQuantityWarning',
           title: 'Min. Alerta',
+          className: 'text-end',
         },
         {
           data: null,
