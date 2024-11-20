@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component, input, model, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, AsyncValidatorFn, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { UserType } from '../../../../models/access-visitors/access-visitors-models';
-import Swal from 'sweetalert2';
 import { AccessVisitorsRegisterServiceService } from '../../../../services/access_visitors/access-visitors-register/access-visitors-register-service/access-visitors-register-service.service';
 import { catchError, map, Observable, of, Subscription } from 'rxjs';
 import { AccessUserReportService } from '../../../../services/access_report/access_httpclient/access_usersApi/access-user-report.service';
@@ -22,6 +21,7 @@ export class AccessVisitorFormComponent implements OnInit, OnDestroy {
 
   value = model<FormGroup<any>>();
   vehicleActivated = input<boolean>(true);
+  emailActivated = input<boolean>(true);
   indexUserType?: number;
   subscriptions = new Subscription();
   
@@ -191,7 +191,7 @@ export class AccessVisitorFormComponent implements OnInit, OnDestroy {
       const emailControl = this.value()?.get('email');
 
       // Aplica la validación de `required` solo si `indexUserType` es `1`
-      if (this.indexUserType === 1) {
+      if (this.emailActivated() && this.indexUserType === 1) {
         emailControl?.setValidators([Validators.required, Validators.email, Validators.maxLength(70)]);
       } else {
         // Elimina la validación de `required` si `indexUserType` no es `1`
