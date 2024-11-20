@@ -10,9 +10,9 @@ import * as XLSX from 'xlsx';
 // Imports de DataTable con soporte para Bootstrap 5
 import $ from 'jquery';
 import 'datatables.net-bs5'; // DataTables con Bootstrap 5
-import 'datatables.net-buttons-bs5'; // Botones con estilos de Bootstrap 5
-import 'datatables.net-buttons/js/buttons.html5';
-import 'datatables.net-buttons/js/buttons.print';
+// import 'datatables.net-buttons-bs5'; // Botones con estilos de Bootstrap 5
+// import 'datatables.net-buttons/js/buttons.html5';
+// import 'datatables.net-buttons/js/buttons.print';
 import { RoutingService } from '../../../../common/services/routing.service';
 import moment from 'moment';
 import jsPDF from 'jspdf';
@@ -225,26 +225,26 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
       },
       //This sets the buttons to export
       //the table data to Excel and PDF.
-      buttons: [
-        {
-          extend: 'excel',
-          text: 'Excel',
-          className: 'btn btn-success export-excel-btn',
-          title: 'Listado de Denuncias',
-          exportOptions: {
-            columns: [0, 1, 2, 3], // This indicates the columns that will be exported to Excel.
-          },
-        },
-        {
-          extend: 'pdf',
-          text: 'PDF',
-          className: 'btn btn-danger export-pdf-btn',
-          title: 'Listado de denuncias',
-          exportOptions: {
-            columns: [0, 1, 2, 3], // This indicates the columns that will be exported to PDF.
-          },
-        }
-      ]
+      // buttons: [
+      //   {
+      //     extend: 'excel',
+      //     text: 'Excel',
+      //     className: 'btn btn-success export-excel-btn',
+      //     title: 'Listado de Denuncias',
+      //     exportOptions: {
+      //       columns: [0, 1, 2, 3], // This indicates the columns that will be exported to Excel.
+      //     },
+      //   },
+      //   {
+      //     extend: 'pdf',
+      //     text: 'PDF',
+      //     className: 'btn btn-danger export-pdf-btn',
+      //     title: 'Listado de denuncias',
+      //     exportOptions: {
+      //       columns: [0, 1, 2, 3], // This indicates the columns that will be exported to PDF.
+      //     },
+      //   }
+      // ]
     });
 
   }

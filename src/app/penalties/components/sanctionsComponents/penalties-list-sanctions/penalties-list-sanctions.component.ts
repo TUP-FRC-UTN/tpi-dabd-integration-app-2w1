@@ -13,9 +13,9 @@ import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 // Imports de DataTable con soporte para Bootstrap 5
 import $ from 'jquery';
 import 'datatables.net-bs5'; // DataTables con Bootstrap 5
-import 'datatables.net-buttons-bs5'; // Botones con estilos de Bootstrap 5
-import 'datatables.net-buttons/js/buttons.html5';
-import 'datatables.net-buttons/js/buttons.print';
+// import 'datatables.net-buttons-bs5'; // Botones con estilos de Bootstrap 5
+// import 'datatables.net-buttons/js/buttons.html5';
+// import 'datatables.net-buttons/js/buttons.print';
 import { RoutingService } from '../../../../common/services/routing.service';
 import moment from 'moment';
 

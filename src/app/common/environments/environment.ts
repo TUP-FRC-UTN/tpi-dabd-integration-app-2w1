@@ -1,21 +1,24 @@
-export const environment = {
-    production: false,
-    services: {
-      accesses: 'http://localhost:9030', 
-      addresses: 'http://localhost:9064',
-      complaints: 'http://localhost:9040',
-      contacts: 'http://localhost:9010',
-      employees: 'http://localhost:9014',
-      expenseGeneration: 'http://localhost:9020',
-      expensesManager: 'http://localhost:9070',
-      fileManager: 'http://localhost:9072',
-      inventory: 'http://localhost:9012',
-      mercadoPago: 'http://localhost:9022',
-      notifications: 'http://localhost:9050', 
-      ownersAndPlots: 'http://localhost:9062',
-      sanctions: 'http://localhost:9042',
-      stripeService: 'http://localhost:9024',
-      usersAndAddresses: 'http://localhost:9060',  
-    }
-  };
+const BASE_URL = 'http://localhost:8080';
+// const BASE_URL = 'http://2w1-villadelcondor.dynns.com:8080';
 
+
+export const environment = {
+  production: true,
+  services: {
+    accesses: `${BASE_URL}/accesses`,
+    addresses: `${BASE_URL}/addresses`,
+    complaints: `${BASE_URL}/complaints`,
+    contacts: `${BASE_URL}/contacts`,
+    employees: `${BASE_URL}/employees`,
+    expenseGeneration: `${BASE_URL}/expense-generation`,
+    expensesManager: `${BASE_URL}/expenses-manager`,
+    fileManager: `${BASE_URL}/file-manager`,
+    inventory: `${BASE_URL}/inventory`,
+    mercadoPago: `${BASE_URL}/mercado-pago-service`,
+    notifications: `${BASE_URL}/notifications`,
+    ownersAndPlots: `${BASE_URL}/owners-and-plots`,
+    sanctions: `${BASE_URL}/sanctions`,
+    stripeService: `${BASE_URL}/stripe-service`,
+    usersAndAddresses: `${BASE_URL}/users-and-addresses`,
+  }
+};
