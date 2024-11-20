@@ -165,7 +165,7 @@ export class AllNotificationComponent implements OnInit {
         this.fillTable();
       },
       error: () => {
-        alert("error al cargar las notifications");
+        console.log("error al cargar las notifications");
       },
     });
     this.subscription.add(getSubscription)

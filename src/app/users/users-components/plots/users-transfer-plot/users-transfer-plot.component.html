@@ -1,0 +1,42 @@
+<div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Transferir Lote</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
+</div>
+<div class="modal-body">
+    <form class="d-flex flex-column justify-content-center align-items-center"
+     [formGroup]="reactiveForm" (ngSubmit)="transferPlot()">
+
+        <div class="mb-3">
+            <div class="d-flex justify-content-center align-items-center">
+                <label class="col-form-label me-3" style="min-width: 100px;" >Propietario Actual</label>
+                <div class="">
+                    <input type="text" class="form-control w-100" formControlName="actualOwner" style="min-width: 200px; max-width: 200px;"/>
+                </div>
+            </div>
+        </div>
+
+        <div class="align-self-center">
+            <i class="bi bi-arrow-down fs-1"></i>
+        </div>
+
+        <div class="m-3">
+            <div class="d-flex justify-content-center align-items-center">
+                <label class=" col-form-label me-3"  style="min-width: 100px;">Nuevo Propietario</label>
+                <div class="">
+                    <app-custom-select  style="min-width: 200px; max-width: 200px;" class="w-100" 
+                    [options]="owners" [selectedOptions]="reactiveForm.get('newOwner')?.value"
+                    (selectedOptionsChange)="reactiveForm.get('newOwner')?.setValue($event)" />
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3 align-self-end mt-3">
+            <div class="col-auto">
+              <button type="button" class="btn btn-secondary"  (click)="activeModal.dismiss('Cross click')">Cancelar</button>
+            </div>
+            <div class="col-auto">
+              <button type="submit" class="btn btn-success" [disabled]="reactiveForm.invalid"> Guardar </button>
+            </div>
+          </div>
+    </form>
+</div>

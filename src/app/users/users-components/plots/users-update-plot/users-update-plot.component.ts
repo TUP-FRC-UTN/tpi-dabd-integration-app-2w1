@@ -11,6 +11,9 @@ import { FileDto } from '../../../users-models/owner/FileDto';
 import { FileService } from '../../../users-servicies/file.service';
 import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
 import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
+import { RoutingService } from '../../../../common/services/routing.service';
+import { AuthService } from '../../../users-servicies/auth.service';
+
 
 @Component({
   selector: 'app-users-update-plot',
@@ -24,6 +27,10 @@ export class UsersUpdatePlotComponent implements OnInit, OnDestroy {
   private readonly plotService = inject(PlotService);
   private readonly fileService = inject(FileService);
   private readonly suscriptionService = inject(SuscriptionManagerService);
+  private readonly routingService = inject(RoutingService);
+
+
+  private readonly authService = inject(AuthService);
   @ViewChild('stateSelect') stateSelect!: CustomSelectComponent; 
   @ViewChild('typeSelect') typeSelect!: CustomSelectComponent; 
 
@@ -34,7 +41,7 @@ export class UsersUpdatePlotComponent implements OnInit, OnDestroy {
   files: File[] = this.existingFiles;
   formReactivo: FormGroup;
 
-  constructor(private fb: FormBuilder, private router: Router, private route: ActivatedRoute) {
+  constructor(private fb: FormBuilder, private route: ActivatedRoute) {
     this.formReactivo = this.fb.group({
       plotNumber: new FormControl(0, [Validators.required, Validators.min(1)]),
       blockNumber: new FormControl(0, [Validators.required, Validators.min(1)]),
@@ -49,8 +56,10 @@ export class UsersUpdatePlotComponent implements OnInit, OnDestroy {
 
     var id = Number(this.route.snapshot.paramMap.get('id')) || 0;
 
-    this.formReactivo.get('plotNumber')?.disable();
-    this.formReactivo.get('blockNumber')?.disable();
+    if(this.authService.getActualRole() != "SuperAdmin"){
+      this.formReactivo.get('plotNumber')?.disable();
+      this.formReactivo.get('blockNumber')?.disable();
+    }
     
     // Después de cargar los tipos y estados, encontrar el ID correcto
     const loadTypesAndStates = new Promise<void>((resolve, reject) => {
@@ -197,6 +206,8 @@ export class UsersUpdatePlotComponent implements OnInit, OnDestroy {
   updatePlot() {
     var id = Number(this.route.snapshot.paramMap.get('id')) || 0;
     const plot: PutPlot = {
+      plot_number: this.formReactivo.get('plotNumber')?.value || 0,
+      block_number: this.formReactivo.get('blockNumber')?.value || 0,
       total_area_in_m2: this.formReactivo.get('totalArea')?.value || 0,
       built_area_in_m2: this.formReactivo.get('totalBuild')?.value || 0,
       plot_state_id: Number(this.formReactivo.get('state')?.value) || 0,
@@ -204,12 +215,7 @@ export class UsersUpdatePlotComponent implements OnInit, OnDestroy {
       userUpdateId: 1,
       files: this.files
     }
-
-    console.log(plot);
-    console.log(id);
-    
-    
-
+  
     const sus = this.plotService.putPlot(id, plot).subscribe({
       next: () => {
         Swal.fire({
@@ -223,7 +229,7 @@ export class UsersUpdatePlotComponent implements OnInit, OnDestroy {
         });
 
         //Redirigir a la lista de lotes
-        this.redirect('main/plots/list');
+        this.redirect();
       },
       error: (error) => {
         console.log("Error al actualizar el lote" + error);
@@ -322,13 +328,8 @@ export class UsersUpdatePlotComponent implements OnInit, OnDestroy {
 
   //--------------------------------------------------Redirecciones------------------------------------------------
 
-  //Redireccionar
-  redirect(url: string) {
-    this.router.navigate([url]);
-  }
-
-  //Confirmar salida
-  confirmExit() {
-    this.redirect('/main/plots/list');
+  //Redireccionar a la lista de lotes
+  redirect() {
+    this.routingService.redirect('main/plots/list', 'Listado de lotes');
   }
 }

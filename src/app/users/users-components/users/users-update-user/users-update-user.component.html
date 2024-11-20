@@ -91,7 +91,6 @@
                 </div>
             </div>
 
-
             <div class="row mb-3 justify-content-end">
                 <div class="col-auto">
                     <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#cancelarConfirmacion">Cancelar</button>
@@ -135,41 +134,6 @@
             </div>
         </div>
     </div>
-    <div
-   #modalConfirmDelete
-   class="modal"
-   id="modalConfirmationDeleteExpense"
-   tabindex="-1"
-   role="dialog"
- >
-   <div class="modal-dialog" role="document">
-     <div class="modal-content">
-       <div class="modal-header">
-         <h5 class="modal-title">Confirmación</h5>
-       </div>
-       
-       <div class="modal-body">
-         <p class="mb-4">¿Está seguro que quiere cancelar la operación?</p> >
-       </div>
- 
-       <div class="modal-footer">
-         <button
-           type="button"
-           class="btn btn-danger"
-         >
-           Zi
-         </button> 
-         <button
-           type="button"
-           class="btn btn-secondary"
-         >
-           Nao nao
-         </button>
-       </div>
-     </div>
-   </div>
- </div>
-
 
  <!-- MODAL DE BOOTSTRAP -->
 
@@ -186,7 +150,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Volver</button>
-          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="confirmExit()">Aceptar</button>
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="redirectList()">Aceptar</button>
         </div>
       </div>
     </div>

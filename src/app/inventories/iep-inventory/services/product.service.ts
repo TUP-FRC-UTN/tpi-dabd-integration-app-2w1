@@ -5,10 +5,11 @@ import { CreateProductDtoClass } from '../models/create-product-dto-class';
 import { DtoProducto } from '../models/dto-producto';
 import { ProductCategory } from '../models/product-category';
 import { Producto } from '../models/producto';
-import { ProductXDetailDto } from '../models/product-xdetail-dto';
+import { ProductXDetailDto, ProductXDetailDto2 } from '../models/product-xdetail-dto';
 import { createProductDTO } from '../models/create-product-dto';
 import { UsersMockIdService } from '../../common-services/users-mock-id.service';
 import { environment } from '../../../common/environments/environment';
+import { UpdateProductDto } from '../models/update-product-dto';
 @Injectable({
   providedIn: 'root',
 })
@@ -26,12 +27,9 @@ export class ProductService {
   private readonly AMOUNT_MODIFICATION_URL_GETALL: string = `${this.AMOUNT_MODIFICATION_URL}/getAllModifications`; // Enzo
   private readonly AMOUNT_MODIFICATION_URL_GETALL_PDF: string = `${this.AMOUNT_MODIFICATION_URL}/getAllModificationsPdf`;
   private readonly AMOUNT_MODIFICATION_URL_GETALL_EXCEL: string = `${this.AMOUNT_MODIFICATION_URL}/getAllModificationsExcel`;
-  private userIdService: UsersMockIdService;
 
   constructor(private http: HttpClient,
-    userIdService:UsersMockIdService
   ) { 
-    this.userIdService = userIdService
   }
 
   // TOMAS C
@@ -76,8 +74,16 @@ export class ProductService {
     });
   }
 
+  getProductById(id: number): Observable<CreateProductDtoClass> {
+    return this.http.get<CreateProductDtoClass>(`${this.PRODUCT_URL}/${id}`);
+  }
+
   getAllProducts(): Observable<ProductXDetailDto[]> {
-    return this.http.get<any[]>(this.PRODUCT_URL + '/getAll');
+    return this.http.get<any[]>(this.PRODUCT_URL);
+  }
+
+  getProducts2(): Observable<ProductXDetailDto2[]> {
+    return this.http.get<ProductXDetailDto2[]>(this.PRODUCT_URL);
   }
 
   // ENZO
@@ -90,6 +96,13 @@ export class ProductService {
         }))
       )
     );
+  }
+
+  updateProduct(dto: UpdateProductDto,userId : number): Observable<any> {
+    const url = `${this.PRODUCT_URL}/${dto.id}`;
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    const params = new HttpParams().set('idUser',userId);
+    return this.http.put<any>(url, dto, { headers, params });
   }
 
   // ENZO
@@ -117,10 +130,10 @@ export class ProductService {
     });
   }
 
-  giveLogicalLow(id: number): Observable<any> {
+  giveLogicalLow(id: number, userId: number): Observable<any> {
     const url = `${this.PRODUCT_URL}/${id}/logicalLow`;
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    const params = new HttpParams().set('idUser', this.userIdService.getMockId()).set('id', id.toString());
+    const params = new HttpParams().set('idUser', userId).set('id', id.toString());
     return this.http.put<any>(url, {}, { headers, params });
   }
 

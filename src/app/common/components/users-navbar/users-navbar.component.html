@@ -56,20 +56,43 @@
 
             <div class="nav-item mt-auto">
                 <hr class="m-0">
-                <button class="nav-link d-flex text-light w-100 px-3 py-2" title="Dashboard" (click)="redirectDashboard()">
-                    <i class="bi-bar-chart-line"></i>
-                    @if (expand) {<span class="ms-2">Dashboard</span>}
-                </button>
+                @if(showDashboard()) {
+                    <button class="nav-link d-flex text-light w-100 px-3 py-2" title="Dashboard" (click)="redirectDashboard()">
+                        <i class="bi-bar-chart-line"></i>
+                        @if (expand) {<span class="ms-2">Dashboard</span>}
+                    </button>
+                }
                 <button class="nav-link d-flex text-light w-100 px-3 py-2" data-bs-toggle="modal"
                     data-bs-target="#infoModal" title="Información">
                     <i class="bi-info-circle"></i>
                     @if (expand) {<span class="ms-2">Información</span>}
                 </button>
-                <button class="nav-link d-flex text-light w-100 px-3 py-2" (click)="changePath({path: 'login'})" title="Salir">
+                <button class="nav-link d-flex text-light w-100 px-3 py-2" data-bs-toggle="modal" data-bs-target="#confirmExit" title="Salir">
                     <i class="bi-box-arrow-left"></i>
                     @if (expand) {<span class="ms-2">Salir</span>}
                 </button>
             </div>
         </div>
     </aside>
+
+
+    <!--Modal de confirmación -->
+
+  <div class="modal fade" id="confirmExit" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">Cerrar Sesión</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>¿Está seguro que quiere salir?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="logOut()">Salir</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

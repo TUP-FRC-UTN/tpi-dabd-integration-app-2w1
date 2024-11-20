@@ -23,7 +23,7 @@ export class AuthService {
       user.name = decodedToken.payloadObj.name;
       user.lastname = decodedToken.payloadObj.lastname;
       user.plotId = decodedToken.payloadObj.plot_id;
-
+      
       return user;
   }
 
@@ -42,7 +42,7 @@ export class AuthService {
     localStorage.removeItem('jwtToken');
   }
 
-  //Verifica si el id existe ene l localstorage
+  //Verifica si el id existe en el localstorage
   isLoggedIn(): boolean {
     return localStorage.getItem('jwtToken') !== null;
   }
