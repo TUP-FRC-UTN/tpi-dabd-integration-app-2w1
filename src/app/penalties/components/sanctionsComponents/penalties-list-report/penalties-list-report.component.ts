@@ -49,6 +49,8 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
   options: { value: string, name: string }[] = []
   @ViewChild(CustomSelectComponent) customSelect!: CustomSelectComponent;
 
+
+
   //Constructor
   constructor(
     private reportServices: SanctionService,
@@ -128,7 +130,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
 
   getPlotData(plotId: number) {
     let plot = this.plots.find((plot) => plot.id === plotId);
-    return `Nro: ${plot?.plot_number} - Manzana: ${plot?.block_number}`;
+    return plot ? `Nro: ${plot?.plot_number} - Manzana: ${plot?.block_number}`: "N/A";
   }
 
   // Configures the DataTable display properties and loads data.
@@ -170,8 +172,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
           data: 'plotId',
           className: 'align-middle',
           render: (data) => {
-            console.log("datos" + data)
-            return `<div class="text-end">${data}</div>`
+            return `<div>${this.getPlotData(data)}</div>`
           }
         },
         {
