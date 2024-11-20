@@ -1,17 +1,18 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { AbstractControl, AsyncValidatorFn, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Observable, Subject, Subscription, combineLatest, of, pipe } from 'rxjs';
-import { catchError, map, takeUntil } from 'rxjs/operators';
+import { Subject, Subscription, combineLatest } from 'rxjs';
+import { take, takeUntil } from 'rxjs/operators';
 import { AccessVisitorsRegisterServiceHttpClientService } from '../../../../services/access_visitors/access-visitors-register/access-visitors-register-service-http-client/access-visitors-register-service-http-client.service';
-import { AccessVisitor, AccessVisitorRecord, AccessAuthRange, AccessVehicle, AccessUser, UserType } from '../../../../models/access-visitors/access-visitors-models';
+import { AccessVisitor, AccessVisitorRecord, AccessAuthRange, AccessUser, AccessVehicle } from '../../../../models/access-visitors/access-visitors-models';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AccessTimeRangeVisitorsRegistrationComponent } from '../access-time-range-visitors-registration/access-time-range-visitors-registration.component';
 import { AccessGridVisitorsRegistrationComponent } from '../access-grid-visitors-registration/access-grid-visitors-registration.component';
 import Swal from 'sweetalert2';
 import { AccessVisitorsRegisterServiceService } from '../../../../services/access_visitors/access-visitors-register/access-visitors-register-service/access-visitors-register-service.service';
-import { AccessUserReportService } from '../../../../services/access_report/access_httpclient/access_usersApi/access-user-report.service';
-import { AccessInsurancesService } from '../../../../services/access-insurances/access-insurances.service';
+import { AccessVisitorFormComponent } from "../access-visitor-form/access-visitor-form.component";
+import { AuthService } from '../../../../../users/users-servicies/auth.service';
+import { UserLoged } from '../../../../../users/users-models/users/UserLoged';
 @Component({
   selector: 'app-access-container-visitors-registration',
   standalone: true,
@@ -21,76 +22,90 @@ import { AccessInsurancesService } from '../../../../services/access-insurances/
     ReactiveFormsModule,
     AccessGridVisitorsRegistrationComponent,
     AccessTimeRangeVisitorsRegistrationComponent,
-    CommonModule
-  ],
+    CommonModule,
+    AccessVisitorFormComponent
+],
 })
 export class AccessContainerVisitorsRegistrationComponent implements OnInit, OnDestroy {
-  indexUserType?: number;
-  onAuthorizedTypeChange(event: Event): void {
-    const selectedValue = (event.target as HTMLSelectElement).value;
-    if (selectedValue !== "") {
-      this.indexUserType = parseInt(selectedValue, 10);
-      console.log(this.indexUserType);
-
-      // Obtén la referencia al control `email`
-      const emailControl = this.visitorForm.get('email');
-
-      // Aplica la validación de `required` solo si `indexUserType` es `1`
-      if (this.indexUserType === 1) {
-        emailControl?.setValidators([Validators.required, Validators.email, Validators.maxLength(70)]);
-      } else {
-        // Elimina la validación de `required` si `indexUserType` no es `1`
-        emailControl?.setValidators([Validators.email, Validators.maxLength(70)]);
-      }
-      // Actualiza el estado de validación del control
-      emailControl?.updateValueAndValidity();
-    }
-  }
-
-  user?: AccessUser;
-  handleSelectedUser(user: AccessUser): void {
-    this.user = user;
-    console.log('Selected user:', this.user);
-  }
   uid?: string;
   qrCodeId?: string;
   isQRCodeAvailable: boolean = false;
-  visitorForm!: FormGroup;
-  vehicleType: string[] = [];
-  patentePattern = /(^[A-Z]{2}\d{3}[A-Z]{2}$)|(^[A-Z]{3}\d{3,4}$)|(^[A-Z]{3}\d{4}$)/;
   private unsubscribe$ = new Subject<void>();
+  user!: UserLoged;
   visitorRecord?: AccessVisitorRecord;
-  vehicleTypes: string[] = ['Car', 'Motorbike', 'Truck', 'Van'];
-  insurances: string[] = [];
-  usersType: UserType[] = [];
   isRegisterButtonVisible: boolean = true;
+  visitorForm!: FormGroup;
 
   isLoading: boolean = false;
   buttonText: string = 'Registrar';
 
-  vehicleTypeMapping: { [key: string]: string } = {
-    'Car': 'Auto',
-    'Motorbike': 'Moto',
-    'Truck': 'Camión',
-    'Van': 'Camioneta'
-  };
-  vehicleOptions: { value: string, label: string }[] = [];
-  translatedVehicleTypes: string[] = [];
   constructor(
-    private fb: FormBuilder,
     private visitorService: AccessVisitorsRegisterServiceService,
     private visitorHttpService: AccessVisitorsRegisterServiceHttpClientService,
-    private userApi: AccessUserReportService,
-    private insuranceService: AccessInsurancesService
-  ) {
-    this.vehicleOptions = this.vehicleTypes.map(type => ({
-      value: type,
-      label: this.vehicleTypeMapping[type] || type
-    }));
-    this.translatedVehicleTypes = this.vehicleTypes.map(type => this.vehicleTypeMapping[type] || type);
+    private authService: AuthService
+  ) {}
+
+
+
+  sendVisitorWithoutRH(): void {
+    if (this.visitorForm.valid) {
+      const visitantData = this.visitorForm.value;
+
+      const vehicle: AccessVehicle | undefined = visitantData.hasVehicle ? {
+        licensePlate: visitantData.licensePlate,
+        vehicleType: {
+          description: visitantData.vehicleType
+        },
+        insurance: visitantData.insurance,
+      } : undefined;
+
+      console.log(visitantData);
+      const visitor: AccessVisitor = {
+        firstName: visitantData.firstName,
+        lastName: visitantData.lastName,
+        document: visitantData.document,
+        email: visitantData.email,
+        hasVehicle: visitantData.hasVehicle,
+        documentType: visitantData.documentType || undefined,
+        vehicle: vehicle,
+        neighborLastName: this.user.lastname,
+        neighborName: this.user.name,
+        userType: visitantData.authorizedType
+      };
+
+      if (!this.visitorService.addVisitorsTemporalsSubject(visitor)) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se puede agregar el visitante: El documento o email ya existe en la lista.',
+          confirmButtonText: 'Entendido'
+        });
+      } else {
+        this.resetForm();
+      }
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Por favor, complete todos los campos requeridos correctamente.',
+        confirmButtonText: 'Entendido'
+      });
+    }
   }
 
-
+  resetForm(): void {
+    const currentAuthorizedType = this.visitorForm.get('authorizedType')?.value;
+    this.visitorForm.reset({
+      authorizedType: currentAuthorizedType,
+      firstName: '',
+      lastName: '',
+      document: '',
+      email: '',
+      hasVehicle: false,
+      licensePlate: '',
+      vehicleType: ''
+    });
+  }
 
   downloadQRCode(): void {
     if (!this.qrCodeId) {
@@ -157,6 +172,21 @@ export class AccessContainerVisitorsRegistrationComponent implements OnInit, OnD
     this.isRegisterButtonVisible = true;
   }
 
+  resetFormComplete(): void {
+    this.visitorForm.reset({
+      authorizedType: '',
+      firstName: '',
+      lastName: '',
+      document: '',
+      documentType: '',
+      email: '',
+      hasVehicle: false,
+      licensePlate: '',
+      vehicleType: '',
+      insurance: ''
+    });
+  }
+
   sendVisitorRecord(): void {
     if (this.visitorRecord) {
       if (this.visitorRecord.visitors.length <= 0) {
@@ -185,7 +215,7 @@ export class AccessContainerVisitorsRegistrationComponent implements OnInit, OnD
       setTimeout(() => {
         this.visitorHttpService.postVisitorRecord(this.visitorRecord!).subscribe({
           next: (response) => {
-            if (this.indexUserType === 1) {
+            if (this.existsVisitor()) {
               if (response.id) {
                 this.qrCodeId = response.id;
               }
@@ -231,6 +261,10 @@ export class AccessContainerVisitorsRegistrationComponent implements OnInit, OnD
     }
   }
 
+  existsVisitor(): boolean {
+    return this.visitorRecord!.visitors.find(v => v.userType === 1) !== undefined;
+  }
+
   initVisitorRecord(): void {
     combineLatest([
       this.visitorService.getVisitorsTemporalsSubject(),
@@ -249,180 +283,12 @@ export class AccessContainerVisitorsRegistrationComponent implements OnInit, OnD
     };
   }
   private documentTypeSubscription?: Subscription;
+
   ngOnInit(): void {
-    this.initForm();
-    this.loadVehicleTypes();
-    this.loadInsurances();
-    this.listenToHasVehicleChanges();
+    this.user = this.authService.getUser();
     this.initVisitorRecord();
-    this.loadUsersType();
-    this.documentTypeSubscription = this.visitorForm.get('documentType')?.valueChanges.subscribe(() => {
-      this.visitorForm.get('document')?.updateValueAndValidity();
-    });
-  }
-  initForm(): void {
-    this.visitorForm = this.fb.group({
-      authorizedType: ['', Validators.required],
-      firstName: ['', [Validators.required, Validators.maxLength(45)]],
-      lastName: ['', [Validators.required, Validators.maxLength(45)]],
-      document: ['', {
-        validators: [
-          Validators.required,
-          this.validateDocumentFormat()
-        ],
-        asyncValidators: [this.validateNonPropietarioDni()],
-        updateOn: 'blur'
-      }],
-      documentType: ['', [Validators.required]],
-      email: [''],
-      hasVehicle: [false],
-      licensePlate: [''],
-      vehicleType: [''],
-      insurance: ['']
-    });
-    const documentTypeControl = this.visitorForm.get('documentType');
-    const documentControl = this.visitorForm.get('document');
-    documentTypeControl?.valueChanges.subscribe(() => {
-      documentControl?.updateValueAndValidity();
-    });
   }
 
-
-  validateNonPropietarioDni(): AsyncValidatorFn {
-    return (control: AbstractControl): Observable<ValidationErrors | null> => {
-      if (!control.value || this.visitorForm?.get('documentType')?.value !== '1') {
-        return of(null);
-      }
-
-      return this.userApi.validateDniNotPropietario(control.value).pipe(
-        map(isValid => {
-          const error = isValid ? null : { dniAlreadyPropietario: true };
-          console.log('Validation result:', error);
-          return error;
-        }),
-        catchError(() => of(null))
-      );
-    };
-  }
-
-  loadVehicleTypes(): void {
-    this.visitorHttpService.getVehicleTypes().pipe(
-      takeUntil(this.unsubscribe$)
-    ).subscribe({
-      next: (types) => {
-        this.vehicleType = types;
-      },
-      error: (error) => {
-        console.error('Error al cargar tipos de vehículos:', error);
-      }
-    });
-  }
-
-  loadInsurances(): void {
-    this.insuranceService.getAll().pipe(
-      takeUntil(this.unsubscribe$)
-    ).subscribe({
-      next: (insurances) => {
-        this.insurances = insurances;
-      },
-      error: (error) => {
-        console.error('Error al cargar los seguros:', error)
-      }
-    })
-  }
-
-  loadUsersType(): void {
-    this.visitorHttpService.getUsersType().pipe(
-      takeUntil(this.unsubscribe$)
-    ).subscribe({
-      next: (types: UserType[]) => {
-        this.usersType = types;
-        console.log('Tipos de usuario cargados:', this.usersType);
-      },
-      error: (error) => {
-        console.error('Error al cargar tipos de usuarios:', error);
-      }
-    });
-  }
-  listenToHasVehicleChanges(): void {
-    const hasVehicleControl = this.visitorForm.get('hasVehicle');
-    if (hasVehicleControl) {
-      hasVehicleControl.valueChanges.pipe(
-        takeUntil(this.unsubscribe$)
-      ).subscribe((hasVehicle: boolean) => {
-        const licensePlateControl = this.visitorForm.get('licensePlate');
-        const vehicleTypeControl = this.visitorForm.get('vehicleType');
-        const insuranceControl = this.visitorForm.get('insurance');
-
-        if (licensePlateControl && vehicleTypeControl && insuranceControl) {
-          if (hasVehicle) {
-            licensePlateControl.setValidators([Validators.required, Validators.pattern(this.patentePattern), Validators.maxLength(7)]);
-            vehicleTypeControl.setValidators([Validators.required]);
-            insuranceControl.setValidators([Validators.required]);
-          } else {
-            licensePlateControl.clearValidators();
-            vehicleTypeControl.clearValidators();
-            insuranceControl.clearValidators();
-          }
-
-          licensePlateControl.updateValueAndValidity();
-          vehicleTypeControl.updateValueAndValidity();
-          insuranceControl.updateValueAndValidity();
-        }
-      });
-    }
-  }
-
-  onLicensePlateInput(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    input.value = input.value.toUpperCase();
-    this.visitorForm.patchValue({ licensePlate: input.value });
-  }
-
-  sendVisitorWithoutRH(): void {
-    if (this.visitorForm.valid) {
-      const visitantData = this.visitorForm.value;
-
-      const vehicle: AccessVehicle | undefined = visitantData.hasVehicle ? {
-        licensePlate: visitantData.licensePlate,
-        vehicleType: {
-          description: visitantData.vehicleType
-        },
-        insurance: visitantData.insurance,
-      } : undefined;
-
-      const visitor: AccessVisitor = {
-        firstName: visitantData.firstName,
-        lastName: visitantData.lastName,
-        document: visitantData.document,
-        email: visitantData.email,
-        hasVehicle: visitantData.hasVehicle,
-        documentType: visitantData.documentType || undefined,
-        vehicle: vehicle,
-        neighborLastName: this.user?.lastname,
-        neighborName: this.user?.name,
-        userType: this.indexUserType
-      };
-
-      if (!this.visitorService.addVisitorsTemporalsSubject(visitor)) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se puede agregar el visitante: El documento o email ya existe en la lista.',
-          confirmButtonText: 'Entendido'
-        });
-      } else {
-        this.resetForm();
-      }
-    } else {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Por favor, complete todos los campos requeridos correctamente.',
-        confirmButtonText: 'Entendido'
-      });
-    }
-  }
 
   setFormData(visit: AccessVisitor): void {
     setTimeout(() => {
@@ -441,100 +307,12 @@ export class AccessContainerVisitorsRegistrationComponent implements OnInit, OnD
   }
 
   updateVisitor(visit: AccessVisitor): void {
-    console.log('Visitante a editar:', visit);
     this.setFormData(visit);
   }
 
-
-
-  resetForm(): void {
-    const currentAuthorizedType = this.visitorForm.get('authorizedType')?.value;
-    this.visitorForm.reset({
-      authorizedType: currentAuthorizedType,
-      firstName: '',
-      lastName: '',
-      document: '',
-      email: '',
-      hasVehicle: false,
-      licensePlate: '',
-      vehicleType: ''
-    });
-  }
-  resetFormComplete(): void {
-    this.visitorForm.reset({
-      authorizedType: '',
-      firstName: '',
-      lastName: '',
-      document: '',
-      documentType: '',
-      email: '',
-      hasVehicle: false,
-      licensePlate: '',
-      vehicleType: '',
-      insurance: ''
-    });
-  }
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
     this.documentTypeSubscription?.unsubscribe();
   }
-
-  validateDocumentFormat(): ValidatorFn {
-    return (control: AbstractControl): ValidationErrors | null => {
-      const documentType = this.visitorForm?.get('documentType')?.value;
-      const documentValue = control.value;
-      if (documentType === '1') {
-        const dniPattern = /^\d{7,8}$/;
-        if (!dniPattern.test(documentValue)) {
-          return { invalidDniFormat: true };
-        }
-      }
-      if (documentType === '2') {
-        const passportPattern = /^[A-Z0-9]{6,9}$/;
-        if (!passportPattern.test(documentValue)) {
-          return { invalidPassportFormat: true };
-        }
-      }
-      if (documentType === '3') {
-        const cuitPattern = /^\d{2}-\d{8}-\d{1}$/;
-        if (!cuitPattern.test(documentValue)) {
-          return { invalidCuitFormat: true };
-        }
-        const cuitSinGuiones = documentValue.replace(/[-]/g, '');
-        if (cuitSinGuiones.length !== 11) {
-          return { invalidCuitLength: true };
-        }
-      }
-      return null;
-    };
-  }
-  onDocumentInput(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const documentType = this.visitorForm.get('documentType')?.value;
-
-    if (documentType === '3') {  
-      let value = input.value.replace(/[^\d]/g, '');
-
-      if (value.length > 11) {
-        value = value.slice(0, 11);
-      }
-
-      if (value.length >= 2) {
-        value = value.slice(0, 2) + '-' + value.slice(2);
-      }
-
-      if (value.length >= 11) {
-        value = value.slice(0, 11) + '-' + value.slice(11);
-      }
-
-      input.value = value;
-    } else if (documentType === '2') {
-      input.value = input.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
-    } else {
-      input.value = input.value.replace(/[^0-9]/g, '');
-    }
-    this.visitorForm.patchValue({ document: input.value });
-  }
-
 }

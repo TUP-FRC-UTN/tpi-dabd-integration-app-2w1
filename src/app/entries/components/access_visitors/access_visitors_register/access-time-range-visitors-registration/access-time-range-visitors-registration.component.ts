@@ -21,9 +21,8 @@ export class AccessTimeRangeVisitorsRegistrationComponent implements OnInit, OnD
 
   private subscriptions: Subscription[] = [];
 
-  @Output() selectedUser = new EventEmitter<AccessUser>();
   ngOnInit(): void {
-    this.visitorService.getAllowedDays().subscribe(days => {
+    this.visitorService.getAllowedDays().pipe(takeUntil(this.unsubscribe$)).subscribe(days => {
       this._allowedDays = days;
       this.updateDaysSelected();
     });

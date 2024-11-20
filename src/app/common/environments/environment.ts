@@ -1,7 +1,7 @@
 export const environment = {
     production: false,
     services: {
-      accesses: 'http://localhost:9030', 
+      accesses: 'http://localhost:8090', 
       addresses: 'http://localhost:9064',
       complaints: 'http://localhost:9040',
       contacts: 'http://localhost:9010',
