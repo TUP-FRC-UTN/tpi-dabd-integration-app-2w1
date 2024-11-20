@@ -111,8 +111,8 @@ export class NotificationComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.getNotificationsFromAPI(this.userId);
     this.userId = this.authservice.getUser().id;
+    this.getNotificationsFromAPI(this.userId);
 
     $(document).on("click", ".mark-read-btn", (event) => {
       console.log("CLICK EN MARCAR LEIDA");
