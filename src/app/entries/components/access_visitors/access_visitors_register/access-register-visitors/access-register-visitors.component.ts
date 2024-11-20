@@ -6,7 +6,7 @@ import { AccessContainerVisitorsRegistrationComponent } from '../access-containe
   standalone: true,
   imports: [AccessContainerVisitorsRegistrationComponent],
   templateUrl: './access-register-visitors.component.html',
-  styleUrl: './access-register-visitors.component.scss'
+  styleUrl: './access-register-visitors.component.css'
 })
 export class AccessRegisterVisitorsComponent {
 
