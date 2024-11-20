@@ -42,14 +42,14 @@ export class IepNuevoIngresoEgresoComponent implements OnInit {
     this.formulario = new FormGroup({
       selectedArticule: new FormControl('',Validators.required),  
       selectedSupplier : new FormControl('',Validators.required),
-      amount : new FormControl(0,[Validators.required,Validators.min(1)]),
-      priceUnit : new FormControl('',[Validators.required,Validators.min(1)]),
+      amount : new FormControl('',[Validators.required,Validators.min(1)]),
+      // priceUnit : new FormControl('',[Validators.required,Validators.min(1)]),
       justify : new FormControl('',Validators.required)
     });
 
     this.formularioEgreso = new FormGroup({
       selectedArticule: new FormControl('',Validators.required),  
-      amount : new FormControl(0,[Validators.required,Validators.min(1)],[this.stockInsuficiente()]),
+      amount : new FormControl('',[Validators.required,Validators.min(1)],[this.stockInsuficiente()]),
       justify : new FormControl('',Validators.required)
     });
     this.formularioEgreso.get('amount')?.valueChanges.subscribe((x)=>{ this.logErrorsEgreso()})
@@ -87,7 +87,7 @@ export class IepNuevoIngresoEgresoComponent implements OnInit {
     dto= {
     amount: this.formulario.get('amount')?.value,
     date: new Date(Date.now()),
-    unitPrice: this.formulario.get('priceUnit')?.value,
+    // unitPrice: this.formulario.get('priceUnit')?.value,
     productId: this.formulario.get('selectedArticule')?.value,
     type: this.selectedType,
     supplierId: this.formulario.get('selectedSupplier')?.value,
@@ -99,7 +99,7 @@ export class IepNuevoIngresoEgresoComponent implements OnInit {
       dto ={
         amount: this.formularioEgreso.get('amount')?.value,
         date: new Date(Date.now()),
-        unitPrice: undefined,
+        // unitPrice: undefined,
         productId: this.formularioEgreso.get('selectedArticule')?.value,
         type: this.selectedType,
         supplierId: undefined,

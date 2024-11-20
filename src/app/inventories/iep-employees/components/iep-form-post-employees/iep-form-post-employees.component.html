@@ -143,7 +143,7 @@
                     'is-valid': (cuilModel.valid && cuilModel.touched)||(isValidCuil)
                 }" (input)="cuilModel.valid ? validarCUILFormato(cuil) : null">
                                 <div *ngIf="cuilModel.invalid && cuilModel.touched" class="invalid-feedback">
-                                    "La entrada no es válida. Asegúrate que cumpla con el formato estipulado."
+                                    "La entrada no es válida. Asegúrate que cumpla con el formato estipulado. (XX-XXXXXXXX-X)"
                                 </div>
                                 <div *ngIf=" !isValidCuil" class="invalid-feedback">
                                     "El CUIL ingresado ya existe en el sistema."

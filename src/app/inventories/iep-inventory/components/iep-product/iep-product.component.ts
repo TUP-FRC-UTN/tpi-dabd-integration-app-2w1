@@ -270,6 +270,7 @@ export class IepProductComponent {
       }
       this.abrirModal = true;
       this.dto.state_id = 1;
+      this.dto.description = this.dto.description ?? '   ';
       if(this.idProductToEdit!=undefined){
         this.updateProduct(form);
       }else{

@@ -45,19 +45,18 @@ export class IepSuppliersFormComponent {
     if (this.proveedorForm.valid) {
       const formData = this.proveedorForm.value;
       console.log(formData);
+     
+      const formAccess = {
+        name: formData.name,
+        cuil: formData.cuit,
+        email: formData.email,
+      }
 
-      this.supplierService.createSupplier(formData).pipe(
+      this.supplierService.createSupplierAccess(formAccess).pipe(
         switchMap(response => {
           console.log( "Proveedor cargado: " +JSON.stringify(response))
 
-          const formAccess = {
-            createdUserId: formData.createdUser,
-            name: formData.name,
-            cuil: formData.cuit,
-            email: formData.email,
-          }
-
-          return this.supplierService.createSupplier(formAccess)
+          return this.supplierService.createSupplier(formData)
         }),
         catchError(error => {
           console.error("Error en el flujo:", error);

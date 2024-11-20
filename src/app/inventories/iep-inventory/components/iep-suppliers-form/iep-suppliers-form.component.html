@@ -143,10 +143,10 @@
             Este campo es requerido.
           </div>
           <div *ngIf="cuitExists" class="invalid-feedback">
-            Este CUIT ya está en uso.
+            El CUIT ingresado ya existe en el sistema.
           </div>
           <div class="invalid-feedback" *ngIf="proveedorForm.get('cuit')?.hasError('cuilInvalido') && proveedorForm.get('cuit')?.touched">
-            El CUIL no es válido.
+            La entrada no es válida. Asegúrate que cumpla con el formato estipulado (XX-XXXXXXXX-X).
           </div>
         </div>
       </div>
