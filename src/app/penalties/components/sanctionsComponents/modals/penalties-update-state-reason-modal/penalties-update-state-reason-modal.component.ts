@@ -62,6 +62,8 @@ export class PenaltiesUpdateStateReasonModalComponent {
     // If the fine is not sent correctly, 
     // it will show an error message.
     this.sanctionService.putStateFine(fineDto).subscribe(res => {
+
+      //  Hacer un If fineState para saber el estado (aceptado o rechazado)
       let dischargeState = ''
       if (this.fineState == 'PAYMENT_PAYMENT') {
         dischargeState = 'REJECTED'// Rechazada
@@ -69,7 +71,7 @@ export class PenaltiesUpdateStateReasonModalComponent {
       else if (this.fineState == 'ACQUITTED') {
         dischargeState = 'ACCEPTED'// Aceptada
       }
-      let ownersIds: number[] = (this.fine.report.plotId);
+      let ownersIds: number[] = this.getOwnersIdByPlotId(this.fine.report.plotId);
       ownersIds.forEach(id => {
         let appealUpdate = {
           appealStatus: dischargeState,
@@ -81,27 +83,43 @@ export class PenaltiesUpdateStateReasonModalComponent {
           error: (e) => {
             console.log("Error al enviar la notificacion: ", e)
           }
-        })
-        Swal.fire({
-          title: 'Multa actualizada!',
-          text: 'El estado de la multa fue actualizado con éxito',
-          icon: 'success',
-          timer: 1500,
-          showConfirmButton: false
-
         });
-        this.sanctionService.triggerRefresh();
-        this.close();
-      }, error => {
-        console.error('Error al enviar la multa', error);
-        Swal.fire({
-          title: 'Error',
-          text: 'No se pudo enviar la multa. Inténtalo de nuevo.',
-          icon: 'error',
-          confirmButtonText: 'Aceptar'
-        });
-      })
-    }
+      });
 
-  
+      Swal.fire({
+        title: 'Multa actualizada!',
+        text: 'El estado de la multa fue actualizado con éxito',
+        icon: 'success',
+        timer: 1500,
+        showConfirmButton: false
+      });
+      this.sanctionService.triggerRefresh();
+      this.close();
+    }, error => {
+      console.error('Error al enviar la multa', error);
+      Swal.fire({
+        title: 'Error',
+        text: 'No se pudo enviar la multa. Inténtalo de nuevo.',
+        icon: 'error',
+        confirmButtonText: 'Aceptar'
+      });
+    })
   }
+
+  getOwnersIdByPlotId(plotId: number): number[] {
+    let ownersIds: number[] = [];
+    let users: UserGet[] = [];
+    this.userService.getUsersByPlotID(plotId).subscribe({
+      next: (data) => { users = data },
+      error: (e) => { console.log("Error al cargar usuarios: ", e) }
+    });
+    users.forEach((user: UserGet) => {
+      if (user.roles.includes('Propietario')) {
+        ownersIds.push(user.id);
+      }
+    });
+    return ownersIds;
+  }
+
+
+}
