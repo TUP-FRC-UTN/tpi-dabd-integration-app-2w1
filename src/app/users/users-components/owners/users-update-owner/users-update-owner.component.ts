@@ -1,7 +1,7 @@
 import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule, formatDate } from '@angular/common';
 import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators, FormBuilder } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { OwnerService } from '../../../users-servicies/owner.service';
 import { Owner } from '../../../users-models/owner/Owner';
 import Swal from 'sweetalert2';
@@ -17,7 +17,7 @@ import { CustomSelectComponent } from '../../../../common/components/custom-sele
 import { PlotService } from '../../../users-servicies/plot.service';
 import { GetPlotModel } from '../../../users-models/plot/GetPlot';
 import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
-import { PlotTypeModel } from '../../../users-models/plot/PlotType';
+import { RoutingService } from '../../../../common/services/routing.service';
 
 @Component({
   selector: 'app-users-update-owner',
@@ -51,8 +51,9 @@ export class UsersUpdateOwnerComponent implements OnInit, OnDestroy {
   private readonly plotService = inject(PlotService)
   private readonly fileService = inject(FileService);
   private readonly suscriptionService = inject(SuscriptionManagerService);
+  private readonly routingService = inject(RoutingService);
 
-  constructor(private router: Router, private route: ActivatedRoute, private fb: FormBuilder) {
+  constructor(private route: ActivatedRoute, private fb: FormBuilder) {
     this.editOwner = this.fb.group({
       name: new FormControl("", [Validators.required, Validators.minLength(3), Validators.maxLength(50)]),
       lastname: new FormControl("", [Validators.required, Validators.minLength(3), Validators.maxLength(50)]),
@@ -289,9 +290,9 @@ export class UsersUpdateOwnerComponent implements OnInit, OnDestroy {
 
   //--------------------------------------------------Funciones------------------------------------------------
 
-  //Redireccionar
-  redirect(url: string) {
-    this.router.navigate([`${url}`]);
+  //Redirecciona al listado de propietarios
+  redirect() {
+    this.routingService.redirect('/main/owners/list', 'Listado de Propietarios');
   }
 
   //Cambiar el estado del campo de nombre de empresa
@@ -384,7 +385,7 @@ export class UsersUpdateOwnerComponent implements OnInit, OnDestroy {
   //Confirmar salida
   confirmExit() {
     this.editOwner.reset();
-    this.redirect('/main/owners/list');
+    this.redirect();
   }
 
   //Actualizar propietario

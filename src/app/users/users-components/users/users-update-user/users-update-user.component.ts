@@ -275,7 +275,7 @@ throw new Error('Method not implemented.');
       this.routingService.redirect('main/users/family', 'Mi familia');
     } else {
 
-      this.routingService.redirect('main/users/list', 'Listado de usuarios');
+      this.routingService.redirect('main/users/list', 'Listado de Usuarios');
     }
   }
 

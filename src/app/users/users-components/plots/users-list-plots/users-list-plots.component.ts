@@ -541,13 +541,13 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
 
   //--------------------------------------------------Redirecciones------------------------------------------------
 
-    // Redirige a la vista de agregar lote
+    // Redirige a la vista para agregar lote
     addPlot() {
-      this.routingService.redirect('/main/plots/add', 'Agregar lote');
+      this.routingService.redirect('/main/plots/add', 'Registrar Lote');
     }
 
     // Redirige a la vista para editar el lote
     redirectEdit(id: number) {
-      this.routingService.redirect(`/main/plots/edit/${id}`, 'Modificar lote');
+      this.routingService.redirect(`/main/plots/edit/${id}`, 'Actualizar Lote');
     }
 }

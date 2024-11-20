@@ -7,7 +7,6 @@ import { UserGet } from '../../../users-models/users/UserGet';
 import { GetPlotDto } from '../../../users-models/plot/GetPlotDto';
 import { PlotService } from '../../../users-servicies/plot.service';
 import { AuthService } from '../../../users-servicies/auth.service';
-import { OwnerService } from '../../../users-servicies/owner.service';
 import { ModalEliminarUserComponent } from '../users-modal-eliminar-user/modal-eliminar-user/modal-eliminar-user.component';
 import { RoutingService } from '../../../../common/services/routing.service';
 import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
@@ -118,12 +117,12 @@ export class UsersFamiliarGroupComponent implements OnInit, OnDestroy {
 
   //Redirecciona a editar un usuario
   redirectEdit(id: number) {
-    this.routingService.redirect(`/main/users/edit/${id}`, 'Modificar usuario');
+    this.routingService.redirect(`/main/users/edit/${id}`, 'Actualizar Usuario');
   }
 
   //Redirecciona a agregar usuario
   redirectAdd() {
-    this.routingService.redirect('/main/users/add', 'Agregar usuario');
+    this.routingService.redirect('/main/users/add', 'Registrar usuario');
   }
 
   //------------------------------------------------------Modales--------------------------------------------------------
