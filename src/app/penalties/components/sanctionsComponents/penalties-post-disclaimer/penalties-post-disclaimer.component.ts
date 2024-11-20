@@ -14,17 +14,17 @@ import { RoutingService } from '../../../../common/services/routing.service';
   styleUrl: './penalties-post-disclaimer.component.scss'
 })
 export class PenaltiesPostDisclaimerComponent implements OnInit {
-  userId:number;
+  userId: number;
   fineIdFromList: number;
   fine: any;
-  reactiveForm:FormGroup;
+  reactiveForm: FormGroup;
 
   constructor(private penaltiesService: SanctionService,
     private router: Router,
-     private route: ActivatedRoute,
-      formBuilder:FormBuilder,
-      private routingService: RoutingService
-    ){
+    private route: ActivatedRoute,
+    formBuilder: FormBuilder,
+    private routingService: RoutingService
+  ) {
     this.userId = 1;
     this.fineIdFromList = 0; //Esto deberia venir del listado
     this.reactiveForm = formBuilder.group({
@@ -39,49 +39,52 @@ export class PenaltiesPostDisclaimerComponent implements OnInit {
     });
   }
 
-  getFine(fineId:number){
+  getFine(fineId: number) {
     this.penaltiesService.getFineById(this.fineIdFromList)
-    .subscribe(
-      (response) => {
-        console.log(response); 
-        this.fine = response
-      },
-      (error) => {
-        console.error('Error:', error);
-      });
+      .subscribe(
+        (response) => {
+          console.log(response);
+          this.fine = response
+        },
+        (error) => {
+          console.error('Error:', error);
+        });
   }
 
-  onSubmit(){
+  onSubmit() {
     const disclaimerData = {
       userId: 10,
-      fineId:this.fineIdFromList,
+      fineId: this.fineIdFromList,
       disclaimer: this.reactiveForm.value.disclaimerControl
     };
 
     // Confirmación antes de enviar el formulario
 
-    this.penaltiesService.addDisclaimer(disclaimerData).subscribe( res => {
-        Swal.fire({
-          title: '¡Descargo enviado!',
-          text: 'El descargo ha sido enviado correctamente.',
-          icon: 'success',
-          timer: 1500,
-          showConfirmButton: false
-        });
-        this.routingService.redirect("main/sanctions/sanctions-list", "Listado de Infracciones")
-      }, error => {
-        console.error('Error al enviar el descargo', error);
-        Swal.fire({
-          title: 'Error',
-          text: 'No se pudo enviar el descargo. Inténtalo de nuevo.',
-          icon: 'error',
-          confirmButtonText: 'Aceptar'
-        });
-      })
+    this.penaltiesService.addDisclaimer(disclaimerData).subscribe(res => {
+      // Notifica la apelacion al responsable de multas
+      this.createNotificationMessage();
+
+      Swal.fire({
+        title: '¡Descargo enviado!',
+        text: 'El descargo ha sido enviado correctamente.',
+        icon: 'success',
+        timer: 1500,
+        showConfirmButton: false
+      });
+      this.routingService.redirect("main/sanctions/sanctions-list", "Listado de Infracciones")
+    }, error => {
+      console.error('Error al enviar el descargo', error);
+      Swal.fire({
+        title: 'Error',
+        text: 'No se pudo enviar el descargo. Inténtalo de nuevo.',
+        icon: 'error',
+        confirmButtonText: 'Aceptar'
+      });
+    })
 
   }
 
-  cancel(){
+  cancel() {
     this.routingService.redirect("main/sanctions/sanctions-list", "Listado de Infracciones")
   }
 
@@ -92,6 +95,30 @@ export class PenaltiesPostDisclaimerComponent implements OnInit {
       'is-invalid': control?.invalid && (control?.dirty || control?.touched),
       'is-valid': control?.valid
     }
+  }
+
+  // Comunicacion con Notificaciones
+  createNotificationMessage() {
+    let reason = this.fine.report.reportReason
+    let plotName = '';
+
+    this.plotService.getPlotById(this.fine.report.plotId).subscribe({
+      next: (data) => {
+        plotName = `Bloque ${data.block_number}, Lote ${data.plot_number}`;
+      },
+      error: (e) => { console.log('Error al consultar getPlotById', e) }
+    })
+    let notificationMessage = 'La multa sobre la propiedad: ' + plotName + ' - motivo: ' + reason + ' ha sido apelada';
+    this.notifyDisclaimer(notificationMessage);
+  }
+
+  notifyDisclaimer(notificationMessage: string) {
+    this.penaltiesService.notifyNewDisclaimer(notificationMessage).subscribe({
+      next: () => { console.log("Notificacion enviada correctamente") },
+      error: (e) => {
+        console.log("Error al enviar la notificacion: ", e)
+      }
+    });
   }
 
 
