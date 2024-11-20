@@ -22,6 +22,8 @@ export class AccessVisitorFormComponent implements OnInit, OnDestroy {
   value = model<FormGroup<any>>();
   vehicleActivated = input<boolean>(true);
   emailActivated = input<boolean>(true);
+  documentRequired = input<boolean>(true);
+
   indexUserType?: number;
   subscriptions = new Subscription();
   
@@ -114,7 +116,7 @@ export class AccessVisitorFormComponent implements OnInit, OnDestroy {
       lastName: ['', [Validators.required, Validators.maxLength(45)]],
       document: ['', {
         validators: [
-          Validators.required,
+          this.validateDocumentRequired(),
           this.validateDocumentFormat()
         ],
         asyncValidators: [this.validateNonPropietarioDni()],
@@ -132,6 +134,14 @@ export class AccessVisitorFormComponent implements OnInit, OnDestroy {
     documentTypeControl?.valueChanges.subscribe(() => {
       documentControl?.updateValueAndValidity();
     });
+  }
+
+  validateDocumentRequired(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!this.documentRequired())
+        return null;
+      return Validators.required(control);
+    }
   }
 
   validateDocumentFormat(): ValidatorFn {
