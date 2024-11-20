@@ -111,8 +111,8 @@ export class NotificationComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.getNotificationsFromAPI(this.userId);
     this.userId = this.authservice.getUser().id;
+    this.getNotificationsFromAPI(this.userId);
 
     $(document).on("click", ".mark-read-btn", (event) => {
       console.log("CLICK EN MARCAR LEIDA");
@@ -267,7 +267,7 @@ export class NotificationComponent implements OnInit {
         this.fillTable();
       },
       error: () => {
-        alert("Error al obtener las notificaciones del back-end");
+        console.log("Error al obtener las notificaciones del back-end");
       },
     });
     this.subscription.add(getNotifications)
