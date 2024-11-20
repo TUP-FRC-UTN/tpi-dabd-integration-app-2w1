@@ -65,7 +65,18 @@ export class UsersNavbarComponent implements OnInit {
   selectRole(role: string) {
     this.authService.saveActualRole(role);
     this.actualRole = role;
-    this.routingService.redirect('/main/home')
+    this.routingService.redirect('/main/home', 'Página principal');
   }
 
+  //Cerrar sesión
+  logOut(){
+    this.authService.logOut();
+    this.routingService.redirect('/login');
+  }
+
+  //Comprobar si el rol actual puede acceder a los dashboards
+  showDashboard(){
+    const rolesPermited = ['SuperAdmin', 'Gerente general', 'Gerente multas', 'Gerente finanzas', 'Gerente inventario', 'Gerente empleados'];
+    return rolesPermited.includes(this.actualRole);
+  }
 }

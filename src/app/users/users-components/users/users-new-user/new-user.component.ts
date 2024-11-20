@@ -1,11 +1,10 @@
-import { CommonModule, formatDate } from '@angular/common';
-import { Component, inject, OnInit, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators, FormBuilder } from '@angular/forms';
 import { RolModel } from '../../../users-models/users/Rol';
 import { UserService } from '../../../users-servicies/user.service';
-import { UserGet } from '../../../users-models/users/UserGet';
 import { UserPost } from '../../../users-models/users/UserPost';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { DateService } from '../../../users-servicies/date.service';
 import { AuthService } from '../../../users-servicies/auth.service';
 import Swal from 'sweetalert2';
@@ -13,6 +12,8 @@ import { PlotService } from '../../../users-servicies/plot.service';
 import { GetPlotDto } from '../../../users-models/plot/GetPlotDto';
 import { ValidatorsService } from '../../../users-servicies/validators.service';
 import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
+import { RoutingService } from '../../../../common/services/routing.service';
+import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
 
 @Component({
   selector: 'app-new-user',
@@ -21,66 +22,66 @@ import { CustomSelectComponent } from '../../../../common/components/custom-sele
   templateUrl: './new-user.component.html',
   styleUrl: './new-user.component.css'
 })
-export class NewUserComponent implements OnInit {
+export class NewUserComponent implements OnInit, OnDestroy {
 
-  constructor(private router:Router, private fb : FormBuilder){
+  constructor(private fb: FormBuilder) {
     this.reactiveForm = this.fb.group({
       name: new FormControl('', [
         Validators.required,
         Validators.minLength(1),
         Validators.maxLength(50)
-    ]),
-    lastname: new FormControl('', [
+      ]),
+      lastname: new FormControl('', [
         Validators.required,
         Validators.minLength(1),
         Validators.maxLength(50)
-    ]),
-    username: new FormControl('', [
+      ]),
+      username: new FormControl('', [
         Validators.required,
         Validators.minLength(1),
         Validators.maxLength(30)
       ],
         this.validatorService.validateUniqueUsername()
-    ),
-    password: new FormControl('', [
-      Validators.required,
-      Validators.minLength(6),
-      Validators.maxLength(30)
-  ]),
-    email: new FormControl('', [
+      ),
+      password: new FormControl('', [
+        Validators.required,
+        Validators.minLength(6),
+        Validators.maxLength(30)
+      ]),
+      email: new FormControl('', [
         Validators.required,
         Validators.email
       ],
         this.validatorService.validateUniqueEmail()
-    ),
-    phone_number: new FormControl('', [
+      ),
+      phone_number: new FormControl('', [
         Validators.required,
         Validators.pattern(/^\d+$/),
         Validators.minLength(10),
         Validators.maxLength(20)
-    ]),
-    dniType: new FormControl(0, [
-      Validators.required
-      
-    ]),
-    dni: new FormControl('', [
+      ]),
+      dniType: new FormControl(0, [
+        Validators.required
+
+      ]),
+      dni: new FormControl('', [
         Validators.required,
         Validators.pattern(/^\d+$/),
         Validators.minLength(8)
       ],
         this.validatorService.validateUniqueDni()
-    ),
-    telegram_id: new FormControl(0,[
+      ),
+      telegram_id: new FormControl(0, [
         Validators.required,
         Validators.min(0),
         Validators.minLength(1),
         Validators.maxLength(9)
-    ]),
-    active: new FormControl(true), 
-    datebirth: new FormControl(DateService.formatDate(new Date("2000-01-02")), [Validators.required]),
-    roles: new FormControl([], Validators.required),
-    plot: new FormControl('', [Validators.required]),
-    userUpdateId: new FormControl(this.authService.getUser().id)
+      ]),
+      active: new FormControl(true),
+      datebirth: new FormControl(DateService.formatDate(new Date("2000-01-02")), [Validators.required]),
+      roles: new FormControl([], Validators.required),
+      plot: new FormControl('', [Validators.required]),
+      userUpdateId: new FormControl(this.authService.getUser().id)
     })
   }
 
@@ -88,10 +89,11 @@ export class NewUserComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly plotService = inject(PlotService);
   private readonly validatorService = inject(ValidatorsService);
-  
+  private readonly routingService = inject(RoutingService);
+  private readonly suscriptionService = inject(SuscriptionManagerService);
 
-  reactiveForm : FormGroup;
-  rolesSelected : string[] = [];
+  reactiveForm: FormGroup;
+  rolesSelected: string[] = [];
   roles: RolModel[] = [];
   rolesHtmlString: string = '';
   rolesString: string = "Roles añadidos:";
@@ -105,23 +107,44 @@ export class NewUserComponent implements OnInit {
   optionsForOwner: string[] = ["Familiar mayor", "Familiar menor"];
   options: any[] = [];
   selectedOptions: string[] = [];
-  passwordVisible: boolean = false; 
+  passwordVisible: boolean = false;
   actualRole = this.authService.getActualRole();
 
   ngOnInit() {
     this.loadRoles();
+    this.loadPlotsAvailables();
 
-     //SOLO MUESTRA LOS LOTES DISPONIBLES
-     this.plotService.getAllPlotsAvailables().subscribe({
+    if (this.authService.getActualRole() == "Propietario") {
+      this.reactiveForm.controls['plot'].disable();
+    }
+
+    this.loadFilteredRoles();
+
+    if (this.authService.getActualRole() == "Gerente") {
+      this.reactiveForm.get("plot")?.disable();
+      this.reactiveForm.get("plot")?.setValue("Sin lote");
+    }
+  }
+
+  //Desuscribirse de los observables
+  ngOnDestroy(): void {
+    this.suscriptionService.unsubscribeAll();
+  }
+
+  //------------------------------------------------------Carga de datos------------------------------------------------
+
+  //Carga los lotes disponibles
+  loadPlotsAvailables() {
+    const sus = this.plotService.getAllPlotsAvailables().subscribe({
       next: (data: GetPlotDto[]) => {
-          if(this.authService.getActualRole() == "Propietario"){
-              this.lotes = data.filter(lote => this.authService.getUser().plotId.includes(lote.id));
-              this.reactiveForm.get('plot')?.setValue(this.authService.getUser().plotId.toString());
-              this.reactiveForm.get('plot')?.disable();
-          }else{
-            this.lotes = data;
-            this.reactiveForm.get('plot')?.setValue(0);
-          }
+        if (this.authService.getActualRole() == "Propietario") {
+          this.lotes = data.filter(lote => this.authService.getUser().plotId.includes(lote.id));
+          this.reactiveForm.get('plot')?.setValue(this.authService.getUser().plotId.toString());
+          this.reactiveForm.get('plot')?.disable();
+        } else {
+          this.lotes = data;
+          this.reactiveForm.get('plot')?.setValue(0);
+        }
       },
       error: (err) => {
         console.error('Error al cargar los lotes:', err);
@@ -139,21 +162,29 @@ export class NewUserComponent implements OnInit {
         if(this.authService.getActualRole() == "Propietario"){
           let optionsFilter = this.options.filter(rol => this.optionsForOwner.includes(rol));
           this.options = [];
+          console.log(optionsFilter);
+          
           optionsFilter.forEach(o => this.options.push({value : o, name: o}))
                     
         }
         if(this.authService.getActualRole() == "SuperAdmin"){
-          let optionsFilter = this.options.filter(rol => this.options.includes(rol) && rol != "Propietario");
+            let optionsFilter = this.options.filter(rol => !["Propietario", "Familiar mayor", "Familiar menor", "Inquilino"].includes(rol));
           this.options = [];
           optionsFilter.forEach(o => this.options.push({value : o, name: o}))
                     
         }
-        else{
-          let optionsFilter = this.options.filter(rol => !this.optionsForOwner.includes(rol) && rol != "Propietario" && rol != "SuperAdmin");
-          this.options = [];
-          optionsFilter.forEach(o => this.options.push({value : o, name: o}))
+        else if(this.authService.getActualRole() == "Gerente"){
+          let optionsFilter = this.options.filter(rol => !["SuperAdmin","Propietario", "Familiar mayor", "Familiar menor", "Inquilino"].includes(rol));
+        this.options = [];
+        optionsFilter.forEach(o => this.options.push({value : o, name: o}))
+                  
         }
-      },
+          else{
+            let optionsFilter = this.options.filter(rol => ["Familiar mayor", "Familiar menor", "Inquilino"].includes(rol));
+            this.options = [];
+            optionsFilter.forEach(o => this.options.push({value : o, name: o}))
+          }
+        },
       error: (error) => {
         console.error('Error al cargar los roles:', error);
       }
@@ -163,8 +194,10 @@ export class NewUserComponent implements OnInit {
       this.reactiveForm.get("plot")?.disable();
       this.reactiveForm.get("plot")?.setValue("Sin lote");
     }
+    //Agregar suscripción
+    this.suscriptionService.addSuscription(sus);
   }
-  
+
   //Carga los roles
   loadRoles() {
     this.userService.getAllRoles().subscribe({
@@ -174,41 +207,62 @@ export class NewUserComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error al cargar los roles:', error);
-        
+
       }
     });
   }
-  
+
+  //Carga los roles y los filtra
+  loadFilteredRoles() {
+    const sus = this.userService.getAllRoles().subscribe({
+      next: (data: RolModel[]) => {
+        this.options = data.map(rol => rol.description);
+        if (this.authService.getActualRole() == "Propietario") {
+          let optionsFilter = this.options.filter(rol => this.optionsForOwner.includes(rol));
+          this.options = [];
+          optionsFilter.forEach(o => this.options.push({ value: o, name: o }))
+
+        }
+        if (this.authService.getActualRole() == "SuperAdmin") {
+          let optionsFilter = this.options.filter(rol => this.options.includes(rol) && rol != "Propietario");
+          this.options = [];
+          optionsFilter.forEach(o => this.options.push({ value: o, name: o }))
+
+        }
+        else {
+          let optionsFilter = this.options.filter(rol => !this.optionsForOwner.includes(rol) && rol != "Propietario" && rol != "SuperAdmin");
+          this.options = [];
+          optionsFilter.forEach(o => this.options.push({ value: o, name: o }))
+        }
+      },
+      error: (error) => {
+        console.error('Error al cargar los roles:', error);
+      }
+    });
+
+    //Agregar suscripción+
+    this.suscriptionService.addSuscription(sus);
+  }
+
+  //------------------------------------------------------Redireccionar------------------------------------------------------
+
   //Redirige a la ruta especificada 
-  redirect(){
-    if(this.authService.getActualRole() == "Propietario"){
-      this.router.navigate(['/main/users/family']);
-    }else{
-      this.router.navigate(['/main/users/list']);
+  redirect() {
+    if (this.authService.getActualRole() == "Propietario") {
+      this.routingService.redirect('/main/users/family', 'Mi familia');
+    } else {
+      this.routingService.redirect('/main/users/list', 'Listado de usuarios');
     }
   }
 
-  //Resetear formularios
-  resetForm() {
-    this.reactiveForm.reset();
-    this.rolesInput = [];
-  }
+  //--------------------------------------------------------Formulario-------------------------------------------------------
 
-verifyOptions() {
-    if(this.selectedOptions.length === 0){  
-      this.checkOption = false;
-    }
-    else{
-      this.checkOption = true;
-    }
-  }
-
-  //Se crea el usuario
+  //Crear el usuario
   createUser() {
-    
+
     const fechaValue = this.reactiveForm.get('datebirth')?.value;
-    
-    const userData : UserPost = {
+
+    const userData: UserPost = {
       name: this.reactiveForm.get('name')?.value || '',
       lastname: this.reactiveForm.get('lastname')?.value || '',
       username: this.reactiveForm.get('username')?.value || '',
@@ -223,18 +277,17 @@ verifyOptions() {
       phone_number: this.reactiveForm.get('phone_number')?.value?.toString() || '',
       userUpdateId: this.reactiveForm.get('userUpdateId')?.value || 0,
       telegram_id: this.reactiveForm.get('telegram_id')?.value || 0
-    
+
     };
-    
 
     //Si el usuario es de tipo owner se setea el plotId
-    if(this.authService.getActualRole() == "Propietario"){
-      userData.plot_id = this.authService.getUser().plotId[0];  
-    }else{
+    if (this.authService.getActualRole() == "Propietario") {
+      userData.plot_id = this.authService.getUser().plotId[0];
+    } else {
       userData.plot_id = 0;
     }
 
-    this.userService.postUser(userData).subscribe({
+    const sus = this.userService.postUser(userData).subscribe({
       next: (response) => {
         //Mostramos que la operación fue exitosa
         Swal.fire({
@@ -247,7 +300,7 @@ verifyOptions() {
         });
         this.redirect();
         this.reactiveForm.reset();
-        
+
       },
       error: (error) => {
         //Mostramos que hubo un error
@@ -256,11 +309,37 @@ verifyOptions() {
           text: 'El usuario no se pudo crear',
           icon: 'error',
           confirmButtonText: 'Aceptar',
-          
         });
-      },
+      }
     });
+
+    //Agregar suscripción
+    this.suscriptionService.addSuscription(sus);
   }
+
+  //Resetear formularios
+  resetForm() {
+    this.reactiveForm.reset();
+    this.rolesInput = [];
+  }
+
+  //---------------------------------------------------------Funciones-------------------------------------------------------
+
+  //Cambia la visibilidad de la contraseña
+  togglePasswordVisibility(): void {
+    this.passwordVisible = !this.passwordVisible;
+  }
+
+  verifyOptions() {
+    if (this.selectedOptions.length === 0) {
+      this.checkOption = false;
+    }
+    else {
+      this.checkOption = true;
+    }
+  }
+
+  //----------------------------------------------------Validaciones----------------------------------------------------
 
   //Retorna una clase para poner el input en verde o rojo dependiendo si esta validado
   onValidate(controlName: string) {
@@ -271,13 +350,13 @@ verifyOptions() {
     }
   }
 
-
+  //Muestra el mensaje de error personalizado
   showError(controlName: string): string {
     const control = this.reactiveForm.get(controlName);
-  
+
     if (control && control.errors) {
       const [errorKey] = Object.keys(control.errors);
-  
+
       switch (errorKey) {
         case 'required':
           return 'Este campo no puede estar vacío.';
@@ -305,30 +384,8 @@ verifyOptions() {
           return 'Error no identificado en el campo.';
       }
     }
-  
+
     // Retorna cadena vacía si no hay errores.
     return '';
   }
-
-  togglePasswordVisibility(): void {
-    this.passwordVisible = !this.passwordVisible;
-  }
-
-  showFormErrors() {
-    // Verificar si el formulario tiene errores generales
-    if (this.reactiveForm.errors) {
-      console.log('Errores del formulario:', this.reactiveForm.errors);
-    }
-  
-    // Recorrer todos los controles del formulario
-    Object.keys(this.reactiveForm.controls).forEach((controlName) => {
-      const control = this.reactiveForm.get(controlName);
-  
-      // Verificar si el control tiene errores
-      if (control?.errors) {
-        console.log(`Errores en el control "${controlName}":`, control.errors);
-      }
-    });
-  }
-  
 }

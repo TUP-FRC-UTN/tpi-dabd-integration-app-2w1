@@ -25,7 +25,7 @@
 </div>
 
 <!-- Sección Principal -->
-<div class="container">
+<div class="container mt-3">
 
     @if(cardView == 0){}
 
@@ -36,21 +36,21 @@
                 <app-users-kpi class="mb-2" title="Área Total" icon="bi bi-arrow-up-right"
                     [amount]="selectedBlockskPIs.totalArea" [customStyles]="{ 'background-color': '#d8ffedde' }"
                     tooltip="Área total disponible" formatPipe="metros" [selectable]="true"
-                    route="/home/charts/users/blocks">
+                    route="/main/plots/dashboard/plot-blocks">
                 </app-users-kpi>
                 <app-users-kpi class="mb-2" title="Área Construida" icon="bi bi-building"
                     [amount]="selectedBlockskPIs.totalBuiltArea" [customStyles]="{ 'background-color': '#d8ffedde' }"
                     tooltip="Superficie total que ya ha sido construida" formatPipe="metros" [selectable]="true"
-                    route="/home/charts/users/plots/stats"></app-users-kpi>
+                    route="/main/plots/dashboard/plot-info"></app-users-kpi>
 
                 <app-users-kpi class="mb-2" title="Cantidad de Lotes" icon="bi bi bi-houses" [amount]="totalLots"
                     [customStyles]="{ 'background-color': '#d8ffedde' }" formatPipe="text"
-                    tooltip="Número total de lotes" [selectable]="true" route="/home/charts/users"></app-users-kpi>
+                    tooltip="Número total de lotes" [selectable]="true" route="/main/plots/dashboard/plot"></app-users-kpi>
 
                 <app-users-kpi class="mb-2" title="Usuarios Registrados" icon="bi bi-hourglass-split"
                     [amount]="ageDistribution.statics.totalUsers" [customStyles]="{ 'background-color': '#e7f1ff' }"
                     formatPipe="users" tooltip="Cantidad de usuarios registrados" [selectable]="true"
-                    route="/home/charts/users/histogram"></app-users-kpi>
+                    route="/main/users/dashboard/user-histogram"></app-users-kpi>
 
             </div>
         </div>
@@ -66,7 +66,7 @@
                             <div *ngIf="!loadingPieChart && !errorPieChart">
                                 <h5 class="card-title align-items-center">Estado de los Lotes<button type="button"
                                         class="btn btn-sm btn-link text-muted bi bi-arrows-angle-expand fs-5 float-end"
-                                        title="Expandir" (click)="changeView('')"></button></h5>
+                                        title="Expandir" (click)="redirect('/plots/dashboard/plot')"></button></h5>
                                 <hr>
                                 <div class="col-12 hover-scale flex-grow-1 d-flex align-items-center ">
                                     <google-chart [type]="pieChart" [data]="plotStateData" [options]="pieChartOptions"
@@ -88,7 +88,7 @@
                                 <h5 class="card-title align-items-center">Distribución de Edades de Usuarios<button
                                         type="button"
                                         class="btn btn-sm btn-link text-muted bi bi-arrows-angle-expand fs-5 float-end"
-                                        title="Expandir" (click)="changeView('histogram')"></button></h5>
+                                        title="Expandir" (click)="redirect('/users/dashboard/user-histogram')"></button></h5>
                                 <hr>
                                 <div class="col-12 hover-scale flex-grow-1 d-flex align-items-center ">
                                     <google-chart [type]="columnChart" [data]="barChartData" [options]="barChartOptions"
@@ -100,7 +100,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-12">
+                <div class="col-md-12 mt-3">
                     <div class="card border-0 shadow-lg rounded-4 h-100">
                         <div class="card-body">
                             <div *ngIf="loadingBlocksChart" class="loading">Cargando...</div>
@@ -110,7 +110,7 @@
                                 <h5 class="card-title align-items-center">Análisis Comparativo de Manzanas<button
                                         type="button"
                                         class="btn btn-sm btn-link text-muted bi bi-arrows-angle-expand fs-5 float-end"
-                                        title="Expandir" (click)="changeView('/blocks')"></button></h5>
+                                        title="Expandir" (click)="redirect('/plots/dashboard/plot-blocks')"></button></h5>
                                 <hr>
                                 <div class="col-12 hover-scale flex-grow-1 d-flex align-items-center ">
                                     <google-chart [type]="chartType" [data]="chartData" [options]="chartOptions"
@@ -125,7 +125,6 @@
         </div>
     </div>
 </div>
-
 
 
 <!-- Modal para filtros avanzados de tipo de lote -->

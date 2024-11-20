@@ -57,46 +57,50 @@
                     <!-- Document Fields -->
                     <div class="col-12 col-md-6">
                       <div class="form-group row mb-3">
-                        <label for="document" class="col-4 col-form-label">Documento</label>
-                        <div class="col-8">
-                          <input type="text" class="form-control" id="document" formControlName="document"
-                            (input)="onDocumentInput($event)"
-                            [class.is-valid]="visitorForm.get('document')?.valid && visitorForm.get('document')?.touched"
-                            [class.is-invalid]="visitorForm.get('document')?.invalid && visitorForm.get('document')?.touched" />
-                          <div class="invalid-feedback"
-                            *ngIf="visitorForm.get('document')?.errors && visitorForm.get('document')?.touched">
-                            <div *ngIf="visitorForm.get('document')?.errors?.['required']">
-                              El documento es requerido.
-                            </div>
-                            <div *ngIf="visitorForm.get('document')?.errors?.['minlength']">
-                              El documento debe tener al menos 8 caracteres.
-                            </div>
+                          <label for="document" class="col-4 col-form-label">Documento</label>
+                          <div class="col-8">
+                              <input type="text" class="form-control" id="document" formControlName="document"
+                                  (input)="onDocumentInput($event)"
+                                  [class.is-valid]="visitorForm.get('document')?.valid && visitorForm.get('document')?.touched"
+                                  [class.is-invalid]="visitorForm.get('document')?.invalid && visitorForm.get('document')?.touched" />
+                              <div class="invalid-feedback"
+                                  *ngIf="visitorForm.get('document')?.errors && visitorForm.get('document')?.touched">
+                                  <div *ngIf="visitorForm.get('document')?.errors?.['required']">
+                                      El documento es requerido.
+                                  </div>
+                                  <div *ngIf="visitorForm.get('document')?.errors?.['minlength']">
+                                      El documento debe tener al menos 8 caracteres.
+                                  </div>
+                                  <div *ngIf="visitorForm.get('document')?.errors?.['dniAlreadyPropietario']">
+                                      Este DNI corresponde a un propietario registrado. Los propietarios no requieren autorización adicional.
+                                  </div>
+                              </div>
                           </div>
-                        </div>
                       </div>
-                    </div>
+                  </div>
 
                     <div class="col-12 col-md-6">
                       <div class="form-group row mb-3">
-                        <label for="documentType" class="col-4 col-form-label">Tipo Documento</label>
-                        <div class="col-8">
-                          <select id="documentType" class="form-select" formControlName="documentType"
-                            [class.is-valid]="visitorForm.get('documentType')?.valid && visitorForm.get('documentType')?.touched"
-                            [class.is-invalid]="visitorForm.get('documentType')?.invalid && visitorForm.get('documentType')?.touched"
-                            required>
-                            <option value="1">DNI</option>
-                            <option value="2">Pasaporte</option>
-                            <option value="3">CUIT</option>
-                          </select>
-                          <div class="invalid-feedback"
-                            *ngIf="visitorForm.get('documentType')?.errors && visitorForm.get('documentType')?.touched">
-                            <div *ngIf="visitorForm.get('documentType')?.errors?.['required']">
-                              El Tipo de Documento es requerido.
-                            </div>
+                          <label for="documentType" class="col-4 col-form-label">Tipo Documento</label>
+                          <div class="col-8">
+                              <select id="documentType" class="form-select" formControlName="documentType"
+                                  [class.is-valid]="visitorForm.get('documentType')?.valid && visitorForm.get('documentType')?.touched"
+                                  [class.is-invalid]="visitorForm.get('documentType')?.invalid && visitorForm.get('documentType')?.touched"
+                                  required>
+                                  <option value="1">DNI</option>
+                                  <option value="2">Pasaporte</option>
+                                  <option value="3">CUIT</option>
+                              </select>
+                              <div class="invalid-feedback" *ngIf="visitorForm.get('documentType')?.errors && visitorForm.get('documentType')?.touched">
+                                  <div *ngIf="visitorForm.get('documentType')?.errors?.['required']">
+                                      El Tipo de Documento es requerido.
+                                  </div>
+                              </div>
+                              
+                          
                           </div>
-                        </div>
                       </div>
-                    </div>
+                  </div>
 
                     <!-- Name Fields -->
                     <div class="col-12 col-md-6">
@@ -195,9 +199,9 @@
                             <select id="insurance" class="form-select" formControlName="insurance"
                               [class.is-valid]="visitorForm.get('insurance')?.valid && visitorForm.get('insurance')?.touched"
                               [class.is-invalid]="visitorForm.get('insurance')?.invalid && visitorForm.get('insurance')?.touched">
-                              <option value="San Cristobal">San Cristobal</option>
-                              <option value="La Nueva">La Nueva</option>
-                              <option value="La Segunda">La Segunda</option>
+                              @for (insurance of insurances; track $index) {
+                                <option [value]="insurance">{{insurance}}</option>
+                              }
                               <!-- ... resto de las opciones ... -->
                             </select>
                             <div class="invalid-feedback"

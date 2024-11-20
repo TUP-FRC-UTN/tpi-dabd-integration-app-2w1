@@ -10,6 +10,7 @@
                         <label for="inputCorreo" class="form-label m-0 me-3 mt-2">Email o Usuario</label>
                         <div class="d-flex flex-column justify-content-start">
                             <input type="text" class="form-control custom-input" 
+                            style="min-width: 350px; max-width: 350px"
                                 formControlName="email" autocomplete="email" [ngClass]="onValidate('email')">
                                 <div class="invalid-feedback d-block mt-1 text-start">{{showError('email')}}</div>
                         </div>
@@ -19,14 +20,16 @@
                     <div class="col d-flex">
                         <label for="inputClave" class="form-label m-0 me-3 mt-2">Contraseña</label>
                         <div class="d-flex flex-column justify-content-start" style="position: relative;">
-                            <input [type]="passwordVisible ? 'text' : 'password'" class="form-control custom-input" 
-                              formControlName="password" autocomplete="current-password" [ngClass]="onValidate('password')">
-                            <i class="bi" 
-                               [ngClass]="passwordVisible ? 'bi-eye-slash' : 'bi-eye'" 
-                               (click)="togglePasswordVisibility()" 
-                               style="cursor: pointer; position: absolute; right: 32px; top: 20px; transform: translateY(-50%);"></i>
-                               <div class="w-100">
-                                <div class="invalid-feedback d-block mt-1 text-start">{{showError('password')}}</div>
+                            <div class="input-group">
+                                <input [type]="passwordVisible ? 'text' : 'password'" 
+                                style="min-width: 309px; max-width: 309px"
+                                       class="custom-input form-control"
+                                       formControlName="password" 
+                                       autocomplete="current-password" 
+                                       [ngClass]="onValidate('password')">
+                                <span class="input-group-text" (click)="togglePasswordVisibility()" style="cursor: pointer;">
+                                  <i class="bi" [ngClass]="passwordVisible ? 'bi-eye-slash' : 'bi-eye'"></i>
+                                </span>
                               </div>
                         </div>
                     </div>

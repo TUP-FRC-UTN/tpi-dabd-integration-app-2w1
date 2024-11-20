@@ -7,6 +7,7 @@ import Swal from 'sweetalert2';
 import { RoutingService } from '../../../../common/services/routing.service';
 import { ReportReasonDto } from '../../../models/ReportReasonDTO';
 import { CustomSelectComponent } from "../../../../common/components/custom-select/custom-select.component";
+import { AuthService } from '../../../../users/users-servicies/auth.service';
 
 @Component({
   selector: 'app-penalties-post-complaint',
@@ -27,7 +28,8 @@ export class PenaltiesPostComplaintComponent implements OnInit {
   constructor(
     private complaintService: ComplaintService,
     private formBuilder: FormBuilder,
-    private routingService: RoutingService
+    private routingService: RoutingService,
+    private authService: AuthService
   ) {
     this.reactiveForm = this.formBuilder.group({  //Usen las validaciones que necesiten, todo lo de aca esta puesto a modo de ejemplo
       complaintReason: new FormControl([], [Validators.required]),
@@ -82,7 +84,12 @@ export class PenaltiesPostComplaintComponent implements OnInit {
           timer: 1500,
           showConfirmButton: false
         });
-        this.routingService.redirect("main", "Página Principal")
+        if(this.getPermisionsToSeeList()){
+          this.routingService.redirect("main/complaints/list-complaint", "Listado de Denuncias")
+        }
+        else{
+          this.routingService.redirect("/main/home", "Página Principal")
+        }
       }, error => {
         console.error('Error al enviar la denuncia', error);
         Swal.fire({
@@ -97,7 +104,13 @@ export class PenaltiesPostComplaintComponent implements OnInit {
 
   //
   cancel() {
-    this.routingService.redirect("main", "Página Principal")
+    if(this.getPermisionsToSeeList()){
+      this.routingService.redirect("main/complaints/list-complaint", "Listado de Denuncias")
+    }
+    else{
+      this.routingService.redirect("/main/home", "Página Principal")
+    }
+
   }
 
 
@@ -181,6 +194,17 @@ export class PenaltiesPostComplaintComponent implements OnInit {
   // files to the currently selected ones.
   onFileChange(event: any) {
     this.files = Array.from(FileList = event.target.files); //Convertir FileList a Array
+  }
+
+  permisionToEdit : boolean = false
+  getPermisionsToSeeList(){
+    console.log(this.authService.getActualRole());
+    
+    if(this.authService.getActualRole() === 'SuperAdmin' || 
+    this.authService.getActualRole() === 'Gerente multas'){
+      this.permisionToEdit = true
+    }
+    return this.permisionToEdit;
   }
 
 }
