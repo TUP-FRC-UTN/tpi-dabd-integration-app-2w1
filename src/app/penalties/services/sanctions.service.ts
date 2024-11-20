@@ -21,6 +21,9 @@ export class SanctionService {
   private readonly url = environment.services.sanctions + '/api/';
   private readonly reportReasonUrl = environment.services.sanctions + '/api/report-reason';
 
+  // Comunicacion con Notificaciones
+  private readonly notificationsUrl = 'http://host.docker.internal:9050/fines/';
+
 
   constructor() { }
 
@@ -119,4 +122,18 @@ export class SanctionService {
     date.setMonth(date.getMonth() - 6); // Cambiar a 6 meses atrás
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   }
+
+  // Comunicacion con Notificaciones
+  notifyNewDisclaimer(message: string) {
+    return this.http.post<any>(`${this.notificationsUrl}/newAppealWarn`, { message });
+  }
+
+  notifyDischargeResolved(appealUpdate: any) {
+    return this.http.post<any>(`${this.notificationsUrl}/appealUpdate`, appealUpdate);
+  }
+
+  notifyNewFineOrWarning(fineOrWarning: any) {
+    return this.http.post<any>(`${this.notificationsUrl}/newFineOrWarning`, fineOrWarning);
+  }
+
 }
