@@ -6,7 +6,6 @@ import * as XLSX from 'xlsx';
 import $ from 'jquery';
 import 'datatables.net';
 import 'datatables.net-bs5';
-import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import Swal from 'sweetalert2';
 import { OwnerService } from '../../../users-servicies/owner.service';
@@ -19,8 +18,8 @@ import { PlotService } from '../../../users-servicies/plot.service';
 import { ModalEliminarOwnerComponent } from '../users-modal-delete-owner/users-modal-delete-owner.component';
 import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
 import moment from 'moment';
-import { Subscription } from 'rxjs';
 import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
+import { RoutingService } from '../../../../common/services/routing.service';
 
 @Component({
   selector: 'app-users-list-owners',
@@ -35,6 +34,7 @@ export class UsersListOwnersComponent implements OnDestroy {
   private readonly apiService = inject(OwnerService);
   private readonly plotService = inject(PlotService);
   private readonly suscriptionService = inject(SuscriptionManagerService);
+  private readonly routingService = inject(RoutingService);
 
   @ViewChild(CustomSelectComponent) customSelect!: CustomSelectComponent;
 
@@ -55,7 +55,7 @@ export class UsersListOwnersComponent implements OnDestroy {
     this.suscriptionService.unsubscribeAll();
   }
 
-  constructor(private router: Router, private modal: NgbModal) {
+  constructor(private modal: NgbModal) {
     const fecha = new Date();
   }
 
@@ -258,15 +258,18 @@ export class UsersListOwnersComponent implements OnDestroy {
       console.error('Error al abrir el modal:', error);
     }
   }
-
+  
+  //Redirigir a la vista de agregar propietario
   addOwner() {
-    this.router.navigate(['main/owners/add'])
+    this.routingService.redirect('main/owners/add', 'Registrar Propietario');
   }
 
+  //Redirigir a la vista de editar propietario
   redirectEdit(id: number) {
-    this.router.navigate(['/main/owners/edit', id])
+    this.routingService.redirect(`/main/owners/edit/${id}`, 'Actualizar Propietario')
   }
 
+  //Carga los tipos de propietarios
   loadTypes() {
     const sus3 = this.apiService.getAllTypes().subscribe({
       next: (data: OwnerTypeModel[]) => {
@@ -274,7 +277,7 @@ export class UsersListOwnersComponent implements OnDestroy {
         this.types = data.map(type => ({ value: type.description, name: type.description }));
       },
       error: (error) => {
-        console.error('Error al cargar los roles:', error);
+        console.error('Error al cargar los tipos:', error);
       }
     });
 
@@ -288,11 +291,12 @@ export class UsersListOwnersComponent implements OnDestroy {
 
     // Escuchar el evento de eliminación para recargar los usuarios
     modalRef.componentInstance.userDeleted.subscribe(() => {
-      this.cargarTabla(); // Recargar los usuarios después de eliminar
+      this.loadTable(); // Recargar los usuarios después de eliminar
     });
   }
 
-  cargarTabla() {
+  //Cargar tabla
+  loadTable() {
     // Destruir la instancia de DataTable si ya existe
     if ($.fn.dataTable.isDataTable('#myTableOwners')) {
       $('#myTableOwners').DataTable().clear().destroy();
