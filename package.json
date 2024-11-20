@@ -41,7 +41,6 @@
     "moment": "^2.30.1",
     "ng2-currency-mask": "^13.0.3",
     "ngx-scanner-qrcode": "^1.6.9",
-    "ngx-toastr": "^19.0.0",
     "npm": "^10.9.0",
     "pdfmake": "^0.2.14",
     "rxjs": "~7.8.0",
