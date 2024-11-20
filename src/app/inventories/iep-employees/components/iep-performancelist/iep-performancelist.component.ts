@@ -762,7 +762,7 @@ onPerformanceTypeChange(selected: any[]): void {
 
   // Add the volverInventario method
   volverInventario(): void {
-    this.router.navigate(["home/employee-list"]);
+    this.router.navigate(["main/employees/employees"]);
   }
 
   

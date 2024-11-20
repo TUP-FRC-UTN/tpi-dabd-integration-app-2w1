@@ -238,7 +238,7 @@ export class IepPutEmployeesComponent implements OnInit {
       confirmButtonText: 'Aceptar'
     }).then(() => {
       if (type === 'success') {
-        this.router.navigate(['/home/employee-list']);
+        this.router.navigate(['main/employees/employees']);
       }
     });
   }
@@ -262,6 +262,6 @@ export class IepPutEmployeesComponent implements OnInit {
     this.terciorizedEmployee = !this.terciorizedEmployee;
   }
   cancelar(): void {
-    this.router.navigate(['/home/employee-list']);
+    this.router.navigate(['main/employees/employees']);
   }
 }

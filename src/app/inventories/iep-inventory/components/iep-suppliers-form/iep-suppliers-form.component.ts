@@ -5,7 +5,8 @@ import { Router, RouterModule } from '@angular/router';
 import { iepBackButtonComponent } from '../../../common-components/iep-back-button/iep-back-button.component';
 import { CommonModule } from '@angular/common';
 import Swal from 'sweetalert2';
-import { debounceTime, distinctUntilChanged, max, switchMap } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, max, of, switchMap } from 'rxjs';
+import { AuthService } from '../../../../users/users-servicies/auth.service';
 
 
 @Component({
@@ -18,7 +19,7 @@ import { debounceTime, distinctUntilChanged, max, switchMap } from 'rxjs';
 export class IepSuppliersFormComponent {
   proveedorForm!: FormGroup;
 
-  constructor(private fb: FormBuilder, private supplierService: SuppliersService, private router: Router) { }
+  constructor(private fb: FormBuilder, private supplierService: SuppliersService, private router: Router, private userService: AuthService) { }
 
   ngOnInit(): void {
     this.proveedorForm = this.fb.group({
@@ -26,6 +27,7 @@ export class IepSuppliersFormComponent {
       cuit: ['', [
         Validators.required, this.validarCUIT()]],
       phoneNumber: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
+      createdUser:[this.userService.getUser().id],
       email: ['', [Validators.required, Validators.email]],
       supplierType: ['OTHER', Validators.required],
       address: ['', Validators.required],
@@ -40,57 +42,119 @@ export class IepSuppliersFormComponent {
 
   onSubmit() {
 
-
-
-
     if (this.proveedorForm.valid) {
       const formData = this.proveedorForm.value;
       console.log(formData);
-      this.supplierService.createSupplier(formData).subscribe((response) => {
-        this.proveedorForm.reset();
-        this.router.navigate(['/suppliers']);
 
-      });
+      this.supplierService.createSupplier(formData).pipe(
+        switchMap(response => {
+          console.log( "Proveedor cargado: " +JSON.stringify(response))
 
-      const formAccess = {
-        name: formData.name,
-        cuil: formData.cuit,
-        email: formData.email,
+          const formAccess = {
+            createdUserId: formData.createdUser,
+            name: formData.name,
+            cuil: formData.cuit,
+            email: formData.email,
+          }
 
-      }
-
-      this.supplierService.createSupplierAccess(formAccess).subscribe({
-
-        next: response => {
-          console.log(JSON.stringify(response))
-          Swal.fire({
-            title: '¡Guardado!',
-            text: "Proveedor guardado con exito",
-            icon: 'success',
-            confirmButtonText: 'Aceptar',
-            showCancelButton: false,
-            confirmButtonColor: '#3085d6'
-          }).then(() => {
-            this.router.navigate(['/suppliers'])
-          });
-          ;
-          console.log("PASO: ", response);
-        },
-        error: error => {
-
+          return this.supplierService.createSupplier(formAccess)
+        }),
+        catchError(error => {
+          console.error("Error en el flujo:", error);
+  
           Swal.fire({
             title: 'Error',
-            text: "Error en el servidor intente nuevamente mas tarde",
+            text: 'Error en el servidor, intente nuevamente más tarde',
             icon: 'error',
             confirmButtonText: 'Aceptar',
-            confirmButtonColor: '#3085d6'
+            confirmButtonColor: '#3085d6',
           });
-
-          console.log("error:" + error.error.message)
-          console.error(error);
-
+  
+          return of(null);
+        })
+      ).subscribe({
+        next: response => {
+          if (response) {
+            console.log("Acceso creado:", JSON.stringify(response));
+  
+            Swal.fire({
+              title: '¡Guardado!',
+              text: 'Proveedor guardado con éxito',
+              icon: 'success',
+              confirmButtonText: 'Aceptar',
+              confirmButtonColor: '#3085d6',
+            }).then(() => {
+              this.router.navigate(['main/providers/suppliers']);
+            });
+          }
         }
-      })
+      });
+
+      //  this.supplierService.createSupplier(formData).subscribe({
+      //   next: response => {
+      //     console.log(JSON.stringify(response))
+      //     const formAccess = {
+      //       createdUserId: formData.createdUser,
+      //       name: formData.name,
+      //       cuil: formData.cuit,
+      //       email: formData.email,
+      //     }
+      //     this.supplierService.createSupplierAccess(formAccess).subscribe({
+      //       next: response => {
+      //         console.log(JSON.stringify(response))
+      //         Swal.fire({
+      //           title: '¡Guardado!',
+      //           text: "Proveedor guardado con exito",
+      //           icon: 'success',
+      //           confirmButtonText: 'Aceptar',
+      //           showCancelButton: false,
+      //           confirmButtonColor: '#3085d6'
+      //         }).then(() => {
+      //           this.router.navigate(['main/providers/suppliers'])
+      //         });
+      //         ;
+      //         console.log("PASO: ", response);
+      //       },
+      //       // error: error => {
+      //       //   Swal.fire({
+      //       //     title: 'Error',
+      //       //     text: "Error en el servidor intente nuevamente mas tarde",
+      //       //     icon: 'error',
+      //       //     confirmButtonText: 'Aceptar',
+      //       //     confirmButtonColor: '#3085d6'
+      //       //   });
+      //       //   console.log("error:" + error.error.message)
+      //       //   console.error(error);
+      //       // }
+      //     })
+      //     // Swal.fire({
+      //     //   title: '¡Guardado!',
+      //     //   text: "Proveedor guardado con exito",
+      //     //   icon: 'success',
+      //     //   confirmButtonText: 'Aceptar',
+      //     //   showCancelButton: false,
+      //     //   confirmButtonColor: '#3085d6'
+      //     // }).then(() => {
+      //     //   this.router.navigate(['main/providers/suppliers'])
+      //     // });
+      //     // ;
+      //     // console.log("PASO: ", response);
+      //     // this.proveedorForm.reset();
+      //   },
+      //   error: error => {
+      //     console.log("Error generar proveedor"+ error)
+      //     // Swal.fire({
+      //     //   title: 'Error',
+      //     //   text: "Error en el servidor intente nuevamente mas tarde",
+      //     //   icon: 'error',
+      //     //   confirmButtonText: 'Aceptar',
+      //     //   confirmButtonColor: '#3085d6'
+      //     // });
+
+      //     // console.log("error:" + error.error.message)
+      //     // console.error(error);
+      //   }
+      // });
     }
   }
 

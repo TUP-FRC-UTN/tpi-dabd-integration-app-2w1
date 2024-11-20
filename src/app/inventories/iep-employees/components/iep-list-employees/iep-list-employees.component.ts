@@ -4,7 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Subscription } from 'rxjs';
 import { FormsModule, NgSelectOption } from '@angular/forms';
-
+import $ from 'jquery';
 import { EmpListadoEmpleados } from '../../Models/emp-listado-empleados';
 import { EmpListadoAsistencias } from '../../Models/emp-listado-asistencias';
 import { EmployeePerformance } from '../../Models/listado-desempeño';
@@ -16,8 +16,6 @@ import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
 import { NgSelectModule } from '@ng-select/ng-select';
 
-declare var $: any;
-declare var DataTable: any;
 
 // Interfaz para los filtros
 interface EmployeeFilters {
@@ -621,13 +619,13 @@ this.table.rows.add(filteredData).draw();
       event.preventDefault();
       const empleadoId = $(event.currentTarget).data('empleado-id');
       console.log(empleadoId);
-      this.router.navigate([`home/employee/attendance/${empleadoId}`]);
+      this.router.navigate([`main/employees/attendance/${empleadoId}`]);
     });
 
     $('#empleadosTable').on('click', '.consultar-desempeño', (event: any) => {
       event.preventDefault();
       const empleadoId = $(event.currentTarget).data('empleado-id');
-      this.router.navigate([`home/employee/performance/${empleadoId}`]); // Redirige al componente de desempeño con el ID del empleado
+      this.router.navigate([`main/employees/performance/${empleadoId}`]); // Redirige al componente de desempeño con el ID del empleado
     });
 
     
@@ -641,14 +639,14 @@ this.table.rows.add(filteredData).draw();
 
   
 
-      // Manejador de clics para los botones de eliminar
-  $('#empleadosTable').on('click', '.eliminar-btn', (event: any) => {
-    event.preventDefault();
-    // Obtener el ID del empleado al que se hace clic
-    this.empleadoIdToDelete = $(event.currentTarget).data('empleado-id');
-    // Mostrar el modal
-    $('#deleteModal').modal('show');
-  });
+  //     // Manejador de clics para los botones de eliminar
+  // $('#empleadosTable').on('click', '.eliminar-btn', (event: any) => {
+  //   event.preventDefault();
+  //   // Obtener el ID del empleado al que se hace clic
+  //   this.empleadoIdToDelete = $(event.currentTarget).data('empleado-id');
+  //   // Mostrar el modal
+  //   $('#deleteModal').modal('show');
+  // });
 
     // Event handler para el botón de eliminar
 /*     $('#empleadosTable').on('click', '.eliminar-btn', (event: any) => {
@@ -716,7 +714,7 @@ this.table.rows.add(filteredData).draw();
   editarEmpleado(id: any): void {
     //this.router.navigate(['employee/update/', id]);
     if (id) {
-      this.router.navigate(['/home/employee/update', id]);
+      this.router.navigate([`main/employees/employee/update/${id}`]);
     }
   }
 

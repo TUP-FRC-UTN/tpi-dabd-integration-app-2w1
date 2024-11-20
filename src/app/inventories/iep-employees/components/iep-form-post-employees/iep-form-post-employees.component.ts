@@ -253,6 +253,7 @@ export class IEPFormPostEmployeesComponent implements OnInit {
             this.postDto.charge=this.cargoSelected?.id
             this.postDto.userId=this.userService.getUser().id
 
+            console.log("Id user"+ this.postDto.userId)
             console.log("Antes del Post (formato JSON):", JSON.stringify(this.postDto, null, 2))
             this.createEmployee$ = this.serviceCombos.createProduct(this.postDto);
             console.log(this.createEmployee$);

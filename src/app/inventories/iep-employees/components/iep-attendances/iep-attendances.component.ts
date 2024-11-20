@@ -10,12 +10,11 @@ import { NgLabelTemplateDirective, NgSelectModule } from '@ng-select/ng-select';
 import { IepAttendancesNgselectComponent } from "../iep-attendances-ngselect/iep-attendances-ngselect.component";
 import { EmpPostConfigurationResponse } from '../../Models/emp-post-configuration';
 import { PillowTimeLateArrivalService } from '../../services/pillow-time-late-arrival.service';
-import { UsersMockIdService } from '../../../common-services/users-mock-id.service';
 import { AuthService } from '../../../../users/users-servicies/auth.service';
-
-declare var $: any;
-declare var DataTable: any;
-declare var bootstrap: any;
+import $ from 'jquery';
+import 'datatables.net'; // Importación de DataTables
+import 'datatables.net-dt'; // Estilos para DataTables
+import 'datatables.net-bs5';
 
 @Component({
   selector: 'app-iep-attendances',
@@ -64,7 +63,7 @@ export class IepAttendancesComponent implements OnInit{
     if (name) { this.empleadoId = name;}  // Guardamos el string
     this.pillowTimeLateArrivalService.actualConfig().subscribe(data=>{
       this.actualConfig=data;
-      console.log(data);
+      console.log("Data"+data);
     })
     this.loadAsistencias();
     this.initializeDates();
@@ -523,6 +522,6 @@ export class IepAttendancesComponent implements OnInit{
 
   // Volver al menu de empleados
   volverInventario(): void {
-    this.router.navigate(["home/employee-list"]);
+    this.router.navigate(["main/employees/employees"]);
   }
 }
