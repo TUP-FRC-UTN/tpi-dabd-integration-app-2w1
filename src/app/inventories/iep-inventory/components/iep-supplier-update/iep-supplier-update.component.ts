@@ -80,7 +80,7 @@ export class IepSupplierUpdateComponent implements OnInit{
     this.proveedorForm = this.fb.group({
       name: ['', Validators.required],
       cuit: ['', Validators.required],
-      phoneNumber: ['', [Validators.required]],
+      phoneNumber: ['', [Validators.required,Validators.pattern('^[0-9]*$')]],
       email: ['', [Validators.required, Validators.email]],
       supplierType: ['', Validators.required],
       address: ['', Validators.required],

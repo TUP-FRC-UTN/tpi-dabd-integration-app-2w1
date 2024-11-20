@@ -1,17 +1,11 @@
-
 import { CommonModule } from '@angular/common';
 import { Component, AfterViewInit, AfterViewChecked, ElementRef, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-
-import { GetWarehouseMovementRequest } from '../../models/GetWarehouseMovementRequest';
-import { WarehouseMovement } from '../../models/getWarehouseMovementResponse';
 import { ProductService } from '../../services/product.service';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { DtoProducto } from '../../models/dto-producto';
-import { WarehouseTypePipe } from '../../pipes/warehouse-type.pipe';
-import { fromEvent, distinctUntilChanged, debounceTime } from 'rxjs';
 import { WarehouseMovementService } from '../../services/warehouse-movement.service';
 import { WarehouseMovementByProduct } from '../../models/WarehouseMovementByProduct';
 import { NgSelectModule } from '@ng-select/ng-select';

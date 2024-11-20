@@ -139,9 +139,9 @@
                             <div class="form-group col-md-9">
                                 <input type="text" class="form-control" id="cuil" name="cuil" [(ngModel)]="cuil"
                                     #cuilModel="ngModel" required pattern="^([0-9]{2}-)?[0-9]{8}-[0-9]$" [ngClass]="{
-                    'is-invalid': (cuilModel.invalid && cuilModel.touched)||(!isValidCuil)||(!isValidCuilFinish), 
+                    'is-invalid': (cuilModel.invalid)||(!isValidCuil)||(!isValidCuilFinish), 
                     'is-valid': (cuilModel.valid && cuilModel.touched)||(isValidCuil)
-                }" (input)="cuilModel.valid ? validateCuil() : null">
+                }" (input)="cuilModel.valid ? validarCUILFormato(cuil) : null">
                                 <div *ngIf="cuilModel.invalid && cuilModel.touched" class="invalid-feedback">
                                     "La entrada no es válida. Asegúrate que cumpla con el formato estipulado."
                                 </div>
@@ -197,14 +197,12 @@
                             <div class="col-md-9">
                                 <input type="text" class="form-control" id="telefono" name="telefono"
                                     [(ngModel)]="telefono" #telefonoModel="ngModel" required
-                                    pattern='^(0?15)?[1-10]\d{9}$' [ngClass]="{
+                                    pattern='^[1-9]\d{9}$' [ngClass]="{
                    'is-invalid': telefonoModel.invalid && telefonoModel.touched, 
                    'is-valid': telefonoModel.valid && telefonoModel.touched
                }">
                                 <div *ngIf="telefonoModel.invalid && telefonoModel.touched" class="invalid-feedback">
                                     "La entrada no es válida. , Asegúrate de no estar agregando 0351 o +54"
-
-
                                 </div>
                             </div>
                         </div>

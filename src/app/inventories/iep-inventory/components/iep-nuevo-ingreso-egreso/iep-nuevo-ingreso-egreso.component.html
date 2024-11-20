@@ -64,7 +64,7 @@
                                         <input type="number" class="form-control" formControlName="amount">
                                         <div *ngIf="formulario.controls['amount'].invalid && formulario.controls['amount'].touched" class="text-danger">
                                             <div *ngIf="formulario.controls['amount'].errors?.['required']"> Cantidad requerida</div>
-                                            <div *ngIf="formulario.controls['amount'].errors?.['min']"> Cantidad minima 1 </div>
+                                            <div *ngIf="formulario.controls['amount'].errors?.['min']"> Cantidad mínima 1 </div>
                                         </div>
                                     </div>
                                 </div>
@@ -130,7 +130,7 @@
                                        <div class="col-10"> 
                                         <textarea class="form-control" formControlName="justify" placeholder="Escribe aquí" rows="3"></textarea>
                                         <div *ngIf="formulario.controls['justify'].invalid && formulario.controls['justify'].touched" class="text-danger">
-                                            <div *ngIf="formulario.controls['justify'].errors?.['required']"> Precio requerido</div>
+                                            <div *ngIf="formulario.controls['justify'].errors?.['required']"> Justificación requerida</div>
                                         </div> 
                                        </div>
                                     </div>
@@ -187,7 +187,7 @@
                                             <div *ngIf="formularioEgreso.controls['amount'].invalid && formularioEgreso.controls['amount'].touched" class="text-danger">
                                                 <div *ngIf="formularioEgreso.controls['amount'].errors?.['required']"> Cantidad requerida</div>
                                                 <div *ngIf="formularioEgreso.controls['amount'].errors?.['min']"> Cantidad minima 1 </div>
-                                                <div *ngIf="formularioEgreso.controls['amount'].errors?.['insuficientStock']"> Stock del producto insuficiento </div>
+                                                <div *ngIf="formularioEgreso.controls['amount'].errors?.['insuficientStock']"> Stock del producto insuficiente </div>
                                                 <div *ngIf="formularioEgreso.controls['amount'].errors?.['noExistProduct']"> el producto ya no esta disponible </div>
 
 
@@ -207,7 +207,7 @@
                                        <div class="col-10"> 
                                         <textarea class="form-control"formControlName="justify" placeholder="Escribe aquí" rows="3"></textarea>
                                         <div *ngIf="formularioEgreso.controls['justify'].invalid && formularioEgreso.controls['justify'].touched" class="text-danger">
-                                            <div *ngIf="formularioEgreso.controls['justify'].errors?.['required']"> Precio requerido</div>
+                                            <div *ngIf="formularioEgreso.controls['justify'].errors?.['required']"> Justificación requerida</div>
                                         </div> 
                                        </div>
                                     </div>

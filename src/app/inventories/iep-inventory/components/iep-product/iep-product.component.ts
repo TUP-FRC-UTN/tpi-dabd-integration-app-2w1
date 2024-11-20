@@ -229,7 +229,7 @@ export class IepProductComponent {
     this.productService.updateProduct(mappedDto,this.userService.getUser().id).subscribe({
       next: response => {
         this.successMessage = response.message;
-        this.showSuccessAlert();
+        this.showUpdateSuccessAlert();
         console.log("PASO: ", response);
         form.reset();
        
