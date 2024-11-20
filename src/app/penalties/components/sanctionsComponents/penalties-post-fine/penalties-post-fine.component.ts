@@ -122,6 +122,19 @@ export class PenaltiesPostFineComponent implements OnInit {
 
         this.penaltiesService.postFine(fineData).subscribe(
           res => {
+            let ownersIds: number[] = this.getOwnersIdByPlotId(this.report.plotId)
+            ownersIds.forEach(id => {
+              let notification = {
+                user_id: id,
+                reason: this.report.reportReason.reportReason, // report => ReportReason (Entidad) => reportReason propiedad de la entidad
+                amount: this.reactiveForm.get('amount')?.value,
+                warning: false
+              }
+              this.penaltiesService.notifyNewFineOrWarning(notification).subscribe({
+                next: () => { },
+                error: (e) => { console.log("Error al notificar al propietario: ", e) }
+              });
+            });
             Swal.fire({
               title: '¡Multa enviada!',
               text: 'La multa ha sido enviada correctamente.',
@@ -160,6 +173,18 @@ export class PenaltiesPostFineComponent implements OnInit {
 
         this.penaltiesService.postWarning(warningData).subscribe(
           res => {
+            let ownersIds: number[] = this.getOwnersIdByPlotId(this.report.plotId)
+            ownersIds.forEach(id => {
+              let notification = {
+                user_id: id,
+                reason: this.report.reportReason.reportReason, // report => ReportReason (Entidad) => reportReason propiedad de la entidad
+                warning: true
+              }
+              this.penaltiesService.notifyNewFineOrWarning(notification).subscribe({
+                next: () => { },
+                error: (e) => { console.log("Error al notificar al propietario: ", e) }
+              });
+            });
             Swal.fire({
               title: '¡Advertencia enviada!',
               text: 'La advertencia ha sido enviada correctamente.',
@@ -199,7 +224,7 @@ export class PenaltiesPostFineComponent implements OnInit {
     }
   }
 
-  
+
   //Controla que se tenga que enviar un mensaje de error, lo busca y retorna
   showError(controlName: string): string {
     const control = this.reactiveForm.get(controlName);
@@ -211,7 +236,7 @@ export class PenaltiesPostFineComponent implements OnInit {
     return '';
   }
 
-  
+
   //Devuelve el mensaje de error
   private getErrorMessage(errorKey: string, errorValue: any): string {
     const errorMessages: { [key: string]: (error: any) => string } = {
