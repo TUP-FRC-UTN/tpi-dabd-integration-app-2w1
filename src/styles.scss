@@ -5,35 +5,107 @@
 @import 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css';
 @import "@ng-select/ng-select/themes/default.theme.css";
 
-
-
-.text-bg-orange{
-    background-color: $orange;
+table.dataTable tbody tr.selected {
+  background-color: transparent !important;
 }
 
 .btn.filterbutton:hover {
-    transform: translateY(-2px);
-  
-  } 
-  
-  table.dataTable tbody tr.selected {
-    background-color: transparent !important;
-  }
-  
-  .text-bg-indigo {
-    background-color: #6610f2 !important; /* Color indigo de Bootstrap 5.3 */
-    color: #fff !important;
-  }
-  .floating-btn {
-    position: fixed;             /* Fija el botón en una posición relativa a la ventana del navegador, manteniéndolo siempre visible en el mismo lugar */
-    bottom: 20px;                /* Coloca el botón a 20 píxeles desde la parte inferior de la pantalla */
-    right: 20px;                 /* Coloca el botón a 20 píxeles desde la parte derecha de la pantalla */
-    width: 50px !important;      /* Define el ancho del botón en 50 píxeles; el !important asegura que esta regla tenga prioridad */
-    height: 50px !important;     /* Define la altura del botón en 50 píxeles, también con !important para darle prioridad */
-    border-radius: 50% !important; /* Redondea el botón para hacerlo circular; el 50% crea un borde completamente redondeado */
-    border: none !important;     /* Elimina el borde del botón y usa !important para sobreescribir cualquier otro estilo de borde */
-    display: flex;               /* Utiliza Flexbox para facilitar el centrado del contenido dentro del botón */
-    align-items: center;         /* Centra verticalmente el contenido (icono o texto) dentro del botón */
-    justify-content: center;     /* Centra horizontalmente el contenido dentro del botón */
-    z-index: 15;                 /* Establece el nivel de superposición del botón sobre otros elementos; un valor más alto asegura que esté sobre otros contenidos */
-  }
+  transform: translateY(-2px);
+
+}
+
+.text-bg-orange {
+  background-color: $orange;
+}
+
+.text-bg-indigo {
+  background-color: #6610f2 !important;
+  /* Color indigo de Bootstrap 5.3 */
+  color: #fff !important;
+}
+
+.text-bg-red {
+  background-color: #d1888f !important;
+  /* Bootstrap red */
+  color: #fff !important;
+}
+
+.text-bg-green {
+  background-color: #28a745 !important;
+  /* Bootstrap green */
+  color: #fff !important;
+}
+
+.text-bg-blue {
+  background-color: #74af7d !important;
+  /* Bootstrap blue */
+  color: #ffffff !important;
+}
+
+.text-bg-salmon {
+  background-color: #dc3545 !important;
+  /* Bootstrap salmon */
+  color: #ffffff !important;
+}
+
+.text-bg-menor {
+  background-color: #0dcaf0 !important;
+  /* Custom light blue */
+  color: #ffffff !important;
+}
+
+.text-bg-orange {
+  background-color: #fd7e14 !important;
+  /* Bootstrap yellow */
+  color: #ffffff !important;
+}
+
+.text-bg-purple {
+  background-color: #6f42c1 !important;
+  /* Bootstrap purple */
+  color: #fff !important;
+}
+
+.text-bg-teal {
+  background-color: #20c997 !important;
+  /* Bootstrap teal */
+  color: #ffffff !important;
+}
+
+.text-bg-pink {
+  background-color: #e83e8c !important;
+  /* Bootstrap pink */
+  color: #fff !important;
+}
+
+.text-bg-cyan {
+  background-color: #17a2b8 !important;
+  /* Bootstrap cyan */
+  color: #fff !important;
+}
+
+
+.floating-btn {
+  position: fixed;
+  /* Fija el botón en una posición relativa a la ventana del navegador, manteniéndolo siempre visible en el mismo lugar */
+  bottom: 20px;
+  /* Coloca el botón a 20 píxeles desde la parte inferior de la pantalla */
+  right: 20px;
+  /* Coloca el botón a 20 píxeles desde la parte derecha de la pantalla */
+  width: 50px !important;
+  /* Define el ancho del botón en 50 píxeles; el !important asegura que esta regla tenga prioridad */
+  height: 50px !important;
+  /* Define la altura del botón en 50 píxeles, también con !important para darle prioridad */
+  border-radius: 50% !important;
+  /* Redondea el botón para hacerlo circular; el 50% crea un borde completamente redondeado */
+  border: none !important;
+  /* Elimina el borde del botón y usa !important para sobreescribir cualquier otro estilo de borde */
+  display: flex;
+  /* Utiliza Flexbox para facilitar el centrado del contenido dentro del botón */
+  align-items: center;
+  /* Centra verticalmente el contenido (icono o texto) dentro del botón */
+  justify-content: center;
+  /* Centra horizontalmente el contenido dentro del botón */
+  z-index: 15;
+  /* Establece el nivel de superposición del botón sobre otros elementos; un valor más alto asegura que esté sobre otros contenidos */
+}

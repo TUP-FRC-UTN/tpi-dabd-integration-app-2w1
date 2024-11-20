@@ -14,7 +14,7 @@ export class OwnerService {
   constructor(private http: HttpClient) {}
 
   getOwnerByUserId(userId: number): Observable<Owner | null> {
-    return this.http.get<GetOwnerAndPlot[]>(`${environment.services.ownersAndPlots}/owners/ownersandplots`)
+    return this.http.get<GetOwnerAndPlot[]>(environment.services.ownersAndPlots + `/owners/ownersandplots`)
       .pipe(
         map(ownersAndPlots => {
           // Buscar el propietario que corresponde al usuario logueado

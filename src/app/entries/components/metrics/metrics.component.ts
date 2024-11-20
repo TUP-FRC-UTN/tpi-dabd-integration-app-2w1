@@ -72,6 +72,7 @@ export class MetricsComponent implements OnInit {
     'Service':'Servicios',
     'Cleaning': 'Limpieza',
     'Worker': 'Trabajador',
+    'Emergency': 'Emergencia',
   };
 
   translateRole(role: string): string {

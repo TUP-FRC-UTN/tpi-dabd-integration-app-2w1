@@ -24,7 +24,7 @@
   </div>
 </div>
 
-<div  class="container">
+<div  class="container mt-3">
   <div class="card border-0 shadow-lg rounded-4">
 
     <div class="card-body">
@@ -40,7 +40,7 @@
             <app-users-kpi class="mb-2" title="Área Total Construida" icon="bi bi-building"
               [amount]="selectedBlockskPIs.totalBuiltArea" [customStyles]="{ 'background-color': '#d8ffedde' }"
               tooltip="Superficie total que ya ha sido construida" formatPipe="metros" [selectable]="true"
-              route="/home/charts/users/plots/stats"></app-users-kpi>
+              route="/main/plots/dashboard/plot-info"></app-users-kpi>
             <app-users-kpi class="mb-2" title="Porcentaje Total Construido" icon="bi bi-percent"
               [amount]="selectedBlockskPIs.utilizationPercentage" [customStyles]="{ 'background-color': '#d8ffedde' }"
               tooltip="Porcentaje del área total que ya ha sido utilizada para construcciones" formatPipe="percent"></app-users-kpi>
@@ -62,7 +62,7 @@
 
           <h4 class="card-title">Análisis Comparativo de Manzanas<button type="button"
               class="btn btn-sm btn-link text-muted bi bi-arrow-left fs-5 float-end" title="Volver"
-              (click)="changeView('/reports')"></button></h4>
+              (click)="changeView()"></button></h4>
           <hr>
           @if(!loading && !error){
 

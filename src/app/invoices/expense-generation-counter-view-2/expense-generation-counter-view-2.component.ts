@@ -689,7 +689,6 @@ export class ExpenseGenerationCounterView2Component {
         const order = { 'Mp': 0, 'STRIPE': 1, 'Efectivo': 2 };
         return (order[a[0] as keyof typeof order] || 0) - (order[b[0] as keyof typeof order] || 0);
       });
-
       console.log(this.pieKpis)
   }
 

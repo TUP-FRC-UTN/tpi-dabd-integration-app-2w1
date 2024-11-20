@@ -87,7 +87,27 @@ export class AccessUserReportService {
       ))
     );
   }
-
+  validateDniNotPropietario(dni: string | number): Observable<boolean> {
+    if (!dni) {
+      return of(true);
+    }
+  
+    return this.getUsersByRole('Propietario').pipe(
+      map(propietarios => {
+        const dniNumber = Number(dni);
+        
+        if (isNaN(dniNumber)) {
+          return true;
+        }
+        
+        const isPropietario = propietarios.some(user => 
+          Number(user.dni) === dniNumber
+        );
+      
+        return !isPropietario;
+      })
+    );
+  }
     // Método para obtener usuarios propietarios con formato para ng-select
     getPropietariosForSelect(): Observable<any[]> {
       return this.getUsersByRole('Propietario').pipe(

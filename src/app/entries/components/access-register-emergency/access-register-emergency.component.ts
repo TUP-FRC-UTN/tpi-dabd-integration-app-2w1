@@ -9,6 +9,7 @@ import Swal from 'sweetalert2';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { AccessUserReportService } from '../../services/access_report/access_httpclient/access_usersApi/access-user-report.service';
 import { AuthService } from '../../../users/users-servicies/auth.service';
+import { AccessVisitorsRegisterServiceHttpClientService } from '../../services/access_visitors/access-visitors-register/access-visitors-register-service-http-client/access-visitors-register-service-http-client.service';
 
 @Component({
   selector: 'access-app-register-emergency',
@@ -21,6 +22,7 @@ export class AccessRegisterEmergencyComponent implements OnInit, OnDestroy, Afte
   private readonly emergenciesService: AccessEmergenciesService = inject(AccessEmergenciesService);
   private readonly userService: AccessUserReportService = inject(AccessUserReportService);
   private readonly authService: AuthService = inject(AuthService);
+  private readonly visitorService: AccessVisitorsRegisterServiceHttpClientService = inject(AccessVisitorsRegisterServiceHttpClientService);
 
   private readonly subscription = new Subscription();
   private readonly personUpdated = new Subject<void>();
@@ -31,6 +33,13 @@ export class AccessRegisterEmergencyComponent implements OnInit, OnDestroy, Afte
   private userId?: number;
   
   ownersOptions: any[] = [];
+  vehicleOptions: { value: string, label: string }[] = [];
+  vehicleTypeMapping: { [key: string]: string } = {
+    'Car': 'Auto',
+    'Motorbike': 'Moto',
+    'Truck': 'Camión',
+    'Van': 'Camioneta'
+  };
 
   form = new FormGroup({
     neighborId: new FormControl(null, [Validators.required]),
@@ -43,13 +52,25 @@ export class AccessRegisterEmergencyComponent implements OnInit, OnDestroy, Afte
   });
 
   ngOnInit(): void {
-    let ownersSubscription = this.userService.getPropietariosForSelect().subscribe(
-      options => this.ownersOptions = options
+    const ownersSubscription = this.userService.getPropietariosForSelect().subscribe({
+      next: options => this.ownersOptions = options,
+      error: error => console.error("Error al cargar propietarios:", error)
+    }
     );
+    const vehicleTypesSubscription = this.visitorService.getVehicleTypes().subscribe({
+      next: vehicleTypes => {
+        this.vehicleOptions = vehicleTypes.map(type => ({
+          value: type,
+          label: this.vehicleTypeMapping[type] || type
+        }));
+      },
+      error: error => console.error("Error al cargar tipos de vehículos:", error)
+    })
 
     this.userId = this.authService.getUser().id;
 
     this.subscription.add(this.personUpdated);
+    this.subscription.add(vehicleTypesSubscription);
     this.subscription.add(ownersSubscription);
     const modal = document.getElementById('emergencyModal');
     modal!.addEventListener('show.bs.modal', event => {

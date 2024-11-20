@@ -9,8 +9,8 @@ import { loadStripe } from '@stripe/stripe-js';
 import {RouterLink, Router} from '@angular/router';
 import { ExpensePaymentUpdateDTO } from '../expense-generation-interfaces/expense-generation-payment-interface';
 import { environment } from '../../common/environments/environment';
+import Swal from 'sweetalert2';
 
-declare var Swal: any;
 
 @Component({
   selector: 'app-expense-generation-payment-form',
@@ -124,18 +124,20 @@ export class ExpenseGenerationPaymentFormComponent implements OnInit {
       if (result.error) {
         throw new Error(result.error.message || "Error al confirmar el pago");
       }
+      
 
       this.confirmPayment();
 
       this.updateExpenseStatus(result.paymentIntent.id);
 
       this.paymentSuccessful = true;
+      this.expenseService.clearSelectedExpenses();
 
       //----   sweet alert message   ------
 
       Swal.fire({
-        title: "Pago realizado con exito!",
-        text: "Deseas descargar el comprobante ?",
+        title: "Pago realizado con exito.",
+        text: "Comprobante disponible.",
         icon: "success",
 
         allowOutsideClick: false,

@@ -181,7 +181,7 @@ export class UsersGraphicHistogramComponent {
     this.loadData();
   }
 
-  changeView(view: string) {
-    this.router.navigate(['/home/charts/users/' + view]);
+  changeView() {
+    this.router.navigate(['/main/plots/dashboard']);
   }
 }
