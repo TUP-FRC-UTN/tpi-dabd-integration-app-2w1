@@ -11,6 +11,7 @@ import { Router } from '@angular/router';
 import { ValidatorsService } from '../../../users-servicies/validators.service';
 import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
 import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
+import { RoutingService } from '../../../../common/services/routing.service';
 
 @Component({
   selector: 'app-users-new-plot',
@@ -29,7 +30,7 @@ export class UsersNewPlotComponent implements OnInit, OnDestroy {
 
   private readonly plotService = inject(PlotService);
   private readonly authService = inject(AuthService);
-  private readonly router: Router = inject(Router);
+  private readonly routingService = inject(RoutingService);
   private readonly validatorService = inject(ValidatorsService);
   private readonly suscriptionService = inject(SuscriptionManagerService);
 
@@ -64,6 +65,16 @@ export class UsersNewPlotComponent implements OnInit, OnDestroy {
         Validators.required
       ])
     })
+
+    //Validar que la superficie construida no sea mayor a la superficie total
+    const sus = this.formReactivo.get('totalBuild')?.valueChanges.subscribe(() => {
+      this.formReactivo.get('totalBuild')?.setValidators([Validators.max(this.formReactivo.get('totalArea')?.value)]);
+    });
+
+    //Agregar suscripción
+    if (sus) {
+      this.suscriptionService.addSuscription(sus);
+    }
   }
 
   ngOnInit(): void {
@@ -140,7 +151,9 @@ export class UsersNewPlotComponent implements OnInit, OnDestroy {
           });
           this.resetForm();
           this.ngOnInit();
-          this.router.navigate(['/main/plots/list']);
+
+          //Redirigir al listado
+          this.redirect();
         },
         error: (error) => {
           console.error('Error al crear el lote:', error);
@@ -195,7 +208,7 @@ export class UsersNewPlotComponent implements OnInit, OnDestroy {
       case 'min':
         return `El valor debe ser mayor o igual a ${errorDetails.min}.`;
       case 'max':
-        return `El valor debe ser menor o igual a ${errorDetails.max}.`;
+        return `El terreno construido no puede ser mayor al terreno total.`;
       case 'requiredTrue':
         return 'Debe aceptar el campo requerido para continuar.';
       case 'date':
@@ -248,8 +261,8 @@ export class UsersNewPlotComponent implements OnInit, OnDestroy {
   //--------------------------------------------------Redireccionar------------------------------------------------
 
   //Redireccionar
-  redirect(url: string) {
-    this.router.navigate([url]);
+  redirect() {
+    this.routingService.redirect('/main/plots/list', 'Listado de lotes');
   }
 
 
