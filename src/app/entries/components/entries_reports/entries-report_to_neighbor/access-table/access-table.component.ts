@@ -399,10 +399,7 @@ onEndDateChange(date: string): void {
 
     this.table.clear();
 
-    if (!Array.isArray(this.movements) || this.movements.length === 0) {
-      this.handleEmptyData();
-      return;
-    }
+  
 
     await this.userService.ensureCacheInitialized();
     const processedRows = await this.processMovements();
@@ -415,16 +412,7 @@ onEndDateChange(date: string): void {
     this.table.draw();
   }
 
-  /**
-   * Maneja el caso de cuando no hay datos para mostrar
-   */
-  private handleEmptyData(): void {
-    Swal.fire({
-      icon: 'warning',
-      title: '¡No se encontraron registros!',
-    });
-    this.disableExportButtons();
-  }
+
 
   /**
    * Habilita los botones de exportación y actualiza el estado del flag

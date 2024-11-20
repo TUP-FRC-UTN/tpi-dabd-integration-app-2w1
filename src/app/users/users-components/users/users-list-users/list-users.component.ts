@@ -1,5 +1,4 @@
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { AfterViewInit, Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { UserGet } from '../../../users-models/users/UserGet';
 import { PlotService } from '../../../users-servicies/plot.service';
 import { CommonModule } from '@angular/common';
@@ -13,15 +12,16 @@ import $ from 'jquery';
 import { GetPlotDto } from '../../../users-models/plot/GetPlotDto';
 import 'datatables.net';
 import 'datatables.net-bs5';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import Swal from 'sweetalert2';
 import { RolModel } from '../../../users-models/users/Rol';
 import { GetPlotModel } from '../../../users-models/plot/GetPlot';
 import { ModalEliminarUserComponent } from '../users-modal-eliminar-user/modal-eliminar-user/modal-eliminar-user.component';
 import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
-import DataTable from 'datatables.net-bs5';
 import moment from 'moment';
+import { RoutingService } from '../../../../common/services/routing.service';
+import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
 
 @Component({
   selector: 'app-list-users',
@@ -30,16 +30,18 @@ import moment from 'moment';
   templateUrl: './list-users.component.html',
   styleUrls: ['./list-users.component.css']
 })
-export class ListUsersComponent implements OnInit {
+export class ListUsersComponent implements OnInit, OnDestroy {
 
-  selectedOptions: any; 
+  selectedOptions: any;
   optionesFilter: any;
 
+  private readonly routingService = inject(RoutingService);
+  private readonly suscriptionService = inject(SuscriptionManagerService);
 
-  constructor(private router: Router, private modal: NgbModal, private plotService: PlotService) { }
-
+  constructor(private modal: NgbModal, private plotService: PlotService) { }
 
   @ViewChild('customSelect') customSelect!: CustomSelectComponent;
+
   typeModal: string = '';
   user: number = 0;
   users: UserGet[] = [];
@@ -56,29 +58,14 @@ export class ListUsersComponent implements OnInit {
   initialDate: FormControl = new FormControl(this.minDate);
   endDate: FormControl = new FormControl(this.maxDate);
   placeholder: string = "Seleccione un rol";
-
-  getPlotByUser(plotId: number) {
-    this.plotService.getPlotById(plotId).subscribe({
-      next: (data: GetPlotModel) => {
-        return data.plot_number;
-      }
-    })
-  }
+  estadoRoles: { [id: string]: boolean } = {};
+  userModal: UserGet = new UserGet();
 
   ngOnInit() {
-
     this.loadRoles();
-
-    this.plotService.getAllPlots().subscribe({
-      next: (data: GetPlotDto[]) => {
-        this.plots = data;
-
-      }
-    }
-    )
-
+    this.loadAllPlots();
     //Trae todos los usuarios
-    this.apiService.getAllUsers().subscribe({
+    const sus = this.apiService.getAllUsers().subscribe({
       next: (data: UserGet[]) => {
         //Cambiar guiones por barras en la fecha de nacimiento
         this.users = data.map(user => ({
@@ -86,9 +73,9 @@ export class ListUsersComponent implements OnInit {
 
           datebirth: user.datebirth.replace(/-/g, '/'),
           create_date: user.create_date.replace(/-/g, '/'),
-          
 
-        }));        
+
+        }));
 
         //Inicializar DataTables después de cargar los datos
         setTimeout(() => {
@@ -103,7 +90,7 @@ export class ListUsersComponent implements OnInit {
             columns: [
               {
                 title: 'Fecha de Creación',
-                className: 'text-start', 
+                className: 'text-start',
                 width: '20%',
                 render: (data, type, row, meta) => {
                   if (type === 'display') {
@@ -116,7 +103,7 @@ export class ListUsersComponent implements OnInit {
                 }
               }
               ,
-              
+
               { title: 'Nombre', width: '20%' },
               { title: 'Rol', width: '30%' },
               {
@@ -252,12 +239,68 @@ export class ListUsersComponent implements OnInit {
           allowOutsideClick: false,
           allowEscapeKey: false
         })
-        this.router.navigate(['/main']);
+        this.routingService.redirect('/main', 'Página principal');
       }
     });
 
+    //Agregar suscripción
+    this.suscriptionService.addSuscription(sus);
   }
 
+  //Desuscribirse de todos los observables
+  ngOnDestroy(): void {
+    this.suscriptionService.unsubscribeAll();
+  }
+
+  //-------------------------------------------------Carga de datos-------------------------------------------
+  //Cargar todos los lotes
+  loadAllPlots() {
+    this.plotService.getAllPlots().subscribe({
+      next: (data: GetPlotDto[]) => {
+        this.plots = data;
+      },
+      error: (error) => {
+        console.error('Error al cargar los lotes:', error);
+      }
+    })
+  }
+
+  //Cargar roles
+  loadRoles() {
+    const sus = this.apiService.getAllRoles().subscribe({
+      next: (data: RolModel[]) => {
+
+        this.roles = data;
+        this.rolesFilter = data.map(r => ({
+          value: r.description,
+          name: r.description
+        }));
+      },
+      error: (error) => {
+        console.error('Error al cargar los roles:', error);
+
+      }
+    });
+
+    //Agregar suscripción
+    this.suscriptionService.addSuscription(sus);
+  }
+
+  //Obtener lotes por id
+  getPlotByUser(plotId: number) {
+    const sus = this.plotService.getPlotById(plotId).subscribe({
+      next: (data: GetPlotModel) => {
+        return data.plot_number;
+      }
+    })
+
+    //Agregar suscripción
+    this.suscriptionService.addSuscription(sus);
+  }
+
+  //-----------------------------------------------------Modal-------------------------------------------------------
+
+  //Abrir modal eliminar usuario
   async openModalEliminar(userId: number) {
     // Obtener el usuario completo usando el UserService
     this.apiService.getUserById(userId).subscribe(user => {
@@ -271,221 +314,17 @@ export class ListUsersComponent implements OnInit {
         });
         return; // Salir de la función sin abrir el modal
       }
-  
+
       // Abrir el modal si el usuario no es "Propietario"
       const modalRef = this.modal.open(ModalEliminarUserComponent, { size: 'md', keyboard: false });
       modalRef.componentInstance.userModal = { id: userId };
-  
+
       // Escuchar el evento de eliminación para recargar los usuarios
       modalRef.componentInstance.userDeleted.subscribe(() => {
         this.cargarTabla(); // Recargar los usuarios después de eliminar
       });
     });
   }
-
-  cargarTabla() {
-    // Destruir la instancia de DataTable si ya existe
-    if ($.fn.dataTable.isDataTable('#myTable')) {
-      $('#myTable').DataTable().clear().destroy();
-    }
-    this.ngOnInit();
-  }
-
-  resetFilters() {
-    // Reiniciar los valores de rol y fechas
-    this.selectRol.setValue('');
-    this.initialDate.setValue(this.minDate);
-    this.endDate.setValue(this.maxDate);
-  
-    // Limpiar el campo de búsqueda general
-    const searchInput = document.getElementById("myTable_search") as HTMLInputElement;
-    if (searchInput) {
-      searchInput.value = ''; // Limpiar el valor del input
-    }
-  
-    // Eliminar todos los filtros personalizados
-    $.fn.dataTable.ext.search.splice(0, $.fn.dataTable.ext.search.length);
-  
-    // Obtener la instancia de DataTable
-    const table = $('#myTable').DataTable();
-  
-    // Reiniciar roles y custom select
-    this.rolesFilter = this.roles.map(r => ({
-      value: r.description,
-      name: r.description,
-    }));
-  
-    if (this.customSelect) {
-      this.customSelect.setData([]); // Reiniciar datos del custom select
-    }
-  
-    // Limpiar filtros de columnas y búsqueda general
-    table.column(2).search(''); // Limpiar columna específica
-    table.search(''); // Limpiar búsqueda general
-  
-    // Redibujar la tabla
-    table.draw();
-  }
-  
-
-  fillOptionsSelected(options: any) {
-    var optiones = options.map((option: any) => option).join(' ');
-    
-    const table = $('#myTable').DataTable();
-    table.order([[0, 'desc']]).draw();  // Asumiendo que la fecha está en la primera columna (índice 0) y deseas ordenarla de manera
-
-    table.column(2).search(optiones).draw();
-  }
-
-  //Metodo para filtrar la tabla en base a las 2 fechas
-  filterByDate() {
-    const table = $('#myTable').DataTable();
-  
-    // Convertir las fechas seleccionadas a objetos Date para comparar
-    const start = this.initialDate.value ? (new Date(this.initialDate.value)).toISOString().split('T')[0] : null;
-    const end = this.endDate.value ? (new Date(this.endDate.value)).toISOString().split('T')[0]  : null;
-  
-    // Limpiar cualquier filtro previo relacionado con fechas
-    $.fn.dataTable.ext.search.splice(0, $.fn.dataTable.ext.search.length);
-  
-    // Agregar una nueva función de filtro
-    $.fn.dataTable.ext.search.push((settings: any, data: any, dataIndex: any) => {
-      // Convertir la fecha de la fila (data[0]) a un objeto Date
-      const rowDateParts = data[0].split('/'); // Asumiendo que la fecha está en formato DD/MM/YYYY
-      const rowDate = (new Date(`${rowDateParts[2]}-${rowDateParts[1]}-${rowDateParts[0]}`)).toISOString().split('T')[0] ; // Convertir a formato YYYY-MM-DD
-      
-      
-  
-      // Realizar las comparaciones
-      if (start && rowDate < start) return false;
-      if (end && rowDate > end) return false;
-      return true;
-    });
-  
-    // Redibujar la tabla con el filtro aplicado
-    table.draw();
-  }
-  
-
-  estadoRoles: { [id: string]: boolean } = {};
-
-  showRole(roles: string[]): string {
-    let rolesA: string = "";
-
-  
-    let max: number = 2;
-  
-    if(roles.length > 1){
-      for (let i = 0; i < max; i++) {
-        let color: string = "";
-        switch (roles[i]) {
-          case "Gerente":
-            color = "text-bg-danger";
-            break;
-          case "Propietario":
-            color = "text-bg-primary";
-            break;
-          case "Familiar mayor":
-            color = "text-bg-secondary";
-            break;
-          case "Familiar menor":
-            color = "text-bg-secondary";
-            break;
-          case "SuperAdmin":
-            color = "text-bg-dark";
-            break;
-          default:
-            color = "badge bg-info text-dark";
-            break;
-        }
-    
-        rolesA += `
-                     <span class="badge rounded-pill50 ${color}">${roles[i]}</span> `;
-      }
-    }else{
-      let color: string = "";
-        switch (roles[0]) {
-          case "Gerente":
-            color = "text-bg-danger";
-            break;
-          case "Propietario":
-            color = "text-bg-primary";
-            break;
-          case "Familiar mayor":
-            color = "text-bg-secondary";
-            break;
-          case "Familiar menor":
-            color = "text-bg-secondary";
-            break;
-          case "SuperAdmin":
-            color = "text-bg-dark";
-            break;
-          default:
-            color = "badge bg-info text-dark";
-            break;
-        }
-    
-        rolesA += `
-                     <span class="badge rounded-pill50 ${color}">${roles[0]}</span> `;
-    }
-  
-  
-    if (roles.length > 2) {
-      var rolesExtra = roles.slice(2);
-      var rolesB = "";
-
-      rolesExtra.forEach((role: string) => {
-        let color: string = "";
-      switch (role) {
-        case "Gerente":
-          color = "text-bg-danger";
-          break;
-        case "Propietario":
-          color = "text-bg-primary";
-          break;
-        case "Familiar mayor":
-          color = "text-bg-secondary";
-          break;
-        case "Familiar menor":
-          color = "text-bg-secondary";
-          break;
-        case "SuperAdmin":
-          color = "text-bg-dark";
-          break;
-        default:
-          color = "badge bg-info text-dark";
-          break;
-      }
-  
-      rolesB += `<span class="badge rounded-pill m-1 ${color}">${role}</span> `;
-      });
-
-      rolesA += `<button class="btn btn-outline-dark text-dark badge" data-bs-toggle="collapse"
-           data-bs-target="#extraRoles" aria-expanded="false" aria-controls="extraRoles">
-              +
-            </button>
-
-            <div class="collapse position-absolute" id="extraRoles">
-              <div class="card card-body d-flex" style="z-index: 10;">
-                ${rolesB}
-              </div>
-            </div>`;
-    }
-  
-    return rolesA;
-  }
-  
-
-  // showRoleForPdf(role : string) : string {
-  //   // Definimos el HTML del botón como una cadena
-  //   const buttonHTML: string = role
-
-  //   // Expresión regular para capturar el texto entre `>` y `<`
-  //   const match = buttonHTML.match(/>([^<]+)</);
-
-  //   // Verificamos si se encontró un resultado y lo extraemos
-  // return buttonValue: string = match ? match[1] : '';
-  // }
 
 
 
@@ -494,10 +333,6 @@ export class ListUsersComponent implements OnInit {
     //Espera a que se cargue el usuario seleccionado
     try {
       await this.selectUser(userId);
-
-      console.log(this.plots);
-      console.log(this.userModal.plot_id);
-
 
       let user: any = this.userModal.plot_id;
       let userPlots: any = [];
@@ -531,38 +366,11 @@ export class ListUsersComponent implements OnInit {
     this.typeModal = type;
   }
 
-  loadRoles() {
-    this.apiService.getAllRoles().subscribe({
-      next: (data: RolModel[]) => {
-
-        this.roles = data;
-        this.rolesFilter = data.map(r => ({
-          value: r.description,
-          name: r.description
-        }));
-      },
-      error: (error) => {
-        console.error('Error al cargar los roles:', error);
-
-      }
-    });
-  }
-
-  addUser() {
-    this.router.navigate(['/main/users/add'])
-  }
-
-  //Redirige
-  redirectEdit(id: number) {
-    this.router.navigate(['/main/users/edit', id]);
-  }
-
   //Busca el user y se lo pasa al modal
-  userModal: UserGet = new UserGet();
   selectUser(id: number): Promise<UserGet> {
     return new Promise((resolve, reject) => {
       this.user = id;
-      this.apiService.getUserById(id).subscribe({
+      const sus = this.apiService.getUserById(id).subscribe({
         next: (data: UserGet) => {
           this.userModal = data;
           Swal.close(); //Cerrar SweetAlert
@@ -581,36 +389,318 @@ export class ListUsersComponent implements OnInit {
           });
         }
       });
+
+      //Agregar suscripción
+      this.suscriptionService.addSuscription(sus);
     });
   }
 
-  getContentBetweenArrows(input: string): string[] {
-    const matches = [...input.matchAll(/>([^+<,]*)</g)];
-    return matches.map(match => match[1].trim()).filter(content => content !== "");
+  //----------------------------------------------------Filtros-----------------------------------------------------
+
+  //Carga la tabla
+  cargarTabla() {
+    // Destruir la instancia de DataTable si ya existe
+    if ($.fn.dataTable.isDataTable('#myTable')) {
+      $('#myTable').DataTable().clear().destroy();
+    }
+    this.ngOnInit();
   }
 
-  getPlotById(plotId: number): number {
-    const plot = this.plots.find(plot => plot.id === plotId);
-    return plot?.plot_number || 0;
+  //Resetear filtros
+  resetFilters() {
+    // Reiniciar los valores de rol y fechas
+    this.selectRol.setValue('');
+    this.initialDate.setValue(this.minDate);
+    this.endDate.setValue(this.maxDate);
+
+    // Limpiar el campo de búsqueda general
+    const searchInput = document.getElementById("myTable_search") as HTMLInputElement;
+    if (searchInput) {
+      searchInput.value = ''; // Limpiar el valor del input
+    }
+
+    // Eliminar todos los filtros personalizados
+    $.fn.dataTable.ext.search.splice(0, $.fn.dataTable.ext.search.length);
+
+    // Obtener la instancia de DataTable
+    const table = $('#myTable').DataTable();
+
+    // Reiniciar roles y custom select
+    this.rolesFilter = this.roles.map(r => ({
+      value: r.description,
+      name: r.description,
+    }));
+
+    if (this.customSelect) {
+      this.customSelect.setData([]); // Reiniciar datos del custom select
+    }
+
+    // Limpiar filtros de columnas y búsqueda general
+    table.column(2).search(''); // Limpiar columna específica
+    table.search(''); // Limpiar búsqueda general
+
+    // Redibujar la tabla
+    table.draw();
   }
 
+  //Filtrar por rol
+  fillOptionsSelected(options: any) {
+    var optionsFilter = options.map((option: any) => option).join('|'); // Usar '|' para permitir múltiples filtros
+    const table = $('#myTable').DataTable();
+
+    // Filtrar por el contenido de la columna de tipo de lote, teniendo en cuenta que puede tener unicamente 1 valor, pero se tiene que filtrar x varios
+    table.column(2).search(optionsFilter, true, false).draw(); 
+  }
+
+  //Metodo para filtrar la tabla en base a las 2 fechas
+  filterByDate() {
+    const table = $('#myTable').DataTable();
+
+    // Convertir las fechas seleccionadas a objetos Date para comparar
+    const start = this.initialDate.value ? (new Date(this.initialDate.value)).toISOString().split('T')[0] : null;
+    const end = this.endDate.value ? (new Date(this.endDate.value)).toISOString().split('T')[0] : null;
+
+    // Limpiar cualquier filtro previo relacionado con fechas
+    $.fn.dataTable.ext.search.splice(0, $.fn.dataTable.ext.search.length);
+
+    // Agregar una nueva función de filtro
+    $.fn.dataTable.ext.search.push((settings: any, data: any, dataIndex: any) => {
+      // Convertir la fecha de la fila (data[0]) a un objeto Date
+      const rowDateParts = data[0].split('/'); // Asumiendo que la fecha está en formato DD/MM/YYYY
+      const rowDate = (new Date(`${rowDateParts[2]}-${rowDateParts[1]}-${rowDateParts[0]}`)).toISOString().split('T')[0]; // Convertir a formato YYYY-MM-DD
+
+
+
+      // Realizar las comparaciones
+      if (start && rowDate < start) return false;
+      if (end && rowDate > end) return false;
+      return true;
+    });
+
+    // Redibujar la tabla con el filtro aplicado
+    table.draw();
+  }
+
+  //----------------------------------------------------Funciones----------------------------------------------------
+
+  //Formatea la fecha
   private formatDate(date: Date): string {
-    // Obtener la zona horaria de Argentina (UTC-3)
-    const argentinaOffset = 3 * 60;  // Argentina está a UTC-3, por lo que el offset es 3 horas * 60 minutos
+    //Obtener la zona horaria de Argentina (UTC-3)
+    //Argentina está a UTC-3, por lo que el offset es 3 horas * 60 minutos
+    const argentinaOffset = 3 * 60;
 
-    // Ajustar la fecha a la zona horaria de Argentina, estableciendo la hora en 00:00
+    //Ajustar la fecha a la zona horaria de Argentina, estableciendo la hora en 00:00
     const localDate = new Date(date.getTime() + (argentinaOffset - date.getTimezoneOffset()) * 60000);
 
-    // Establecer la hora en 00:00 para evitar cambios de fecha no deseados
+    //Establecer la hora en 00:00 para evitar cambios de fecha no deseados
     localDate.setHours(0, 0, 0, 0);
 
-    // Sumar un día
+    //Sumar un día
     localDate.setDate(localDate.getDate() + 1);
 
     const options: Intl.DateTimeFormatOptions = { day: '2-digit', month: '2-digit', year: 'numeric' };
     return new Intl.DateTimeFormat('es-ES', options).format(localDate);
   }
 
+  //Filtrar lote por id
+  getPlotById(plotId: number): number {
+    const plot = this.plots.find(plot => plot.id === plotId);
+    return plot?.plot_number || 0;
+  }
+
+  //---------------------------------------------------Redirecciones--------------------------------------------------
+
+  //Redirigir a agregar usuario
+  addUser() {
+    this.routingService.redirect('/main/users/add', 'Agregar usuario');
+  }
+
+  //Redirige a la edición de un usuario
+  redirectEdit(id: number) {
+    this.routingService.redirect(`/main/users/edit/${id}`, 'Modificar usuario');
+  }
+
+  //--------------------------------------------------Estilos----------------------------------------------------
+
+  //Obtener el contenido entre <>
+  getContentBetweenArrows(input: string): string[] {
+    const matches = [...input.matchAll(/>([^+<,]*)</g)];
+    return matches.map(match => match[1].trim()).filter(content => content !== "");
+  }
+
+  //Mostrar roles con badges
+  showRole(roles: string[]): string {
+    let rolesA: string = "";
+
+
+    let max: number = 2;
+
+    if (roles.length > 1) {
+      for (let i = 0; i < max; i++) {
+        let color: string = "";
+        switch (roles[i]) {
+          case "Gerente general":
+            color = "text-bg-salmon";
+            break;
+          case "Propietario":
+            color = "text-bg-primary";
+            break;
+          case "Familiar mayor":
+            color = "bg-secondary";
+            break;
+          case "Familiar menor":
+            color = "text-bg-menor";
+            break;
+          case "SuperAdmin":
+            color = "text-bg-dark";
+            break;
+          case "Inquilino":
+            color = "text-bg-cyan";
+            break;
+          case "Gerente finanzas":
+            color = "text-bg-pink";
+            break;
+          case "Contador":
+            color = "text-bg-teal text-dark";
+            break;
+          case "Seguridad":
+            color = "text-bg-orange";
+            break;
+          case "Gerente inventario":
+            color = "text-bg-blue";
+            break;
+          case "Gerente empleados":
+            color = "text-bg-red";
+            break;
+          case "Gerente multas":
+            color = "text-bg-indigo";
+            break;
+          default:
+            color = "badge bg-info text-dark";
+            break;
+        }
+
+        rolesA += `
+                     <span class="badge rounded-pill ${color}">${roles[i]}</span> `;
+      }
+    } else {
+      let color: string = "";
+      switch (roles[0]) {
+        case "Gerente general":
+            color = "text-bg-salmon";
+            break;
+          case "Propietario":
+            color = "text-bg-primary";
+            break;
+          case "Familiar mayor":
+            color = "bg-secondary";
+            break;
+          case "Familiar menor":
+            color = "text-bg-menor";
+            break;
+          case "SuperAdmin":
+            color = "text-bg-dark";
+            break;
+          case "Inquilino":
+            color = "text-bg-cyan";
+            break;
+          case "Gerente finanzas":
+            color = "text-bg-pink";
+            break;
+          case "Contador":
+            color = "text-bg-teal text-dark";
+            break;
+          case "Seguridad":
+            color = "text-bg-orange";
+            break;
+          case "Gerente inventario":
+            color = "text-bg-blue";
+            break;
+          case "Gerente empleados":
+            color = "text-bg-red";
+            break;
+          case "Gerente multas":
+            color = "text-bg-indigo";
+            break;
+          default:
+            color = "badge bg-info text-dark";
+            break;
+      }
+
+      rolesA += `
+                     <span class="badge rounded-pill ${color}">${roles[0]}</span> `;
+    }
+
+
+    if (roles.length > 2) {
+      var rolesExtra = roles.slice(2);
+      var rolesB = "";
+
+      rolesExtra.forEach((role: string) => {
+        let color: string = "";
+        switch (role) {
+          case "Gerente general":
+            color = "text-bg-salmon";
+            break;
+          case "Propietario":
+            color = "text-bg-primary";
+            break;
+          case "Familiar mayor":
+            color = "bg-secondary";
+            break;
+          case "Familiar menor":
+            color = "text-bg-menor";
+            break;
+          case "SuperAdmin":
+            color = "text-bg-dark";
+            break;
+          case "Inquilino":
+            color = "text-bg-cyan";
+            break;
+          case "Gerente finanzas":
+            color = "text-bg-pink";
+            break;
+          case "Contador":
+            color = "text-bg-teal text-dark";
+            break;
+          case "Seguridad":
+            color = "text-bg-orange";
+            break;
+          case "Gerente inventario":
+            color = "text-bg-blue";
+            break;
+          case "Gerente empleados":
+            color = "text-bg-red";
+            break;
+          case "Gerente multas":
+            color = "text-bg-indigo";
+            break;
+          default:
+            color = "badge bg-info text-dark";
+            break;
+        }
+
+        rolesB += `<span class="badge rounded-pill m-1 ${color}">${role}</span> `;
+      });
+
+      rolesA += `<button class="btn btn-outline-dark text-dark badge" data-bs-toggle="collapse"
+           data-bs-target="#extraRoles" aria-expanded="false" aria-controls="extraRoles">
+              +
+            </button>
+
+            <div class="collapse position-absolute" id="extraRoles">
+              <div class="card card-body d-flex" style="z-index: 10;">
+                ${rolesB}
+              </div>
+            </div>`;
+    }
+
+    return rolesA;
+  }
+
+  //------------------------------------------------Exportar------------------------------------------------
+
+  //Exportar a PDF
   exportPdf() {
     const doc = new jsPDF();
 
@@ -652,26 +742,27 @@ export class ListUsersComponent implements OnInit {
     doc.save(`${formattedDesde}_${formattedHasta}_listado_usuarios.pdf`);
   }
 
+  //Exportar a Excel
   exportExcel() {
     const table = $('#myTable').DataTable(); // Inicializa DataTable una vez
-  
+
     // Obtener las filas visibles usando 'search: applied' (como en el export PDF)
     const visibleRows = table.rows({ search: 'applied' }).data().toArray();
-  
+
     // Obtener las fechas 'Desde' y 'Hasta' solo para el nombre del archivo
     const formattedDesde = this.formatDate(new Date(this.initialDate.value));
     const formattedHasta = this.formatDate(new Date(this.endDate.value));
-  
+
     // Mapeamos las filas visibles a un formato adecuado para los datos de Excel
     const dataRows = visibleRows.map((row: any) => {
       // Extraemos los datos de la fila
       const fechaCreacion = row[0]; // Fecha de creación
       const nombre = row[1]; // Nombre
-      const rol = Array.isArray(row[2]) 
-                  ? row[2].map((r: string) => this.getContentBetweenArrows(r).join(', ')).join(', ') 
-                  : this.getContentBetweenArrows(row[2]).join(', '); // Aplicamos getContentBetweenArrows si es un array o un string
+      const rol = Array.isArray(row[2])
+        ? row[2].map((r: string) => this.getContentBetweenArrows(r).join(', ')).join(', ')
+        : this.getContentBetweenArrows(row[2]).join(', '); // Aplicamos getContentBetweenArrows si es un array o un string
       const lote = Array.isArray(row[3]) ? row[3].join(', ') : row[3]; // Si lote es un array, lo unimos por comas
-  
+
       // Creamos el objeto para cada fila
       return {
         'Fecha de Creación': fechaCreacion,
@@ -680,19 +771,17 @@ export class ListUsersComponent implements OnInit {
         'Lote': lote // Convertido a string
       };
     });
-  
+
     // Crear la hoja de trabajo con los datos de los usuarios
     const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(dataRows, { header: ['Fecha de Creación', 'Nombre', 'Rol', 'Lote'] });
-  
+
     // Crear el libro de trabajo
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Usuarios');
-  
+
     // Guardar el archivo Excel con las fechas de los filtros
     const fileName = `${formattedDesde}_${formattedHasta}_listado_usuarios.xlsx`;
     XLSX.writeFile(wb, fileName);
   }
-  
-  
 }
 

@@ -78,9 +78,9 @@ export class NavbarNotificationComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.userId = this.authservice.getUser().id;
     this.fetchNotifications();
     this.initializeModal();
-    this.userId = this.authservice.getUser().id;
   }
 
   private initializeModal(): void {

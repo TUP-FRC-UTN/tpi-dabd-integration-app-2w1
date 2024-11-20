@@ -576,8 +576,6 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
     );
   }
 
-  
-
     // Método para abrir el modal de observación
     
     openObservationModal() {
@@ -1196,11 +1194,11 @@ applyPagination(data: any[]) {
     }
     this.filter$.next({ ...this.filter });
   }
-  async openPdf(id: number) {
+  async openPdf(uuid: string) {
     try {
+      const cleanUuid = uuid.replace('uuid:', '');
       const response = await fetch(
-        environment.services.expenseGeneration + `/api/expenses/pdf/${id}`
-      );
+        `${environment.services.expenseGeneration}/api/expenses/pdf/${cleanUuid}`);
       if (!response.ok) {
         alert('No se pudo cargar el PDF');
         return;
@@ -1223,8 +1221,8 @@ applyPagination(data: any[]) {
 
       const hasLetters = /[a-zA-Z]/.test(expense.payment_id);
       const url = hasLetters
-        ? environment.services.expenseGeneration + `/generate-receipt/${expense.payment_id}`
-        : environment.services.expenseGeneration + `/api/receipts/${expense.payment_id}/pdf`;
+        ? environment.services.stripeService + `/generate-receipt/${expense.payment_id}`
+        : environment.services.mercadoPago + `/api/receipts/${expense.payment_id}/pdf`;
 
       const response = await fetch(url);
       if (!response.ok) {

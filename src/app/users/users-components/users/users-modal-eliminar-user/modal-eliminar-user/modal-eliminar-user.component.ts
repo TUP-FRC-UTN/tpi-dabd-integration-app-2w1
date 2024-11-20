@@ -1,16 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DeleteUser } from '../../../../users-models/owner/DeleteUser';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UserService } from '../../../../users-servicies/user.service';
-import { UserGet } from '../../../../users-models/users/UserGet';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-modal-eliminar-user',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, ],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule,],
   templateUrl: './modal-eliminar-user.component.html',
   styleUrl: './modal-eliminar-user.component.css'
 })
@@ -39,21 +38,37 @@ export class ModalEliminarUserComponent {
     });
   }
 
+  //-------------------------------------------------------Acciones-------------------------------------------------------
+
+  //Cerrar modal
   closeModal() {
     this.activeModal.close();
   }
 
+  //Confirmar eliminación
+  confirmDelete() {
+    this.confirmDesactivate();
+  }
+
+  //-------------------------------------------------------Alertas-------------------------------------------------------
+
+  //Mostrar modal de exito
   showSuccessModal() {
     Swal.fire({
       title: '¡Usuario eliminado!',
       text: 'El usuario ha sido eliminado exitosamente.',
       icon: 'success',
-      showConfirmButton: true, 
-      timer: 2000 
+      showConfirmButton: true
     });
   }
 
-  confirmDelete() {
-    this.confirmDesactivate();
+  //Mostrar modal de eliminación
+  showDeleteModal() {
+    Swal.fire({
+      title: '¡Usuario eliminado!',
+      text: 'El usuario ha sido eliminado exitosamente.',
+      icon: 'success',
+      showConfirmButton: true
+    });
   }
 }

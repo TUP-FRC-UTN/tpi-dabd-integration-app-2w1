@@ -46,6 +46,9 @@
                                     <div *ngIf="visitorForm.get('document')?.errors?.['pattern']">
                                         El documento debe contener solo letras y números.
                                     </div>
+                                    <div *ngIf="visitorForm.get('document')?.errors?.['dniAlreadyPropietario']">
+                                        Este DNI corresponde a un propietario registrado. Los propietarios no requieren autorización adicional.
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -206,19 +209,9 @@
                                     <select id="insurance" class="form-select flex-grow-1" formControlName="insurance"
                                     [class.is-valid]="visitorForm.get('insurance')?.valid && visitorForm.get('insurance')?.touched"
                                     [class.is-invalid]="visitorForm.get('insurance')?.invalid && visitorForm.get('insurance')?.touched">
-                                    <option value="San Cristobal">San Cristobal</option>
-                                    <option value="La Nueva">La Nueva</option>
-                                    <option value="La Segunda">La Segunda</option>
-                                    <option value="Sancor Seguros">Sancor Seguros</option>
-                                    <option value="Federación Patronal">Federación Patronal</option>
-                                    <option value="Mapfre">Mapfre</option>
-                                    <option value="Provincia Seguros">Provincia Seguros</option>
-                                    <option value="Allianz">Allianz</option>
-                                    <option value="Zurich Seguros">Zurich Seguros</option>
-                                    <option value="Nación Seguros">Nación Seguros</option>
-                                    <option value="Securitas">Securitas</option>
-                                    <option value="Mercantil Andina">Mercantil Andina</option>
-                                    <option value="Quálitas">Quálitas</option>
+                                    @for (insurance of insurances; track $index) {
+                                        <option [value]="insurance">{{insurance}}</option>
+                                    }
                                 </select>
                                 <div class="invalid-feedback"
                                 *ngIf="visitorForm.get('insurance')?.errors && visitorForm.get('insurance')?.touched">
