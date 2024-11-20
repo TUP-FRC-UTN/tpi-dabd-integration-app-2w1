@@ -31,9 +31,10 @@
                 <!-- Select Infractor -->
                 <div class="col-lg-6 mb-3">
                     <div class="row">
-                        <label class="col-2 col-form-label">Parcela</label>
+                        <label class="col-2 col-form-label">Lote</label>
                         <div class="col-10">
                             <app-custom-select [options]="optionsplot"
+                                [multiple]="true"
                                 [selectedOptions]="reactiveForm.get('plotId')?.value"
                                 (selectedOptionsChange)="updateSelectplot($event)"
                                 [validations]="reactiveForm.get('plotId')?.validator">

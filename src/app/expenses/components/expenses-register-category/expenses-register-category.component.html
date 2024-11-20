@@ -1,35 +1,31 @@
-<div class="modal fade" id="categoryRegisterModal" tabindex="-1" aria-labelledby="expenseModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="expenseModalLabel">Registrar Categoría</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form [formGroup]="categoryForm">
-          <div class="row">
-            <div class="col">
-              <p>Descripción:</p>
-              <input
-                class="form-control form-control-sm"
-                formControlName="description"
-                type="text"
-                required
-                [ngClass]="{
-                  'is-valid': categoryForm.get('description')?.valid && (categoryForm.get('description')?.dirty || categoryForm.get('description')?.touched),
-                  'is-invalid': categoryForm.get('description')?.invalid && (categoryForm.get('description')?.dirty || categoryForm.get('description')?.touched)
-                }">
-              <div *ngIf="categoryForm.get('description')?.invalid && (categoryForm.get('description')?.dirty || categoryForm.get('description')?.touched)" class="invalid-feedback">
-                La descripción es requerida y debe tener al menos 3 caracteres.
-              </div>
-            </div>
+<div class="modal-content">
+  <div class="modal-header">
+    <h5 class="modal-title" id="expenseModalLabel">Registrar Categoría</h5>
+    <button type="button" class="btn-close" aria-label="Close" (click)="clearInputs()"></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="categoryForm">
+      <div class="row">
+        <div class="col">
+          <p>Descripción:</p>
+          <input
+            class="form-control form-control-sm"
+            formControlName="description"
+            type="text"
+            required
+            [ngClass]="{
+              'is-valid': categoryForm.get('description')?.valid && (categoryForm.get('description')?.dirty || categoryForm.get('description')?.touched),
+              'is-invalid': categoryForm.get('description')?.invalid && (categoryForm.get('description')?.dirty || categoryForm.get('description')?.touched)
+            }">
+          <div *ngIf="categoryForm.get('description')?.invalid && (categoryForm.get('description')?.dirty || categoryForm.get('description')?.touched)" class="invalid-feedback">
+            La descripción es requerida y debe tener al menos 3 caracteres.
           </div>
-        </form>
+        </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-success" data-bs-dismiss="modal" (click)="save()" [disabled]="validateDescription()">Guardar</button>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="clearInputs()">Cancelar</button>
-      </div>
-    </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-success"  (click)="save()" [disabled]="validateDescription()">Guardar</button>
+    <button type="button" class="btn btn-secondary"  (click)="clearInputs()">Cancelar</button>
   </div>
 </div>

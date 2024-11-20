@@ -5,6 +5,7 @@ import { Provincia } from '../Models/emp-provincia';
 import { Charge, DocumentTypeEnum, PostEmployeeDto } from '../Models/emp-post-employee-dto';
 import { EmpPutEmployees } from '../Models/emp-put-employees';
 import { environment } from '../../../common/environments/environment';
+import { EmpPutEmployeeRequest } from '../Models/EmpPutEmployeeRequest';
 
 @Injectable({
   providedIn: 'root',
@@ -20,7 +21,7 @@ export class EmpPostEmployeeService {
   private readonly EMPLOYEE_POST_URL: string = `${this.EMPLOYEE_URL}/post`;
 
   private baseUrlProvinces: string =
-    'https://mocki.io/v1/555e5ed8-37c8-480b-8452-7affe6f6f833';
+    'https://mocki.io/v1/e7d43042-d186-49a4-94cc-b2a4db9ac5c0';
 
   constructor(private client: HttpClient) { }
 
@@ -70,10 +71,7 @@ export class EmpPostEmployeeService {
       // Puedes añadir más encabezados aquí si es necesario
   });
   // Realiza la petición GET
-  return this.client.get<boolean>(`${this.EMPLOYEE_URL}/validate/cuil`, { params});
-
-  
-  }
+  return this.client.get<boolean>(`${this.EMPLOYEE_URL}/validate/cuil`, { params}); }
 
   
 
@@ -87,7 +85,7 @@ export class EmpPostEmployeeService {
     return this.client.post<any>(url, json, { headers });
   }
 
-  updateEmployee(dto: EmpPutEmployees): Observable<any> {
+  updateEmployee(dto: EmpPutEmployeeRequest): Observable<any> {
     const url = `${this.EMPLOYEE_URL}/put/${dto.id}`;
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     const json = JSON.stringify(dto);

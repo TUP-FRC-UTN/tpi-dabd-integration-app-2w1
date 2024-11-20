@@ -57,7 +57,7 @@ export class NewReportComponent {
     this.reactiveForm = this.formBuilder.group({  //Usen las validaciones que necesiten, todo lo de aca esta puesto a modo de ejemplo
       reportReason: new FormControl([], [Validators.required]),
       descriptionControl: new FormControl('', [Validators.required, Validators.minLength(10), Validators.maxLength(800)]),
-      plotId: new FormControl([], [Validators.required])
+      plotIds: new FormControl([])
     });
   }
 
@@ -116,8 +116,7 @@ export class NewReportComponent {
   }
 
   onSubmit(): void {
-    console.log("Submit");
-    const userId = 1;
+
     const plotId = this.plot;
 
     const complaintsIds = this.complaintsList.length > 0
@@ -139,29 +138,34 @@ export class NewReportComponent {
 
     if (this.reactiveForm.valid) {
       let formData = this.reactiveForm.value;
-      let reportDTO = {
-        reportReasonId:  formData.reportReason,
-        plotId:  formData.plotId,
-        description: formData.descriptionControl,
-        complaints: complaintsIds,
-        userId: userId,
-      };
-      console.log(reportDTO);
-      this.reportService.postReport(reportDTO).subscribe({
-        next: (response) => {
-          Swal.fire({
-            title: '¡Informe creado!',
-            text: 'El informe ha sido creado correctamente.',
-            icon: 'success',
-            timer: 1500,
-            showConfirmButton: false
-          });
-          this.routingService.redirect("main/sanctions/report-list", "Listado de Informes")
-        },
-        error: (error) => {
-          console.error('Error al enviar la denuncia', error);
-        }
+      
+      let postsApiSuccess = false;
+      formData.plotIds.array.forEach((plotId: any) => {
+        let reportDTO = {
+          reportReasonId:  formData.reportReason,
+          plotId:  plotId,
+          description: formData.descriptionControl,
+          complaints: complaintsIds,
+        };
+        this.reportService.postReport(reportDTO).subscribe({
+          next: (response) => {
+            postsApiSuccess = true
+          },
+          error: (error) => {
+            console.error('Error al enviar la denuncia', error);
+            postsApiSuccess = false
+          }
+        });
       });
+      Swal.fire({
+        title: '¡Informe creado!',
+        text: 'El informe ha sido creado correctamente.',
+        icon: 'success',
+        timer: 1500,
+        showConfirmButton: false
+      });
+      this.routingService.redirect("main/sanctions/report-list", "Listado de Informes")
+      
     } else {
       console.log("Los campos no estaban validados")
     }

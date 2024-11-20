@@ -12,6 +12,7 @@ import Swal from 'sweetalert2';
 import { AuthService } from '../../../../users/users-servicies/auth.service';
 import { AccessVisitorsRegisterServiceHttpClientService } from '../../../services/access_visitors/access-visitors-register/access-visitors-register-service-http-client/access-visitors-register-service-http-client.service';
 import { AccessRegisterEmergencyComponent } from "../../access-register-emergency/access-register-emergency.component";
+import { AccessInsurancesService } from '../../../services/access-insurances/access-insurances.service';
 
 declare var bootstrap: any;
 @Component({
@@ -25,12 +26,14 @@ declare var bootstrap: any;
 export class AccessVehiclesViewComponent implements OnDestroy,OnInit  {
   constructor(
     private fb: FormBuilder,
-    private authService: AuthService
+    private authService: AuthService,
+    private insuranceService: AccessInsurancesService
   ) {}
 
   @ViewChild('confirmModal') confirmModal: any;
   ngOnInit(): void {
-    this.loadVehicleTypes()
+    this.loadVehicleTypes();
+    this.loadInsurances();
     this.formVehicle = this.fb.group({
       document: [
         '', 
@@ -45,7 +48,6 @@ export class AccessVehiclesViewComponent implements OnDestroy,OnInit  {
     this.formVehicle.get('documentType')?.valueChanges.subscribe(() => {
       this.formVehicle.get('document')?.updateValueAndValidity();
     });
-
 
     this.userId = this.authService.getUser().id;
   }
@@ -66,6 +68,7 @@ export class AccessVehiclesViewComponent implements OnDestroy,OnInit  {
     'Truck': 'Camión',
     'Van': 'Camioneta'
   };
+  insurances: string[] = [];
   vehicleOptions: { value: string, label: string }[] = [];
   vehiculos:AccessNewVehicleDto[]=[]
   isValidating: boolean = false;
@@ -226,6 +229,20 @@ finUserByDni(): AsyncValidatorFn {
       }
     });
   }
+
+  loadInsurances(): void {
+    this.insuranceService.getAll().pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe({
+      next: (insurances) => {
+        this.insurances = insurances;
+      },
+      error: (error) => {
+        console.error('Error al cargar los seguros:', error)
+      }
+    })
+  }
+
   openConfirmModal(plate: string): void {
     this.selectedVehicle = { plate };  // Establecer la patente seleccionada
     const modalElement = document.getElementById('confirmModal');
