@@ -16,7 +16,7 @@ import { RoutingService } from '../../services/routing.service';
 export class LandingPageComponent implements OnInit {
 
   //Injects
-  private router = inject(Router);
+  private routingService = inject(RoutingService);
   private plotService = inject(PlotService);
   //-----------------------------------------implementar el servicio de notificaciones para enviar un mail-------------------------------
 
@@ -44,7 +44,7 @@ export class LandingPageComponent implements OnInit {
   ];
 
   //Formulario para hacer consultas
-  constructor(private fb : FormBuilder, private routingService : RoutingService) {
+  constructor(private fb : FormBuilder) {
     this.formMessage = this.fb.group({
       name: new FormControl('', [Validators.required]),
       email: new FormControl('', [Validators.required, Validators.email]),
