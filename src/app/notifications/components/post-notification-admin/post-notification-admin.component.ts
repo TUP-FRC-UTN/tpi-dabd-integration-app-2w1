@@ -76,7 +76,7 @@ export class PostNotificationAdminComponent implements AfterViewInit, OnInit{
     let table = $("#myTable").DataTable();
     for (let user of this.users) {
 
-      table.row.add([user.name,user.lastname,user.dni,user.email, '<input type="checkbox" class="userCheckbox" />']).draw(false);
+      table.row.add([user.name,user.lastname,user.dni,user.email, '<input type="checkbox" class="userCheckbox form-check-input border border-secondary" />']).draw(false);
     }
   }
   
