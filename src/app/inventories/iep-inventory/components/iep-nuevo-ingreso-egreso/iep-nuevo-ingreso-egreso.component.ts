@@ -54,7 +54,10 @@ export class IepNuevoIngresoEgresoComponent implements OnInit {
     });
     this.formularioEgreso.get('amount')?.valueChanges.subscribe((x)=>{ this.logErrorsEgreso()})
     this.formulario.get('amount')?.valueChanges.subscribe((x)=>{ this.logErrorsFormulario()})
-
+    this.formularioEgreso.get('selectedArticule')?.valueChanges.subscribe((x)=>{ 
+      this.formularioEgreso.get('amount')?.setValue(0)
+      this.logErrorsEgreso()
+    })
     this.loadSuppliers();
     this.loadProductos();
     this.idUser= this.serviceUsers.getMockId()

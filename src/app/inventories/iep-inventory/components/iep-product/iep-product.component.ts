@@ -163,6 +163,8 @@ export class IepProductComponent {
       title: 'Registro actualizado',
       text: this.successMessage,
       confirmButtonText: 'OK'
+    }).then(() => {
+      this.router.navigate(['/main/inventories/inventory']);
     });
   }
 
