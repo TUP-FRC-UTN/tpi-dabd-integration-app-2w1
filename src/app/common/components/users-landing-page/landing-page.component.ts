@@ -23,6 +23,26 @@ export class LandingPageComponent implements OnInit {
   formMessage : FormGroup;
   plotsCard : {number : number, blockNumber : number, totalArea : number, type : string, status : string}[] = [];
 
+  images: any[] = [
+    'https://www.villadelcondor.com/imagenes/villadelcondor1.jpg',
+    'https://www.villadelcondor.com/imagenes/villadelcondor2.jpg',
+    'https://www.villadelcondor.com/imagenes/villadelcondor3.jpg',
+    'https://www.villadelcondor.com/imagenes/villadelcondor4.jpg',
+    'https://www.villadelcondor.com/imagenes/villadelcondor5.jpg',
+    'https://www.villadelcondor.com/imagenes/villadelcondor6.jpg',
+    'https://www.villadelcondor.com/imagenes/villadelcondor7.jpg',
+    'https://www.villadelcondor.com/imagenes/villadelcondor8.jpg',
+    'https://www.villadelcondor.com/imagenes/villadelcondor9.jpg',
+    'https://www.villadelcondor.com/imagenes/villadelcondor10.jpg',
+    'https://www.villadelcondor.com/imagenes/villadelcondor11.jpg',
+    'https://www.villadelcondor.com/imagenes/villadelcondor12.jpg',
+    'https://www.villadelcondor.com/imagenes/villadelcondor14.jpg',
+    'https://www.villadelcondor.com/imagenes/villadelcondor15.jpg',
+    'https://www.villadelcondor.com/imagenes/villadelcondor16.jpg',
+    'https://www.villadelcondor.com/imagenes/villadelcondor17.jpg',
+    'https://www.villadelcondor.com/imagenes/villadelcondor18.jpg'
+  ];
+
   //Formulario para hacer consultas
   constructor(private fb : FormBuilder, private routingService : RoutingService) {
     this.formMessage = this.fb.group({
@@ -40,7 +60,7 @@ export class LandingPageComponent implements OnInit {
     this.plotService.getAllPlotsAvailables().subscribe({
       next: (data: GetPlotModel[]) => {
         
-        const firstThreePlots = data.slice(0, 3);
+        const firstThreePlots = data.slice(0, 6);
         this.plotsCard = firstThreePlots.map(d => ({
           number: d.plot_number,
           blockNumber: d.block_number,
