@@ -24,6 +24,7 @@ import { SanctionsDTO } from '../../../models/SanctionsDTO';
 import autoTable from 'jspdf-autotable';
 import { CustomSelectComponent } from "../../../../common/components/custom-select/custom-select.component";
 import { AuthService } from '../../../../users/users-servicies/auth.service';
+import { PlotService } from '../../../../users/users-servicies/plot.service';
 
 
 @Component({
@@ -47,6 +48,7 @@ export class PenaltiesSanctionsListComponent implements OnInit {
   selectedState: string = '';
   selectedStates: string[] = [];
   today: string = '';
+  plots: any[] = [];
 
   options: { name: string, value: any }[] = []
   @ViewChild(CustomSelectComponent) customSelect!: CustomSelectComponent;
@@ -57,10 +59,12 @@ export class PenaltiesSanctionsListComponent implements OnInit {
     //Metodo para recargar la datatable desde dentro de un modal en el modal
     this.sanctionService.refreshTable$.subscribe(() => {
       this.refreshData();
+      
     });
 
-    this.getStates()
-    this.refreshData()
+    this.getStates();
+    this.refreshData();
+    this.loadPlots();
     //Esto es para acceder al metodo desde afuera del datatable
     const that = this; // para referenciar metodos afuera de la datatable
     $('#sanctionsTable').on('click', 'a.dropdown-item', function (event) {
@@ -103,13 +107,26 @@ export class PenaltiesSanctionsListComponent implements OnInit {
     return adjustedDate.toLocaleDateString('en-CA'); // Formato estándar `YYYY-MM-DD`
   }
 
+  loadPlots() {
+    this.plotService.getAllPlots().subscribe({
+      next: (data) => {
+        this.plots = data;
+        console.log('Lotes cargados:', data);
+      },
+      error: (error) => {
+        console.error('error: ', error);
+      }
+    })
+  }
+
 
   //Constructor
   constructor(
     private _modal: NgbModal,
     private sanctionService: SanctionService,
     private routingService: RoutingService,
-    private authService: AuthService
+    private authService: AuthService,
+    private plotService: PlotService
   ) {
     (window as any).viewFine = (id: number) => this.viewFine(id);
   }
@@ -155,7 +172,7 @@ export class PenaltiesSanctionsListComponent implements OnInit {
           data: 'plotId',
           className: 'align-middle',
           render: (data) =>
-            `<div class="text-end">${data}</div>`
+            `<div>${this.getPlotData(data)}</div>`
         },
         {
           data: 'amount',
@@ -401,6 +418,11 @@ export class PenaltiesSanctionsListComponent implements OnInit {
   //Redirige a la pagina para dar de alta un descargo
   newDisclaimer(id: number) {
     this.routingService.redirect(`main/sanctions/post-disclaimer/${id}`, "Registrar Descargo")
+  }
+
+  getPlotData(plotId: number) {
+    let plot = this.plots.find((plot) => plot.id === plotId);
+    return `Nro: ${plot?.plot_number} - Manzana: ${plot?.block_number}`;
   }
 
 

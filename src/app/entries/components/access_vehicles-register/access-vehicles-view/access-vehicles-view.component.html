@@ -1,274 +1,246 @@
 <div class="card mt-5 mx-3 mx-md-5 shadow-lg p-3 mb-5 bg-body-tertiary rounded pruebaNavbar">
-  
-    <div class="card-body fs-2">
-      <!-- <h5 class="card-title">Ingrese aquí los datos:</h5> -->
-    </div>
-    
-    <form [formGroup]="formVehicle" class="needs-validation" novalidate (ngSubmit)="onSubmit()">
-      <!-- Document Info -->
-      <div class="card mt-3 mb-3">
-        <div class="card-body">
-          <div class="row g-3 mb-3">
-            <!-- Campo Documento -->
-            <div class="col-md-6">
-              <div class="d-flex flex-column">
-                <div class="input-group">
-                  <label for="document" class="form-label me-2" style="width: 120px;">Documento</label>
-                  <div class="col-10">
-                  <input type="text" 
-                         class="form-control flex-grow-1"
-                         id="document" 
-                         formControlName="document"
-                         [class.is-valid]="formVehicle.get('document')?.valid && formVehicle.get('document')?.touched"
-                         [class.is-invalid]="formVehicle.get('document')?.invalid && formVehicle.get('document')?.touched">
-                
-                
+
+  <div class="card-body fs-2">
+    <!-- <h5 class="card-title">Ingrese aquí los datos:</h5> -->
+  </div>
+
+  <form [formGroup]="formVehicle" class="needs-validation" novalidate (ngSubmit)="onSubmit()">
+    <!-- Document Info -->
+    <div class="card mt-3 mb-3">
+      <div class="card-body pb-5">
+        <div class="row g-3 mb-5 align-items-center">
+          <!-- Campo Documento -->
+          <div class="col-md-6">
+            <div class="d-flex align-items-center">
+              <label for="document" class="form-label me-2" style="width: 120px;">Documento</label>
+              <div class="position-relative">
+                <input type="text" class="form-control flex-grow-1" id="document" formControlName="document"
+                  [class.is-valid]="formVehicle.get('document')?.valid && formVehicle.get('document')?.touched"
+                  [class.is-invalid]="formVehicle.get('document')?.invalid && formVehicle.get('document')?.touched">
                 <!-- Mensajes de error para Documento -->
-                <div class="validation-messages ms-[120px]">
-                  <div *ngIf="formVehicle.get('document')?.hasError('userNotFound') && formVehicle.get('document')?.touched" 
-                       class="invalid-feedback d-block">
+                <div class="invalid-feedback position-absolute [120px]">
+                  <div
+                    *ngIf="formVehicle.get('document')?.hasError('userNotFound') && formVehicle.get('document')?.touched">
                     El documento no existe.
                   </div>
-                  
-                  <div *ngIf="formVehicle.get('document')?.hasError('userExists') && formVehicle.get('document')?.touched" 
-                       class="valid-feedback d-block">
-                    El documento existe.
-                  </div>
-                  
-                  <div *ngIf="formVehicle.get('document')?.hasError('apiError') && formVehicle.get('document')?.touched" 
-                       class="invalid-feedback d-block">
+                  <div *ngIf="formVehicle.get('document')?.hasError('apiError') && formVehicle.get('document')?.touched">
                     Documento no encontrado.
                   </div>
-                  
                   @if(formVehicle.get('document')?.invalid && formVehicle.get('document')?.touched){
                     @if(formVehicle.get('document')?.errors?.['required']){
-                      <div class="invalid-feedback d-block">El documento es requerido</div>
+                      <p>El documento es requerido</p>
                     }
                     @if(formVehicle.get('document')?.errors?.['pattern']){
-                      <div class="invalid-feedback d-block">El documento debe contener solo números.</div>
+                      <div>El documento debe contener solo números.</div>
                     }
                     @if(formVehicle.get('document')?.errors?.['minlengt']){
-                      <div class="invalid-feedback d-block">El documento debe tener 8 caracteres</div>
+                      <div>El documento debe tener 8 caracteres</div>
                     }
                     @if(formVehicle.get('document')?.errors?.['min']){
-                      <div class="invalid-feedback d-block">El documento debe tener 8 caracteres</div>
+                      <div>El documento debe tener 8 caracteres</div>
                     }
                     @if(formVehicle.get('document')?.errors?.['userNotFound']){
-                      <div class="invalid-feedback d-block">El usuario no existe</div>
+                      <div>El usuario no existe</div>
                     }
                   }
                 </div>
               </div>
-              </div>
-              </div>
             </div>
-      
-            <!-- Campo Tipo de Documento -->
-            <div class="col-md-6">
-              <div class="d-flex flex-column">
-                <div class="input-group">
-                  <label for="documentType" class="form-label me-2" style="width: 120px;">Tipo de Documento</label>
-                  <div class="col-10">
-                  <select class="form-control" 
-                          id="documentType" 
-                          formControlName="documentType"
-                          [class.is-valid]="formVehicle.get('documentType')?.valid && formVehicle.get('documentType')?.touched"
-                          [class.is-invalid]="formVehicle.get('documentType')?.invalid && formVehicle.get('documentType')?.touched">
-                    <option value="">Seleccione tipo de documento</option>
-                    <option value="DNI">DNI</option>
-                    <option value="PASSPORT">Pasaporte</option>
-                    <option value="CUIT">CUIT</option>
-                  </select>
+          </div>
+
+          <!-- Campo Tipo de Documento -->
+          <div class="col-md-6">
+            <div class="d-flex align-items-center">
+              <label for="documentType" class="form-label me-2" style="width: 120px;">Tipo de Documento</label>
+              <div class="position-relative">
+                <select class="form-control" id="documentType" formControlName="documentType"
+                  [class.is-valid]="formVehicle.get('documentType')?.valid && formVehicle.get('documentType')?.touched"
+                  [class.is-invalid]="formVehicle.get('documentType')?.invalid && formVehicle.get('documentType')?.touched">
+                  <option value="">Seleccione tipo de documento</option>
+                  <option value="DNI">DNI</option>
+                  <option value="PASSPORT">Pasaporte</option>
+                  <option value="CUIT">CUIT</option>
+                </select>
+                <div class="invalid-feedback position-absolute">
                   @if(formVehicle.get('documentType')?.invalid && formVehicle.get('documentType')?.touched){
                     @if(formVehicle.get('documentType')?.errors?.['required']){
-                      <div class="invalid-feedback d-block">El tipo es requerido</div>
+                      <div>El tipo es requerido</div>
                     }
                   }
-                <!-- Espacio para mensajes de error del tipo de documento si los hubiera -->  
+                </div>
+                <!-- Espacio para mensajes de error del tipo de documento si los hubiera -->
               </div>
             </div>
           </div>
         </div>
       </div>
-      </div>
-      </div>
-        @if (isUserFound) {
-          <div class="card mt-3 mb-3">
-          <div class="card-body">
-          <div class="row g-3 mb-3">
-          <div class="col-12">
-            <h5>Datos del Usuario:</h5>
-            <p>Nombre: {{ userAllowed?.name }} </p>
-            <p>Apellido: {{ userAllowed?.last_name }}</p>
-            <p>Email: {{ userAllowed?.email }}</p>
-          </div>
-          </div>
-          </div>
-          </div>
-          <div class="card mt-3 mb-3">
-            <div class="card-body">
-            <div class="row g-3 mb-3">
-          <h5>Listado de Vehículos:</h5>
-          @for(vehicle of userAllowed?.vehicles;track $index){
-            
-            <div class="col-12 col-md-3 d-flex align-items-center">
-              <label for="plate{{$index}}" class="form-label me-2">Patente</label>
-              <input type="text" class="form-control " [id]="'plate'+$index" name="plate" value="{{vehicle.plate}}" [disabled]="true" >
-            </div>
-            <div class="col-12 col-md-3  d-flex align-items-center">
-              <label for="vehicle_Type{{$index}}" class="form-label me-2">Tipo de Vehículo</label>
-              <input type="text" class="form-control " [id]="'vehicle_Type'+$index" name="vehicle_Type" value="{{vehicle.vehicle_Type.description==='Car'?'Auto':vehicle.vehicle_Type.description
-           ==='Motorbike' ?'Moto':vehicle.vehicle_Type.description==='Truck'?'Camión':vehicle.vehicle_Type.description==='Van'?'Camioneta':vehicle.vehicle_Type.description}}"[disabled]="true">
-            </div>
-
-            <div class="col-12 col-md-3  d-flex align-items-center">
-              <label for="insurance{{$index}}" class="form-label me-2">Seguro</label>
-              <input type="text" class="form-control " [id]="'insurance'+$index" name="insurance" value="{{vehicle.insurance}}" [disabled]="true">
-            </div>
-            <div class="col-12 col-md-3 d-flex align-items-center ">
-              <button type="button" class="btn btn-danger btn-sm " (click)="openConfirmModal(vehicle.plate)">
-                Baja 
-              </button>
-            </div>
-           
-          }
-          </div>   
-          </div>
-          </div>
-        }
-      <!-- Vehicle Forms -->
+    </div>
+    @if (isUserFound) {
       <div class="card mt-3 mb-3">
         <div class="card-body">
-          <h5>Alta de Vehículos:</h5>
-          <div formArrayName="vehicles">
-            @for (vehicleGroup of VehiclesArray.controls; track $index) {
-              <div [formGroupName]="$index" class="row g-3 mb-3 border-bottom pb-3">
-                <!-- Campo Patente -->
-                <div class="col-12 col-md-3">
-                  <div class="d-flex flex-column">
-                    <div class="input-group">
-                      <label for="plate" class="form-label me-2">Patente</label>     
-                      <div class="col-10">
-                      <input type="text" 
-                             class="form-control" 
-                             [id]="'plate'+$index" 
-                             formControlName="plate"
-                             [class.is-valid]="vehicleGroup.get('plate')?.valid && vehicleGroup.get('plate')?.touched"
-                             [class.is-invalid]="vehicleGroup.get('plate')?.invalid && vehicleGroup.get('plate')?.touched">
-                      
-                    <div class="validation-messages ms-[120px]">
-                      @if (vehicleGroup.get('plate')?.errors?.['required'] && vehicleGroup.get('plate')?.touched) {
-                        <div class="invalid-feedback d-block">La patente es requerida.</div>
-                      }
-                      @if (vehicleGroup.get('plate')?.errors?.['pattern'] && vehicleGroup.get('plate')?.touched) {
-                        <div class="invalid-feedback d-block">Formato de patente inválido.</div>
-                      }
-                    </div>
-                      </div>
-                      </div>
-                    </div>
-              
-                    </div>
-            
-                
-      
-                <!-- Campo Tipo de Vehículo -->
-                <div class="col-12 col-md-3">
-                  <div class="d-flex flex-column">
-                    <div class="input-group">
-                     
-                      <label for="vehicleType" class="form-label me-2" >Tipo de Vehículo</label>
-                      <div class="col-8">
-                      <select class="form-control" 
-                              [id]="'vehicleType'+$index" 
-                              formControlName="vehicleType"
-                              [class.is-valid]="vehicleGroup.get('vehicleType')?.valid && vehicleGroup.get('vehicleType')?.touched"
-                              [class.is-invalid]="vehicleGroup.get('vehicleType')?.invalid && vehicleGroup.get('vehicleType')?.touched">
-                        <option value="">Seleccione el tipo de vehículo</option>
-                        @for (option of vehicleOptions; track option.value) {
-                          <option [value]="option.value">{{option.label}}</option>
-                        }
-                      </select>
-                    
-                    <div class="validation-messages ms-[120px]">
-                      @if (vehicleGroup.get('vehicleType')?.errors?.['required'] && vehicleGroup.get('vehicleType')?.touched) {
-                        <div class="invalid-feedback d-block">Por favor, seleccione un tipo de vehículo.</div>
-                      }
-                    </div>
-                  </div>
-                </div>
-                </div>
-                </div>
-                <!-- Campo Seguro -->
-                <div class="col-12 col-md-3">
-                  <div class="d-flex flex-column">
-                    <div class="input-group">
-                      <label for="insurance" class="form-label me-2" >Seguro</label>
-                      <div class="col-10">
-                      <select class="form-control" 
-                              [id]="'insurance'+$index" 
-                              formControlName="insurance"
-                              [class.is-valid]="vehicleGroup.get('insurance')?.valid && vehicleGroup.get('insurance')?.touched"
-                              [class.is-invalid]="vehicleGroup.get('insurance')?.invalid && vehicleGroup.get('insurance')?.touched">
-                        <option value="">Seleccione el seguro de vehículo</option>
-                        <option value="San Cristobal">San Cristobal</option>
-                        <option value="La Nueva">La Nueva</option>
-                      </select>
-                   
-                    <div class="validation-messages ms-[120px]">
-                      @if (vehicleGroup.get('insurance')?.errors?.['required'] && vehicleGroup.get('insurance')?.touched) {
-                        <div class="invalid-feedback d-block">Por favor, seleccione un seguro.</div>
-                      }
-                    </div>
-                  </div>
-                </div>
-                  </div>
-                </div>
-                <!-- Botón Quitar -->
-                <div class="col-12 col-md-1 d-flex align-items-start justify-content-end">
-                  <button type="button" class="btn btn-danger btn-sm" (click)="removeVehicle($index)">
-                    Quitar
-                  </button>
-                </div>
+          <div class="row g-3 mb-3">
+            <div class="col-12">
+              <h5>Datos del Usuario:</h5>
+              <p>Nombre: {{ userAllowed?.name }} </p>
+              <p>Apellido: {{ userAllowed?.last_name }}</p>
+              <p>Email: {{ userAllowed?.email }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card mt-3 mb-3">
+        <div class="card-body">
+          <div class="row g-3 mb-3">
+            <h5>Listado de Vehículos:</h5>
+            @for(vehicle of userAllowed?.vehicles;track $index){
+              <div class="col-12 col-md-3 d-flex align-items-center">
+                <label for="plate{{$index}}" class="form-label me-2">Patente</label>
+                <input type="text" class="form-control " [id]="'plate'+$index" name="plate" value="{{vehicle.plate}}"
+                  [disabled]="true">
               </div>
+              <div class="col-12 col-md-3 d-flex align-items-center">
+                <label for="vehicle_Type{{$index}}" class="form-label me-2">Tipo de Vehículo</label>
+                <input type="text" class="form-control " [id]="'vehicle_Type'+$index" name="vehicle_Type"
+                  value="{{vehicle.vehicle_Type.description==='Car'?'Auto':vehicle.vehicle_Type.description
+              ==='Motorbike' ?'Moto':vehicle.vehicle_Type.description==='Truck'?'Camión':vehicle.vehicle_Type.description==='Van'?'Camioneta':vehicle.vehicle_Type.description}}" [disabled]="true">
+              </div>
+              <div class="col-12 col-md-3  d-flex align-items-center">
+                <label for="insurance{{$index}}" class="form-label me-2">Seguro</label>
+                <input type="text" class="form-control " [id]="'insurance'+$index" name="insurance"
+                  value="{{vehicle.insurance}}" [disabled]="true">
+              </div>
+              <div class="col-12 col-md-3 d-flex align-items-center ">
+                <button type="button" class="btn btn-danger btn-sm " (click)="openConfirmModal(vehicle.plate)">
+                  Baja
+                </button>
+              </div>
+
             }
           </div>
-          <div class="col-12 md-3  text-end">
-            <button type="button" class="btn btn-primary" (click)="addVehicle()">
-              Añadir
-            </button>
-          </div>
         </div>
       </div>
-      <!-- Add Vehicle Button -->
-    
-      
-      <!-- Submit Button -->
-      
-        <div class="col-12 md-3 text-end">
-          <button type="submit" class="btn btn-success " [disabled]="!formVehicle.valid">
-            Registrar
+    }
+    <!-- Vehicle Forms -->
+    <div class="card mt-3 mb-3">
+      <div class="card-body">
+        <h5>Alta de Vehículos:</h5>
+        <div formArrayName="vehicles">
+          @for (vehicleGroup of VehiclesArray.controls; track $index) {
+          <div [formGroupName]="$index" class="g-3 mb-3 border-bottom pb-3">
+            <div class="row align-items-center mb-4">
+              <!-- Campo Patente -->
+              <div class="col-12 col-md-3">
+                <div class="d-flex align-items-center">
+                  <label for="plate" class="form-label me-2">Patente</label>
+                  <div class="position-relative">
+                    <input type="text" class="form-control" [id]="'plate'+$index" formControlName="plate"
+                      [class.is-valid]="vehicleGroup.get('plate')?.valid && vehicleGroup.get('plate')?.touched"
+                      [class.is-invalid]="vehicleGroup.get('plate')?.invalid && vehicleGroup.get('plate')?.touched">
+                    <div class="invalid-feedback ms-[120px] position-absolute">
+                      @if (vehicleGroup.get('plate')?.errors?.['required'] && vehicleGroup.get('plate')?.touched) {
+                        <div>La patente es requerida.</div>
+                      }
+                      @if (vehicleGroup.get('plate')?.errors?.['pattern'] && vehicleGroup.get('plate')?.touched) {
+                        <div>Formato de patente inválido.</div>
+                      }
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Campo Tipo de Vehículo -->
+              <div class="col-12 col-md-3">
+                <div class="d-flex align-items-center">
+                  <label for="vehicleType" class="form-label me-2">Tipo de Vehículo</label>
+                  <div class="col-8 position-relative">
+                    <select class="form-control" [id]="'vehicleType'+$index" formControlName="vehicleType"
+                      [class.is-valid]="vehicleGroup.get('vehicleType')?.valid && vehicleGroup.get('vehicleType')?.touched"
+                      [class.is-invalid]="vehicleGroup.get('vehicleType')?.invalid && vehicleGroup.get('vehicleType')?.touched">
+                      <option value="">Seleccione el tipo de vehículo</option>
+                      @for (option of vehicleOptions; track option.value) {
+                        <option [value]="option.value">{{option.label}}</option>
+                      }
+                    </select>
+  
+                    <div class="invalid-feedback ms-[120px] position-absolute">
+                      @if (vehicleGroup.get('vehicleType')?.errors?.['required'] &&
+                        vehicleGroup.get('vehicleType')?.touched) {
+                        <div>Por favor, seleccione un tipo de vehículo.</div>
+                      }
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Campo Seguro -->
+              <div class="col-12 col-md-3">
+                <div class="d-flex align-items-center">
+                  <label for="insurance" class="form-label me-2">Seguro</label>
+                  <div class="col-10 position-relative">
+                    <select class="form-control" [id]="'insurance'+$index" formControlName="insurance"
+                      [class.is-valid]="vehicleGroup.get('insurance')?.valid && vehicleGroup.get('insurance')?.touched"
+                      [class.is-invalid]="vehicleGroup.get('insurance')?.invalid && vehicleGroup.get('insurance')?.touched">
+                      <option value="">Seleccione el seguro de vehículo</option>
+                      @for (insurance of insurances; track $index) {
+                        <option [value]="insurance">{{insurance}}</option>
+                      }
+                    </select>
+  
+                    <div class="invalid-feedback ms-[120px] position-absolute">
+                      @if (vehicleGroup.get('insurance')?.errors?.['required'] &&
+                        vehicleGroup.get('insurance')?.touched) {
+                        <div>Por favor, seleccione un seguro.</div>
+                      }
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Botón Quitar -->
+              <div class="col-12 col-md d-flex flex-column align-items-end justify-content-end">
+                <button type="button" class="btn btn-danger btn-sm" (click)="removeVehicle($index)">
+                  Quitar
+                </button>
+              </div>
+            </div>
+          </div>
+          }
+        </div>
+        <div class="col-12 md-3  text-end">
+          <button type="button" class="btn btn-primary" (click)="addVehicle()">
+            Añadir
           </button>
         </div>
-     
-       <!-- Modal -->
-      <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="confirmModalLabel">Confirmación</h5>
-            </div>
-            <div class="modal-body">
-              ¿Estás seguro de que deseas dar de baja el vehículo la con patente <strong>{{ selectedVehicle?.plate }}</strong>?
-            </div>
-            <div class="modal-footer border-0">
-              <button type="button" class="btn btn-danger" (click)="logicDownVehicle()"  data-bs-dismiss="modal">Eliminar</button>
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-            </div>
+      </div>
+    </div>
+    <!-- Add Vehicle Button -->
+
+
+    <!-- Submit Button -->
+
+    <div class="col-12 md-3 text-end">
+      <button type="submit" class="btn btn-success " [disabled]="!formVehicle.valid">
+        Registrar
+      </button>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="confirmModalLabel">Confirmación</h5>
+          </div>
+          <div class="modal-body">
+            ¿Estás seguro de que deseas dar de baja el vehículo la con patente <strong>{{ selectedVehicle?.plate
+              }}</strong>?
+          </div>
+          <div class="modal-footer border-0">
+            <button type="button" class="btn btn-danger" (click)="logicDownVehicle()"
+              data-bs-dismiss="modal">Eliminar</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
           </div>
         </div>
       </div>
-    </form>
-  </div>
+    </div>
+  </form>
+</div>
 
 <access-app-register-emergency></access-app-register-emergency>

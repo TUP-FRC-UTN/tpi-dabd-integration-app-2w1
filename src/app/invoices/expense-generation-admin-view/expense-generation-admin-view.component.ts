@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule, registerLocaleData } from '@angular/common';
 import { ExpenseGenerationExpenseService } from '../expense-generation-services/expense-generation-expense.service';
@@ -15,15 +15,10 @@ import { Observable } from 'rxjs/internal/Observable';
 import { BehaviorSubject } from 'rxjs';
 import localeEsAr from '@angular/common/locales/es-AR';
 import { environment } from '../../common/environments/environment';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 registerLocaleData(localeEsAr, 'es-AR');
 
 declare var window: any;
-
-interface MultiplierData {
-  latePayment: number;
-  expiration: number;
-  generationDay: number;
-}
 
 @Component({
   selector: 'app-expense-generation-admin-view',
@@ -34,10 +29,13 @@ interface MultiplierData {
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class ExpenseGenerationAdminViewComponent implements OnInit {
+  @ViewChild('dateRangeContent') dateRangeContent!: TemplateRef<any>;
+  @ViewChild('observationContent') observationContent!: TemplateRef<any>;
+  @ViewChild('multipliersContent') multipliersContent!: TemplateRef<any>;
+
   // Formatear los períodos
   loadMultipliersData() {
     this.isLoadingMultipliers = true;
-
     forkJoin({
       multipliers: this.expenseService.getMultipliers(),
       generationDay: this.expenseService.getGenerationDay(),
@@ -46,6 +44,11 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
         this.latePaymentPercentage = multipliers.latePayment * 100;
         this.expirationPercentage = multipliers.expiration * 100;
         this.generationDay = generationDay;
+        
+        // Guardar los valores originales
+        this.originalLatePaymentPercentage = this.latePaymentPercentage;
+        this.originalExpirationPercentage = this.expirationPercentage;
+        this.originalGenerationDay = this.generationDay;
       },
       error: (error) => {
         console.error('Error loading multipliers data', error);
@@ -57,13 +60,11 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
   }
 
   saveAllChanges() {
-    const observation = 'Updated configuration'; // Customize this if needed
+    const observation = 'Updated configuration'; 
 
-    // Convert percentages back to decimal for the update
     const latePaymentMultiplier = this.latePaymentPercentage / 100;
     const expirationMultiplier = this.expirationPercentage / 100;
 
-    // Call all update methods simultaneously
     forkJoin([
       this.expenseService.updateLatePaymentMultiplier(
         latePaymentMultiplier,
@@ -77,7 +78,7 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
     ]).subscribe({
       next: () => {
         console.log('All fields updated successfully');
-        this.onModalClose(); // Optionally close the modal here
+        this.onModalClose(); 
       },
       error: (error) => {
         console.error('Error updating fields', error);
@@ -126,6 +127,11 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
   totalPages: number = 0;
   observation: string = '';
 
+  todayNow: Date = new Date; 
+
+  startDate: string = '';
+  endDate: string = '';
+
   // Valores originales (desde la BD)
   originalLatePayment: number = 0;
   originalExpiration: number = 0;
@@ -165,7 +171,7 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
     { value: 12, label: '12 - Diciembre' },
   ];
   listStatus: string[] = ['Pendiente', 'Pago', 'Exceptuado'];
-  typedoc = ['DNI', 'PASAPORTE'];
+  typedoc = ['DNI', 'PASAPORTE', 'CUIT/CUIL'];
   filter = {
     from: '',
     until: '',
@@ -179,12 +185,11 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
 
   status = ['Pendiente', 'Pago', 'Exceptuado'];
   showStatusDropdown = false;
-  constructor(private expenseService: ExpenseGenerationExpenseService) {}
+  constructor(private expenseService: ExpenseGenerationExpenseService, private modalService: NgbModal,) {}
 
   originalLatePaymentPercentage: number = 0;
   originalExpirationPercentage: number = 0;
 
-  // Control de campos
   fieldModified: 'generationDay' | 'latePayment' | 'expiration' | null = null;
   activeField: 'generationDay' | 'latePayment' | 'expiration' | null = null;
 
@@ -269,18 +274,16 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
     this.expirationPercentage = this.originalExpirationPercentage;
   }
 
-  isFieldModified(
-    fieldName: 'generationDay' | 'latePayment' | 'expiration'
-  ): boolean {
+  isFieldModified(fieldName: 'generationDay' | 'latePayment' | 'expiration'): boolean {
     switch (fieldName) {
       case 'generationDay':
         return this.generationDay !== this.originalGenerationDay;
       case 'latePayment':
-        return (
-          this.latePaymentPercentage !== this.originalLatePaymentPercentage
-        );
+        return this.latePaymentPercentage !== this.originalLatePaymentPercentage;
       case 'expiration':
         return this.expirationPercentage !== this.originalExpirationPercentage;
+      default:
+        return false;
     }
   }
 
@@ -288,16 +291,13 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
     this.activeField = null;
   }
 
-  onFieldChange(
-    fieldName: 'generationDay' | 'latePayment' | 'expiration'
-  ): void {
+  onFieldChange(fieldName: 'generationDay' | 'latePayment' | 'expiration'): void {
     if (this.isFieldModified(fieldName)) {
       this.fieldModified = fieldName;
     } else {
       this.fieldModified = null;
     }
   }
-
   resetFieldState(): void {
     this.fieldModified = null;
     this.activeField = null;
@@ -339,9 +339,10 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
     this.selectedOwner = null;
   }
 
-  onModalClose(): void {
-    this.resetAllValues();
+  onModalClose() {
+    // Limpiar estados si es necesario
     this.fieldModified = null;
+    this.observation = '';
   }
 
   hasUnsavedChanges(): boolean {
@@ -354,19 +355,21 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
 
   ngOnInit() {
     const today = new Date();
-    const lastMonth = new Date();
-    lastMonth.setMonth(lastMonth.getMonth() - 3);
+    const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+    
+    // Actualizamos el filtro con los valores deseados
+    this.filter.until = today.toISOString().split('T')[0];
+    this.filter.from = lastMonth.toISOString().split('T')[0];
+
+
+    // Emitimos los cambios en el filtro
     this.filter$.next({ ...this.filter });
     this.filter$.subscribe(() => {
       this.searchTickets();
     });
-    this.filter.until = today.toISOString().split('T')[0];
-    this.filter.from = lastMonth.toISOString().split('T')[0];
 
-    // Cargar datos iniciales
     this.loadInitialData();
 
-    // Initialize modals
     this.detallesModal = new window.bootstrap.Modal(
       document.getElementById('detallesModal')
     );
@@ -379,7 +382,6 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
     this.isLoading = true;
     this.error = null;
 
-    // Primero cargar la configuración
     this.loadConfiguration();
 
     // Luego cargar los propietarios y sus boletas
@@ -474,7 +476,6 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
     );
     let endPage = Math.min(this.totalPages, startPage + maxVisiblePages - 1);
 
-    // Ajustar startPage si estamos cerca del final
     if (endPage - startPage + 1 < maxVisiblePages) {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
@@ -507,9 +508,18 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
   }
 
   isValidGenerationDay(): boolean {
-    return this.generationDay >= 1 && this.generationDay <= 28;
+    if (!this.generationDay) return false;
+    
+    const today = new Date();
+    const currentDay = today.getDate();
+    
+    return this.generationDay >= 1 && 
+           this.generationDay <= 28 && 
+           this.generationDay > currentDay;
   }
 
+  
+  
   hasChangesExpense(): boolean {
     if (!this.selectedExpense) return false;
 
@@ -566,26 +576,63 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
     );
   }
 
-  openObservationModal() {
-    this.observation = '';
-    const detallesModalElement = document.getElementById('detallesModal');
-    const detallesModal =
-      window.bootstrap.Modal.getInstance(detallesModalElement);
-
-    if (detallesModal) {
-      detallesModal.hide();
-    }
-    const observationModalElement = document.getElementById(
-      'observationModalExpenses'
-    );
-    const observationModal = new window.bootstrap.Modal(
-      observationModalElement,
-      {
-        backdrop: 'static',
+    // Método para abrir el modal de observación
+    
+    openObservationModal() {
+      if (this.hasChanges()) {
+        const modalRef = this.modalService.open(this.observationContent, {
+          backdrop: 'static'
+        });
+        modalRef.result.then(
+          (result) => {
+            if (result === 'confirm') {
+              this.saveChanges();
+            }
+          },
+          () => {
+            // Modal dismissed
+          }
+        );
       }
-    );
-    observationModal.show();
-  }
+    }
+
+    // Método para abrir el modal principal
+    openMultipliersModal() {
+      this.modalService.open(this.multipliersContent, {
+        size: 'lg',
+        backdrop: 'static'
+      }).result.then(
+        (result) => {
+          this.onModalClose();
+        },
+        (reason) => {
+          this.onModalClose();
+        }
+      );
+      this.loadMultipliersData();
+    }
+
+    // Método para abrir el modal de rango de fechas
+    openDateRangeModal() {
+      const modalRef = this.modalService.open(this.dateRangeContent, {
+        backdrop: 'static'
+      });
+      modalRef.result.then(
+        (result) => {
+          if (result === 'confirm') {
+            this.confirmDateRange();
+          }
+        },
+        () => {
+          // Modal dismissed
+        }
+      );
+    }
+
+    generateExpensesNow() {
+      this.modalService.dismissAll();
+      this.openDateRangeModal();
+    }
 
   closeObservationModal() {
     const observationModalElement = document.getElementById(
@@ -712,27 +759,45 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
     this.searchTickets();
   }
 
+
+
   handleSaveClick() {
     if (this.hasChanges()) {
-      // Cierra el modal de multiplicadores
-      const multipliersModalElement = document.getElementById('multipliersModal');
-      if (multipliersModalElement) {
-        const multipliersModal = window.bootstrap.Modal.getInstance(multipliersModalElement);
-        if (multipliersModal) {
-          multipliersModal.hide();
-        }
-      }
-  
-      // Restablece fieldModified después de guardar
+      this.modalService.dismissAll();
       this.fieldModified = null;
-  
-      // Abre el modal de observación
-      const observationModalElement = document.getElementById('observationModal');
-      if (observationModalElement) {
-        const observationModal = new window.bootstrap.Modal(observationModalElement);
-        observationModal.show();
-      }
+      this.openObservationModal();
     }
+  }
+
+
+  confirmDateRange() {
+    if (!this.filter.from || !this.filter.until) {
+        Swal.fire({
+        title: 'Error',
+        text: 'Debe seleccionar ambas fechas',
+        icon: 'error'
+      });
+      return;
+    }
+
+    this.expenseService.generateAllExpenses(this.filter.from, this.filter.until)
+      .subscribe({
+        next: () => {
+          Swal.fire({
+            title: 'Éxito',
+            text: 'Facturas generadas correctamente',
+            icon: 'success'
+          });
+          this.modalService.dismissAll();
+        },
+        error: () => {
+          Swal.fire({
+            title: 'Error',
+            text: 'No se pudieron generar las facturas',
+            icon: 'error'
+          });
+        }
+      });
   }
   
 
@@ -808,33 +873,17 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
     // Ejecutar todas las solicitudes en paralelo
     forkJoin(requests).subscribe({
       next: (responses) => {
-        console.log('Respuestas:', responses);
-
-        // Actualizar valores originales con los nuevos valores
-        if (updatedValues.latePayment !== undefined) {
-          this.originalLatePayment = updatedValues.latePayment;
-        }
-        if (updatedValues.expiration !== undefined) {
-          this.originalExpiration = updatedValues.expiration;
-        }
-        if (updatedValues.generationDay !== undefined) {
-          this.originalGenerationDay = updatedValues.generationDay;
-        }
-
-        // Cerrar modales
-        this.closeAllModals();
-
-        // Limpiar observación
+        // ... tu lógica existente ...
+        this.modalService.dismissAll();
         this.observation = '';
-
-        // Mostrar mensaje de éxito
+        
         Swal.fire({
           title: 'Éxito',
           text: 'Los cambios se han guardado correctamente',
           icon: 'success',
           confirmButtonText: 'Aceptar',
         }).then(() => {
-          this.updateVisiblePages;
+          this.updateVisiblePages();
           this.loadConfiguration();
         });
       },
@@ -904,18 +953,9 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
     }
   }
 
-  validateDates() {
-    const from = new Date(this.filter.from);
-    const until = new Date(this.filter.until);
-    const today = new Date();
-
-    if (until < from) {
-      this.filter.until = this.filter.from;
-    }
-
-    if (until > today) {
-      this.filter.until = today.toISOString().split('T')[0];
-    }
+  validateDates(): boolean {
+    return !!(this.filter.from && this.filter.until && 
+      new Date(this.filter.from) <= new Date(this.filter.until));
   }
 
   loadAllOwnersWithExpenses() {
@@ -995,7 +1035,7 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
   cleanFilters() {
     const today = new Date();
     const lastMonth = new Date();
-    lastMonth.setMonth(lastMonth.getMonth() - 3);
+    lastMonth.setMonth(lastMonth.getMonth() - 1);
 
     this.filter = {
       from: lastMonth.toISOString().split('T')[0],
@@ -1014,11 +1054,11 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
   }
 
   getPlotNumbers(owner: Owner): string {
-    if (!owner.plots || owner.plots.length === 0) return 'Sin lotes';
-    const plotNumbers = owner.plots
+    if (!owner.plot || owner.plot.length === 0) return 'Sin lotes';
+    const plotNumbers = owner.plot
       .map((plot) => `${plot.plot_number}`)
       .join(', ');
-    return owner.plots.length > 1 ? `${plotNumbers}` : `${plotNumbers}`;
+    return owner.plot.length > 1 ? `${plotNumbers}` : `${plotNumbers}`;
   }
 
   searchUsers() {
@@ -1154,11 +1194,11 @@ applyPagination(data: any[]) {
     }
     this.filter$.next({ ...this.filter });
   }
-  async openPdf(id: number) {
+  async openPdf(uuid: string) {
     try {
+      const cleanUuid = uuid.replace('uuid:', '');
       const response = await fetch(
-        environment.services.expenseGeneration + `/api/expenses/pdf/${id}`
-      );
+        `${environment.services.expenseGeneration}/api/expenses/pdf/${cleanUuid}`);
       if (!response.ok) {
         alert('No se pudo cargar el PDF');
         return;
@@ -1181,8 +1221,8 @@ applyPagination(data: any[]) {
 
       const hasLetters = /[a-zA-Z]/.test(expense.payment_id);
       const url = hasLetters
-        ? environment.services.expenseGeneration + `/generate-receipt/${expense.payment_id}`
-        : environment.services.expenseGeneration + `/api/receipts/${expense.payment_id}/pdf`;
+        ? environment.services.stripeService + `/generate-receipt/${expense.payment_id}`
+        : environment.services.mercadoPago + `/api/receipts/${expense.payment_id}/pdf`;
 
       const response = await fetch(url);
       if (!response.ok) {
@@ -1254,6 +1294,8 @@ applyPagination(data: any[]) {
           ? 'D'
           : owner.dni_type === 'Pasaporte'
           ? 'P'
+          : owner.dni_type === 'CUIT/CUIL'
+          ? 'C'
           : 'N/A';
       return `${initial}- ${owner.dni}`;
     }

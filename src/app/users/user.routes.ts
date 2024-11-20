@@ -12,6 +12,10 @@ import { UsersRecoveryPasswordComponent } from "../common/components/users-recov
 import { ListUsersComponent } from "./users-components/users/users-list-users/list-users.component";
 import { NewUserComponent } from "./users-components/users/users-new-user/new-user.component";
 import { UsersUpdateUserComponent } from "./users-components/users/users-update-user/users-update-user.component";
+import { UsersReportComponent } from "./users-components/dashboard/users-report/users-report.component";
+import { UsersKpiComponent } from "./users-components/dashboard/users-kpi/users-kpi.component";
+import { UsersGraphicHistogramComponent } from "./users-components/dashboard/users-graphic-histogram/users-graphic-histogram.component";
+import { UsersGraphicBlocksComponent } from "./users-components/dashboard/users-graphic-blocks/users-graphic-blocks.component";
 
 export const USER_ROUTES: Routes = [
   {
@@ -27,5 +31,7 @@ export const USER_ROUTES: Routes = [
   { path: 'list', component: ListUsersComponent, data: { roles: ['Gerente', 'SuperAdmin'] } },
   { path: 'add', component: NewUserComponent },
   { path: 'edit/:id', component: UsersUpdateUserComponent },
-  { path: 'dashboard', component: UsersHomeComponent } // Cambiar por el componente correspondiente
+  { path: 'dashboard', component: UsersReportComponent},
+  { path: 'dashboard/user-histogram', component: UsersGraphicHistogramComponent }
+  
 ];

@@ -1,45 +1,41 @@
-<div class="modal fade" id="categoryEditModal" tabindex="-1" aria-labelledby="expenseModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-sm"> <!-- modal-sm para reducir el tamaño del modal -->
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="expenseModalLabel">Editar Categoria</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="modal-content">
+  <div class="modal-header">
+    <h5 class="modal-title" id="expenseModalLabel">Editar Categoria</h5>
+    <button type="button" class="btn-close" aria-label="Close" (click)="close()"></button>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-12 d-flex align-items-center mb-3">
+        <label class="me-2" style="width: 80px;">Descripcion</label>
+        <input
+          class="form-control form-control-sm" 
+          *ngIf="category"
+          [(ngModel)]="category.description"
+          type="text"
+          style="width: 70%;" 
+        />
       </div>
-      <div class="modal-body">
-        <div class="row">
-          <div class="col-12 d-flex align-items-center mb-3">
-            <label class="me-2" style="width: 80px;">Descripcion</label>
-            <input
-              class="form-control form-control-sm" 
-              *ngIf="category"
-              [(ngModel)]="category.description"
-              type="text"
-              style="width: 70%;" 
-            />
-          </div>
-          <div class="col-12 d-flex align-items-center">
-            <label class="me-2" style="width: 80px;">Estado</label>
-            <div class="form-check form-switch">
-              <input
-                type="checkbox"
-                id="enabledSwitch"
-                *ngIf="category"
-                [checked]="category.state === 'Activo'"
-                (change)="toggleState()"
-                class="form-check-input"
-                role="switch"
-              />
-              <label class="form-check-label" for="enabledSwitch">
-                {{ category.state }}
-              </label>
-            </div>
-          </div>
+      <div class="col-12 d-flex align-items-center">
+        <label class="me-2" style="width: 80px;">Estado</label>
+        <div class="form-check form-switch">
+          <input
+            type="checkbox"
+            id="enabledSwitch"
+            *ngIf="category"
+            [checked]="category.state === 'Activo'"
+            (change)="toggleState()"
+            class="form-check-input"
+            role="switch"
+          />
+          <label class="form-check-label" for="enabledSwitch">
+            {{ category.state }}
+          </label>
         </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary btn-sm" data-bs-dismiss="modal" (click)="edit()">Guardar</button>
-        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" >Cancelar</button>
-      </div>
     </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary btn-sm" (click)="edit()">Guardar</button>
+    <button type="button" class="btn btn-secondary btn-sm"  (click)="close()" >Cancelar</button>
   </div>
 </div>
