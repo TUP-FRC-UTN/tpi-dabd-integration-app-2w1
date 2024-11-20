@@ -1,6 +1,58 @@
 <div class="py-5">
   <div class="container p-3 border border-2 rounded shadow-lg">
     <div class="">
+      <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+              <h5 class="modal-title">Información sobre Gestión de Cargos</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <p>
+                Bienvenido al sistema de gestión de cargos. En esta página, puedes registrar y administrar
+                los diferentes cargos de la empresa. A continuación, se detallan las funcionalidades principales:
+              </p>
+              <ul>
+                <li>
+                  <strong>Registro de Cargos:</strong> Permite crear nuevos cargos con su respectiva descripción
+                </li>
+                <li>
+                  <strong>Búsqueda:</strong> Facilita la búsqueda de cargos específicos mediante filtros
+                </li>
+                <li>
+                  <strong>Gestión de Estados:</strong> Permite filtrar cargos según su estado actual
+                </li>
+                <li>
+                  <strong>Funcionalidades Principales:</strong>
+                  <ul>
+                    <li><em>Crear:</em> Agregar nuevos cargos al sistema</li>
+                    <li><em>Editar:</em> Modificar información de cargos existentes</li>
+                    <li><em>Eliminar:</em> Dar de baja cargos que ya no se utilicen</li>
+                    <li><em>Exportar:</em> Generar reportes en Excel o PDF</li>
+                  </ul>
+                </li>
+              </ul>
+              <p><strong>Campos Requeridos:</strong></p>
+              <ul>
+                <li>
+                  <strong>Cargo:</strong> Nombre o título del cargo (campo obligatorio)
+                </li>
+                <li>
+                  <strong>Descripción:</strong> Detalle de las responsabilidades y funciones del cargo (campo obligatorio)
+                </li>
+              </ul>
+              <p><strong>Notas importantes:</strong></p>
+              <ul>
+                <li>Los nombres de los cargos deben ser únicos en el sistema.</li>
+                <li>La descripción debe ser clara y específica sobre las responsabilidades del cargo.</li>
+                <li>Antes de eliminar un cargo, asegúrese de que no esté asociado a ningún empleado activo.</li>
+                <li>Los cambios realizados en los cargos se reflejarán en todos los registros asociados.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
       <!-- Fila de opciones (Filtro, Exportar, Nuevo) -->
       <div class="d-flex justify-content-between align-items-center mb-3">
         <!-- Filtro de búsqueda a la izquierda -->
@@ -347,8 +399,8 @@
         <div class="modal-body">
           <p>
             ¿Estás seguro de que deseas eliminar el cargo
-            <strong>{{ cargoSeleccionado?.charge }}</strong
-            >?
+           {{ cargoSeleccionado?.charge }}
+            ?
           </p>
         </div>
         <div class="modal-footer">
@@ -417,6 +469,7 @@
       </div>
     </div>
   </div>
+
 
   <!-- Botón Flotante -->
   <button

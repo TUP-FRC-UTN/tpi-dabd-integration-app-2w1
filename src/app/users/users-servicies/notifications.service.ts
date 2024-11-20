@@ -10,10 +10,14 @@ import { environment } from '../../common/environments/environment';
 export class NotificationsService {
 
   private readonly http = inject(HttpClient);
-  private readonly url = environment.services.notifications + '/general/';
+  private readonly url = environment.services.notifications;
   
   
   getAll(): Observable<LandingNotification[]>{
-    return this.http.get<LandingNotification[]>(this.url + 'getNotificationGeneral');
+    return this.http.get<LandingNotification[]>(this.url + '/general/getNotificationGeneral');
+  }
+
+  getAllByUser(userId: number): Observable<LandingNotification[]>{
+    return this.http.get<LandingNotification[]>(this.url + '/getGeneralNotifications/' + userId);
   }
 }

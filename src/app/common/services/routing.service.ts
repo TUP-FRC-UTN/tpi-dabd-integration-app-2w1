@@ -42,7 +42,7 @@ export class RoutingService {
       name: 'Familia',
       title: 'Grupo familiar',
       route: 'main/users/family',
-      roles: ['SuperAdmin', 'Propietario', 'Inquilino'],
+      roles: ['Propietario', 'Inquilino'],
     },
     {
       //Btn con hijos
@@ -169,14 +169,14 @@ export class RoutingService {
     {
       icon: 'bi-wallet',
       name: 'Boletas',
-      title: 'Mis Boletas (owner)',
+      title: 'Mis Boletas',
       route: 'main/invoices/expense-generation-user-view',
       roles: ['SuperAdmin', 'Propietario', 'Inquilino'],
     },
     {
       icon: 'bi-person-lines-fill',
       name: 'Boletas',
-      title: 'Lista de Boletas (Gerente)',
+      title: 'Lista de Boletas',
       route: 'main/invoices/expense-generation-admin-view',
       roles: ['SuperAdmin', 'Gerente general', 'Gerente finanzas'],
     },
@@ -210,13 +210,6 @@ export class RoutingService {
           roles: ['SuperAdmin', 'Gerente general', 'Gerente inventario'],
         },
         {
-          icon: 'bi-arrow-left-right',
-          name: 'Movimientos',
-          title: 'Movimientos de Inventario',
-          route: 'main/inventories/warehouse-movements',
-          roles: ['SuperAdmin', 'Gerente general', 'Gerente inventario'],
-        },
-        {
           icon: 'bi-truck',
           name: 'Proveedores',
           title: 'Listado de Proveedores',
@@ -244,13 +237,6 @@ export class RoutingService {
           name: 'Listado',
           title: 'Listado de Empleados',
           route: 'main/employees/employees',
-          roles: ['SuperAdmin', 'Gerente general', 'Gerente empleados'],
-        },
-        {
-          icon: 'bi-card-checklist',
-          name: 'Desempeño',
-          title: 'Historial de Desempeño',
-          route: 'main/employees/performance',
           roles: ['SuperAdmin', 'Gerente general', 'Gerente empleados'],
         },
         {
