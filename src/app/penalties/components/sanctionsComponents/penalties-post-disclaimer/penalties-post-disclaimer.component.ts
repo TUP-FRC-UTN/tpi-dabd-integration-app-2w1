@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { SanctionService } from '../../../services/sanctions.service';
 import Swal from 'sweetalert2';
 import { RoutingService } from '../../../../common/services/routing.service';
+import { PlotService } from '../../../../users/users-servicies/plot.service';
 
 @Component({
   selector: 'app-penalties-post-disclaimer',
@@ -14,6 +15,7 @@ import { RoutingService } from '../../../../common/services/routing.service';
   styleUrl: './penalties-post-disclaimer.component.scss'
 })
 export class PenaltiesPostDisclaimerComponent implements OnInit {
+  private readonly plotService = inject(PlotService);
   userId: number;
   fineIdFromList: number;
   fine: any;
