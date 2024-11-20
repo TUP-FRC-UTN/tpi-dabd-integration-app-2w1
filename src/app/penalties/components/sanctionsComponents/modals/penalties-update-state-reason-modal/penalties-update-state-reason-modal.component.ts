@@ -18,6 +18,7 @@ export class PenaltiesUpdateStateReasonModalComponent {
   reasonText: String = ""
   @Input() id: number = 1
   @Input() fineState: string = ""
+  @Input() fine: any = ""
   userId: number = 1;
 
 
@@ -68,40 +69,39 @@ export class PenaltiesUpdateStateReasonModalComponent {
       else if (this.fineState == 'ACQUITTED') {
         dischargeState = 'ACCEPTED'// Aceptada
       }
-      let ownersIds: number[] = this.getOwnersIdByPlotId(this.fine.report.plotId);
-      Swal.fire({
-        title: 'Multa actualizada!',
-        text: 'El estado de la multa fue actualizado con éxito',
-        icon: 'success',
-        timer: 1500,
-        showConfirmButton: false
+      let ownersIds: number[] = (this.fine.report.plotId);
+      ownersIds.forEach(id => {
+        let appealUpdate = {
+          appealStatus: dischargeState,
+          motive: this.reasonText,
+          user_id: id
+        };
+        this.sanctionService.notifyDischargeResolved(appealUpdate).subscribe({
+          next: () => { console.log("Notificacion enviada correctamente") },
+          error: (e) => {
+            console.log("Error al enviar la notificacion: ", e)
+          }
+        })
+        Swal.fire({
+          title: 'Multa actualizada!',
+          text: 'El estado de la multa fue actualizado con éxito',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false
 
-      });
-      this.sanctionService.triggerRefresh();
-      this.close();
-    }, error => {
-      console.error('Error al enviar la multa', error);
-      Swal.fire({
-        title: 'Error',
-        text: 'No se pudo enviar la multa. Inténtalo de nuevo.',
-        icon: 'error',
-        confirmButtonText: 'Aceptar'
-      });
-    })
+        });
+        this.sanctionService.triggerRefresh();
+        this.close();
+      }, error => {
+        console.error('Error al enviar la multa', error);
+        Swal.fire({
+          title: 'Error',
+          text: 'No se pudo enviar la multa. Inténtalo de nuevo.',
+          icon: 'error',
+          confirmButtonText: 'Aceptar'
+        });
+      })
+    }
+
+  
   }
-
-  getOwnersIdByPlotId(plotId: number): number[] {
-    let ownersIds: number[] = [];
-    let users: UserGet[] = [];
-    this.userService.getUsersByPlotID(plotId).subscribe({
-      next: (data) => { users = data },
-      error: (e) => { console.log("Error al cargar usuarios: ", e) }
-    });
-    users.forEach((user: UserGet) => {
-      if (user.roles.includes('Propietario')) {
-        ownersIds.push(user.id);
-      }
-    });
-    return ownersIds;
-  };
-}
