@@ -575,7 +575,7 @@ loadUsersAllowedData(): Observable<boolean> {
                   <i class="bi bi-briefcase text-dark"></i>
                 </button>`
       }
-      case "Supplier" : {   //turquesa / verde agua (teal)
+      case "Supplied" : {   //turquesa / verde agua (teal)
         return `<button style="background-color: #FFCECE;border: bisque;" class="btn btn-warning" title="Proveedor">
                   <i class="bi bi-truck text-dark"></i>
                 </button>`
@@ -623,7 +623,7 @@ loadUsersAllowedData(): Observable<boolean> {
       }
 
       default : {
-      return  `<button style="background-color: #FFB0B0;border: bisque;" class="btn btn-primary" title="???">
+      return  `<button style="background-color: black;border: bisque;" class="btn btn-primary" title="???">
                   <i class="bi bi-question-lg"></i>
                 </button> `
       }
@@ -637,8 +637,8 @@ loadUsersAllowedData(): Observable<boolean> {
     { value: 'neighbour', label: 'Vecino', descriptions: ['Owner', 'Tenant'] },
     { value: 'visitor', label: 'Visitante', descriptions: ['Visitor'] },
     { value: 'employee', label: 'Empleado', descriptions: ['Employeed'] },
-    { value: 'service', label: 'Servicio', descriptions: ['Supplier', 'Worker', 'Delivery', 'Cleaning', 'Gardener'] },
-    { value: 'supplier', label: 'Proveedor', descriptions: ['Supplier'] },
+    { value: 'service', label: 'Servicio', descriptions: ['Supplied', 'Worker', 'Delivery', 'Cleaning', 'Gardener'] },
+    { value: 'supplied', label: 'Proveedor', descriptions: ['Supplied'] },
     { value: 'worker', label: 'Obrero', descriptions: ['Worker'] },
     { value: 'delivery', label: 'Delivery', descriptions: ['Delivery'] },
     { value: 'cleaning', label: 'Personal de Limpieza', descriptions: ['Cleaning'] },
@@ -694,7 +694,7 @@ loadUsersAllowedData(): Observable<boolean> {
 
       if (visitor.userType.description === 'Owner' || visitor.userType.description === 'Tenant') {
         accessObservable = this.prepareEntryMovement(visitor,vehiclePlate);
-      } else if (visitor.userType.description === 'Employeed' || visitor.userType.description === 'Supplier') {
+      } else if (visitor.userType.description === 'Employeed' || visitor.userType.description === 'Supplier' || visitor.userType.description === 'Supplied') {
         accessObservable = this.prepareEntryMovementEmp(visitor, vehiclePlate);
       } else {
         //es para visitors y los otros tipos q funcionan igual
@@ -733,7 +733,7 @@ loadUsersAllowedData(): Observable<boolean> {
         exitObservable = this.prepareExitMovement(visitor,vehiclePlate);
         
 
-      } else if (visitor.userType.description === 'Employeed' || visitor.userType.description === 'Supplier') {
+      } else if (visitor.userType.description === 'Employeed' || visitor.userType.description === 'Supplier' || visitor.userType.description === 'Supplied') {
         exitObservable = this.prepareExitMovementEmp(visitor, vehiclePlate);
 
       } else {
