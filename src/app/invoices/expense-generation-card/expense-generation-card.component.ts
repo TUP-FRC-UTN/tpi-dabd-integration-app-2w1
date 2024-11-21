@@ -40,8 +40,10 @@ export class ExpenseGenerationCardComponent implements OnInit {
 
   async openPdf(uuid: string) {
     try {
+      const cleanUuid = uuid.replace('uuid:', '');
+      
       const response = await fetch(
-        environment.services.expenseGeneration + `/api/expenses/pdf/${uuid}`
+        `${environment.services.expenseGeneration}/api/expenses/pdf/${cleanUuid}`
       );
       if (!response.ok) {
         alert('No se pudo cargar el pdf');
@@ -50,9 +52,10 @@ export class ExpenseGenerationCardComponent implements OnInit {
       const url = window.URL.createObjectURL(blob);
       window.open(url);
     } catch (error) {
-      console.error('There was an error opening the PDF:', error);
+      console.error('Hubo un error abriendo el PDF: ', error);
     }
-  }
+}
+
 
   // METODO QUE ENVIA EL MONTO DE LA BOLETA AL COMPONENT PADRE
 
