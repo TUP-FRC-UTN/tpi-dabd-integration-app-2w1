@@ -1,0 +1,67 @@
+<div class="container">
+    <div class="row g-3">
+        <div class="col-12 col-md-6 mb-3">
+          <div class="d-flex align-items-center">
+            <label class="form-label me-3 text-nowrap" style="width: 150px;">Historico de Visitas</label>
+            <div class="flex-grow-1">
+                <ng-select 
+                [items]="visitors"
+                [bindLabel]="'name'"
+                placeholder="Buscar"
+                [(ngModel)]="selectedVisitorId"
+                (change)="onVisitorSelect($event)"
+                [clearable]="true">
+                <ng-option [value]="null">Ninguno</ng-option>
+                <ng-template ng-option-tmp let-item="item">
+                    {{item.name}} {{item.last_name}} - {{item.document}}
+                </ng-template>
+                
+                <ng-template ng-label-tmp let-item="item">
+                    {{item.name}} {{item.last_name}} - {{item.document}}
+                </ng-template>
+            </ng-select>
+            </div>
+          </div>
+        
+        </div>
+      </div>
+ 
+    <app-access-visitor-form 
+      [(value)]="visitorForm" 
+      [vehicleActivated]="false" 
+      [emailActivated]="false"
+     
+      >
+    </app-access-visitor-form>
+ 
+    <div class="col-12 col-md-6 mt-3" [formGroup]="visitorForm">
+        <div class="d-flex align-items-center">
+            <label class="form-label me-3 text-nowrap" style="width: 150px;">Email (Opcional)</label>
+            <div class="flex-grow-1">
+                <input 
+                    type="email" 
+                    class="form-control" 
+                    formControlName="email"
+                    [class.is-invalid]="visitorForm.get('email')?.errors?.['email'] && visitorForm.get('email')?.touched"
+                >
+                <div class="invalid-feedback" 
+                    *ngIf="visitorForm.get('email')?.errors?.['email'] && visitorForm.get('email')?.touched">
+                    Por favor, ingrese un email válido
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+      
+    <div class="row mt-3">
+      <div class="col-12 d-flex justify-content-end">
+        <button 
+          class="btn btn-success" 
+          (click)="onGiveTempAccess()"
+          [disabled]="!visitorForm.valid">
+          Autorizar
+        </button>
+      </div>
+    </div>
+ </div>

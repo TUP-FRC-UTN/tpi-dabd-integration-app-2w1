@@ -245,4 +245,20 @@ export const BADGE_STYLES = {
       text: 'Salida'
     }
   };
+
+  export const TIPOS_DOCUMENTO: SelectOption[] = [
+    { value: 'DNI', label: 'DNI' },
+    { value: 'PASSPORT', label: 'Pasaporte' }, 
+    { value: 'CUIT', label: 'CUIT' }
+   ];
+   
+  export const documentTypeMap: { [key: string]: string } = {
+    'DNI': '1',
+    'PASSPORT': '2',
+    'CUIT': '3'
+  };
+
+  export const userTypeMap: { [key: string]: string } = {
+    'Visitor': '1',     
+  };
   
