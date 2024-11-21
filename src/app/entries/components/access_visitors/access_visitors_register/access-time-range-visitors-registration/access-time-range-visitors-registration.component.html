@@ -6,21 +6,21 @@
         <div class="col-md-6 mb-3">
           <div class="d-flex align-items-center">
             <label for="startDate" class="form-label me-3">Desde</label>
-            <input type="date" class="form-control flex-grow-1" id="startDate" formControlName="startDate" [disabled]="areDatesDisabled"
+            <input type="date" class="form-control" id="startDate" formControlName="startDate" [disabled]="areDatesDisabled"
               [readonly]="areDatesReadonly" [class.bg-gray-100]="areDatesReadonly" required>
           </div>
         </div>
-        <div class="col-md-5 mb-3">
+        <div class="col-md-6 mb-3">
           <div class="d-flex align-items-center">
             <label for="endDate" class="form-label me-3">Hasta</label>
-            <input type="date" class="form-control flex-grow-1" id="endDate" formControlName="endDate" [disabled]="areDatesDisabled"
+            <input type="date" class="form-control" id="endDate" formControlName="endDate" [disabled]="areDatesDisabled"
               [class.bg-gray-100]="areDatesReadonly" required>
           </div>
         </div>
       </div>
 
       <div class="row g-2 align-items-center mb-3">
-        <div class="col-md-12">
+        <div class="col-md-10">
           <div class="btn-group d-flex flex-wrap" role="group" aria-label="Días de visita">
             @for (day of days; track $index) {
               <ng-container>
@@ -32,11 +32,16 @@
             }
           </div>
         </div>
+
+        <div class="col-md-2 ps-3"> 
+          <button class="btn btn-secondary w-100" (click)="addAllDays()">Todos</button>
+        </div>
+
         <div class="col-md-12">
-          <div class="row g-2">
+          <div class="row g-4">
             <div class="col-md-5">
               <div class="d-flex align-items-center">
-                <label for="initHour" class="form-label me-2">Hora de inicio</label>
+                <label for="initHour" class="form-label me-3">Hora Inicio</label>
                 <div class="flex-grow-1">
                   <input
                     type="time"
@@ -63,7 +68,7 @@
             </div>
             <div class="col-md-5">
               <div class="d-flex align-items-center">
-                <label for="endHour" class="form-label me-2">Hora de fin</label>
+                <label for="endHour" class="form-label me-3">Hora Fin</label>
                 <div class="flex-grow-1">
                   <input
                     type="time"

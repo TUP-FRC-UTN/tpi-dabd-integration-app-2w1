@@ -1,10 +1,9 @@
-import { Component, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { AccessAllowedDay, AccessDay, AccessAuthRange, AccessUser } from '../../../../models/access-visitors/access-visitors-models';
+import { AccessAllowedDay, AccessDay, AccessAuthRange } from '../../../../models/access-visitors/access-visitors-models';
 import Swal from 'sweetalert2';
 import { Subject, Subscription, takeUntil } from 'rxjs';
-import { EventEmitter } from '@angular/core';
 import { AuthService } from '../../../../../users/users-servicies/auth.service';
 import { AccessVisitorsRegisterServiceService } from '../../../../services/access_visitors/access-visitors-register/access-visitors-register-service/access-visitors-register-service.service';
 
@@ -55,15 +54,21 @@ export class AccessTimeRangeVisitorsRegistrationComponent implements OnInit, OnD
     const localDate = new Date(today.getTime() - (today.getTimezoneOffset() * 60000))
       .toISOString()
       .split('T')[0];
-      const localDatePlusOneDay = new Date(today.getTime() - (today.getTimezoneOffset() * 60000) + 24 * 60 * 60 * 1000)
+    const localDatePlusOneDay = new Date(today.getTime() - (today.getTimezoneOffset() * 60000) + 24 * 60 * 60 * 1000)
       .toISOString()
       .split('T')[0];
+    const currentTime: string = new Date().toLocaleTimeString('es-ES', { 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        hour12: false 
+      });
+    const currentTimePlusTwelveHours = this.getCurrentTimePlusTwelveHours();
 
     this.form = this.fb.group({
       startDate: [localDate, Validators.required],
       endDate: [localDatePlusOneDay, Validators.required],
-      initHour: ['10:00', Validators.required],
-      endHour: ['22:00', Validators.required],
+      initHour: [currentTime, Validators.required],
+      endHour: [currentTimePlusTwelveHours, Validators.required],
       Lun: [{ value: false, disabled: true }],
       Mar: [{ value: false, disabled: true }],
       Mié: [{ value: false, disabled: true }],
@@ -89,6 +94,81 @@ export class AccessTimeRangeVisitorsRegistrationComponent implements OnInit, OnD
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
     this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
+  getCurrentTimePlusTwelveHours = (): string => {
+    const now = new Date();
+    const futureTime = new Date(now.getTime() + 12 * 60 * 60 * 1000);
+    
+    let hours = futureTime.getHours();
+    let minutes = futureTime.getMinutes();
+    
+    if (hours > 23) {
+      hours = 23;
+      minutes = 59;
+    }
+    
+    const formatHours = hours.toString().padStart(2, '0');
+    const formatMinutes = minutes.toString().padStart(2, '0');
+    
+    return `${formatHours}:${formatMinutes}`;
+  };
+  
+  addAllDays() {
+      // Check if all allowed days are currently checked
+      const allAllowedChecked = this.days
+        .filter(day => this.isAllowedDayV2(day))
+        .every(day => this.form.get(day.name)?.value === true);
+      
+        console.log("allAllowedChecked: ", allAllowedChecked)
+        console.log("allowedDays: ", this.updateAvailableDays())
+
+      // Toggle the state for allowed days
+      this.days.forEach(day => {
+        if (this.isAllowedDayV2(day)) {
+          console.log("dia a check-> true o false", this.form.get(day.name));
+          this.form.get(day.name)?.setValue(!allAllowedChecked);
+        }
+      });
+    }
+
+    isAllowedDayV2(day: AccessDay): boolean {
+      const startDate = new Date(this.form.get('startDate')?.value);
+      const endDate = new Date(this.form.get('endDate')?.value);
+  
+  
+      startDate.setHours(0, 0, 0, 0);
+      endDate.setHours(23, 59, 59, 999);
+
+      let availableDays: String[] = this.getDaysBetweenDatesV2(startDate, endDate);
+      return availableDays.some(allowedDay => allowedDay === day.name);
+    }
+
+    
+  getDaysBetweenDatesV2(start: Date, end: Date): string[] {
+
+    const spanishDays = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+
+
+    startDate.setHours(0, 0, 0, 0);
+    endDate.setHours(23, 59, 59, 999);
+
+    const days = new Set<string>();
+    const currentDate = new Date(startDate);
+
+
+    while (currentDate <= endDate) {
+      const dayName = spanishDays[currentDate.getDay()];
+      days.add(dayName);
+
+
+      const nextDate = new Date(currentDate);
+      nextDate.setDate(currentDate.getDate() + 1);
+      currentDate.setTime(nextDate.getTime());
+    }
+    return Array.from(days);
   }
 
 
@@ -200,7 +280,6 @@ export class AccessTimeRangeVisitorsRegistrationComponent implements OnInit, OnD
       nextDate.setDate(currentDate.getDate() + 1);
       currentDate.setTime(nextDate.getTime());
     }
-
     return Array.from(days);
   }
 
@@ -346,7 +425,6 @@ export class AccessTimeRangeVisitorsRegistrationComponent implements OnInit, OnD
     this.agregarAuthRange();
   }
   isAllowedDay(day: AccessDay): boolean {
-
     return this._allowedDays.some(allowedDay => allowedDay.day.name === day.name);
   }
 
