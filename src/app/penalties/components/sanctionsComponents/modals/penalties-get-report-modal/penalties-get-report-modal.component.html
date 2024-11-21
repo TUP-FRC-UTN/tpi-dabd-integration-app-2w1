@@ -19,7 +19,7 @@
       <hr>
 
         <h5>Denuncias</h5>
-        <div class="overflow-auto" style="max-height: 300px;">
+      <div class="overflow-auto" style="max-height: 300px;">
         <table class="table table-bordered">
 
             <thead>
@@ -51,8 +51,31 @@
             
             </tbody>
         </table>
-      </div>
         <hr>
+      </div>
+       <h5>Advertencias</h5>
+      <div class="overflow-auto" style="max-height: 300px;">
+        <table class="table table-bordered">
+
+            <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Descripción</th>
+                </tr>
+            </thead>
+            <tbody>  
+              @for(a of advetencias; track $index){
+                <tr>
+                    <td>{{ a.createdDate | date:"dd/MM/yyyy"}}</td>
+                    <td><p> {{ a.description  }}</p></td>
+                </tr>
+              
+              }
+            
+            </tbody>
+        </table>
+        <hr>
+      </div>
         <h5>Estado de la Multa</h5>
       <div class="row mb-3">
           <div class="col-md-6">
