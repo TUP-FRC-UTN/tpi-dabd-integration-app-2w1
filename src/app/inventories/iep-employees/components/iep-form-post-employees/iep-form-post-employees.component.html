@@ -195,14 +195,21 @@
                         <div class="row">
                             <label for="telefono" class="col-form-label col-md-3 text-end">Teléfono</label>
                             <div class="col-md-9">
-                                <input type="text" class="form-control" id="telefono" name="telefono"
-                                    [(ngModel)]="telefono" #telefonoModel="ngModel" required
-                                    pattern='^[1-9]\d{9}$' [ngClass]="{
-                   'is-invalid': telefonoModel.invalid && telefonoModel.touched, 
-                   'is-valid': telefonoModel.valid && telefonoModel.touched
-               }">
+                                <input 
+                                type="text" 
+                                class="form-control" 
+                                id="telefono" 
+                                name="telefono"
+                                [(ngModel)]="telefono" 
+                                #telefonoModel="ngModel" 
+                                required
+                                pattern="^[0-9]{1,15}$" 
+                                [ngClass]="{
+                                    'is-invalid': telefonoModel.invalid && telefonoModel.touched, 
+                                    'is-valid': telefonoModel.valid && telefonoModel.touched
+                                }">
                                 <div *ngIf="telefonoModel.invalid && telefonoModel.touched" class="invalid-feedback">
-                                    "La entrada no es válida. , Asegúrate de no estar agregando 0351 o +54"
+                                    "La entrada no es válida. Asegúrate de ingresar solo números (sin caracteres especiales)."
                                 </div>
                             </div>
                         </div>
@@ -346,7 +353,7 @@
                             <label for="piso" class="col-form-label col-md-3">Piso</label>
                             <div class="col-md-9">
                                 <input type="text" class="form-control" id="piso" name="piso" [(ngModel)]="piso"
-                                    #pisoModel="ngModel" required pattern="^-?[0-9]\d*$" [ngClass]="{
+                                    #pisoModel="ngModel" pattern="^-?[0-9]\d*$" [ngClass]="{
                    'is-invalid': pisoModel.invalid && pisoModel.touched, 
                    'is-valid': pisoModel.valid && pisoModel.touched
                }">
@@ -433,15 +440,24 @@
 
                             <label class="col-form-label col-md-3" for="salario">Salario</label>
                             <div class="col-md-9">
-                                <input type="number" class="form-control text-end" id="salario" name="salario"
-                                    [(ngModel)]="salario" #salarioModel="ngModel" required pattern="^[1-9]\d*$"
+                                <input 
+                                    type="number" 
+                                    class="form-control text-end" 
+                                    id="salario" 
+                                    name="salario"
+                                    [(ngModel)]="salario" 
+                                    #salarioModel="ngModel" 
+                                    required 
+                                    min="1" 
+                                    max="2147483647"
+                                    pattern="^[1-9]\d*$"
                                     [ngClass]="{
-                           'is-invalid': salarioModel.invalid && salarioModel.touched, 
-                           'is-valid': salarioModel.valid && salarioModel.touched
-                       }">
+                                        'is-invalid': salarioModel.invalid && salarioModel.touched, 
+                                        'is-valid': salarioModel.valid && salarioModel.touched
+                                    }">
 
                                 <div *ngIf="salarioModel.invalid && salarioModel.touched" class="invalid-feedback">
-                                    La entrada no es válida. Asegúrate de introducir un número entero positivo.
+                                    La entrada no es válida. Asegúrate de introducir un número entero positivo entre 1 y 2,147,483,647.
                                 </div>
                             </div>
                         </div>
@@ -488,21 +504,29 @@
                       </div>
 
 
-                    <!-- fecha inicio contrato -->
-                    <div class="col-md-6 ">
+                    <!-- Fecha de inicio de contrato -->
+                    <div class="col-md-6">
                         <div class="row text-end">
-                            <label for="start-time-contract" class="col-form-label col-md-3">Inicio</label>
+                            <label for="startTimeContract" class="col-form-label col-md-3">Inicio</label>
                             <div class="col-md-9">
-                                <input type="date" id="startTimeContract"  id="startTimeContract" class="form-control"
-                                    name="startTimeContract" [(ngModel)]="startTimeContract"
-                                    #startTimeContractModel="ngModel" required (ngModelChange)="validateDate()"
-                                    [ngClass]="{
-                            'is-invalid': (startTimeContractModel.invalid && startTimeContractModel.touched) || invalidDate, 
-                            'is-valid': (startTimeContractModel.valid && startTimeContractModel.touched )&& !invalidDate
-                        }">
-                                <div *ngIf="(startTimeContractModel.invalid && startTimeContractModel.touched )||(invalidDate && startTimeContractModel.touched)"
+                                <input 
+                                type="date" 
+                                id="startTimeContract" 
+                                class="form-control"
+                                name="startTimeContract" 
+                                [(ngModel)]="startTimeContract"
+                                #startTimeContractModel="ngModel" 
+                                required 
+                                (ngModelChange)="validateDate()"
+                                min="{{ minDate }}" 
+                                max="{{ maxDate }}"
+                                [ngClass]="{
+                                    'is-invalid': (startTimeContractModel.invalid && startTimeContractModel.touched) || invalidDate, 
+                                    'is-valid': (startTimeContractModel.valid && startTimeContractModel.touched) && !invalidDate
+                                }">
+                                <div *ngIf="(startTimeContractModel.invalid && startTimeContractModel.touched ) || (invalidDate && startTimeContractModel.touched)"
                                     class="invalid-feedback">
-                                    Por favor, selecciona una fecha válida.
+                                    Por favor, selecciona una fecha válida dentro de los últimos 3 meses y los próximos 3 meses.
                                 </div>
                             </div>
                         </div>

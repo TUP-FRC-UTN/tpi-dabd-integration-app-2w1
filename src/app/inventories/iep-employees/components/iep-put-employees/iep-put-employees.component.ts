@@ -196,7 +196,7 @@ export class IepPutEmployeesComponent implements OnInit {
     const addressDto = {
       street: this.calle || '',
       numberStreet: this.numeroCalle || 0,
-      apartment: this.dpto || '',
+      apartment: this.dpto || '0',
       floor: this.piso || 0,
       postalCode: this.codigoPostal  || '',
       city: this.provinciaSelect?.nombre || '',
@@ -263,5 +263,9 @@ export class IepPutEmployeesComponent implements OnInit {
   }
   cancelar(): void {
     this.router.navigate(['main/employees/employees']);
+  }
+
+  toggleLicense(): void {
+    this.license = !this.license;
   }
 }

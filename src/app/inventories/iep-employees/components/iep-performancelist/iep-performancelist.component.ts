@@ -356,14 +356,15 @@ openNewCallModal(employeeId: number) {
           data: null,
           render: (data: any) => `${data.year}-${data.month.toString().padStart(2, '0')}`
         },
-        { data: 'fullName' },
+        { data: 'fullName', className: 'text-left' },
         { data: 'totalObservations' },
         { 
-          data: 'performanceType',
+          data: 'performanceType', className: 'text-center',
           render: (data: string) => `<span class="tag ${data.toLowerCase()}">${data}</span>`
         },
         {
           data: null,
+          className: 'text-center',
           render: (data: any) => `
             <div class="text-center">
                   <div class="btn-group">
@@ -371,7 +372,7 @@ openNewCallModal(employeeId: number) {
                       <button type="button" class="btn border border-2 bi-three-dots-vertical btn-cambiar-estado" data-bs-toggle="dropdown"></button>
                         <ul class="dropdown-menu">
                           <li>
-                            <button class="dropdown-item btn-sm btn-primary view-details" data-bs-target="#viewDetail" 
+                            <button class="dropdown-item btn-sm btn-primary view-details" data-bs-target="#viewDetail"  
                             data-bs-toggle="modal" data-id="${data.id}" data-year="${data.year}" data-month="${data.month}">
                             Ver más
                             </button>

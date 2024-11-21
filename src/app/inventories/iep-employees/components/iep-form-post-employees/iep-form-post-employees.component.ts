@@ -25,7 +25,17 @@ export class IEPFormPostEmployeesComponent implements OnInit {
  
   
   constructor(private serviceCombos: EmpPostEmployeeService , private router : Router,private userService: AuthService) {
-    
+    const currentDate = new Date();
+    // Definir la fecha mínima (3 meses en el pasado)
+    const minDate = new Date();
+    minDate.setMonth(currentDate.getMonth() - 3);
+
+    // Definir la fecha máxima (3 meses en el futuro)
+    const maxDate = new Date();
+    maxDate.setMonth(currentDate.getMonth() + 3);
+    // Formatear fechas para el input de tipo "date"
+    this.minDate = minDate.toISOString().split('T')[0];
+    this.maxDate = maxDate.toISOString().split('T')[0];
   }
 
   isInfoModalVisible: boolean = false;
@@ -44,6 +54,9 @@ export class IEPFormPostEmployeesComponent implements OnInit {
 
   validateDni$:Observable<any> = new Observable<any>();
   validateCuil$:Observable<any>=new Observable<any>();
+
+  minDate: string;
+  maxDate: string;
 
   lunes:boolean=true;
   martes:boolean=true;
@@ -67,7 +80,7 @@ export class IEPFormPostEmployeesComponent implements OnInit {
   numeroCalle: number = 0;
   piso: number = 0;
   dpto: string = '';
-  codigoPostal: string = '5000';
+  codigoPostal: string = '';
   salario?: number;
   horaSalida: string = '17:00';
   horaEntrada: string = '08:00';
@@ -195,8 +208,8 @@ export class IEPFormPostEmployeesComponent implements OnInit {
           this.adressDto.city=this.provinciaSelect?.nombre
           this.adressDto.locality=this.provinciaSelect?.nombre
           this.adressDto.postalCode=this.codigoPostal
-          this.adressDto.apartment=this.dpto
-          this.adressDto.floor=this.piso
+          this.adressDto.apartment=this.dpto || "0"
+          this.adressDto.floor=this.piso || 0
           this.adressDto.numberStreet=this.numeroCalle
 
           if(this.postDto!=null){
@@ -273,6 +286,7 @@ export class IEPFormPostEmployeesComponent implements OnInit {
                   confirmButtonColor: '#3085d6'
                 }).then(() => {
                   this.resetForm(form)
+                  this.router.navigate(['/main/employees/employees']);
                 });
                 console.log("PASO: ", response);
               },
@@ -429,7 +443,7 @@ export class IEPFormPostEmployeesComponent implements OnInit {
    this.cuil = '';
    this.documentType=DocumentTypeEnum.DNI;
    this.piso = 0;
-   this.codigoPostal = '5000';
+   this.codigoPostal = '';
    this.salario=0
    this.horaSalida = '17:00';
    this. horaEntrada = '08:00';
