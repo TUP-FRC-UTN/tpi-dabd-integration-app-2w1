@@ -1,6 +1,6 @@
 import { CommonModule, JsonPipe, NgFor } from '@angular/common';
 import { Component, importProvidersFrom, Inject, OnInit } from '@angular/core';
-import { Form, FormsModule, NgForm, PatternValidator } from '@angular/forms';
+import { Form, FormBuilder, FormGroup, FormsModule, NgForm, PatternValidator, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Ciudad, Provincia } from '../../Models/emp-provincia';
 import { Observable } from 'rxjs';
 import { Provider } from '../../../iep-inventory/models/provider';
@@ -12,19 +12,21 @@ import Swal from 'sweetalert2';
 import { Router, RouterLink } from '@angular/router';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { AuthService } from '../../../../users/users-servicies/auth.service';
+import { ChargeService } from '../../services/charge.service';
+declare var bootstrap: any; // Añadir esta declaración al principio
 
 
 @Component({
   selector: 'app-iep-form-post-employees',
   standalone: true,
-  imports: [FormsModule, CommonModule, NgSelectModule, RouterLink],
+  imports: [FormsModule, CommonModule, NgSelectModule, RouterLink, ReactiveFormsModule],
   templateUrl: './iep-form-post-employees.component.html',
   styleUrl: './iep-form-post-employees.component.css',
 })
 export class IEPFormPostEmployeesComponent implements OnInit {
  
   
-  constructor(private serviceCombos: EmpPostEmployeeService , private router : Router,private userService: AuthService) {
+  constructor(private serviceCombos: EmpPostEmployeeService , private router : Router,private userService: AuthService, private fb: FormBuilder,private cargoService: ChargeService,) {
     const currentDate = new Date();
     // Definir la fecha mínima (3 meses en el pasado)
     const minDate = new Date();
@@ -36,6 +38,12 @@ export class IEPFormPostEmployeesComponent implements OnInit {
     // Formatear fechas para el input de tipo "date"
     this.minDate = minDate.toISOString().split('T')[0];
     this.maxDate = maxDate.toISOString().split('T')[0];
+
+    this.cargoForm = this.fb.group({
+      charge: ['', Validators.required],
+      description: ['', Validators.required],
+      
+    });
   }
 
   isInfoModalVisible: boolean = false;
@@ -86,6 +94,8 @@ export class IEPFormPostEmployeesComponent implements OnInit {
   horaEntrada: string = '08:00';
   startTimeContract: string = new Date().toISOString().split('T')[0];
 
+  cargoForm: FormGroup;
+  isCreateModalOpen = false;
  
 
   success:boolean=false;
@@ -455,15 +465,123 @@ export class IEPFormPostEmployeesComponent implements OnInit {
   this.showModal=!this.showModal
  }
 
+ reset():void{
+  this.cargoForm.reset();
+}
+
   ngOnInit(): void {
    this.loadSupplier();
    this.loadProvincias();
    this.loadCharges();
    console.log(this.provincias);
-   
   }
 
-    ERROR_MESSAGES = {
+    // Modal management methods
+    openCreateModal(): void {
+      this.cargoForm.reset();
+      this.isCreateModalOpen = true;
+      document.body.classList.add('modal-open');
+    }
+  
+    closeCreateModal(): void {
+      this.isCreateModalOpen = false;
+      document.body.classList.remove('modal-open');
+      this.cargoForm.reset();
+    }
+
+    closeModale(modalId: string) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        const modalInstance = bootstrap.Modal.getInstance(modal);
+        modalInstance?.hide();
+      }
+  
+      const modalElement = document.getElementById(modalId);
+      if (modalElement) {
+        const modal = bootstrap.Modal.getInstance(modalElement);
+        if (modal) {
+          modal.hide();
+        }
+        
+        // Limpieza completa del modal y sus efectos
+        setTimeout(() => {
+          // Remover clases del body
+          document.body.classList.remove('modal-open');
+          document.body.style.removeProperty('padding-right');
+          document.body.style.removeProperty('overflow');
+          
+          // Remover todos los backdrops
+          const backdrops = document.getElementsByClassName('modal-backdrop');
+          while (backdrops.length > 0) {
+            backdrops[0].remove();
+          }
+  
+          // Limpiar el modal
+          modalElement.classList.remove('show');
+          modalElement.style.display = 'none';
+          modalElement.setAttribute('aria-hidden', 'true');
+          modalElement.removeAttribute('aria-modal');
+          modalElement.removeAttribute('role');
+          
+          // Remover cualquier estilo inline que Bootstrap pueda haber añadido
+          const allModals = document.querySelectorAll('.modal');
+          allModals.forEach(modal => {
+            (modal as HTMLElement).style.display = 'none';
+          });
+        }, 100);
+      }
+    }
+
+    onSubmitCreate(): void {
+      if (this.cargoForm.valid) {
+          const chargeValue = this.cargoForm.get('charge')?.value;
+          console.log("Nuevo cargo: "+chargeValue);
+          this.cargoService.getAllCargos().subscribe(cargos => {
+              const exists = cargos.some(cargo => cargo.charge === chargeValue);
+  
+              if (exists) {
+                  Swal.fire({
+                      title: 'Error',
+                      text: `El cargo "${chargeValue}" ya existe. Por favor, elige otro nombre.`,
+                      icon: 'error',
+                      confirmButtonText: 'Aceptar'
+                  }).then(() => {
+                      this.closeModale('createChargeModal'); // Cerrar modal en caso de error
+                  });
+                  return;
+              }
+  
+              this.cargoService.createCargo(this.cargoForm.value).subscribe({
+                  next: () => {
+                      Swal.fire({
+                          title: '¡Creado!',
+                          text: 'El cargo ha sido creado correctamente.',
+                          icon: 'success',
+                          confirmButtonText: 'Aceptar'
+                      }).then(() => {
+                          this.closeModale('createChargeModal'); // Cerrar modal tras éxito
+                          this.cargoForm.reset();
+                          this.loadCharges();
+                      });
+                  },
+                  error: () => {
+                      Swal.fire({
+                          title: 'Error',
+                          text: 'Ocurrió un error al crear el cargo.',
+                          icon: 'error',
+                          confirmButtonText: 'Aceptar',
+                          confirmButtonColor: '#3085d6'
+                      }).then(() => {
+                          this.closeModale('createChargeModal'); // Cerrar modal en caso de error
+                          this.cargoForm.reset();
+                      });
+                  }
+              });
+          });
+      }
+    }
+
+  ERROR_MESSAGES = {
     'Cuil exists in the system': 'Ya existe un empleado con ese cuil',
     'Document exists in the system': 'Ya existe un empleado con ese dni',
     'Error in contact server': 'El servidor de contacto fallo, intente nuevamente mas tarde',

@@ -488,21 +488,127 @@
                     <div class="col-md-6 mb-3">
                         <div class="row text-end">
                           <label class="col-form-label col-md-3" for="cargo">Cargo</label>
-                          <div class="col-md-9 ">
-                            <ng-select
-                            class="text-start"
-                              id="cargo"
-                              name="cargo"                             
-                              [items]="cargos"
-                              [(ngModel)]="cargoSelected"
-                              [clearable]="false"
-                              bindLabel= "charge"           
-                              required>
-                            </ng-select>
-                          </div>
+                            <div class="col-md-7">
+                                <ng-select
+                                class="text-start"
+                                id="cargo"
+                                name="cargo"                             
+                                [items]="cargos"
+                                [(ngModel)]="cargoSelected"
+                                [clearable]="false"
+                                bindLabel= "charge"           
+                                required>
+                                </ng-select>
+                            </div>
+    
+                            <!-- Campo SA/SCR -->
+                            <div class="col-2">
+                                <button class="form-control" type="button" data-bs-target="#createChargeModal"
+                                data-bs-toggle="modal">+</button>
+                            </div>
                         </div>
-                      </div>
+                    </div>
 
+
+                    <!-- Modal para Crear Cargo -->
+                    <div class="modal fade" id="createChargeModal" tabindex="-1">
+                        <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                            <h5 class="modal-title">Nuevo Cargo</h5>
+                            <button
+                                type="button"
+                                class="btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"
+                                (click)="reset()"
+                            ></button>
+                            </div>
+                            <div class="modal-body">
+                            <form [formGroup]="cargoForm" (ngSubmit)="onSubmitCreate()">
+                                <div class="mb-3 row">
+                                <label for="charge" class="col-sm-3 col-form-label text-end"
+                                    >Cargo</label
+                                >
+                                <div class="col-sm-9">
+                                    <input
+                                    type="text"
+                                    class="form-control"
+                                    id="charge"
+                                    formControlName="charge"
+                                    [ngClass]="{
+                                        'is-valid':
+                                        cargoForm.get('charge')?.valid &&
+                                        cargoForm.get('charge')?.touched,
+                                        'is-invalid':
+                                        cargoForm.get('charge')?.invalid &&
+                                        cargoForm.get('charge')?.touched
+                                    }"
+                                    />
+                                    <div
+                                    *ngIf="
+                                        cargoForm.get('charge')?.invalid &&
+                                        cargoForm.get('charge')?.touched
+                                    "
+                                    class="invalid-feedback"
+                                    >
+                                    <small>El cargo es requerido</small>
+                                    </div>
+                                </div>
+                                </div>
+                                <div class="mb-3 row">
+                                <label for="description" class="col-sm-3 col-form-label text-end"
+                                    >Descripción</label
+                                >
+                                <div class="col-sm-9">
+                                    <textarea
+                                    class="form-control"
+                                    id="description"
+                                    formControlName="description"
+                                    rows="3"
+                                    [ngClass]="{
+                                        'is-valid':
+                                        cargoForm.get('description')?.valid &&
+                                        cargoForm.get('description')?.touched,
+                                        'is-invalid':
+                                        cargoForm.get('description')?.invalid &&
+                                        cargoForm.get('description')?.touched
+                                    }"
+                                    ></textarea>
+                                    <div
+                                    *ngIf="
+                                        cargoForm.get('description')?.invalid &&
+                                        cargoForm.get('description')?.touched
+                                    "
+                                    class="invalid-feedback"
+                                    >
+                                    <small>La descripción es requerida</small>
+                                    </div>
+                                </div>
+                                </div>
+                                <div class="modal-footer">
+                                <button
+                                    type="button"
+                                    class="btn btn-secondary"
+                                    data-bs-dismiss="modal"
+                                    aria-label="Close"
+                                    (click)="reset()"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    type="submit"
+                                    class="btn btn-success"
+                                    [disabled]="cargoForm.invalid"
+                                >
+                                    Registrar
+                                </button>
+                                </div>
+                            </form>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
 
                     <!-- Fecha de inicio de contrato -->
                     <div class="col-md-6">
