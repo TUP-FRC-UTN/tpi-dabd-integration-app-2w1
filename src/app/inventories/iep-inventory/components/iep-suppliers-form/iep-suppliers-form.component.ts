@@ -26,9 +26,9 @@ export class IepSuppliersFormComponent {
       name: ['', Validators.required],
       cuit: ['', [
         Validators.required, this.validarCUIT()]],
-      phoneNumber: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
+      phoneNumber: ['', [Validators.required, Validators.pattern('[1-9]{10}$')]],
       createdUser:[this.userService.getUser().id],
-      email: ['', [Validators.required, Validators.email]],
+      email: ['', [Validators.required, Validators.email, this.emailDomainValidator]],
       supplierType: ['OTHER', Validators.required],
       address: ['', Validators.required],
       discontinued: [false]
@@ -89,76 +89,8 @@ export class IepSuppliersFormComponent {
           }
         }
       });
-
-      //  this.supplierService.createSupplier(formData).subscribe({
-      //   next: response => {
-      //     console.log(JSON.stringify(response))
-      //     const formAccess = {
-      //       createdUserId: formData.createdUser,
-      //       name: formData.name,
-      //       cuil: formData.cuit,
-      //       email: formData.email,
-      //     }
-      //     this.supplierService.createSupplierAccess(formAccess).subscribe({
-      //       next: response => {
-      //         console.log(JSON.stringify(response))
-      //         Swal.fire({
-      //           title: '¡Guardado!',
-      //           text: "Proveedor guardado con exito",
-      //           icon: 'success',
-      //           confirmButtonText: 'Aceptar',
-      //           showCancelButton: false,
-      //           confirmButtonColor: '#3085d6'
-      //         }).then(() => {
-      //           this.router.navigate(['main/providers/suppliers'])
-      //         });
-      //         ;
-      //         console.log("PASO: ", response);
-      //       },
-      //       // error: error => {
-      //       //   Swal.fire({
-      //       //     title: 'Error',
-      //       //     text: "Error en el servidor intente nuevamente mas tarde",
-      //       //     icon: 'error',
-      //       //     confirmButtonText: 'Aceptar',
-      //       //     confirmButtonColor: '#3085d6'
-      //       //   });
-      //       //   console.log("error:" + error.error.message)
-      //       //   console.error(error);
-      //       // }
-      //     })
-      //     // Swal.fire({
-      //     //   title: '¡Guardado!',
-      //     //   text: "Proveedor guardado con exito",
-      //     //   icon: 'success',
-      //     //   confirmButtonText: 'Aceptar',
-      //     //   showCancelButton: false,
-      //     //   confirmButtonColor: '#3085d6'
-      //     // }).then(() => {
-      //     //   this.router.navigate(['main/providers/suppliers'])
-      //     // });
-      //     // ;
-      //     // console.log("PASO: ", response);
-      //     // this.proveedorForm.reset();
-      //   },
-      //   error: error => {
-      //     console.log("Error generar proveedor"+ error)
-      //     // Swal.fire({
-      //     //   title: 'Error',
-      //     //   text: "Error en el servidor intente nuevamente mas tarde",
-      //     //   icon: 'error',
-      //     //   confirmButtonText: 'Aceptar',
-      //     //   confirmButtonColor: '#3085d6'
-      //     // });
-
-      //     // console.log("error:" + error.error.message)
-      //     // console.error(error);
-      //   }
-      // });
     }
   }
-
-
 
   isFieldInvalid(field: string): boolean {
     const control = this.proveedorForm.get(field);
@@ -194,61 +126,6 @@ export class IepSuppliersFormComponent {
         }
       );
   }
-
-  /* isValidCuilFinish: boolean = false;
-
-  validarCUITFormato(): ValidatorFn {
-    return (control: AbstractControl): ValidationErrors | null => {
-      if (!control.value) {
-        return null;
-      }
-  
-      const cuit = control.value.toString().trim();
-      
-      // Validar ÚNICAMENTE el formato con guiones (XX-XXXXXXXX-X)
-      const formatoConGuiones = /^\d{2}-\d{8}-\d{1}$/;
-      
-      if (!formatoConGuiones.test(cuit)) {
-        return {
-          invalidCUIT: 'El formato debe ser XX-XXXXXXXX-X (incluyendo los guiones)'
-        };
-      }
-  
-      // Eliminar guiones para la validación del dígito verificador
-      const cuitLimpio = cuit.replace(/-/g, '');
-      
-      // Validar tipo de CUIT
-      const tipo = parseInt(cuitLimpio.substring(0, 2), 10);
-      const tiposValidos = [20, 23, 24, 27, 30, 33, 34];
-      if (!tiposValidos.includes(tipo)) {
-        return {
-          invalidCUIT: 'El tipo de CUIT no es válido (debe comenzar con: 20, 23, 24, 27, 30, 33 o 34)'
-        };
-      }
-  
-      // Validar dígito verificador
-      const multiplicadores = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
-      const digitoVerificador = parseInt(cuitLimpio.charAt(10), 10);
-  
-      let suma = 0;
-      for (let i = 0; i < 10; i++) {
-        suma += parseInt(cuitLimpio.charAt(i), 10) * multiplicadores[i];
-      }
-  
-      let resto = suma % 11;
-      let digitoCalculado = resto === 0 ? 0 : 11 - resto;
-  
-      if (digitoCalculado !== digitoVerificador) {
-        return {
-          invalidCUIT: 'El dígito verificador no es válido'
-        };
-      }
-  
-      return null;
-    };
-  }
-    */
-
 
   emailExists: boolean = false;
 
@@ -342,5 +219,15 @@ export class IepSuppliersFormComponent {
       }
       return null; 
     };
+  }
+
+  emailDomainValidator(control: AbstractControl) {
+    const email = control.value;
+    if (email && email.endsWith('.com') || email.endsWith('.com.ar') || email.endsWith('.net') || 
+    email.endsWith('.mx') || email.endsWith('.org') || email.endsWith('.gov') || email.endsWith('.edu')) {
+      return null; 
+    } else {
+      return { emailDomain: true }; 
+    }
   }
 }
