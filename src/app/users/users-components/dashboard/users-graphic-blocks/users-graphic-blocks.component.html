@@ -2,29 +2,27 @@
 
   <!-- Sección de Filtros -->
   <div class="row">
-      <div class="col d-flex gap-3">
-          <div class="col">
-              <input type="date" class="form-control border-1 bg-light" [formControl]="startDate"
-                  (change)="filterByDate()">
-          </div>
-          <div class="col">
-              <input type="date" class="form-control border-1 bg-light" [formControl]="endDate"
-                  (change)="filterByDate()">
-          </div>
+    <div class="col d-flex gap-3">
+      <div class="col">
+        <input type="date" class="form-control border-1 bg-light" [formControl]="startDate" (change)="filterByDate()">
       </div>
+      <div class="col">
+        <input type="date" class="form-control border-1 bg-light" [formControl]="endDate" (change)="filterByDate()">
+      </div>
+    </div>
 
-      <div class="col-auto d-flex gap-1 ms-auto">
-          <button class="btn btn-primary filterbutton" data-bs-toggle="modal" title="Filtros Avanzados"
-              data-bs-target="#filtrosAvanzados">
-              <i class="bi bi-funnel-fill"></i>
-          </button>
-          <button type="button" class="btn btn-secondary bi bi-trash filterbutton" (click)="clearFilters()"
-              title="Limpiar Filtros"></button>
-      </div>
+    <div class="col-auto d-flex gap-1 ms-auto">
+      <button class="btn btn-primary filterbutton" data-bs-toggle="modal" title="Filtros Avanzados"
+        data-bs-target="#filtrosAvanzados">
+        <i class="bi bi-funnel-fill"></i>
+      </button>
+      <button type="button" class="btn btn-secondary bi bi-trash filterbutton" (click)="clearFilters()"
+        title="Limpiar Filtros"></button>
+    </div>
   </div>
 </div>
 
-<div  class="container mt-3">
+<div class="container mt-3">
   <div class="card border-0 shadow-lg rounded-4">
 
     <div class="card-body">
@@ -43,14 +41,21 @@
               route="/main/plots/dashboard/plot-info"></app-users-kpi>
             <app-users-kpi class="mb-2" title="Porcentaje Total Construido" icon="bi bi-percent"
               [amount]="selectedBlockskPIs.utilizationPercentage" [customStyles]="{ 'background-color': '#d8ffedde' }"
-              tooltip="Porcentaje del área total que ya ha sido utilizada para construcciones" formatPipe="percent"></app-users-kpi>
+              tooltip="Porcentaje del área total que ya ha sido utilizada para construcciones"
+              formatPipe="percent"></app-users-kpi>
             <app-users-kpi class="mb-2" title="Porcentaje Total No Construido" icon="bi bi-percent"
               [amount]="selectedBlockskPIs.notUtilizationPercentage"
-              [customStyles]="{ 'background-color': '#fcc7ccde' }" tooltip="Porcentaje del área total que permanece libre de construcciones" formatPipe="percent"></app-users-kpi>
+              [customStyles]="{ 'background-color': '#fcc7ccde' }"
+              tooltip="Porcentaje del área total que permanece libre de construcciones"
+              formatPipe="percent"></app-users-kpi>
           </div>
         </div>
         <div class="col-md-10">
 
+          <h4 class="card-title">Análisis Comparativo de Manzanas<button type="button"
+              class="btn btn-sm btn-link text-muted bi bi-arrow-left fs-5 float-end" title="Volver"
+              (click)="changeView()"></button></h4>
+          <hr>
           @if(loading){
           <div class="loading">Cargando...</div>
           }
@@ -60,10 +65,6 @@
             <p>{{ error }}</p>
           </div>
 
-          <h4 class="card-title">Análisis Comparativo de Manzanas<button type="button"
-              class="btn btn-sm btn-link text-muted bi bi-arrow-left fs-5 float-end" title="Volver"
-              (click)="changeView()"></button></h4>
-          <hr>
           @if(!loading && !error){
 
           <google-chart [type]="chartType" [data]="chartData" [options]="chartOptions" [width]="width"
@@ -112,6 +113,59 @@
           </div>
 
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="infoModal" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Reporte</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <ul>
+          <li>
+            <p>
+              <strong>Análisis Comparativo de Manzanas</strong>: Este gráfico muestra una comparativa
+              entre dos manzanas a elección del usuario. Por defecto está configurado para mostrar la
+              comparación entre dos manzanas, Mzna 1 y Mzna 2.
+            </p>
+            <p>
+              Incluye cuatro KPI que muestran el área total, el área total construida, el porcentaje total
+              construido y el porcentaje total no construido entre todas las manzanas.
+            </p>
+          </li>
+          <li>
+            El gráfico de barras detallan las siguientes métricas para cada manzana:
+            <ul>
+              <li>Área Total</li>
+              <li>Área Construida</li>
+              <li>Porcentaje Construido</li>
+              <li>Porcentaje No Construido</li>
+            </ul>
+          </li>
+
+          <li>
+            <strong>Botones</strong>:
+            <ul>
+              <li><button class="btn btn-primary bi bi-funnel-fill mb-2"></button> Permite aplicar filtros
+                avanzados.
+              </li>
+              <li><button class="btn btn-secondary bi bi-trash mb-2"></button> Elimina los filtros
+                avanzados aplicados.
+              </li>
+              <li><button class="btn btn-sm btn-link text-muted bi bi-arrow-left fs-5"></button> Vuelve a
+                la pantalla
+                principal.</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
       </div>
     </div>
   </div>

@@ -77,17 +77,25 @@
             </div>
           </div>
 
+          @if(loadingPieChart){
+          <div class="loading">Cargando...</div>
+          }
+
           <div *ngIf="errorPieChart" class="error-container">
             <i class="bi bi-exclamation-triangle-fill error-icon"></i>
             <p>{{ errorPieChart }}</p>
           </div>
 
-          @if(!errorPieChart){
+          @if(!errorPieChart && !loadingPieChart){
           <google-chart [type]="pieChart" [data]="pieChartData" [options]="pieChartOptions" [width]="400"
             [height]="184">
           </google-chart>
           }
         </div>
+
+        @if(loadingBarChart){
+        <div class="loading">Cargando...</div>
+        }
 
         <div class="col-md-7">
           <div *ngIf="errorBarChart" class="error-container">
@@ -95,7 +103,7 @@
             <p>{{ errorBarChart }}</p>
           </div>
 
-          @if(!errorBarChart){
+          @if(!errorBarChart && !loadingBarChart){
           <google-chart [type]="columnChart" [data]="barChartData" [options]="barChartOptions" [width]="600"
             [height]="360">
           </google-chart>
@@ -144,6 +152,55 @@
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
           </div>
         </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="infoModal" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Reporte</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <ul>
+          <li>
+            <p>
+              <strong>Distribución de Lotes por Manzana y por Propietarios</strong>:
+              Este gráfico presenta información sobre la distribución los lotes, desglosada tanto
+              por manzana como por los diferentes propietarios. Incluye cuatro KPI que
+              indican la cantidad total de lotes Ocupados, la cantidad de lotes En Construcción y Disponibles.
+            </p>
+
+            <p>
+              El gráfico de barras representa la Distribución de Lotes por Manzana. 
+              Cada una de las barras muestra la cantidad de lotes ocpuados (en azul), los
+              lotes en construcción (en naranja) y los lotes disponibles (en verde) para cada manzana.
+
+            </p>
+            <p>
+              El gráfico circular  detalla el porcentaje de lotes pertenecientes a cada uno de los propietarios.
+            </p>
+          <li>
+            <strong>Botones</strong>:
+            <ul>
+              <li><button class="btn btn-primary bi bi-funnel-fill mb-2"></button> Permite aplicar filtros
+                avanzados.
+              </li>
+              <li><button class="btn btn-secondary bi bi-trash mb-2"></button> Elimina los filtros
+                avanzados aplicados.
+              </li>
+              <li><button class="btn btn-sm btn-link text-muted bi bi-arrow-left fs-5"></button> Vuelve a
+                la pantalla
+                principal.</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
       </div>
     </div>
   </div>
