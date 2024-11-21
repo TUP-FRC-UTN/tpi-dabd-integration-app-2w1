@@ -406,7 +406,7 @@ export class UsersListOwnersComponent implements OnDestroy {
     localDate.setHours(0, 0, 0, 0);
 
     // Sumar un día
-    localDate.setDate(localDate.getDate() + 1);
+    localDate.setDate(localDate.getDate());
 
     const options: Intl.DateTimeFormatOptions = { day: '2-digit', month: '2-digit', year: 'numeric' };
     return new Intl.DateTimeFormat('es-ES', options).format(localDate);
@@ -452,9 +452,9 @@ export class UsersListOwnersComponent implements OnDestroy {
       margin: { top: 30, bottom: 20 },
       columnStyles: {
         0: { cellWidth: 50 },
-        1: { cellWidth: 30 },
+        1: { cellWidth: 40 },
         2: { cellWidth: 30 },
-        3: { cellWidth: 50 },
+        3: { cellWidth: 40 },
         4: { cellWidth: 30 }
       },
     });
