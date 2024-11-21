@@ -61,6 +61,8 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
   plotsTypes: PlotTypeModel[] = [];
   plotsStatus: PlotStateModel[] = [];
 
+  loadingPieChart = false;
+  loadingBarChart = false;
   errorPieChart: string | null = null;
   errorBarChart: string | null = null;
   errorRangeDate: string | null = null;
@@ -164,6 +166,7 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
   private applyFilters() {
     this.errorBarChart = null;
     this.errorPieChart = null;
+    this.loadingPieChart = true;
 
     this.filteredPlotsStats = { ...this.plotsStats };
     this.filteredPlotsByBlock = [...this.plotsByBlock];
@@ -189,6 +192,7 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
             }
             this.filteredOwnerDistribution = data;
             this.processPieChartData();
+            this.loadingPieChart = false;
           },
           error: () => {
             this.errorPieChart = 'Error al cargar la distribución de propietarios';
@@ -230,6 +234,8 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
   private loadData() {
     this.errorBarChart = null;
     this.errorPieChart = null;
+    this.loadingBarChart = true;
+    this.loadingPieChart = true;
     this.loadStats();
     this.loadBarChart();
     this.loadPieChart();
@@ -255,9 +261,10 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
         this.filteredPlotsByBlock = [...this.plotsByBlock];
         this.processData();
         this.processFilterOptions();
+        this.loadingBarChart = false;
       },
       error: () => {
-        this.errorBarChart = 'Error al cargar los datos por manzana';
+        this.errorBarChart = 'Error al cargar los datos de las manzanas';
       },
     });
   }
@@ -269,6 +276,7 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
         this.ownerDistribution = data;
         this.filteredOwnerDistribution = [...this.ownerDistribution];
         this.processPieChartData();
+        this.loadingPieChart = false
       },
       error: () => {
         this.errorPieChart = 'Error al cargar la distribución de propietarios';
@@ -362,6 +370,8 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
     this.endDate.reset();
     this.filterForm.reset();
     this.errorRangeDate = null;
+    this.errorBarChart = null;
+    this.errorPieChart = null;
     this.filteredPlotsByBlock = [...this.plotsByBlock];
     this.filteredOwnerDistribution = [...this.ownerDistribution];
     this.filteredPlotsStats = { ...this.plotsStats };
@@ -396,6 +406,9 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
     this.errorBarChart = null;
     this.errorPieChart = null;
 
+    this.loadingBarChart = true;
+    this.loadingPieChart = true;
+    
     this.apiService
       .getPlotsStats(
         startDate,
@@ -417,6 +430,7 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
       next: (plotsByBlock) => {
         this.filteredPlotsByBlock = plotsByBlock;
         this.processData();
+        this.loadingBarChart = false;
       },
       error: (error) => {
         console.error('Error al obtener datos por bloque:', error);
@@ -434,6 +448,7 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
         next: (distribution) => {
           this.filteredOwnerDistribution = distribution;
           this.processPieChartData();
+          this.loadingPieChart = false
         },
         error: (error) => {
           console.error('Error al obtener distribución:', error);
@@ -443,20 +458,6 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
 
   private formatDate(date: Date): string {
     return date.toISOString().split('T')[0];
-  }
-
-  resetPieChart() {
-    this.filterForm.reset();
-    this.startDate.reset();
-    this.endDate.reset();
-    this.loadPieChart();
-    this.loadStats();
-  }
-
-  resetBarChart() {
-    this.startDate.reset();
-    this.endDate.reset();
-    this.loadBarChart();
   }
 
   resetAll() {
