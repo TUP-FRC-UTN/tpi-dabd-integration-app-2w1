@@ -128,8 +128,7 @@ export class UsersGraphicBlocksComponent implements OnInit {
       map(([block1, block2, blocks]) => {
         if (block1 && block2) {
           this.updateChartData(Number(block1), Number(block2), blocks);
-          this.updateSelectedBlocksKPIs( blocks);
-          //Number(block1), Number(block2),
+          this.updateSelectedBlocksKPIs(blocks, Number(block1), Number(block2));
         }
       })
     ).subscribe();
@@ -229,25 +228,25 @@ export class UsersGraphicBlocksComponent implements OnInit {
     notUtilizationPercentage: 0
   };
 
-  private updateSelectedBlocksKPIs( blocks: BlockData[]): void {
-    //block1: number, block2: number,
-    //const b1 = blocks.find(b => b.blockNumber === block1);
-    //const b2 = blocks.find(b => b.blockNumber === block2);
+  private updateSelectedBlocksKPIs(blocks: BlockData[], block1: number, block2: number): void {
+    const b1 = blocks.find(b => b.blockNumber === block1);
+    const b2 = blocks.find(b => b.blockNumber === block2);
 
-    //if (!b1 || !b2) return;
+    if (!b1 || !b2) return;
 
-    /*this.selectedBlockskPIs = {
+    this.selectedBlockskPIs = {
       totalArea: b1.totalArea + b2.totalArea,
       totalBuiltArea: b1.builtArea + b2.builtArea,
-      utilizationPercentage: ((b1.builtArea + b2.builtArea) / (b1.totalArea + b2.totalArea)) * 100,
-      notUtilizationPercentage: 100 - (((b1.builtArea + b2.builtArea) / (b1.totalArea + b2.totalArea)) * 100)
-    };*/
-    this.selectedBlockskPIs = {
+      utilizationPercentage: ((b1.builtArea + b2.builtArea) / (b1.totalArea + b2.totalArea)),
+      notUtilizationPercentage: 1 - (((b1.builtArea + b2.builtArea) / (b1.totalArea + b2.totalArea)))
+    };
+    
+    /*this.selectedBlockskPIs = {
       totalArea: blocks.reduce((acc, b) => acc + b.totalArea, 0),
       totalBuiltArea: blocks.reduce((acc, b) => acc + b.builtArea, 0),
       utilizationPercentage: blocks.reduce((acc, b) => acc + b.builtArea, 0) / blocks.reduce((acc, b) => acc + b.totalArea, 0),
       notUtilizationPercentage: 1 - (blocks.reduce((acc, b) => acc + b.builtArea, 0) / blocks.reduce((acc, b) => acc + b.totalArea, 0))
-    };    
+    };*/    
   }
 
   filterByDate() {

@@ -7,10 +7,13 @@ import {
   PlotsStats
 } from '../../../users-models/dashboard/plots-stats';
 import {
+  AbstractControl,
   FormControl,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn,
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
@@ -52,6 +55,7 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
     type: new FormControl(''),
     status: new FormControl(''),
   });
+  isSelectedDisabled = false;
 
   filteredPlotsStats: PlotsStats | null = null;
   filteredPlotsByBlock: PlotsByBlock[] = [];
@@ -101,7 +105,7 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
       titleTextStyle: { color: '#6c757d', fontSize: 14, bold: true },
       textStyle: { color: '#495057', fontSize: 12 },
     },
-    bar: { groupWidth: '70%' },
+    bar: { groupWidth: '40%' },
     tooltip: {
       showColorCode: true,
       trigger: 'both',
@@ -166,7 +170,6 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
   private applyFilters() {
     this.errorBarChart = null;
     this.errorPieChart = null;
-    this.loadingPieChart = true;
 
     this.filteredPlotsStats = { ...this.plotsStats };
     this.filteredPlotsByBlock = [...this.plotsByBlock];
@@ -229,6 +232,14 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
       value: block,
       name: `Nro. Manzana: ${block}`,
     }));
+    
+    this.blocksNumber.push({ value: '', name: 'Todas' });
+    this.blocksNumber.push({ value: '', name: 'Todas' });
+    this.blocksNumber.push({ value: '', name: 'Todas' });
+    this.blocksNumber.push({ value: '', name: 'Todas' });
+    this.blocksNumber.push({ value: '', name: 'Todas' });
+    this.blocksNumber.push({ value: '', name: 'Todas' });
+    
   }
 
   private loadData() {
@@ -290,8 +301,13 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
       this.errorBarChart = 'No hay datos disponibles con esos filtros';
     }
 
+    this.filteredPlotsByBlock.sort((a, b) => a.blockNumber - b.blockNumber);
+    
+    // Tomar solo las 10 primeras manzanas
+    const displayData = this.filteredPlotsByBlock.slice(0, 10);
+
     this.barChartData = [
-      ...this.filteredPlotsByBlock.map((item: PlotsByBlock) => [
+      ...displayData.map((item: PlotsByBlock) => [
         {
           v: item.blockNumber,
           f: `Nro. Manzana: ${item.blockNumber}`,
@@ -469,5 +485,18 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
 
   changeView(){
     this.routerService.redirect('main/users/dashboard');
+  }
+  
+  maxBlocksValidator(max: number): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const selectedBlocks = control.value;
+      if (selectedBlocks && selectedBlocks.length > max) {
+        this.isSelectedDisabled = true;
+        return { 'customsErrors': { message: `Se alcanzó el máximo de ${max} manzanas seleccionadas` } };
+      }else{
+        this.isSelectedDisabled = false;
+      }
+      return null;
+    };
   }
 }
