@@ -7,16 +7,17 @@
   [closeOnSelect]="!multiple"
   (change)="onCategoryChange()"
   [selectableGroup]="true"
-  [clearable] = "multiple"
-  >
+  [clearable]="multiple"
+  (blur)="onBlur()"
+  [class.is-valid]="isValid() && showValidBorder">
     
   @if (multiple) {
     <ng-template ng-multi-label-tmp let-items="items">
-      @if(items.length == 1){
-          {{ items[0].description }}
+      @if(items.length == 1) {
+        {{ items[0].description }}
       }
-      @if(items.length>1){
-          {{ items.length }} seleccionados
+      @if(items.length > 1) {
+        {{ items.length }} seleccionados
       }
     </ng-template>
     <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">

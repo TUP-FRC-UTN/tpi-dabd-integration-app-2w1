@@ -22,7 +22,7 @@ export class UnauthorizedComponent implements OnInit {
         this.timeLeft--;
       } else {
         clearInterval(this.intervalId);
-        this.routingService.redirect('/home', 'Página principal');
+        this.routingService.redirect('/main/', 'Página principal');
       }
     }, 1000);
 

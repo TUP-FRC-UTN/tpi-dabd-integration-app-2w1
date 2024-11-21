@@ -13,56 +13,37 @@ import { Subject, takeUntil } from 'rxjs';
   templateUrl: './expense-providers-ng-select.component.html',
   styleUrl: './expense-providers-ng-select.component.scss'
 })
-export class ExpenseProvidersNgSelectComponent implements OnInit, OnDestroy  {
-
-  /*Lo utilizo two bind, el componente padre le envia la lista o el valor seleccionado
-  Para hacer el two bind de esta forma el Output debe llamarse igual al Input pero con sufijo "Change"
-  No probe si es necesario que el EventEmitter emita el valor o puede ser void, pero lo dejo asi
-  por si es necesari capturar el valor mediente el metodo y no el two bind
-  */
-  //Si uso el multiple uso esto
-  @Input() selectedProviders: Provider[] =[];
-  //Si es individual uso esto
-  @Input() selectedProvider: number=0;
-  //Bandera para indicar si uso multiple select o individual
-  @Input() multiple:Boolean=true;
-  //Bandera para indicar si agrego un elemento sin descripcion
-  @Input() emptyValue: Boolean= false;
-  //Si uso el multiple emito esto
+export class ExpenseProvidersNgSelectComponent implements OnInit, OnDestroy {
+  @Input() selectedProviders: Provider[] = [];
+  @Input() selectedProvider: number = 0;
+  @Input() multiple: Boolean = true;
+  @Input() emptyValue: Boolean = false;
   @Output() selectedProvidersChange = new EventEmitter<Provider[]>();
-  //Si es individual emito esto
   @Output() selectedProviderChange = new EventEmitter<number>();
-  
-  
-  /*La lista que viene del servicio, si van a seguir manejando desde el padre la logica del servicio
-  esto deberia ser un input
-  */
-  providersList : Provider[] = [];
-  //Para cancelar la sub al service
+  @Input() showValidBorder: boolean = false;
+  providersList: Provider[] = [];
   private destroy$ = new Subject<void>();
-  constructor(private providerService: ProviderService){}
+  isBlurred: boolean = false;
+
+  constructor(private providerService: ProviderService) {}
+
   ngOnInit(): void {
-    //Al iniciar busco la lista del servicio
     this.loadProviders();
   }
-  ngOnDestroy(): void {
-    //Limpio las subscripciones
-    this.destroy$.next(); 
-    this.destroy$.complete(); 
-  }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   loadProviders(): void {
     this.providerService.getProviders()
-      .pipe(takeUntil(this.destroy$)) 
+      .pipe(takeUntil(this.destroy$))
       .subscribe(
         (providers) => {
           this.providersList = providers;
-          console.log(this.providersList)
-          //Si necesito el elemento empty lo agrego
           if (this.emptyValue) {
             this.providersList.push({ id: 0, description: '' });
-            
           }
           this.providersList.sort((a, b) => a.description.localeCompare(b.description));
         },
@@ -71,30 +52,39 @@ export class ExpenseProvidersNgSelectComponent implements OnInit, OnDestroy  {
         }
       );
   }
-  //Evento que uso cada vez que el ng-select cambia, deacuerdo a si es multiple o no, emite el evento correspondiene
+
   onProviderChange(): void {
-    if(this.multiple){
+    if (this.multiple) {
       this.selectedProvidersChange.emit(this.selectedProviders);
-    }else{
+    } else {
       this.selectedProviderChange.emit(this.selectedProvider);
     }
   }
 
-  /*
-    Get y Set utilizado para pasar gestionar los valores seleccionados,
-    hay que usarlos asi porque de acuerdo si es multiple o no, el valor cambia
-    entonces de esta forma manejas la logica de que valor tiene que tomar o recibir el
-    ng select, esto en el html es asi [(ngModel)] = "selectValue"
-  */
-  set selectValue(value:any){
-    if(this.multiple){
+  onBlur(): void {
+    this.isBlurred = true;
+  }
+
+  isValid(): boolean {
+    if (!this.isBlurred) return false;
+    
+    if (this.multiple) {
+      return this.selectedProviders && this.selectedProviders.length > 0;
+    } else {
+      // Se considera válido si hay una selección (incluso si es la opción vacía con id=0)
+      return this.selectedProvider !== undefined && this.selectedProvider !== null;
+    }
+  }
+
+  set selectValue(value: any) {
+    if (this.multiple) {
       this.selectedProviders = value;
-    }else{
+    } else {
       this.selectedProvider = value;
     }
   }
-  get selectValue(){
-    return this.multiple ? this.selectedProviders : this.selectedProvider
+
+  get selectValue() {
+    return this.multiple ? this.selectedProviders : this.selectedProvider;
   }
-  
 }
