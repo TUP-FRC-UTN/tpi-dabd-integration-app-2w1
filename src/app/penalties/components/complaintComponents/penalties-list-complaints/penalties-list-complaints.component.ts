@@ -118,13 +118,12 @@ export class PenaltiesListComplaintComponent implements OnInit {
           className: 'align-middle',
           render: (data) => {
             let displayText = data;
-            let badgeClass = this.getStatusClass(data); // Usa la clase CSS predeterminada para el estado
+            let badgeClass = this.getStatusClass(data); 
             
             if (data === "Nueva") {
-              displayText = "Pendiente"; // Cambia el texto a "Pendiente"
-              badgeClass = "badge bg-warning"; // Usa el mismo color que "Pendiente"
+              displayText = "Pendiente"; 
+              badgeClass = "badge bg-warning"; 
               
-              // Incluye una bola verde usando Bootstrap
               return `
                 <div class="text-center">
                   <div class="badge ${badgeClass} border rounded-pill text-body-emphasis">
