@@ -301,7 +301,8 @@ export class AccessContainerVisitorsRegistrationComponent implements OnInit, OnD
         hasVehicle: visit.hasVehicle,
         licensePlate: visit.hasVehicle ? visit.vehicle?.licensePlate : '',
         vehicleType: visit.hasVehicle ? visit.vehicle?.vehicleType?.description : '',
-        insurance: visit.hasVehicle ? visit.vehicle?.insurance : ''
+        insurance: visit.hasVehicle ? visit.vehicle?.insurance : '',
+        authorizedType: visit.userType
       });
     }, 0);
   }

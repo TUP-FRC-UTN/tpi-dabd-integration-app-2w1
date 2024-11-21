@@ -65,7 +65,7 @@ export class MetricsComponent implements OnInit {
   roleTranslations: { [key: string]: string } = {
     'Employeed': 'Empleado',
     'Tenant': 'Inquilino',
-    'Supplier': 'Proveedor',
+    'Supplied': 'Proveedor',
     'Visitor': 'Visitante',
     'Owner':'Vecino',
     'Gardener':'Jardinero',
@@ -659,7 +659,7 @@ loadUtilizationTotalData(year: number, startMonth: number, endMonth: number): vo
   selectedUserTypes: string[] = [];
   availableUserTypes = [
     { label: 'Empleado', value: 'Employeed' },
-    { label: 'Proveedor', value: 'Supplier' },
+    { label: 'Proveedor', value: 'Supplied' },
     { label: 'Vecino', value: 'Owner' },
     { label: 'Inquilino', value: 'Tenant' },
     { label: 'Visitante', value: 'Visitor' },

@@ -9,11 +9,12 @@ import $ from 'jquery';
 import 'datatables.net'
 import 'datatables.net-bs5';
 import { AccessVisitorsRegisterServiceService } from '../../../../services/access_visitors/access-visitors-register/access-visitors-register-service/access-visitors-register-service.service';
+import { AccessVisitorsExcelReaderComponent } from '../access-visitors-excel-reader/access-visitors-excel-reader.component';
 
 @Component({
   selector: 'app-access-grid-visitors-registration',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, AccessVisitorsExcelReaderComponent],
   templateUrl: './access-grid-visitors-registration.component.html',
   styleUrl: './access-grid-visitors-registration.component.css'
 })
@@ -21,6 +22,7 @@ export class AccessGridVisitorsRegistrationComponent implements OnInit, OnDestro
 
   @Output() updateVisit = new EventEmitter<AccessVisitor>();
   private unsubscribe$ = new Subject<void>();
+  unifiedSearch: string = '';
   visitors: AccessVisitor[] = [];
   VisitorOnUpdate: AccessVisitor | null = null;
   table: any = null;
@@ -38,41 +40,43 @@ export class AccessGridVisitorsRegistrationComponent implements OnInit, OnDestro
         visitor.lastName, 
         visitor.hasVehicle ? visitor.vehicle?.licensePlate : 'Sin vehículo', 
         `<div class="dropdown d-flex justify-content-center">
-          <button class="btn btn-light dropdown-toggle d-flex align-items-center justify-content-center" type="button" id="actionMenu${index}" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fas fa-ellipsis-v" style="color: black;"></i>
+          <button class="btn btn-light d-flex align-items-center justify-content-center" type="button" id="actionMenu${index}" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-three-dots-vertical" style="color: black;"></i>
           </button>
           <ul class="dropdown-menu" aria-labelledby="actionMenuButton-${visitor.document}">
-            <li><a role="button" class="dropdown-item update-visitor-btn" data-index="${index}">Modificar</a></li>
-            <li><a role="button" class="dropdown-item text-danger delete-visitor-btn" data-index="${index}">Eliminar</a></li>
+            <li>
+              <a role="button" class="dropdown-item update-visitor-btn"
+              onclick="window.dispatchEvent(new CustomEvent('updateVisitor', { detail: '${index}' }))">Modificar</a>
+            </li>
+            <li>
+              <a role="button" class="dropdown-item text-danger delete-visitor-btn" 
+              onclick="window.dispatchEvent(new CustomEvent('deleteVisitor', { detail: '${index}' }))"">Eliminar</a>
+            </li>
           </ul>
         </div>`
       ]);
     });
     this.table.draw();
-    this.addActionsEventListeners();
   }
   
   addActionsEventListeners() {
-    const updateButtons = document.querySelectorAll('.update-visitor-btn') as NodeListOf<HTMLButtonElement>;
-    const deleteButtons = document.querySelectorAll('.delete-visitor-btn') as NodeListOf<HTMLButtonElement>;
-    updateButtons.forEach(b => {
-      b.addEventListener('click', () => {
-        const index = parseInt(b.getAttribute('data-index') || '0', 10);
-        const selectedVisitor = this.visitors[index];
-        this.updateVisitor(selectedVisitor);
-      });
+    window.addEventListener('updateVisitor', (event) => {
+      const customEvent = event as CustomEvent;
+      const index = customEvent.detail;
+      const selectedVisitor = this.visitors[index];
+      this.updateVisitor(selectedVisitor);
     });
-    deleteButtons.forEach(b => {
-      b.addEventListener('click', () => {
-        const index = parseInt(b.getAttribute('data-index') || '0', 10);
-        const selectedVisitor = this.visitors[index];
-        this.deleteVisitor(selectedVisitor);
-      });
+
+    window.addEventListener('deleteVisitor', (event) => {
+      const customEvent = event as CustomEvent;
+      const index = customEvent.detail;
+      const selectedVisitor = this.visitors[index];
+      this.deleteVisitor(selectedVisitor);
     });
   }
   initializeDataTable(): void {
     this.table = ($('#tablaconsulta') as any).DataTable({
-      dom: '<"top d-flex justify-content-start mb-2"f>rt<"bottom d-flex justify-content-between align-items-center"<"d-flex align-items-center gap-3"li>p><"clear">',
+      dom: 'rt<"bottom d-flex justify-content-between align-items-center"<"d-flex align-items-center gap-3"l i> p><"clear">',
       columnDefs: [
         { orderable: false, searchable: false, targets: 4 },
         { className: "text-start", targets: '_all' }, // Alinea todas las columnas a la izquierda
@@ -102,9 +106,11 @@ export class AccessGridVisitorsRegistrationComponent implements OnInit, OnDestro
   }
 
   ngOnInit(): void {
+    this.addActionsEventListeners();
     setTimeout(() => {
       this.initializeDataTable();
-  
+      this.setupUnifiedSearchFilter();
+      this.setupCustomFilters();
 
       $('#tablaconsulta tbody').on('click', '.view-more-btn', (event: any) => {
         const index = $(event.currentTarget).data('index');
@@ -118,10 +124,8 @@ export class AccessGridVisitorsRegistrationComponent implements OnInit, OnDestro
       .pipe(
         takeUntil(this.unsubscribe$))
       .subscribe(visitors => {
-        console.log(visitors);
         this.visitors = visitors;
         this.updateDataTable();
-        console.log('Visitantes actualizados en la grilla:', this.visitors);
       });
   }
 
@@ -132,7 +136,6 @@ export class AccessGridVisitorsRegistrationComponent implements OnInit, OnDestro
 
   updateVisitor(visitor: AccessVisitor) {
     this.VisitorOnUpdate = { ...visitor };
-    console.log('Visitante a editar:', this.VisitorOnUpdate); 
     this.updateVisit.emit(this.VisitorOnUpdate);
     this.deleteVisitor(visitor);
   }
@@ -146,5 +149,35 @@ export class AccessGridVisitorsRegistrationComponent implements OnInit, OnDestro
   
   deleteVisitor(visitor: AccessVisitor) {
     this.visitorService.deleteVisitorsTemporalsSubject(visitor);
+  }
+
+  private filterRow(data: string[]): boolean {
+    if (this.unifiedSearch) {
+      const searchTerm = this.unifiedSearch.toLowerCase();
+      if (!data.some(field => field.toLowerCase().includes(searchTerm))) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  private setupCustomFilters(): void {
+    $.fn.dataTable.ext.search.push(
+      (settings: any, data: string[]) => this.filterRow(data)
+    );
+  }
+
+  private setupUnifiedSearchFilter(): void {
+    $('#unifiedSearchFilter').on('keyup', (e) => {
+      const target = $(e.target);
+      const inputValue = target.val() as string;
+      
+      this.unifiedSearch = inputValue.length >= 3 ? inputValue : '';
+      
+      if (this.table) {
+        this.table.draw();
+      }
+    });
   }
 }

@@ -8,7 +8,7 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [AccessContainerVisitorsRegistrationComponent,AccessVisitorsEventualComponent, FormsModule],
   templateUrl: './access-register-visitors.component.html',
-  styleUrl: './access-register-visitors.component.scss'
+  styleUrl: './access-register-visitors.component.css'
 })
 export class AccessRegisterVisitorsComponent {
     selectedComponent: 'registration' | 'eventual' = 'eventual';
