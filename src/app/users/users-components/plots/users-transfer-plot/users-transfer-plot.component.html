@@ -30,12 +30,22 @@
             </div>
         </div>
 
+        @if(confirm){
+            <div class="m-3">
+                <div class="alert alert-danger" role="alert">
+                    {{messageConfirm()}}
+                  </div>
+            </div>
+        }
+        
+
         <div class="row mb-3 align-self-end mt-3">
             <div class="col-auto">
               <button type="button" class="btn btn-secondary"  (click)="activeModal.dismiss('Cross click')">Cancelar</button>
             </div>
+        
             <div class="col-auto">
-              <button type="submit" class="btn btn-success" [disabled]="reactiveForm.invalid"> Guardar </button>
+              <button type="button" class="btn btn-success" (click)="confirmAction()" [disabled]="reactiveForm.invalid">Guardar</button>
             </div>
           </div>
     </form>

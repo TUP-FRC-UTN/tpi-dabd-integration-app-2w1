@@ -19,7 +19,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 })
 export class UsersTransferPlotComponent implements OnInit {
 
-  constructor(public activeModal: NgbActiveModal ,private fb: FormBuilder ){
+  constructor(public activeModal: NgbActiveModal, private fb: FormBuilder) {
     this.reactiveForm = this.fb.group({
       actualOwner: [''],
       newOwner: ['', [Validators.required]]
@@ -30,14 +30,17 @@ export class UsersTransferPlotComponent implements OnInit {
   actualOwner: Owner = new Owner();
   plot: GetPlotModel = new GetPlotModel();
   reactiveForm: FormGroup;
+  confirm: boolean = false;
+
   @Input() plotId: number = 0;
+
   private readonly ownersService = inject(OwnerService);
   private readonly plotService = inject(PlotService);
   private readonly authService = inject(AuthService);
 
-   ngOnInit() {
+  ngOnInit() {
     this.reactiveForm.get('actualOwner')?.disable();
-     this.loadAllOwners(); 
+    this.loadAllOwners();
   }
 
   //Cargar todos los propietarios
@@ -46,34 +49,45 @@ export class UsersTransferPlotComponent implements OnInit {
       next: (data: Owner[]) => {
         this.owners = data.map(owner => ({
           value: owner.id,
-          name: `${owner.name}, ${owner.lastname}`
+          name: `${owner.name}, ${owner.lastname} - ${owner.dni}`
         }));
-        
-        this.loadActualOwner();   
+
+        this.loadActualOwner();
       },
       error: (error) => {
-        console.log('No se pudo cargar los propietarios');
+        console.log('No se pudo cargar los propietarios, ' + error);
       }
     });
   }
 
+  //Cargar el propietario actual
   loadActualOwner() {
     this.ownersService.getOwnerByPlotId(this.plotId).subscribe({
       next: (data: Owner[]) => {
-        this.actualOwner = data.find(owner => owner.active == true)!;               
-        this.owners = this.owners.filter(owner => owner.value != this.actualOwner.id);    
+        this.actualOwner = data.find(owner => owner.active == true)!;
+        this.owners = this.owners.filter(owner => owner.value != this.actualOwner.id);
         this.reactiveForm.get('actualOwner')?.setValue(this.actualOwner.name + ' ' + this.actualOwner.lastname);
       },
       error: (error) => {
-        console.log('No se pudo cargar la información del propietario');
+        console.log('No se pudo cargar la información del propietario, ' + error);
       }
     });
   }
 
-  transferPlot(){
+  confirmAction(){
+    let message : string = '¿Estás seguro de que desea transferir el lote?'
+    if(this.actualOwner.plot?.length == 1){
+      message = `¿Estás seguro de que deseas transferir el lote, el propietario ${this.actualOwner.name}  ${this.actualOwner.lastname} se dará de baja por inexistencia de lotes a su nombre?`
+      this.confirm = true;
+    }
+    return message;
+  }
+
+  //Transferir el lote
+  transferPlot() {
     this.plotService.transferPlot(this.plotId,
-       this.reactiveForm.get('newOwner')?.value,
-       this.authService.getUser().id).subscribe({
+      this.reactiveForm.get('newOwner')?.value,
+      this.authService.getUser().id).subscribe({
         next: () => {
           Swal.fire({
             icon: "success",
@@ -91,4 +105,6 @@ export class UsersTransferPlotComponent implements OnInit {
           console.error('Error al trasnferir el lote:', error);
         }
       });
-}}
+  }
+}
+
