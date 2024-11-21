@@ -585,8 +585,9 @@ export class UsersReportComponent implements OnInit{
     }
   }
   private updateDashboardData(startDate: string, endDate: string) {
-    this.loadPlotStateData(startDate, endDate);
-    this.loadPlotTypeData(startDate, endDate);
+    const plotType = this.selectedPlotType;
+    this.loadPlotStateData(startDate, endDate, plotType);
+    this.loadPlotTypeData(startDate, endDate, plotType);
   }
 
   private updateDashboardDataAge(startDate: string, endDate: string) {

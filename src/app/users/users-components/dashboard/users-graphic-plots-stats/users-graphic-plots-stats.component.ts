@@ -105,7 +105,7 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
       titleTextStyle: { color: '#6c757d', fontSize: 14, bold: true },
       textStyle: { color: '#495057', fontSize: 12 },
     },
-    bar: { groupWidth: '40%' },
+    bar: { groupWidth: '80%' },
     tooltip: {
       showColorCode: true,
       trigger: 'both',
