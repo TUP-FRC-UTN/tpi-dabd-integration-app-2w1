@@ -24,7 +24,7 @@ input.custom-input:focus {
 
 
 .fondo{
-    background-image: url('C:/Users/Usuario/source/repos/1logo.png');
+    background-image: url('../../assets/login.png');
     background-repeat: no-repeat;
     background-position: center;
     background-size: 50%;
