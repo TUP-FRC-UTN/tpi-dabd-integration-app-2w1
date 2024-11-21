@@ -3,12 +3,12 @@
     <div class="stepper-header">
       <div class="step" [class.active]="currentStep === 0">
         <div class="step-circle">1</div>
-        <div class="step-label">Registrar Personas</div>
+        <div class="step-label">Agregar Personas</div>
       </div>
       <div class="step-line"></div>
       <div class="step" [class.active]="currentStep === 1">
         <div class="step-circle">2</div>
-        <div class="step-label">Revisar Lista de Autorizados</div>
+        <div class="step-label">Revisar Lista</div>
       </div>
       <div class="step-line"></div>
       <div class="step" [class.active]="currentStep === 2">
@@ -61,7 +61,7 @@
         <!-- Botón Registrar movido al último step -->
         <div class="col-12 mt-3">
           <div class="d-flex justify-content-end">
-            <button class="btn btn-primary btn-sm" 
+            <button class="btn btn-success" 
                     type="button"
                     *ngIf="isRegisterButtonVisible || isLoading"
                     (click)="sendVisitorRecord()" 

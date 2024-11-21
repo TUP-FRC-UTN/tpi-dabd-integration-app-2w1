@@ -333,11 +333,11 @@ export class AccessTimeRangeVisitorsRegistrationComponent implements OnInit, OnD
 
     try {
       this.visitorService.setAuthRange(authRange);
-      Swal.fire({
-        icon: 'success',
-        title: 'Éxito',
-        text: 'Rango de autorización agregado correctamente.',
-      });
+      // Swal.fire({
+      //   icon: 'success',
+      //   title: 'Éxito',
+      //   text: 'Rango de autorización agregado correctamente.',
+      // });
     } catch (error) {
       Swal.fire({
         icon: 'error',
