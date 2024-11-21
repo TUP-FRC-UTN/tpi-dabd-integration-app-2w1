@@ -68,11 +68,11 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
 
   //Init
   ngOnInit(): void {
+    this.loadPlots();
+    this.getTypes();
     this.reportServices.refreshTable$.subscribe(() => {
       this.refreshData();
     });
-    this.loadPlots();
-    this.getTypes();
     this.refreshData();
 
     const that = this; // para referenciar metodos afuera de la datatable
@@ -112,6 +112,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
       next: (data) => {
         this.plots = data;
         console.log('Lotes cargados:', data);
+        this.refreshData(); // Call refreshData after plots are loaded
       },
       error: (error) => {
         console.error('error: ', error);
@@ -326,12 +327,12 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
       response => {
         this.report = response;
         this.reportfilter = this.report;
-        this.updateDataTable()
-        this.filterDate()
+        this.updateDataTable();
+        this.filterDate();
       }, error => {
-        alert(error)
+        alert(error);
       }
-    )
+    );
   }
 
 
