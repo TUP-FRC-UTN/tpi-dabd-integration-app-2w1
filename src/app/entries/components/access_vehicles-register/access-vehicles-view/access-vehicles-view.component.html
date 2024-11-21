@@ -30,9 +30,6 @@
                     @if(formVehicle.get('document')?.errors?.['required']){
                       <p>El documento es requerido</p>
                     }
-                    @if(formVehicle.get('document')?.errors?.['pattern']){
-                      <div>El documento debe contener solo números.</div>
-                    }
                     @if(formVehicle.get('document')?.errors?.['minlengt']){
                       <div>El documento debe tener 8 caracteres</div>
                     }
