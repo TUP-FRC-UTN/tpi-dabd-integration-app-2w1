@@ -15,7 +15,7 @@ export const environment = {
       ownersAndPlots: 'http://localhost:9062',
       sanctions: 'http://localhost:9042',
       stripeService: 'http://localhost:9024',
-      usersAndAddresses: 'http://localhost:9060', //'http://localhost:9060',  
+      usersAndAddresses: 'http://2w1-villadelcondor.dynns.com:8080/users-and-addresses', //'http://localhost:9060',  
     }
   };
 

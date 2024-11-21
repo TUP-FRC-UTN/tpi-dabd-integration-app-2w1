@@ -82,6 +82,7 @@ export class AccessVisitorsEventualComponent implements OnInit {
     this.visitorForm.get('document')?.disable();
     this.visitorForm.get('authorizedType')?.disable();   
     this.visitorForm.get('documentType')?.disable();
+    this.visitorForm.get('email')?.disable();
 
     this.visitorForm.patchValue({
       authorizedType: userTypeMap[visitor.userType.description],
