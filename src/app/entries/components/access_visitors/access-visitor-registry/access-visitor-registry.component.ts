@@ -1047,6 +1047,18 @@ loadUsersAllowedAfterRegistrationData(): Observable<boolean> {
         const vehicless = plate ? visitor.vehicles.find(v => v.plate === plate) || undefined : undefined;
         const firstRange = visitor.authRanges[0];
         const now = new Date();
+        let hasMovement=false;
+
+        for(const auth of visitor.authRanges){
+          let startDate = new Date(auth.init_date);
+          let endDate = new Date(auth.end_date);
+
+        if (startDate <= now && endDate >= now) {
+          hasMovement = true; 
+          break; 
+        }
+
+        }
   
         // Construir objeto de movimiento
         this.movement = {
@@ -1091,6 +1103,20 @@ loadUsersAllowedAfterRegistrationData(): Observable<boolean> {
         // Configurar el botón de confirmación
         const confirmButton = document.getElementById('confirmButton')!;
         confirmButton.onclick = () => {
+          if (!hasMovement) {
+            Swal.fire({
+              title: 'No se puede registrar el ingreso',
+              text: 'El vecino no tiene un rango de autorización válido para ingresar.',
+              icon: 'error',
+              confirmButtonText: 'Cerrar',
+            }).then(() => {
+              observer.next(false);
+              observer.complete();
+              modal.hide();
+            });
+            return;
+          }
+    
           this.ownerService.registerOwnerRenterEntry(this.movement).subscribe({
             next: (response) => {
               modal.hide();

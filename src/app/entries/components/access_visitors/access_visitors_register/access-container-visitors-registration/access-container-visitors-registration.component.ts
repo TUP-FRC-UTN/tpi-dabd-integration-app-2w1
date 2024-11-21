@@ -35,15 +35,61 @@ export class AccessContainerVisitorsRegistrationComponent implements OnInit, OnD
   visitorRecord?: AccessVisitorRecord;
   isRegisterButtonVisible: boolean = true;
   visitorForm!: FormGroup;
+  currentStep = 0;
 
   isLoading: boolean = false;
-  buttonText: string = 'Registrar';
+  buttonText: string = 'Autorizar';
 
   constructor(
     private visitorService: AccessVisitorsRegisterServiceService,
     private visitorHttpService: AccessVisitorsRegisterServiceHttpClientService,
     private authService: AuthService
   ) {}
+  handleUpdateVisitor(event: any): void {
+    // Primero actualizamos el visitante como lo hacías antes
+    this.updateVisitor(event);
+    
+    // Luego regresamos al paso 1 y actualizamos el formulario
+    this.currentStep = 0;
+    
+    // Aquí deberías actualizar el formulario con los datos del visitante
+    // Asumiendo que el evento trae los datos necesarios
+    this.visitorForm.patchValue({
+      firstName: event.firstName,
+      lastName: event.lastName,
+      document: event.document,
+      email: event.email,
+      // ... otros campos que necesites actualizar
+    });
+  }
+  
+  // Opcional: para mejor control de la navegación entre steps
+  canProceedToNextStep(): boolean | undefined {
+    switch(this.currentStep) {
+      case 0:
+        return this.visitorForm.get('document')?.valid && 
+               this.visitorForm.get('firstName')?.valid && 
+               this.visitorForm.get('lastName')?.valid && 
+               this.visitorForm.get('email')?.valid;
+      case 1:
+        return true; // Define aquí las validaciones necesarias para el paso 2
+      default:
+        return true;
+    }
+  }
+  
+  // Opcional: para navegar entre steps de manera más controlada
+  nextStep(): void {
+    if (this.currentStep < 2 && this.canProceedToNextStep()) {
+      this.currentStep++;
+    }
+  }
+  
+  previousStep(): void {
+    if (this.currentStep > 0) {
+      this.currentStep--;
+    }
+  }
 
 
 

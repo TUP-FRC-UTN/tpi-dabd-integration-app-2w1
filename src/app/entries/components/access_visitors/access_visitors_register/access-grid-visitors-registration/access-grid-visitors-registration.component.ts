@@ -79,8 +79,8 @@ export class AccessGridVisitorsRegistrationComponent implements OnInit, OnDestro
       dom: 'rt<"bottom d-flex justify-content-between align-items-center"<"d-flex align-items-center gap-3"l i> p><"clear">',
       columnDefs: [
         { orderable: false, searchable: false, targets: 4 },
-        { className: "text-start", targets: '_all' }, // Alinea todas las columnas a la izquierda
-        { className: "text-start", targets: 0 }       // Específicamente alinea la columna de documento
+        { className: "text-start", targets: '_all' },
+        { className: "text-start", targets: 0 }
       ],
       paging: true,
       ordering: true,
@@ -96,9 +96,9 @@ export class AccessGridVisitorsRegistrationComponent implements OnInit, OnDestro
         search: "", 
         searchPlaceholder: "Buscar",
         emptyTable: "No hay invitaciones cargadas",
-        info: "",
+        info: "_TOTAL_ Invitaciones cargadas",
         infoEmpty: "",
-        infoFiltered: ""
+        infoFiltered: "(filtrado de _MAX_ registros totales)"
       },
       responsive: true
     });

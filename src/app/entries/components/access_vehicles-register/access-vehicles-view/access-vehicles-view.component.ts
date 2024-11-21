@@ -37,7 +37,7 @@ export class AccessVehiclesViewComponent implements OnDestroy,OnInit  {
     this.formVehicle = this.fb.group({
       document: [
         '', 
-        [Validators.required, this.ValidateCharacters,Validators.pattern('^[0-9]+$')], 
+        [Validators.required, this.ValidateCharacters], 
         [this.finUserByDni()] // Agregando la validación asincrónica aquí
       ],
       documentType: ['', Validators.required],
@@ -82,7 +82,7 @@ export class AccessVehiclesViewComponent implements OnDestroy,OnInit  {
   
   formVehicle:FormGroup=new FormGroup({
     document:new FormControl('',[Validators.required,this.ValidateCharacters,
-      this.finUserByDni,Validators.minLength(8), Validators.pattern('^[0-9]+$')]),
+      this.finUserByDni,Validators.minLength(8)]),
     documentType:new FormControl('',[Validators.required]),
     vehicles:new FormArray([])
   })
