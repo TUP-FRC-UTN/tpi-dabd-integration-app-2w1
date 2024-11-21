@@ -92,12 +92,12 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
               owners[index] // Usar el nombre del propietario cargado
             ]),
             columns: [
-              { title: 'Lote', width: '10%', className: 'text-start' },
-              { title: 'Manzana', width: '10%', className: 'text-start' },
-              { title: 'Mts.2 Terreno', width: '15%', className: 'text-start' },
-              { title: 'Mts.2 Construidos', width: '15%', className: 'text-start' },
-              { title: 'Tipo Lote', width: '15%', className: 'text-start' },
-              { title: 'Estado', width: '15%', className: 'text-start' },
+              { title: 'Lote', width: '10%', className: 'text-end' },
+              { title: 'Manzana', width: '10%', className: 'text-end' },
+              { title: 'Mts.2 Terreno', width: '15%', className: 'text-end' },
+              { title: 'Mts.2 Construidos', width: '15%', className: 'text-end' },
+              { title: 'Tipo Lote', width: '15%', className: 'text-center' },
+              { title: 'Estado', width: '15%', className: 'text-center' },
               { title: 'Propietario', width: '15%', className: 'text-start' }, // Nueva columna
               {
           title: 'Acciones',

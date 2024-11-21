@@ -25,7 +25,8 @@ export class UsersModaInfoPlotComponent implements OnInit, OnDestroy {
   ownerName: string = '';           // Para almacenar el nombre del propietario
   ownerLastName: string = '';      // Para almacenar el apellido del propietario
   ownerDNI: string = '';          // Para almacenar el DNI del propietario
-  ownerType: string = ''         //Tipo de propietario
+  ownerType: string = '';         //Tipo de propietario
+  ownerDniType: string = '';
 
   private readonly ownerService = inject(OwnerService);
   private readonly fileService = inject(FileService);
@@ -71,6 +72,7 @@ export class UsersModaInfoPlotComponent implements OnInit, OnDestroy {
         if (owners.length > 0) {
           this.ownerName = owners[0].name;
           this.ownerLastName = owners[0].lastname;
+          this.ownerDniType = owners[0].dni_type;
           this.ownerDNI = owners[0].dni;
           this.ownerType = owners[0].ownerType;
         }
