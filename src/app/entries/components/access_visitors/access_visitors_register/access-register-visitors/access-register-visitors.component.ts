@@ -11,7 +11,6 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './access-register-visitors.component.scss'
 })
 export class AccessRegisterVisitorsComponent {
- 
-    selectedComponent: 'registration' | 'eventual' = 'registration';
+    selectedComponent: 'registration' | 'eventual' = 'eventual';
 }
 

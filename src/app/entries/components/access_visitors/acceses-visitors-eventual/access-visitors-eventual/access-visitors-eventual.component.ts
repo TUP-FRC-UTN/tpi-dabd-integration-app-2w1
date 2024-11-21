@@ -24,7 +24,7 @@ export class AccessVisitorsEventualComponent implements OnInit {
  visitorForm!: FormGroup;
  visitors: AccessUserAllowedInfoDto[] = [];
  selectedVisitorId: AccessUserAllowedInfoDto | null = null;
- isVisitorSelected: boolean = false;
+ selectedVisitor?: AccessUserAllowedInfoDto;
  
 
 
@@ -70,18 +70,18 @@ export class AccessVisitorsEventualComponent implements OnInit {
       lastName: [''],
       email: ['']
     });
+    console.log("pasa");
+    this.selectedVisitor = undefined;
     return;
-  }
- 
- 
+  } 
+
   if (visitor) {
     console.log('Email del visitante:', visitor.email);
     this.visitorForm.get('firstName')?.disable();
     this.visitorForm.get('lastName')?.disable();
     this.visitorForm.get('document')?.disable();
-    
-   
-
+    this.visitorForm.get('authorizedType')?.disable();   
+    this.visitorForm.get('documentType')?.disable();
 
     this.visitorForm.patchValue({
       authorizedType: userTypeMap[visitor.userType.description],
@@ -92,17 +92,18 @@ export class AccessVisitorsEventualComponent implements OnInit {
       email: visitor.email 
       
     });
-
-  
- 
-      
-    console.log('Visitor selected:', visitor);
     
+    this.selectedVisitor = visitor;   
   }
  }
  onGiveTempAccess() {
-  if (this.visitorForm.valid) {
-    const formData = this.visitorForm.value;
+  if (this.visitorForm.valid || this.selectedVisitor) {
+    const formData = this.selectedVisitor ?? this.visitorForm.value;
+    if (!formData.authorizedType)
+      formData.authorizedType = userTypeMap[formData.userType.description];
+    if (!formData.documentType)
+      formData.documentType = documentTypeMap[formData.documentTypeDto.description];
+    console.log(formData);
     const userId = this.authService.getUser().id;
     console.log('Type:', formData.authorizedType);
    
@@ -125,6 +126,7 @@ export class AccessVisitorsEventualComponent implements OnInit {
         .subscribe({
           next: (response) => {
             this.visitorForm.reset();
+            this.selectedVisitor = undefined;
             Swal.fire('Acceso temporal otorgado', 'El acceso temporal ha sido otorgado correctamente', 'success');
           },
           error: (error) => {
@@ -180,11 +182,3 @@ export class AccessVisitorsEventualComponent implements OnInit {
   }
 }
 }
-
-
-
-
-   
-
-
-
