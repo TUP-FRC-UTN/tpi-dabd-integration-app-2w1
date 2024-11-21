@@ -13,7 +13,7 @@ import 'datatables.net-buttons/js/buttons.print';
 import { PenaltiesModalConsultComplaintComponent } from '../modals/penalties-get-complaint-modal/penalties-get-complaint.component';
 import { PenaltiesModalStateReasonComponent } from '../modals/penalties-update-stateReason-modal/penalties-update-stateReason-modal.component';
 import { ComplaintService } from '../../../services/complaints.service';
-import { ComplaintDto } from '../../../models/complaint';
+import { ComplaintDto, PutStateComplaintDto } from '../../../models/complaint';
 import { RoutingService } from '../../../../common/services/routing.service';
 import moment from 'moment';
 import jsPDF from 'jspdf';
@@ -107,48 +107,76 @@ export class PenaltiesListComplaintComponent implements OnInit {
       columns: [
         {
           data: 'createdDate',
-          render: (data) => moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY'),
+          render: (data, type, row) => {
+            const boldClass = row.complaintState === 'Nueva' ? 'fw-bold' : '';
+            return `<span class="${boldClass}">${moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY')}</span>`;
+          },
           type: 'date-moment'
         },
         {
           data: 'complaintState',
           className: 'align-middle',
-          render: (data) => `
+          render: (data) => {
+            let displayText = data;
+            let badgeClass = this.getStatusClass(data); // Usa la clase CSS predeterminada para el estado
+            
+            if (data === "Nueva") {
+              displayText = "Pendiente"; // Cambia el texto a "Pendiente"
+              badgeClass = "badge bg-warning"; // Usa el mismo color que "Pendiente"
+              
+              // Incluye una bola verde usando Bootstrap
+              return `
+                <div class="text-center">
+                  <div class="badge ${badgeClass} border rounded-pill text-body-emphasis">
+                    ${displayText}
+                  </div>
+                </div>`;
+            }
+            
+            return `
               <div class="text-center">
-                <div class="badge ${this.getStatusClass(data)} border rounded-pill">${data}</div>
-              </div>`
+                <div class="badge ${badgeClass} border rounded-pill">${displayText}</div>
+              </div>`;
+          }
         },
         {
           data: 'description',
           className: 'align-middle',
-          render: (data) =>
-            `<div>${data}</div>`
+          render: (data, type, row) => {
+            const boldClass = row.complaintState === 'Nueva' ? 'fw-bold' : '';
+            return `<div class="${boldClass}">${data}</div>`;
+          }
         },
         {
           data: 'fileQuantity',
           className: 'align-middle',
-          render: (data) =>
-            `<i class="bi bi-paperclip"></i> ${data} Archivo adjunto`
+          render: (data, type, row) => {
+            const boldClass = row.complaintState === 'Nueva' ? 'fw-bold' : '';
+            return `<i class="bi bi-paperclip ${boldClass}"></i> <span class="${boldClass}">${data} Archivo adjunto</span>`;
+          }
         },
         {
           data: null,
           className: 'align-middle',
           searchable: false,
-          render: (data) => `
-            <div class="text-center">
-              <div class="btn-group">
-                <div class="dropdown">
-                  <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
-                  <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" onclick="viewComplaint(${data.id})">Ver más</a></li>
-                    ${data.complaintState == "Pendiente" ? `
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" onclick="changeState('REJECTED', ${data.id}, ${this.authService.getUser().id})">Rechazar</a></li>
-                    <li><a class="dropdown-item" onclick="changeState('SOLVED', ${data.id}, ${this.authService.getUser().id})">Resuelta</a></li>` : ``}
-                  </ul>
+          render: (data, type, row) => {
+            const boldClass = row.complaintState === 'Nueva' ? 'fw-bold' : '';
+            return `
+              <div class="text-center ${boldClass}">
+                <div class="btn-group">
+                  <div class="dropdown">
+                    <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
+                    <ul class="dropdown-menu">
+                      <li><a class="dropdown-item" onclick="viewComplaint(${data.id})">Ver más</a></li>
+                      ${data.complaintState === "Pendiente" ? `
+                      <li><hr class="dropdown-divider"></li>
+                      <li><a class="dropdown-item" onclick="changeState('REJECTED', ${data.id}, ${this.authService.getUser().id})">Rechazar</a></li>
+                      <li><a class="dropdown-item" onclick="changeState('SOLVED', ${data.id}, ${this.authService.getUser().id})">Resuelta</a></li>` : ``}
+                    </ul>
+                  </div>
                 </div>
-              </div>
-            </div>`
+              </div>`;
+          }
         },
       ],
       dom:
@@ -279,6 +307,7 @@ export class PenaltiesListComplaintComponent implements OnInit {
     const newState = option;
     this.openModal(idComplaint, userId, newState);
   }
+
 
 
   //Metodos propios de nuestro micro:
