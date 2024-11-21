@@ -86,8 +86,8 @@ export class UsersListOwnersComponent implements OnDestroy {
         // Esperar a que todas las promesas de loadPlots se resuelvan
         const plotsData = await Promise.all(
           this.owners.map(async (owner) => [
-            owner.create_date,
-            `${owner.name}, ${owner.lastname}`,
+            ` ${owner.lastname}, ${owner.name}`,
+            `${owner.dni_type}`,
             `<p class="text-end"> ${owner.dni}<p/>`,
             //owner.ownerType,
             this.showOwerType(owner.ownerType),
@@ -108,22 +108,11 @@ export class UsersListOwnersComponent implements OnDestroy {
             order: [[0, 'asc']],
             pageLength: 5,
             columns: [
-              {
-                title: 'Fecha de Creación', width: '15%', className: 'text-start',
-                render: (data, type) => {
-                  if (type === 'display') {
-                    // Mostrar la fecha formateada en la tabla
-                    return moment(data, 'DD/MM/YYYY').format('DD/MM/YYYY');
-                  } else {
-                    // Usar un formato que DataTables pueda ordenar correctamente
-                    return moment(data, 'DD/MM/YYYY').toDate();
-                  }
-                },
-              },
               { title: 'Nombre', width: '15%', className: 'text-start' },
-              { title: 'Documento', width: '10%', className: 'text-start' },
-              { title: 'Tipo', width: '15%', className: 'text-start' },
-              { title: 'Lotes', width: '10%', className: 'text-start' },
+              { title: 'Tipo Documento', width: '10%', className: 'text-start' },
+              { title: 'Documento', width: '15%', className: 'text-end' },
+              { title: 'Tipo', width: '15%', className: 'text-end' },
+              { title: 'Lotes', width: '10%', className: 'text-end' },
               {
                 title: 'Acciones',
                 orderable: false,
@@ -168,7 +157,7 @@ export class UsersListOwnersComponent implements OnDestroy {
           const searchInputWrapper = $('#myTable_filter_Owners');
           searchInputWrapper.addClass('d-flex justify-content-start');
 
-          table.order([0, 'desc']).draw(); // Ordenar por fecha de creación de forma descendente
+          table.order([0, 'asc']).draw(); // Ordenar por fecha de creación de forma descendente
 
           // Desvincular el comportamiento predeterminado de búsqueda
           $('#myTable_filter_Owners input').unbind();
@@ -432,12 +421,11 @@ export class UsersListOwnersComponent implements OnDestroy {
     doc.text(title, 15, 20);
     doc.setFontSize(12);
 
-    const formattedDesde = this.formatDate(new Date(this.initialDate.value));
-    const formattedHasta = this.formatDate(new Date(this.endDate.value));
-    doc.text(`Fechas: Desde ${formattedDesde} hasta ${formattedHasta}`, 15, 30);
+    const today = this.formatDate(new Date());
+    doc.text(`Fecha: ${today}`, 15, 30);
 
     // Definir columnas para el PDF
-    const columns = ['Fecha de Creación', 'Nombre', 'Documento', 'Tipo', 'Lotes'];
+    const columns = ['Nombre','Tipo Documento', 'Documento', 'Tipo', 'Lotes'];
 
     // Filtrar datos visibles en la tabla
     const table = $('#myTableOwners').DataTable();
@@ -447,11 +435,12 @@ export class UsersListOwnersComponent implements OnDestroy {
 
     // Mapear los datos visibles a un formato adecuado para jsPDF
     const rows = visibleRows.map((row: any) => [
+  
       `${row[0]}`,
       `${row[1]}`,
       `${this.getContentBetweenArrows(row[2])}`,
       `${this.getContentBetweenArrows(row[3])}`,
-      `${row[4]}`
+      `${row[4]}`,
     ]);
 
     // Generar la tabla en el PDF usando autoTable
@@ -471,7 +460,7 @@ export class UsersListOwnersComponent implements OnDestroy {
     });
 
     // Guardar el PDF con el nombre dinámico
-    doc.save(`${formattedDesde}_${formattedHasta}_listado_propietarios.pdf`);
+    doc.save(`${today}_listado_propietarios.pdf`);
   }
 
   async exportExcel() {
@@ -484,8 +473,7 @@ export class UsersListOwnersComponent implements OnDestroy {
     let owners = this.owners.filter(owner => visibleRows.some(row => row[1].includes(owner.name) && row[1].includes(owner.lastname)));
 
     // Obtener las fechas 'Desde' y 'Hasta' solo para el nombre del archivo
-    const formattedDesde = this.formatDate(new Date(this.initialDate.value));
-    const formattedHasta = this.formatDate(new Date(this.endDate.value));
+    const today = this.formatDate(new Date);
 
     const dataRows = await Promise.all(this.owners.map(async (owner) => {
       // Obtener los lotes de manera asíncrona
@@ -493,8 +481,8 @@ export class UsersListOwnersComponent implements OnDestroy {
 
       // Retornar la fila con la información del propietario
       return {
-        FechaCreacion: owner.create_date.replace(/-/g, '/'),
         Nombre: `${owner.lastname}, ${owner.name}`,
+        TipoDocumento: owner.dni_type,
         Documento: owner.dni,
         Tipo: owner.ownerType,
         Lote: lotes  // El string con los lotes
@@ -502,16 +490,14 @@ export class UsersListOwnersComponent implements OnDestroy {
     }));
 
     // Crear la hoja de trabajo con los datos de los propietarios
-    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(dataRows, { header: ['FechaCreacion', 'Nombre', 'Documento', 'Tipo', 'Lote'] });
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(dataRows, { header: ['Nombre', 'Documento', 'Tipo Documento', 'Tipo', 'Lote'] });
 
     // Crear el libro de trabajo
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Propietarios');
 
-    // Obtener la fecha actual para el nombre del archivo
-    const today = new Date();
-    const formattedDate = today.toISOString().split('T')[0].replace(/-/g, '_');
-    const fileName = `${formattedDesde}_${formattedHasta}_listado_propietarios.xlsx`;
+
+    const fileName = `${today}_listado_propietarios.xlsx`;
 
     // Guardar el archivo Excel
     XLSX.writeFile(wb, fileName);
