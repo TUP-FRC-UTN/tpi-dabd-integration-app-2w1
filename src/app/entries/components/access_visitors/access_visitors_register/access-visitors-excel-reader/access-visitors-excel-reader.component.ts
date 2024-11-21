@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import * as XLSX from 'xlsx';
+import * as ExcelJS from 'exceljs';
 import { AccessVisitor, UserType } from '../../../../models/access-visitors/access-visitors-models';
 import { AccessVisitorsRegisterServiceHttpClientService } from '../../../../services/access_visitors/access-visitors-register/access-visitors-register-service-http-client/access-visitors-register-service-http-client.service';
 import { Subscription } from 'rxjs';
@@ -65,6 +66,8 @@ export class AccessVisitorsExcelReaderComponent implements OnInit, OnDestroy {
     let visitors: AccessVisitor[] = [];
     let errors: string[] = [];
 
+    console.log(workBook.Sheets[workBook.SheetNames[0]]);
+
     const headerErrors: string[] = this.getHeadersErrors(workBook.Sheets[workBook.SheetNames[0]])
 
     if (headerErrors.length > 0) {
@@ -109,31 +112,33 @@ export class AccessVisitorsExcelReaderComponent implements OnInit, OnDestroy {
     return visitors;
   }
 
-  downloadTemplate() {
-    const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(this.getSheetData());
-    worksheet['!cols'] = [
-      { wch: 15 }, // Nombre
-      { wch: 15 }, // Apellido
-      { wch: 15 }, // Documento
-      { wch: 20 }, // Tipo Documento
-      { wch: 20 }, // Tipo Visitante
-      { wch: 10 },
-      { wch: 25 }, // Tipos de visitantes
-      { wch: 25 }  // Tipos de documentos
-    ];
-    const workbook: XLSX.WorkBook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Invitados');
-    XLSX.writeFile(workbook, `lista_invitados.xlsx`);
-  }
-
-  getSheetData(): string[][] {
-    let sheetData = [['Nombre', 'Apellido', 'Documento', 'Tipo Documento', 'Tipo Visitante', '', 'Tipos de visitantes', 'Tipos de documentos']];
-    const maxItems = Math.max(this.userTypes.length, this.documentTypes.length);
-    for (let i = 0; i < maxItems; i++) {
-      const rowData = ['', '', '', '', '', '', this.userTypes[i].description, this.documentTypes[i]];
-      sheetData.push(rowData);
+  async downloadTemplate() {
+    const workBook = new ExcelJS.Workbook();
+    const sheet = workBook.addWorksheet('Invitados');
+    sheet.columns = [
+      { header: 'Nombre', width: 15 },
+      { header: 'Apellido', width: 15 },
+      { header: 'Documento', width: 15 },
+      { header: 'Tipo Documento', width: 20 },
+      { header: 'Tipo Visitante', width: 20 }
+    ]
+    sheet.getCell('D2').dataValidation = {
+      type: 'list',
+      allowBlank: false,
+      formulae: ['"' + this.documentTypes.join(',') + '"']
     }
-    return sheetData;
+    sheet.getCell('E2').dataValidation = {
+      type: 'list',
+      allowBlank: false,
+      formulae: ['"' + this.userTypes.map(v => v.description).join(',') + '"']
+    }
+
+    const buffer = await workBook.xlsx.writeBuffer();
+    const blob = new Blob([buffer]);
+    const link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    link.setAttribute('download', 'lista_invitados.xlsx');
+    link.click();
   }
 
   rowIsEmpty(row: any): boolean {
