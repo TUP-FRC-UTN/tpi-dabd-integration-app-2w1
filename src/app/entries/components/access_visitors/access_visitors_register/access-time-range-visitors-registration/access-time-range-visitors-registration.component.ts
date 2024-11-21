@@ -102,8 +102,9 @@ export class AccessTimeRangeVisitorsRegistrationComponent implements OnInit, OnD
     
     let hours = futureTime.getHours();
     let minutes = futureTime.getMinutes();
+    let actualHour = now.getHours();
     
-    if (hours > 23) {
+    if (hours < actualHour) {
       hours = 23;
       minutes = 59;
     }

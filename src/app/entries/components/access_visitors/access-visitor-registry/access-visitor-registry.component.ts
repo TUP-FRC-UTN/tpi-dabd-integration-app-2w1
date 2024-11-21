@@ -481,6 +481,13 @@ loadUsersAllowedData(): Observable<boolean> {
               let statusButton = '';
               let actionButtons = '';
 
+              let fullName = '';
+              if(visitor.last_name === ""){
+                fullName = visitor.name;
+              } else {
+                fullName = `${visitor.last_name}, ${visitor.name}`;
+              }
+
               switch (status) {
                 case 'Ingresado':
                   statusButton = `<span class="badge  text-bg-success">Ingresado</span>`;
@@ -502,7 +509,7 @@ loadUsersAllowedData(): Observable<boolean> {
               </span> 
               </div>`;
               return [
-                `${visitor.last_name}, ${visitor.name}`,
+                fullName,
                 userTypeIconWithClick,
                 `<div class="text-start">${this.getDocumentType(visitor).substring(0,1) + " - " +visitor.document}</div>`,
                 `<div class="text-start">

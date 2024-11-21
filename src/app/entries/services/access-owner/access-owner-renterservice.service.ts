@@ -35,7 +35,6 @@ export class AccessOwnerRenterserviceService {
    console.log(visitorDocument)
    const cleanedDocument = visitorDocument
      .replace(/^[CDP]-/, "")  // Elimina "C-" o "D-" o "P-" al principio
-     .replace(/-/g, "")       // Elimina todos los guiones
      .trim(); 
 
    console.log(cleanedDocument); 
@@ -45,7 +44,6 @@ export class AccessOwnerRenterserviceService {
  onMOvement(visitorDocument: string, movement: string, plate: string) {
    const cleanedDocument = visitorDocument
      .replace(/^[CDP]-/, "")  // Elimina "C-" o "D-" o "P-" al principio
-     .replace(/-/g, "")       // Elimina todos los guiones
      .trim(); 
 
    this.movemenSubject.next({ document: cleanedDocument, movement: movement, plate: plate });
