@@ -122,15 +122,18 @@ export class AccessVisitorsExcelReaderComponent implements OnInit, OnDestroy {
       { header: 'Tipo Documento', width: 20 },
       { header: 'Tipo Visitante', width: 20 }
     ]
-    sheet.getCell('D2').dataValidation = {
-      type: 'list',
-      allowBlank: false,
-      formulae: ['"' + this.documentTypes.join(',') + '"']
-    }
-    sheet.getCell('E2').dataValidation = {
-      type: 'list',
-      allowBlank: false,
-      formulae: ['"' + this.userTypes.map(v => v.description).join(',') + '"']
+    
+    for (let i = 2; i <= 9999; i++) {
+      sheet.getCell('D' + i).dataValidation = {
+        type: 'list',
+        allowBlank: false,
+        formulae: ['"' + this.documentTypes.join(',') + '"']
+      }
+      sheet.getCell('E' + i).dataValidation = {
+        type: 'list',
+        allowBlank: false,
+        formulae: ['"' + this.userTypes.map(v => v.description).join(',') + '"']
+      }
     }
 
     const buffer = await workBook.xlsx.writeBuffer();
