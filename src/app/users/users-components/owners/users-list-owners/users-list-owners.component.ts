@@ -41,7 +41,7 @@ export class UsersListOwnersComponent implements OnDestroy {
   showDeactivateModal: boolean = false;
   userToDeactivate: number = 0;
   types: any[] = [];
-  maxDate: string = new Date().toISOString().split('T')[0];
+  maxDate = new Date(new Date().setHours(new Date().getHours() - 3)).toISOString().split('T')[0];
   minDate: string = new Date(new Date().setDate(new Date().getDate() - 30)).toISOString().split('T')[0];
   selectType: FormControl = new FormControl([]);
   initialDate: FormControl = new FormControl(this.minDate);
