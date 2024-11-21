@@ -55,12 +55,15 @@ export class AccessTimeRangeVisitorsRegistrationComponent implements OnInit, OnD
     const localDate = new Date(today.getTime() - (today.getTimezoneOffset() * 60000))
       .toISOString()
       .split('T')[0];
+      const localDatePlusOneDay = new Date(today.getTime() - (today.getTimezoneOffset() * 60000) + 24 * 60 * 60 * 1000)
+      .toISOString()
+      .split('T')[0];
 
     this.form = this.fb.group({
       startDate: [localDate, Validators.required],
-      endDate: [localDate, Validators.required],
-      initHour: ['', Validators.required],
-      endHour: ['', Validators.required],
+      endDate: [localDatePlusOneDay, Validators.required],
+      initHour: ['10:00', Validators.required],
+      endHour: ['22:00', Validators.required],
       Lun: [{ value: false, disabled: true }],
       Mar: [{ value: false, disabled: true }],
       Mié: [{ value: false, disabled: true }],
