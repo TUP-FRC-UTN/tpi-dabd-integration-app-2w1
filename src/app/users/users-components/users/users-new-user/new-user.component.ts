@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators, FormBuilder } from '@angular/forms';
 import { RolModel } from '../../../users-models/users/Rol';
 import { UserService } from '../../../users-servicies/user.service';
@@ -91,6 +91,7 @@ export class NewUserComponent implements OnInit, OnDestroy {
   private readonly validatorService = inject(ValidatorsService);
   private readonly routingService = inject(RoutingService);
   private readonly suscriptionService = inject(SuscriptionManagerService);
+  @ViewChild(CustomSelectComponent) customSelectComponent!: CustomSelectComponent;
 
   reactiveForm: FormGroup;
   rolesSelected: string[] = [];
@@ -111,6 +112,7 @@ export class NewUserComponent implements OnInit, OnDestroy {
   actualRole = this.authService.getActualRole();
 
   ngOnInit() {
+
     this.loadRoles();
     this.loadPlotsAvailables();
 
@@ -120,10 +122,11 @@ export class NewUserComponent implements OnInit, OnDestroy {
 
     this.loadFilteredRoles();
 
-    if (this.authService.getActualRole() == "Gerente") {
+    if (this.authService.getActualRole() == "Gerente general") {
       this.reactiveForm.get("plot")?.disable();
       this.reactiveForm.get("plot")?.setValue("Sin lote");
     }
+      
   }
 
   //Desuscribirse de los observables
@@ -160,27 +163,24 @@ export class NewUserComponent implements OnInit, OnDestroy {
       next: (data: RolModel[]) => {
         this.options = data.map(rol => rol.description);
         if(this.authService.getActualRole() == "Propietario"){
-          let optionsFilter = this.options.filter(rol => this.optionsForOwner.includes(rol));
-          this.options = [];
-          console.log(optionsFilter);
-          
+          let optionsFilter = this.options.filter(rol => !["Familiar mayor", "Familiar menor", "Inquilino"].includes(rol));
+          this.options = [];          
           optionsFilter.forEach(o => this.options.push({value : o, name: o}))
                     
         }
-        if(this.authService.getActualRole() == "SuperAdmin"){
+        else if(this.authService.getActualRole() == "SuperAdmin"){
             let optionsFilter = this.options.filter(rol => !["Propietario", "Familiar mayor", "Familiar menor", "Inquilino"].includes(rol));
           this.options = [];
           optionsFilter.forEach(o => this.options.push({value : o, name: o}))
-                    
+          
         }
-        else if(this.authService.getActualRole() == "Gerente"){
+        else if(this.authService.getActualRole() == "Gerente general"){
           let optionsFilter = this.options.filter(rol => !["SuperAdmin","Propietario", "Familiar mayor", "Familiar menor", "Inquilino"].includes(rol));
-        this.options = [];
-        optionsFilter.forEach(o => this.options.push({value : o, name: o}))
-                  
+          this.options = [];
+          optionsFilter.forEach(o => this.options.push({value : o, name: o}))           
         }
           else{
-            let optionsFilter = this.options.filter(rol => ["Familiar mayor", "Familiar menor", "Inquilino"].includes(rol));
+            let optionsFilter = this.options.filter(rol => !["Familiar mayor", "Familiar menor", "Inquilino"].includes(rol));
             this.options = [];
             optionsFilter.forEach(o => this.options.push({value : o, name: o}))
           }
@@ -190,7 +190,7 @@ export class NewUserComponent implements OnInit, OnDestroy {
       }
     });
 
-    if(this.authService.getActualRole() == "Gerente"){
+    if(this.authService.getActualRole() == "Gerente general"){
       this.reactiveForm.get("plot")?.disable();
       this.reactiveForm.get("plot")?.setValue("Sin lote");
     }
@@ -218,12 +218,11 @@ export class NewUserComponent implements OnInit, OnDestroy {
       next: (data: RolModel[]) => {
         this.options = data.map(rol => rol.description);
         if (this.authService.getActualRole() == "Propietario") {
-          let optionsFilter = this.options.filter(rol => this.optionsForOwner.includes(rol));
+          let optionsFilter = this.options.filter(rol => ["Familiar mayor", "Familiar menor", "Inquilino"].includes(rol));
           this.options = [];
-          optionsFilter.forEach(o => this.options.push({ value: o, name: o }))
-
+          optionsFilter.forEach(o => this.options.push({ value: o, name: o }))        
         }
-        if (this.authService.getActualRole() == "SuperAdmin") {
+        else if (this.authService.getActualRole() == "SuperAdmin") {
           let optionsFilter = this.options.filter(rol => this.options.includes(rol) && rol != "Propietario");
           this.options = [];
           optionsFilter.forEach(o => this.options.push({ value: o, name: o }))
@@ -249,9 +248,9 @@ export class NewUserComponent implements OnInit, OnDestroy {
   //Redirige a la ruta especificada 
   redirect() {
     if (this.authService.getActualRole() == "Propietario") {
-      this.routingService.redirect('/main/users/family', 'Mi familia');
+      this.routingService.redirect('/main/users/family', 'Mi Familia');
     } else {
-      this.routingService.redirect('/main/users/list', 'Listado de usuarios');
+      this.routingService.redirect('/main/users/list', 'Listado de Usuarios');
     }
   }
 
@@ -286,6 +285,9 @@ export class NewUserComponent implements OnInit, OnDestroy {
     } else {
       userData.plot_id = 0;
     }
+
+    console.log(userData);
+    
 
     const sus = this.userService.postUser(userData).subscribe({
       next: (response) => {

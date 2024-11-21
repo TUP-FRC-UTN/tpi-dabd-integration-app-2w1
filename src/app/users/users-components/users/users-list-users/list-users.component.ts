@@ -239,7 +239,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
           allowOutsideClick: false,
           allowEscapeKey: false
         })
-        this.routingService.redirect('/main', 'Página principal');
+        this.routingService.redirect('/main', 'Página Principal');
       }
     });
 
@@ -512,12 +512,12 @@ export class ListUsersComponent implements OnInit, OnDestroy {
 
   //Redirigir a agregar usuario
   addUser() {
-    this.routingService.redirect('/main/users/add', 'Agregar usuario');
+    this.routingService.redirect('/main/users/add', 'Registrar usuario');
   }
 
   //Redirige a la edición de un usuario
   redirectEdit(id: number) {
-    this.routingService.redirect(`/main/users/edit/${id}`, 'Modificar usuario');
+    this.routingService.redirect(`/main/users/edit/${id}`, 'Actualizar usuario');
   }
 
   //--------------------------------------------------Estilos----------------------------------------------------

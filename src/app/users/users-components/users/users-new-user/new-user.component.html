@@ -116,8 +116,7 @@
             <app-custom-select [options]="options" [multiple]="true" (selectedOptionsChange)="reactiveForm.get('roles')?.setValue($event)" [selectedOptions]="reactiveForm.get('roles')?.value"
               [validations]="reactiveForm.get('roles')?.validator" />
             <div class="text-danger form-error">
-              @if(reactiveForm.get('roles')?.hasError('required')){ Ingrese al menos una opción }
-
+             
             </div>
           </div>
         </div>
@@ -188,7 +187,7 @@
           <br>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
         </div>
       </div>
     </div>
