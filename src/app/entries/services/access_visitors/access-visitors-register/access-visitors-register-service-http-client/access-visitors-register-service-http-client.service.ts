@@ -75,6 +75,26 @@ export class AccessVisitorsRegisterServiceHttpClientService {
      })
    );
  }
+ getUsersType2(): Observable<UserType[]> {
+  return this.http.get<UserType[]>(API_ENDPOINTS.USERS_TYPE).pipe(
+    map(response => {
+      if (Array.isArray(response)) {
+        return response
+          .filter(item => 
+            item.description.toUpperCase() !== 'TAXI' && 
+            item.description.toUpperCase() !== 'DELIVERY'
+          )
+          .map(item => ({
+            id: item.id,
+            description: this.userTypeMapping[item.description] || item.description
+          }));
+      } else {
+        console.error('La respuesta no es un array:', response);
+        return [];
+      }
+    })
+  );
+ }
 
  getUsers(): Observable<AccessUser[]> {
    return this.http.get<AccessUser[]>(API_ENDPOINTS.USERS).pipe(
@@ -93,6 +113,7 @@ export class AccessVisitorsRegisterServiceHttpClientService {
    const transformedData = this.transformVisitorRecord(visitorRecord);
    return this.http.post(API_ENDPOINTS.GENERATE_QR, transformedData);
  }
+
 
  private transformVisitorRecord(visitorRecord: AccessVisitorRecord): any[] {
    return visitorRecord.visitors.map(visitor => ({
