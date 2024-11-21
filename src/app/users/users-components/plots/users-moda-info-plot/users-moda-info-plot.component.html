@@ -9,12 +9,12 @@
         <div class="row mb-3">
             <div class="col-md-6">
                 <p><strong>Lote:</strong> {{ plotForm.get('plot')?.value || 'N/A' }}</p>
-                <p><strong>Mts Total:</strong> {{ plotForm.get('total_area')?.value || 'N/A' }}</p>
+                <p><strong>Mts² Total:</strong> {{ plotForm.get('total_area')?.value || 'N/A' }}</p>
             </div>
         
             <div class="col-md-6">
                 <p><strong>Manzana:</strong> {{ plotForm.get('block')?.value || 'N/A' }}</p>
-                <p><strong>Mts Construidos:</strong> {{ plotForm.get('built_area')?.value || 'N/A' }}</p>
+                <p><strong>Mts² Construidos:</strong> {{ plotForm.get('built_area')?.value || '0' }}</p>
             </div>
         </div>
         <hr>
@@ -34,11 +34,7 @@
         <h5>Información del Propietario</h5>
         <div class="row mb-3">
             <div class="col-md-6">
-                <p><strong>Nombre:</strong> {{ ownerName || 'N/A' }}</p> <!-- Muestra el nombre del propietario -->
-            </div>
-            <div class="col-md-6">
-                <p><strong>Apellido:</strong> {{ ownerLastName || 'N/A' }}</p>
-                <!-- Muestra el apellido del propietario -->
+                <p><strong>Nombre:</strong> {{ (ownerLastName && ownerName) ? ownerLastName + ', ' + ownerName : 'N/A' }}</p> <!-- Muestra el nombre del propietario -->
             </div>
             <div class="col-md-6">
                 <p><strong>DNI:</strong> {{ ownerDNI || 'N/A' }}</p> <!-- Muestra el DNI del propietario -->

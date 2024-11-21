@@ -105,7 +105,8 @@ export class ListUsersComponent implements OnInit, OnDestroy {
               // ,
 
               { title: 'Nombre', width: '20%' },
-              { title: 'Rol', width: '30%' },
+              {title: 'Documento', className: 'text-end', width: '20%'},
+              { title: 'Rol', className: 'text-center',width: '30%' },
               {
                 title: 'Lotes', className: 'text-start', width: '15%',
                 render: (data) => {
@@ -168,6 +169,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
             data: this.users.map(user => [
               // user.create_date,
               `${user.lastname}, ${user.name}`,  //Nombre completo
+              user.dni,                                //Documento
               this.showRole(user.roles),              //Roles
               user.plot_id,                                //Nro. de lote (puedes ajustar esto)                 
               '<button class="btn btn-info">Ver más</button>'  //Ejemplo de acción
@@ -184,8 +186,6 @@ export class ListUsersComponent implements OnInit, OnDestroy {
               emptyTable: "No hay datos disponibles en la tabla"
             },
           });
-
-          table.order([[0, 'desc']]).draw();
 
           //Alinear la caja de búsqueda a la derecha
           const searchInputWrapper = $('#myTable_filter');
@@ -712,7 +712,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
     const date = this.formatDate(new Date());
     doc.text(`Fecha: ${date}`, 15, 30);
 
-    const columns = ['Nombre', 'Rol', 'Lotes'];
+    const columns = ['Nombre', 'Dcomuento', 'Roles', 'Lotes'];
 
     const table = $('#myTable').DataTable();
 
@@ -720,8 +720,9 @@ export class ListUsersComponent implements OnInit, OnDestroy {
 
     const rows = visibleRows.map((row: any) => [
       `${row[0]}`,               // Nombre
-      `${this.getContentBetweenArrows(row[1])}`, // Rol
-      `${row[2]}` // Lote
+      `${row[1]}`,              // Documento
+      `${this.getContentBetweenArrows(row[2])}`, // Rol
+      `${row[3]}` // Lote
     ]);
 
     autoTable(doc, {
@@ -733,7 +734,8 @@ export class ListUsersComponent implements OnInit, OnDestroy {
       columnStyles: {
         0: { cellWidth: 50 },
         1: { cellWidth: 50 },
-        2: { cellWidth: 50 }
+        2: { cellWidth: 50 },
+        3: { cellWidth: 30 }
       },
     });
     doc.save(`${date}_listado_usuarios.pdf`);
@@ -753,21 +755,23 @@ export class ListUsersComponent implements OnInit, OnDestroy {
     const dataRows = visibleRows.map((row: any) => {
       // Extraemos los datos de la fila
       const nombre = row[0]; // Nombre
-      const rol = Array.isArray(row[1])
-        ? row[1].map((r: string) => this.getContentBetweenArrows(r).join(', ')).join(', ')
-        : this.getContentBetweenArrows(row[1]).join(', '); // Aplicamos getContentBetweenArrows si es un array o un string
-      const lote = Array.isArray(row[2]) ? row[2].join(', ') : row[3]; // Si lote es un array, lo unimos por comas
+      const documento = row[1]; // Documento
+      const rol = Array.isArray(row[2])
+        ? row[2].map((r: string) => this.getContentBetweenArrows(r).join(', ')).join(', ')
+        : this.getContentBetweenArrows(row[2]).join(', '); // Aplicamos getContentBetweenArrows si es un array o un string
+      const lote = Array.isArray(row[3]) ? row[3].join(', ') : row[4]; // Si lote es un array, lo unimos por comas
 
       // Creamos el objeto para cada fila
       return {
         'Nombre': nombre,
+        'Documento': documento,
         'Rol': rol,  // Aplicado getContentBetweenArrows a 'rol'
         'Lote': lote // Convertido a string
       };
     });
 
     // Crear la hoja de trabajo con los datos de los usuarios
-    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(dataRows, { header: ['Nombre', 'Rol', 'Lote'] });
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(dataRows, { header: ['Nombre', 'Documento', 'Rol', 'Lote'] });
 
     // Crear el libro de trabajo
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
