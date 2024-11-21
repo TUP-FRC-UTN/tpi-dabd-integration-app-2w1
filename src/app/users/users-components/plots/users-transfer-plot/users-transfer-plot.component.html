@@ -10,7 +10,7 @@
             <div class="d-flex justify-content-center align-items-center">
                 <label class="col-form-label me-3" style="min-width: 100px;" >Propietario Actual</label>
                 <div class="">
-                    <input type="text" class="form-control w-100" formControlName="actualOwner" style="min-width: 200px; max-width: 200px;"/>
+                    <input type="text" class="form-control w-100" formControlName="actualOwner" style="min-width: 300px; max-width: 3ch;"/>
                 </div>
             </div>
         </div>
@@ -23,7 +23,7 @@
             <div class="d-flex justify-content-center align-items-center">
                 <label class=" col-form-label me-3"  style="min-width: 100px;">Nuevo Propietario</label>
                 <div class="">
-                    <app-custom-select  style="min-width: 200px; max-width: 200px;" class="w-100" 
+                    <app-custom-select  style="min-width: 300px; max-width: 300px;" class="w-100" 
                     [options]="owners" [selectedOptions]="reactiveForm.get('newOwner')?.value"
                     (selectedOptionsChange)="reactiveForm.get('newOwner')?.setValue($event)" />
                 </div>
@@ -33,7 +33,7 @@
         @if(confirm){
             <div class="m-3">
                 <div class="alert alert-danger" role="alert">
-                    {{messageConfirm()}}
+                    {{confirmAction()}}
                   </div>
             </div>
         }
@@ -43,10 +43,16 @@
             <div class="col-auto">
               <button type="button" class="btn btn-secondary"  (click)="activeModal.dismiss('Cross click')">Cancelar</button>
             </div>
-        
-            <div class="col-auto">
-              <button type="button" class="btn btn-success" (click)="confirmAction()" [disabled]="reactiveForm.invalid">Guardar</button>
-            </div>
+            @if(confirm){
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-success" [disabled]="reactiveForm.invalid">Guardar</button>
+                  </div>
+            }@else {
+                <div class="col-auto">
+                    <button type="button" class="btn btn-success" (click)="confirmAction()" [disabled]="reactiveForm.invalid">Siguiente</button>
+                  </div>
+            }
+            
           </div>
     </form>
 </div>

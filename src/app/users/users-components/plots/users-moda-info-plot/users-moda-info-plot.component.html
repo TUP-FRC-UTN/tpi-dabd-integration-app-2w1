@@ -45,6 +45,21 @@
         </div>
         <hr>
 
+        <h5>Información de sus Usuarios</h5>
+        @for (user of users; track $index) {
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <p><strong>Nombre:</strong> {{ (user.name && user.lastname) ? user.name + ', ' + user.lastname : 'N/A' }}</p> <!-- Muestra el nombre del propietario -->
+                </div>
+                <div class="col-md-6">
+                    <p><strong>DNI:</strong> {{ user.dni || 'N/A' }}</p> <!-- Muestra el DNI del propietario -->
+                </div>
+            </div>
+        }@if(users.length == 0)    {
+            <p>No existen usuarios para este lote</p>
+        } 
+       <hr>
+
         <!-- Mostrar y descargar archivos adjuntos -->
         <div class="mt-4">
             <h5 class="mb-3">Archivos Adjuntos</h5>
@@ -60,6 +75,9 @@
                         Descargar
                     </button>
                 </div>
+                @if(filesPlot.length == 0) {
+                    <p>No existen archivos adjuntos</p>
+                }
             </div>
         </div>
 

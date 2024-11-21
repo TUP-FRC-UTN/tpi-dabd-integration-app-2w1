@@ -29,6 +29,7 @@ export class UsersTransferPlotComponent implements OnInit {
   plot: GetPlotModel = new GetPlotModel();
   reactiveForm: FormGroup;
   confirm: boolean = false;
+  plotLength: number = 0;
 
   @Input() plotId: number = 0;
 
@@ -61,10 +62,12 @@ export class UsersTransferPlotComponent implements OnInit {
   //Cargar el propietario actual
   loadActualOwner() {
     this.ownersService.getOwnerByPlotId(this.plotId).subscribe({
-      next: (data: Owner[]) => {
+      next: (data: Owner[]) => {        
         this.actualOwner = data.find(owner => owner.active == true)!;
         this.owners = this.owners.filter(owner => owner.value != this.actualOwner.id);
-        this.reactiveForm.get('actualOwner')?.setValue(this.actualOwner.name + ' ' + this.actualOwner.lastname);
+        this.reactiveForm.get('actualOwner')?.setValue(this.actualOwner.name + ' ' + this.actualOwner.lastname + ' - ' + this.actualOwner.dni);
+      
+        this.loadPlotOwner(this.actualOwner.id);
       },
       error: (error) => {
         console.log('No se pudo cargar la información del propietario, ' + error);
@@ -72,14 +75,25 @@ export class UsersTransferPlotComponent implements OnInit {
     });
   }
 
-  //Mensaje de confirmación
-  messageConfirm(){
+  loadPlotOwner(id : number){
+    this.plotService.getPlotsByOwnerId(id).subscribe({
+      next: (data : GetPlotModel[]) =>{
+        this.plotLength = data.length
+      }
+    })
+  }
+
+  confirmAction(){
+    this.confirm = true;
+
     let message : string = '¿Estás seguro de que desea transferir el lote?'
-    if(this.actualOwner.plot?.length == 1){
-      message = `¿Estás seguro de que deseas transferir el lote, el propietario ${this.actualOwner.name}  ${this.actualOwner.lastname} se dará de baja por inexistencia de lotes a su nombre?`
+    
+    if(this.plotLength == 1){
+      message = `¿Estás seguro de que deseas transferir el lote? El propietario ${this.actualOwner.name} ${this.actualOwner.lastname} - ${this.actualOwner.dni} se dará de baja por inexistencia de lotes a su nombre`
     }
     return message;
   }
+
 
   //Transferir el lote
   transferPlot() {

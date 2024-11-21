@@ -12,6 +12,7 @@ import { ValidatorsService } from '../../../users-servicies/validators.service';
 import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
 import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
 import { RoutingService } from '../../../../common/services/routing.service';
+import { min } from 'moment';
 
 @Component({
   selector: 'app-users-new-plot',
@@ -68,13 +69,15 @@ export class UsersNewPlotComponent implements OnInit, OnDestroy {
 
     //Validar que la superficie construida no sea mayor a la superficie total
     const sus = this.formReactivo.get('totalBuild')?.valueChanges.subscribe(() => {
-      this.formReactivo.get('totalBuild')?.setValidators([Validators.max(this.formReactivo.get('totalArea')?.value)]);
+      this.formReactivo.get('totalBuild')?.setValidators([Validators.max(this.formReactivo.get('totalArea')?.value), Validators.min(1)]);
+    });
+
+    const sus2 = this.formReactivo.get('totalArea')?.valueChanges.subscribe(() => {
+      this.formReactivo.get('totalBuild')?.setValidators([Validators.max(this.formReactivo.get('totalArea')?.value), Validators.min(1)]);
     });
 
     //Agregar suscripción
-    if (sus) {
-      this.suscriptionService.addSuscription(sus);
-    }
+    [sus, sus2].forEach(s => s && this.suscriptionService.addSuscription(s));
   }
 
   ngOnInit(): void {
