@@ -490,7 +490,7 @@ export class UsersListOwnersComponent implements OnDestroy {
     }));
 
     // Crear la hoja de trabajo con los datos de los propietarios
-    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(dataRows, { header: ['Nombre', 'Documento', 'Tipo Documento', 'Tipo', 'Lote'] });
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(dataRows, { header: ['Nombre', 'Tipo Documento', 'Documento', 'Tipo', 'Lote'] });
 
     // Crear el libro de trabajo
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
