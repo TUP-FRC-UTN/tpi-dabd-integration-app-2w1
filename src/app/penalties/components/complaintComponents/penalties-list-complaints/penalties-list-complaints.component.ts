@@ -5,9 +5,9 @@ import * as XLSX from 'xlsx';
 // Imports de DataTable con soporte para Bootstrap 5
 import $ from 'jquery';
 import 'datatables.net-bs5'; // DataTables con Bootstrap 5
-import 'datatables.net-buttons-bs5'; // Botones con estilos de Bootstrap 5
-import 'datatables.net-buttons/js/buttons.html5';
-import 'datatables.net-buttons/js/buttons.print';
+// import 'datatables.net-buttons-bs5'; // Botones con estilos de Bootstrap 5
+// import 'datatables.net-buttons/js/buttons.html5';
+// import 'datatables.net-buttons/js/buttons.print';
 
 //Imports propios de multas
 import { PenaltiesModalConsultComplaintComponent } from '../modals/penalties-get-complaint-modal/penalties-get-complaint.component';

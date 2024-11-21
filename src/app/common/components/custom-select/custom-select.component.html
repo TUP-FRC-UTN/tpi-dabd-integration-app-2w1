@@ -1,7 +1,6 @@
 <form [formGroup]="reactiveForm">
     <ng-select [formControl]="selectControl" bindLabel="name" bindValue="value" [closeOnSelect]="!multiple"
-        [multiple]="multiple" [items]="options" [placeholder]="'Seleccione...'" [ngClass]="onValidate('selectControl')"
-        class="form-select p-0">
+        [multiple]="multiple" [items]="options" [placeholder]="placeholder" [ngClass]="onValidate('selectControl')">
         @if(multiple){
         <ng-template ng-multi-label-tmp let-items="items">
             {{items.length === 1 ? items[0].name : items.length + ' seleccionados'}}

@@ -330,6 +330,6 @@ export class UsersUpdatePlotComponent implements OnInit, OnDestroy {
 
   //Redireccionar a la lista de lotes
   redirect() {
-    this.routingService.redirect('main/plots/list', 'Listado de lotes');
+    this.routingService.redirect('main/plots/list', 'Listado de Lotes');
   }
 }
