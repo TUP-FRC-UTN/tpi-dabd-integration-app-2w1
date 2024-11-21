@@ -8,10 +8,6 @@
     box-shadow: rgba(0, 0, 0, 0.15) 8px 8px 3.2px;
 }
 
-/* .fondo{
-    background-image: url('https://www.villadelcondor.com/imagenes/iso_villa_del_condor.png');
-    background-size: cover;
-} */
 
 input.custom-input:focus {
     background-color: #ffffff;
@@ -24,4 +20,13 @@ input.custom-input:focus {
 
 .custom-link:hover {
     text-decoration: underline;
+}
+
+
+.fondo{
+    background-image: url('../../assets/login.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 50%;
+    background-blend-mode: overlay; /* Adjust size as needed */
 }

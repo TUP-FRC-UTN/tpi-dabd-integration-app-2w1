@@ -153,7 +153,7 @@ export class ExpenseGenerationUserViewComponent implements OnInit {
       const url = window.URL.createObjectURL(blob);
       window.open(url);
     } catch (error) {
-      console.error('There was an error opening the PDF:', error);
+      console.error('Hubo un error abriendo el PDF: ', error);
     }
 }
 

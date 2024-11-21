@@ -7,13 +7,6 @@
       /* Sombra solo al enfocar o mientras está seleccionado */
       &:focus-within {
         box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
-        border-color: rgba(0, 123, 255, .5);
-      }
-
-
-      /* Sin efecto en hover */
-      &:hover {
-        box-shadow: none;
       }
     }
 

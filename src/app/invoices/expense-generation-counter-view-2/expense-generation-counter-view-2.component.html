@@ -1,8 +1,3 @@
-
-
-<br>
-<br>
-
 <div class="container">
   <!-- Filtors -->
   <div class="row  border-0 rounded-4 p-3 shadow mb-4">
@@ -41,26 +36,26 @@
     <!-- KPI LIMITE 5-->
     <div class="col-3 gap-2 d-flex flex-column justify-content-center">
       @for (kpi of principalKpis; track $index) {
-      <app-custom-kpi [amount]="kpi.amount" [title]="kpi.title" [subTitle]="kpi.subTitle"
-        [tooltip]="kpi.tooltip" [customStyles]="kpi.customStyles" [icon]="kpi.icon" [formatPipe]="kpi.formatPipe">
+      <app-custom-kpi [amount]="kpi.amount" [title]="kpi.title" [subTitle]="kpi.subTitle" [tooltip]="kpi.tooltip"
+        [customStyles]="kpi.customStyles" [icon]="kpi.icon" [formatPipe]="kpi.formatPipe">
       </app-custom-kpi> }
 
     </div>
 
     <div class="col-9">
       <!-- Graficos chicos (pie, lines, list)-->
-      <div class="row mb-2">
+      <div class="row mb-2 ">
         <!-- Grafico 1 -->
         <div class="col col-md-6">
-          <div class="card border-0 shadow-lg hover-scale rounded-4 h-100">
-            <div class="card-body">
+          <div class="card border-0 shadow-lg  rounded-4 h-100">
+            <div class="card-body ">
               <h4 class="card-title align-items-center">Promedios por metodo de pago<button type="button"
                   class="btn btn-sm btn-link text-muted bi bi-arrows-angle-expand fs-5 float-end" title="Expandir"
                   (click)="makeBig(1)"></button></h4>
 
               <hr>
-              <div class="row justify-content-center text-center align-items-center">
-                <div class="col-12  flex-grow-1 d-flex align-items-center ">
+              <div class="row justify-content-center text-center align-items-center ">
+                <div class="col-12  flex-grow-1 d-flex align-items-center">
                   <google-chart [type]="pieChartType" [data]="pieChartData" [options]="pieChartOptions" class="w-100">
                   </google-chart>
 
@@ -74,7 +69,7 @@
         </div>
         <!-- Grafico 2 -->
         <div class="col col-md-6">
-          <div class="card border-0 shadow-lg hover-scale rounded-4 h-100">
+          <div class="card border-0 shadow-lg rounded-4 h-100">
             <div class="card-body">
               <h4 class="card-title align-items-center">Top 5 deudores<button type="button"
                   class="btn btn-sm btn-link text-muted bi bi-arrows-angle-expand fs-5 float-end" title="Expandir"
@@ -82,10 +77,10 @@
 
               <hr>
               <div class="row justify-content-center text-center align-items-center">
-                <div class="col-12  flex-grow-1 d-flex align-items-center ">
-                  <div class="table-responsive">
+                <div class="col-12 flex-grow-1 d-flex align-items-center">
+                  <div class="table-responsive h-100" style="max-height: 190px; overflow-y: auto;">
                     <table class="table table-hover">
-                      <thead>
+                      <thead style="position: sticky; top: 0; background-color: white; z-index: 1;">
                         <tr>
                           <th scope="col">Nombre</th>
                           <th scope="col" class="text-end">Deuda Total</th>
@@ -96,7 +91,8 @@
                         </tr>
                       </thead>
                       <tbody>
-                        <tr *ngFor="let debtor of top5Data" data-bs-toggle="modal" data-bs-target="#ownerModal" (click)="selectOwner(debtor.ownerId, debtor.ownerName)">
+                        <tr *ngFor="let debtor of top5Data" data-bs-toggle="modal" data-bs-target="#ownerModal"
+                          (click)="selectOwner(debtor.ownerId, debtor.ownerName)">
                           <td>{{debtor.ownerName}}</td>
                           <td class="text-end">{{debtor.totalDebt | currency:'ARS':'symbol-narrow':'1.0-0'}}</td>
                           <td class="text-end">{{debtor.oldestDebtDays | number:'1.0-0'}}</td>
@@ -108,11 +104,8 @@
                     </table>
                   </div>
                 </div>
-
-
               </div>
             </div>
-
           </div>
         </div>
       </div>
@@ -120,7 +113,7 @@
       <div class="row ">
         <!-- Grafico 3 -->
         <div class="col ">
-          <div class="card border-0 shadow-lg hover-scale rounded-4 h-100">
+          <div class="card border-0 shadow-lg  rounded-4 h-100">
             <div class="card-body">
               <h4 class="card-title align-items-center">Comparación de facturado y cobrado <button type="button"
                   class="btn btn-sm btn-link text-muted bi bi-arrows-angle-expand fs-5 float-end" title="Expandir"
@@ -159,10 +152,10 @@
                   <div class="col-8 mb-1 w-100">
                     @for (kpi of pieKpis; track $index) {
                     <div class="mb-2">
-                      <app-custom-kpi  [amount]="kpi.amount" [title]="kpi.title" [subTitle]="kpi.subTitle"
+                      <app-custom-kpi [amount]="kpi.amount" [title]="kpi.title" [subTitle]="kpi.subTitle"
                         [tooltip]="kpi.tooltip" [customStyles]="kpi.customStyles" [icon]="kpi.icon"
                         [formatPipe]="kpi.formatPipe">
-                      </app-custom-kpi >
+                      </app-custom-kpi>
                     </div>
                     }
                   </div>
@@ -172,7 +165,7 @@
             </div>
             <div class="col-9">
               <div class="row flex-grow-1 d-flex justify-content-center align-items-center mt-1 h-100  ">
-                <div class="col-12  d-flex align-items-center justify-content-center hover-scale h-100 w-100">
+                <div class="col-12  d-flex align-items-center justify-content-center  h-100 w-100">
                   <google-chart [type]="pieChartType" [data]="pieChartData" [options]="pieChartOptions"
                     class="w-100 h-100">
                   </google-chart>
@@ -209,7 +202,7 @@
                       <app-custom-kpi [amount]="kpi.amount" [title]="kpi.title" [subTitle]="kpi.subTitle"
                         [tooltip]="kpi.tooltip" [customStyles]="kpi.customStyles" [icon]="kpi.icon"
                         [formatPipe]="kpi.formatPipe">
-                      </app-custom-kpi >
+                      </app-custom-kpi>
                     </div>
                     }
                   </div>
@@ -218,7 +211,7 @@
             </div>
             <div class="col-9">
               <div class="row flex-grow-1 d-flex justify-content-center align-items-center w-100  mt-1 h-100">
-                <div class="  d-flex align-items-center justify-content-center  w-100 h-100 hover-scale">
+                <div class="  d-flex align-items-center justify-content-center  w-100 h-100 ">
                   <div class="table-responsive w-100 h-100 p-2">
                     <table class="table table-hover">
                       <thead>
@@ -278,7 +271,7 @@
             <div class="row h-100 ">
               <!-- Grafico Columna -->
               <div class="col  h-100">
-                <div class="col-12 hover-scale flex-grow-1 d-flex align-items-center  justify-content-center h-100">
+                <div class="col-12  flex-grow-1 d-flex align-items-center  justify-content-center h-100">
                   <google-chart [type]="columnChartType" [data]="columnChartData" [options]="columnChartOptions"
                     class="w-100 h-100 ">
                   </google-chart>
@@ -469,14 +462,14 @@
         <h5 class="text-center p-3">Boletas Impagas</h5>
         <div class="row">
           @for(item of debtorExpenses; track $index){
-            <div class="col-6">
-              <div class="card bg-secondary-subtle border-0 shadow mb-3">
-                <div class="card-body">
-                  <p><b>PERIODO:</b> {{item.period | date: 'MM/yyyy'}} </p>
-                  <p><b>MONTO:</b> {{item.actual_amount | currency:'ARS':'symbol-narrow':'1.0-0'}} </p>
-                </div>
+          <div class="col-6">
+            <div class="card bg-secondary-subtle border-0 shadow mb-3">
+              <div class="card-body">
+                <p><b>PERIODO:</b> {{item.period}} </p>
+                <p><b>MONTO:</b> {{item.actual_amount | currency:'ARS':'symbol-narrow':'1.0-0'}} </p>
               </div>
             </div>
+          </div>
           }
         </div>
       </div>
