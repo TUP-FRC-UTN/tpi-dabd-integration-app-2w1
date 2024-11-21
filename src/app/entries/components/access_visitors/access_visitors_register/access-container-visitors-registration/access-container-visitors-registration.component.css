@@ -68,10 +68,19 @@
   
     button {
       min-width: 150px;
-      text-transform: uppercase;
     }
   }
   
+  .stepper-buttons-only-right {
+    display: flex;
+    justify-content: end;
+    margin-top: 20px;
+    padding: 0 20px;
+  
+    button {
+      min-width: 150px;
+    }
+  }
  
   .invalid-feedback {
     color: #dc3545;

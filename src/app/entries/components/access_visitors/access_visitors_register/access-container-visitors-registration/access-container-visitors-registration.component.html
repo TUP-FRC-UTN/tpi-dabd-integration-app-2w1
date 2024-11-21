@@ -3,17 +3,17 @@
     <div class="stepper-header">
       <div class="step" [class.active]="currentStep === 0">
         <div class="step-circle">1</div>
-        <div class="step-label">step1</div>
+        <div class="step-label">Registrar Personas</div>
       </div>
       <div class="step-line"></div>
       <div class="step" [class.active]="currentStep === 1">
         <div class="step-circle">2</div>
-        <div class="step-label">step2</div>
+        <div class="step-label">Revisar Lista de Autorizados</div>
       </div>
       <div class="step-line"></div>
       <div class="step" [class.active]="currentStep === 2">
         <div class="step-circle">3</div>
-        <div class="step-label">step3</div>
+        <div class="step-label">Agregar Rangos Autorizados</div>
       </div>
     </div>
   
@@ -78,16 +78,26 @@
     </div>
   
     <!-- Navigation Buttons -->
-    <div class="stepper-buttons">
-      <button class="btn btn-primary" 
-              *ngIf="currentStep > 0"
-              (click)="currentStep = currentStep - 1">
-        PREVIOUS STEP
-      </button>
-      <button class="btn btn-primary" 
-              *ngIf="currentStep < 2"
-              (click)="currentStep = currentStep + 1">
-        NEXT STEP
-      </button>
-    </div>
+     @if (currentStep == 0) {
+      <div class="stepper-buttons-only-right">
+        <button class="btn btn-primary text-right" 
+                *ngIf="currentStep < 2"
+                (click)="currentStep = currentStep + 1">
+          Paso Siguiente
+        </button>
+      </div>
+     } @else {
+      <div class="stepper-buttons">
+        <button class="btn btn-primary" 
+                *ngIf="currentStep > 0"
+                (click)="currentStep = currentStep - 1">
+          Paso Anterior
+        </button>
+        <button class="btn btn-primary text-right" 
+                *ngIf="currentStep < 2"
+                (click)="currentStep = currentStep + 1">
+          Paso Siguiente
+        </button>
+      </div>
+     }
   </div>
