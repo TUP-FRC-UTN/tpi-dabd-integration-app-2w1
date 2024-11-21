@@ -1,12 +1,10 @@
 import { Component, inject, Input, OnInit } from '@angular/core';
-import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
 import { OwnerService } from '../../../users-servicies/owner.service';
 import { Owner } from '../../../users-models/owner/Owner';
 import { PlotService } from '../../../users-servicies/plot.service';
 import { GetPlotModel } from '../../../users-models/plot/GetPlot';
 import { AuthService } from '../../../users-servicies/auth.service';
-import { ActivatedRoute } from '@angular/router';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CustomSelectComponent } from "../../../../common/components/custom-select/custom-select.component";
 import Swal from 'sweetalert2';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -74,11 +72,11 @@ export class UsersTransferPlotComponent implements OnInit {
     });
   }
 
-  confirmAction(){
+  //Mensaje de confirmación
+  messageConfirm(){
     let message : string = '¿Estás seguro de que desea transferir el lote?'
     if(this.actualOwner.plot?.length == 1){
       message = `¿Estás seguro de que deseas transferir el lote, el propietario ${this.actualOwner.name}  ${this.actualOwner.lastname} se dará de baja por inexistencia de lotes a su nombre?`
-      this.confirm = true;
     }
     return message;
   }

@@ -1,5 +1,4 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 import { SideButton } from '../../models/SideButton';
 import { UsersSideButtonComponent } from '../users-side-button/users-side-button.component';
 import { NavbarNotificationComponent } from "../../../notifications/components/navbar-notification/navbar-notification.component";
@@ -31,6 +30,7 @@ export class UsersNavbarComponent implements OnInit {
 
   //Roles del usuario
   userRoles: string[] = [];
+
   // userRoles: string[] = ["SuperAdmin", "Gerente general"]; //Hardcodeado para no levantar el micro para login
 
   //Rol seleccionado

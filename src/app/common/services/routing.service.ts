@@ -42,7 +42,7 @@ export class RoutingService {
       name: 'Familia',
       title: 'Grupo familiar',
       route: 'main/users/family',
-      roles: ['SuperAdmin', 'Propietario', 'Inquilino'],
+      roles: ['Propietario', 'Inquilino'],
     },
     {
       //Btn con hijos

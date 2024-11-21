@@ -166,6 +166,7 @@
           <div class="col-10">
             <!-- ============================CheckMe======================= -->
             <app-custom-select [options]="availablePlots" [multiple]="true" [selectedOptions]="formReactivo.get('plots')?.value" (selectedOptionsChange)="formReactivo.get('plots')?.setValue($event)" />
+            <button type="button" class="btn btn-primary rounded-circle" (click)="redirect('/main/plots/add')"><span class="bi-plus-lg"></span></button>
           </div>
         </div>
       </div>
