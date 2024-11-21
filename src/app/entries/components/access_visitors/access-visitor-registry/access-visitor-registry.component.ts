@@ -729,7 +729,7 @@ loadUsersAllowedData(): Observable<boolean> {
               this.subscription.add(sub2);
 
             } else {
-              console.error('Falló al registrar egreso');
+              console.error('Falló al registrar ingreso');
             }
           },
           error: (error) => {
