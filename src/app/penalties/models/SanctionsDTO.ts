@@ -6,4 +6,5 @@ export interface SanctionsDTO {
     amount: number | null;  
     createdDate: string;  
     hasSubmittedDisclaimer: boolean;  
+    reportId?: number;
 }
