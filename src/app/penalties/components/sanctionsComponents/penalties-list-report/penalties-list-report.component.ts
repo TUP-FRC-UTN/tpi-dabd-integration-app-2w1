@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { SanctionService } from '../../../services/sanctions.service';
 import { ReportDTO } from '../../../models/reportDTO';
 import { CommonModule } from '@angular/common';
@@ -71,10 +71,9 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
     this.reportServices.refreshTable$.subscribe(() => {
       this.refreshData();
     });
-    this.refreshData();
     this.loadPlots();
-
     this.getTypes();
+    this.refreshData();
 
     const that = this; // para referenciar metodos afuera de la datatable
 
@@ -96,6 +95,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
     this.resetDates()
     this.today = new Date().toISOString().split('T')[0];
   }
+
 
   resetDates() {
     const today = new Date();
@@ -119,6 +119,11 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
     })
   }
 
+  getPlotData(plotId: number) {
+    let plot = this.plots.find((plot) => plot.id === plotId);
+    return plot ? `Nro: ${plot?.plot_number} - Manzana: ${plot?.block_number}`: "N/A";
+  }
+
 
   // Función para convertir la fecha al formato `YYYY-MM-DD`
   private formatDateToString(date: Date): string {
@@ -128,10 +133,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
   }
 
 
-  getPlotData(plotId: number) {
-    let plot = this.plots.find((plot) => plot.id === plotId);
-    return plot ? `Nro: ${plot?.plot_number} - Manzana: ${plot?.block_number}`: "N/A";
-  }
+
 
   // Configures the DataTable display properties and loads data.
   updateDataTable() {
@@ -192,8 +194,6 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
                   <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
                   <ul class="dropdown-menu">
                     <li><a class="dropdown-item" onclick="viewReport(${data.id})">Ver más</a></li>
-                                              ${data.reportState === 'Cerrado' || data.reportState === 'Pendiente' ?
-              `<li><a class="dropdown-item" data-action="changeState" data-id="${data.id}" data-state="OPEN"">Abrir</a></li>` : ''}
                     ${data.reportState === 'Abierto' ?
               `<li><hr class="dropdown-divider"></li> <li><a class="dropdown-item" onclick="editReport(${data.id})">Editar</a></li>` : ''}
                       ${data.reportState === 'Abierto' ?

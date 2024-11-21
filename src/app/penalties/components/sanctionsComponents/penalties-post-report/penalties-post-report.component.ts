@@ -65,7 +65,7 @@ export class NewReportComponent {
     this.reactiveForm.get('reportReason')?.setValue(data)
   }
   updateSelectplot(data : any){
-    this.reactiveForm.get('plotId')?.setValue(data)
+    this.reactiveForm.get('plotIds')?.setValue(data)
   }
 
   setTodayDate(): string {
@@ -94,6 +94,7 @@ export class NewReportComponent {
     
 
   }
+  
 
   getPlots(): void {
     //el mock se usa para no pegarle a usuarios
@@ -107,6 +108,11 @@ export class NewReportComponent {
         console.error('Error al cargar plots: ', error);
       }
     );
+  }
+
+  // Método que oculta si hay mas de 2 plots
+  shouldHideButton(): boolean {
+    return this.reactiveForm.value.plotIds.length > 1;
   }
 
   handleSelectedComplaints(selectedComplaints: any[]): void {
@@ -123,24 +129,13 @@ export class NewReportComponent {
       ? this.complaintsList.map(complaint => complaint.id)
       : [];
 
-    if (complaintsIds.length === 0) {
-      Swal.fire({
-        title: '¡Advertencia!',
-        text: 'Debe cargar al menos una denuncia.',
-        icon: 'warning',
-        confirmButtonText: 'Aceptar',
-        customClass: {
-          confirmButton: 'btn btn-secondary'
-        },
-      });
-      return;
-    }
+    
 
     if (this.reactiveForm.valid) {
       let formData = this.reactiveForm.value;
       
       let postsApiSuccess = false;
-      formData.plotIds.array.forEach((plotId: any) => {
+      formData.plotIds.forEach((plotId: any) => {
         let reportDTO = {
           reportReasonId:  formData.reportReason,
           plotId:  plotId,
@@ -149,24 +144,23 @@ export class NewReportComponent {
         };
         this.reportService.postReport(reportDTO).subscribe({
           next: (response) => {
-            postsApiSuccess = true
           },
           error: (error) => {
             console.error('Error al enviar la denuncia', error);
-            postsApiSuccess = false
           }
         });
       });
-      Swal.fire({
-        title: '¡Informe creado!',
-        text: 'El informe ha sido creado correctamente.',
-        icon: 'success',
-        timer: 1500,
-        showConfirmButton: false
-      });
-      this.routingService.redirect("main/sanctions/report-list", "Listado de Informes")
       
-    } else {
+        Swal.fire({
+          title: '¡Informe creado!',
+          text: 'El informe ha sido creado correctamente.',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false
+        });
+        this.reportService.triggerRefresh();
+        this.routingService.redirect("main/sanctions/report-list", "Listado de Informes")  
+      } else {
       console.log("Los campos no estaban validados")
     }
   }
