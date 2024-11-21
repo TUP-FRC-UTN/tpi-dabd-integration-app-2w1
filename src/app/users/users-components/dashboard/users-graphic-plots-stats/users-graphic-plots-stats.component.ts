@@ -232,14 +232,6 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
       value: block,
       name: `Nro. Manzana: ${block}`,
     }));
-    
-    this.blocksNumber.push({ value: '', name: 'Todas' });
-    this.blocksNumber.push({ value: '', name: 'Todas' });
-    this.blocksNumber.push({ value: '', name: 'Todas' });
-    this.blocksNumber.push({ value: '', name: 'Todas' });
-    this.blocksNumber.push({ value: '', name: 'Todas' });
-    this.blocksNumber.push({ value: '', name: 'Todas' });
-    
   }
 
   private loadData() {
@@ -298,7 +290,7 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
 
   private processData() {
     if(this.filteredPlotsByBlock.length === 0) {
-      this.errorBarChart = 'No hay datos disponibles con esos filtros';
+      this.errorBarChart = 'No se encontraron datos para los filtros seleccionados';
     }
 
     this.filteredPlotsByBlock.sort((a, b) => a.blockNumber - b.blockNumber);
@@ -330,7 +322,7 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
 
   private processPieChartData() {
     if (!this.filteredOwnerDistribution?.length) {
-      this.errorPieChart = 'No hay datos disponibles con esos filtros';
+      this.errorPieChart = 'No se encontraron datos para los filtros seleccionados';
     }
 
     const sortedOwners = [...this.filteredOwnerDistribution].sort(

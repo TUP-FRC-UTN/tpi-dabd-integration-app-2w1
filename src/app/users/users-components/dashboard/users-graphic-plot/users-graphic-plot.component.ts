@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { PlotStateCount } from '../../../users-models/dashboard/PlotStateCount';
 import { CommonModule } from '@angular/common';
@@ -17,7 +17,7 @@ import { UsersKpiComponent } from "../users-kpi/users-kpi.component";
   templateUrl: './users-graphic-plot.component.html',
   styleUrls: ['./users-graphic-plot.component.css']
 })
-export class UsersGraphicPlotComponent implements OnInit {
+export class UsersGraphicPlotComponent implements OnInit , OnDestroy{
   private readonly dashboardService = inject(DashboardService);
   private readonly router = inject(Router);
   subscriptions = new Subscription();
@@ -64,14 +64,18 @@ export class UsersGraphicPlotComponent implements OnInit {
     this.setupFilters();
   }
 
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+  }
+
   private setupFilters() {
     // Suscribirse a cambios en los filtros y actualizar los datos en consecuencia
-    this.subscriptions.add(
+    /*this.subscriptions.add(
       this.startDate.valueChanges.subscribe(() => this.applyFilters())
     );
     this.subscriptions.add(
       this.endDate.valueChanges.subscribe(() => this.applyFilters())
-    );
+    );*/
     this.subscriptions.add(
       this.plotTypes.valueChanges.subscribe(value => {
         this.selectedPlotType = value ? Number(value) : undefined;
@@ -104,6 +108,10 @@ export class UsersGraphicPlotComponent implements OnInit {
           this.loadingPieChart = false;
           this.processPlotStateData(data);
           this.updateTotalLots(data);
+
+          if(data.length === 0) {
+            this.errorPieChart = 'No se encontraron datos para los filtros seleccionados';
+          }
         },
         error: () => {
           this.errorPieChart = 'Error al cargar los datos de estado de los lotes';
@@ -146,7 +154,7 @@ export class UsersGraphicPlotComponent implements OnInit {
         case 'Comercial':
           this.commercialLots = item.count;
           break;
-        case 'Baldío':
+        case 'Baldio':
           this.emptyLots = item.count;
           break;
       }

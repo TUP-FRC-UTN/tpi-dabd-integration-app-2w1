@@ -292,7 +292,7 @@ export class UsersGraphicBlocksComponent implements OnInit {
           this.blocksNumber = stats.map(block => block.blockNumber).sort((a, b) => a - b);
           
           if (this.blocksNumber.length === 0) {
-            this.error = 'No se encontraron datos para las fechas seleccionadas';
+            this.error = 'No se encontraron datos para los filtros seleccionados';
           }
           this.blocksSubject.next(stats);
 
