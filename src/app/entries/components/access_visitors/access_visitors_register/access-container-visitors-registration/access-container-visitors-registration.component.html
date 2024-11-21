@@ -1,30 +1,93 @@
-<app-access-visitor-form [(value)]="visitorForm"></app-access-visitor-form>
-
-<div class="col-12 d-flex justify-content-end mt-3">
-    <button (click)="sendVisitorWithoutRH()" class="btn btn-primary btn-sm" style="margin-bottom: 2px;" [disabled]="!(
-        visitorForm.get('document')?.valid &&
-        visitorForm.get('firstName')?.valid &&
-        visitorForm.get('lastName')?.valid &&
-        visitorForm.get('email')?.valid
-    )">Agregar</button>
-</div>
-
-<app-access-grid-visitors-registration
-    (updateVisit)="updateVisitor($event)"></app-access-grid-visitors-registration>
-<app-access-time-range-visitors-registration></app-access-time-range-visitors-registration>
-
-<div class="col-12 mt-3">
-    <div class="d-flex justify-content-end gap-3">
-        <button class="btn btn-outline-success btn-sm" type="button"
-            *ngIf="isQRCodeAvailable && existsVisitor()" (click)="downloadQRCode()"
-            [disabled]="!isQRCodeAvailable">
-            Descargar Qr
-        </button>
-        <button class="btn btn-primary btn-sm" type="button" *ngIf="isRegisterButtonVisible || isLoading"
-            (click)="sendVisitorRecord()" [disabled]="isLoading">
-            <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status"
-                aria-hidden="true"></span>
-            {{ buttonText }}
-        </button>
+<div class="stepper-wrapper">
+    <!-- Stepper Header -->
+    <div class="stepper-header">
+      <div class="step" [class.active]="currentStep === 0">
+        <div class="step-circle">1</div>
+        <div class="step-label">step1</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" [class.active]="currentStep === 1">
+        <div class="step-circle">2</div>
+        <div class="step-label">step2</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" [class.active]="currentStep === 2">
+        <div class="step-circle">3</div>
+        <div class="step-label">step3</div>
+      </div>
     </div>
-</div>
+  
+    <!-- Stepper Content -->
+    <div class="stepper-content">
+      <!-- Step 1 Content -->
+      <div class="step-pane" *ngIf="currentStep === 0">
+        <app-access-visitor-form [(value)]="visitorForm"></app-access-visitor-form>
+        
+        <div class="col-12 d-flex justify-content-end mt-3">
+          <button (click)="sendVisitorWithoutRH()" 
+                  class="btn btn-primary btn-sm" 
+                  [disabled]="!(visitorForm.get('document')?.valid && 
+                              visitorForm.get('firstName')?.valid && 
+                              visitorForm.get('lastName')?.valid && 
+                              visitorForm.get('email')?.valid)">
+            Agregar
+          </button>
+        </div>
+      </div>
+  
+      <!-- Step 2 Content -->
+      <div class="step-pane" *ngIf="currentStep === 1">
+        <app-access-grid-visitors-registration
+          (updateVisit)="handleUpdateVisitor($event)">
+        </app-access-grid-visitors-registration>
+  
+        <div class="col-12 mt-3">
+          <div class="d-flex justify-content-end gap-3">
+            <button class="btn btn-outline-success btn-sm" 
+                    type="button"
+                    *ngIf="isQRCodeAvailable && existsVisitor()" 
+                    (click)="downloadQRCode()"
+                    [disabled]="!isQRCodeAvailable">
+              Descargar Qr
+            </button>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Step 3 Content -->
+      <div class="step-pane" *ngIf="currentStep === 2">
+        <app-access-time-range-visitors-registration></app-access-time-range-visitors-registration>
+  
+        <!-- Botón Registrar movido al último step -->
+        <div class="col-12 mt-3">
+          <div class="d-flex justify-content-end">
+            <button class="btn btn-primary btn-sm" 
+                    type="button"
+                    *ngIf="isRegisterButtonVisible || isLoading"
+                    (click)="sendVisitorRecord()" 
+                    [disabled]="isLoading">
+              <span *ngIf="isLoading" 
+                    class="spinner-border spinner-border-sm me-2" 
+                    role="status" 
+                    aria-hidden="true"></span>
+              {{ buttonText }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Navigation Buttons -->
+    <div class="stepper-buttons">
+      <button class="btn btn-primary" 
+              *ngIf="currentStep > 0"
+              (click)="currentStep = currentStep - 1">
+        PREVIOUS STEP
+      </button>
+      <button class="btn btn-primary" 
+              *ngIf="currentStep < 2"
+              (click)="currentStep = currentStep + 1">
+        NEXT STEP
+      </button>
+    </div>
+  </div>
