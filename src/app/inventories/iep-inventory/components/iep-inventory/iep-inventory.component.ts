@@ -401,7 +401,8 @@ applyFilter(): void {
         },
         {
           data: null,
-          title: 'Estado',
+          title: 'Estado', 
+          className: 'text-center',
           render: (data: any) => {
             const discontinued = data.discontinued;
             const isActive = data.stock > 0;
@@ -458,6 +459,7 @@ applyFilter(): void {
         {
           data: 'minQuantityWarning',
           title: 'Min. Alerta',
+          className: 'text-end',
         },
         {
           data: null,
@@ -468,29 +470,26 @@ applyFilter(): void {
             const discontinued = row.discontinued;
             const isActive = row.stock > 0;
             const status = discontinued ? 'Discontinuado' : isActive ? 'Activo' : 'Inactivo';
-            
-            // El botón eliminar solo estará habilitado cuando el estado sea 'Inactivo'
-            const isDeleteDisabled = status !== 'Inactivo';
-            const deleteButtonClass = isDeleteDisabled ? 'dropdown-item btn delete-btn disabled text-muted' : 'dropdown-item btn delete-btn';
-            
-            // Mensaje personalizado según el estado
-            const disabledMessage = status === 'Activo' ? 
-              'No se puede eliminar un producto activo' : 
-              'No se puede eliminar un producto discontinuado';
+            const shouldShowDeleteButton = status === 'Inactivo';
         
             return `
             <div class="text-center">
               <div class="btn-group">
                 <div class="dropdown">
                   <button type="button" class="btn border border-2 bi-three-dots-vertical btn-cambiar-estado" data-bs-toggle="dropdown"></button>
-                    <ul class="dropdown-menu">
-                      <li><button class="dropdown-item btn botonDetalleEditar" data-id="${row.id}">Editar</button>
-                      <li><button class="${deleteButtonClass}" data-id="${row.id}" 
-                        ${isDeleteDisabled ? `disabled title="${disabledMessage}"` : ''}
-                        (click)="giveLogicalLow(${row.id})" data-bs-target="#eliminarProductoModal" 
-                            data-bs-toggle="modal">Eliminar</button>
-                      </li>
-                    </ul>
+                  <ul class="dropdown-menu">
+                    <li>
+                      <button class="dropdown-item btn botonDetalleEditar" data-id="${row.id}">Editar</button>
+                    </li>
+                    ${shouldShowDeleteButton
+                        ? `<li>
+                             <button class="dropdown-item btn delete-btn" data-id="${row.id}" 
+                               (click)="giveLogicalLow(${row.id})" data-bs-target="#eliminarProductoModal" 
+                               data-bs-toggle="modal">Eliminar</button>
+                           </li>`
+                        : ''
+                    }
+                  </ul>
                 </div>
               </div>
             </div>`;

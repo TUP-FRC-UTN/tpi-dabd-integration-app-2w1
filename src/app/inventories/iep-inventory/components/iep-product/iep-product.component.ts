@@ -163,6 +163,8 @@ export class IepProductComponent {
       title: 'Registro actualizado',
       text: this.successMessage,
       confirmButtonText: 'OK'
+    }).then(() => {
+      this.router.navigate(['/main/inventories/inventory']);
     });
   }
 
@@ -229,7 +231,7 @@ export class IepProductComponent {
     this.productService.updateProduct(mappedDto,this.userService.getUser().id).subscribe({
       next: response => {
         this.successMessage = response.message;
-        this.showSuccessAlert();
+        this.showUpdateSuccessAlert();
         console.log("PASO: ", response);
         form.reset();
        
@@ -268,6 +270,7 @@ export class IepProductComponent {
       }
       this.abrirModal = true;
       this.dto.state_id = 1;
+      this.dto.description = this.dto.description ?? '   ';
       if(this.idProductToEdit!=undefined){
         this.updateProduct(form);
       }else{

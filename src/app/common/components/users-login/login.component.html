@@ -1,58 +1,59 @@
 <section class="fondo bg-dark min-vh-100 d-flex align-items-center justify-content-center">
-    <div class="container d-flex flex-column align-items-center">
+    <div class="container px-5 align-items-center">
         <form [formGroup]="reactiveForm" action="" (ngSubmit)="login()" autocomplete="on">
             <div class="row mb-3">
                 <h2>Inicio de sesión</h2>
             </div>
-            <div class="d-flex flex-column align-items-end">
-                <div class="row mb-3">
-                    <div class="col d-flex">
-                        <label for="inputCorreo" class="form-label m-0 me-3 mt-2">Email o Usuario</label>
-                        <div class="d-flex flex-column justify-content-start">
-                            <input type="text" class="form-control custom-input" 
-                            style="min-width: 350px; max-width: 350px"
-                                formControlName="email" autocomplete="email" [ngClass]="onValidate('email')">
-                                <div class="invalid-feedback d-block mt-1 text-start">{{showError('email')}}</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col d-flex">
-                        <label for="inputClave" class="form-label m-0 me-3 mt-2">Contraseña</label>
-                        <div class="d-flex flex-column justify-content-start" style="position: relative;">
-                            <div class="input-group">
-                                <input [type]="passwordVisible ? 'text' : 'password'" 
-                                style="min-width: 309px; max-width: 309px"
-                                       class="custom-input form-control"
-                                       formControlName="password" 
-                                       autocomplete="current-password" 
-                                       [ngClass]="onValidate('password')">
-                                <span class="input-group-text" (click)="togglePasswordVisibility()" style="cursor: pointer;">
-                                  <i class="bi" [ngClass]="passwordVisible ? 'bi-eye-slash' : 'bi-eye'"></i>
-                                </span>
-                              </div>
-                        </div>
-                    </div>
-                </div>
-            </div>      
+
+            <!-- Input email o usuario -->
             <div class="row mb-3">
+                <label class="col-3  p-0 col-form-label text-start">Email o Usuario</label>
+                <div class="col-9">
+                    <div class="input-group">
+                        <input type="text" class="custom-input form-control" formControlName="email"
+                            autocomplete="current-password" [ngClass]="onValidate('email')">
+                        <span class="input-group-text"
+                            [ngClass]="reactiveForm.get('email')?.valid ? 'bi-person-arms-up' : 'bi-person-standing'">
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input contraseña -->
+            <div class="row mb-3">
+                <label class="col-3 p-0 col-form-label text-start">Contraseña</label>
+                <div class="col-9">
+                    <div class="input-group">
+                        <input [type]="passwordVisible ? 'text' : 'password'" class="custom-input form-control"
+                            formControlName="password" autocomplete="current-password"
+                            [ngClass]="onValidate('password')">
+                        <span class="input-group-text" [ngClass]="passwordVisible ? 'bi-eye-slash' : 'bi-eye'"
+                            (click)="togglePasswordVisibility()" style="cursor: pointer;">
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row my-3">
                 <div class="col">
-                    <button type="submit" class="btn btn-dark rounded-pill w-25" [disabled]="!reactiveForm.valid" >Ingresar</button>
+                    <button type="submit" class="btn btn-dark rounded-pill w-25"
+                        [disabled]="!reactiveForm.valid">Ingresar</button>
                 </div>
             </div>
 
             @if (errorLog) {
-                <div class="row mb-3">
-                    <div class="invalid-feedback d-block mt-1 text-center">Email o contraseña no válidos. Por favor, intentelo de nuevo.</div>
-                </div>
+            <div class="row mb-3">
+                <div class="invalid-feedback d-block mt-1 text-center">Email o contraseña no válidos. Por favor,
+                    intentelo de nuevo.</div>
+            </div>
             }
             <div class="row">
-                <div class="col text-center">
-                    <a class="custom-link" [routerLink]="'/recovery'" style="color: black;">
+                <div class="col">
+                    <a class="custom-link" [routerLink]="'/recovery'">
                         ¿Olvidaste tu contraseña?
                     </a>
                 </div>
             </div>
         </form>
-    </div>    
+    </div>
 </section>

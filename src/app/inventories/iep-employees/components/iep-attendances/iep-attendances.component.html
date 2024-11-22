@@ -8,35 +8,18 @@
         </button>
       </div>
       <div class="col-2">
-        <input
-          type="text"
-          id="searchTerm"
-          [(ngModel)]="empleadoName"
-          placeholder="Buscar"
-          class="form-control"
-          readonly
-        />
+        <input type="text" id="searchTerm" [(ngModel)]="empleadoName"
+        class="form-control" readonly/>
       </div>
       <!-- Filtros por fecha -->
       <div class="col-2">
-        <input
-          type="date"
-          id="startDate"
-          [attr.max]="fechaMaxima"
-          class="form-control"
-          [(ngModel)]="startDate"
-          (change)="onStartDateChange()"
-        />
+        <input type="date" id="startDate" [attr.max]="fechaMaxima"
+          class="form-control" [(ngModel)]="startDate" (change)="onStartDateChange()"/>
       </div>
       <div class="col-2">
         <input
-          type="date"
-          id="endDate"
-          [attr.max]="fechaMaxima"
-          class="form-control"
-          [(ngModel)]="endDate"
-          (change)="onEndDateChange()"
-        />
+          type="date" id="endDate" [attr.max]="fechaMaxima"
+          class="form-control" [(ngModel)]="endDate" (change)="onEndDateChange()"/>
       </div>
       <!-- Filtro de estado  -->
       <div class="col-2">
@@ -48,65 +31,38 @@
         ></app-iep-attendances-ngselect>
       </div>
 
-      <!-- <div class="col-2">
-                <select class="form-select" id="" [(ngModel)]="estadoFiltrado" (ngModelChange)="loadAsistencias()">
-                    <option value="" selected>Estado</option>
-                    <option value="PRESENTE">PRESENTE</option>
-                    <option value="TARDE">TARDE</option>
-                    <option value="AUSENTE">AUSENTE</option>
-                    <option value="JUSTIFICADO">JUSTIFICADO</option>
-                </select>
-            </div> -->
-
       <!-- Botones de exportación en Asistencias y Desempeño -->
       <div class="col text-end">
-        <button
-          class="btn btn-secondary ms-2 filterbutton"
-          (click)="limpiarFiltro()"
-        >
+        <button class="btn btn-secondary ms-2 filterbutton" (click)="limpiarFiltro()">
           <i class="bi bi-trash"></i>
         </button>
-        <button
-          class="btn btn-success ms-2 filterbutton"
-          (click)="exportToExcel()"
-        >
+        <button class="btn btn-success ms-2 filterbutton" (click)="exportToExcel()">
           <i class="fa-solid bi-file-earmark-excel"></i>
         </button>
-        <button
-          class="btn btn-danger ms-2 filterbutton"
-          (click)="exportToPdf()"
-        >
+        <button class="btn btn-danger ms-2 filterbutton" (click)="exportToPdf()">
           <i class="fas bi-file-earmark-pdf"></i>
         </button>
       </div>
     </div>
 
     <!-- Tabla de empleados con cabecera de columnas -->
-
-    <table
-      id="empleadosTable"
-      class="table table-striped table-hover border border-4 rounded"
-    >
+    <table id="empleadosTable"
+    class="table table-striped table-hover border border-4 rounded">
         <thead class="table-light border border-4">
-        <tr>
-          <th></th>
-          <th></th>
-          <th></th>
-          <th></th>
-          <th scope="col" class="text-center">Acción</th>
-        </tr>
-      </thead>
+          <tr>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th scope="col" class="text-center">Acción</th>
+          </tr>
+        </thead>
       <tbody></tbody>
     </table>
 
     <!-- Modal put Justificacion -->
-    <div
-      #modalConfirmDelete
-      class="modal"
-      id="modalPutJustificacion"
-      tabindex="-1"
-      role="dialog"
-    >
+    <div #modalConfirmDelete class="modal" id="modalPutJustificacion"
+    tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <!-- HEADER -->
@@ -123,46 +79,30 @@
                 >Justificación:</label
               >
               <div class="col-9">
-                <textarea
-                  id="justification"
-                  class="form-control"
-                  rows="3"
-                  required
-                  maxlength="155"
-                  [(ngModel)]="justificationPutText"
-                  #justificationText="ngModel"
-                  [ngClass]="{
-                    'is-invalid':
-                      justificationText.invalid && justificationText.touched,
-                    'is-valid': justificationText.valid
-                  }"
-                ></textarea>
+                <textarea id="justification" class="form-control" rows="3"
+                required maxlength="155" [(ngModel)]="justificationPutText"
+                #justificationText="ngModel"
+                [ngClass]="{
+                  'is-invalid':
+                    justificationText.invalid && justificationText.touched,
+                  'is-valid': justificationText.valid
+                }">
+                </textarea>
               </div>
             </div>
-            <div
-              *ngIf="justificationText.invalid && justificationText.touched"
-              class="invalid-feedback"
-            >
+            <div *ngIf="justificationText.invalid && justificationText.touched"
+            class="invalid-feedback">
               Este campo es obligatorio.
             </div>
           </div>
 
           <!-- FOOTER -->
           <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
               Cancelar
             </button>
-            <button
-              type="button"
-              class="btn btn-primary"
-              [disabled]="justificationText.invalid"
-              data-bs-dismiss="modal"
-              (click)="confirmarJustificacion()"
-            >
+            <button type="button" class="btn btn-primary" [disabled]="justificationText.invalid" 
+            data-bs-dismiss="modal" (click)="confirmarJustificacion()">
               Guardar
             </button>
           </div>
@@ -171,13 +111,8 @@
     </div>
 
     <!-- Modal get Justificacion -->
-    <div
-      #modalConfirmDelete
-      class="modal"
-      id="modalGetJustificacion"
-      tabindex="-1"
-      role="dialog"
-    >
+    <div #modalConfirmDelete class="modal" id="modalGetJustificacion"
+    tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <!-- HEADER -->
@@ -192,11 +127,8 @@
 
           <!-- FOOTER -->
           <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
+            <button type="button" class="btn btn-secondary"
+            data-bs-dismiss="modal">
               Cerrar
             </button>
           </div>
@@ -215,29 +147,20 @@
       </div>
       <div class="modal-body">
         <ul>
-          <p>
-            En esta ventana podras visualizar el registro de las asistencias del empleado seleccionado.
-          </p>
+          <p> En esta ventana podras visualizar el registro de las asistencias del empleado seleccionado.</p>
           <li>
-            <p>
-              Por cada registro figura la fecha, el horario de entrada y de salida y el estado en el que se encuentra la misma.
-          </p>
-        </li>
-        <li>
-
-          <p>
-            Si una asistencia cuenta con el estado "Ausente" podrá con el boton al final de la tabla justificarla. (ESTA ACCION NO ES REVERSIBLE).
-          </p>
-        </li>
-        <li>
-          <p>
-            Si una asistencia cuenta con el estado "Justicado" podrá con el boton al final de la tabla ver en detalle la justificacion.
-          </p>
-        </li>
+            <p> Por cada registro figura la fecha, el horario de entrada y de salida y el estado en el que se encuentra la misma.</p>
+          </li>
+          <li>
+            <p> Si una asistencia cuenta con el estado "Ausente" podrá con el boton al final de la tabla justificarla. (ESTA ACCION NO ES REVERSIBLE). </p>
+          </li>
+          <li>
+            <p> Si una asistencia cuenta con el estado "Justicado" podrá con el boton al final de la tabla ver en detalle la justificacion. </p>
+          </li>
         </ul>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
       </div>
     </div>
   </div>
