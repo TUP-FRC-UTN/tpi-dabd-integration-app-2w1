@@ -89,10 +89,9 @@
           </div>
 
 
-          <!-- Results Table -->
           <div class="table-responsive">
-            <table class="table table-striped border border-3 table-hover ">
-              <thead class="table-light   ">
+            <table class="table table-striped border border-3 table-hover">
+              <thead class="table-light">
                 <tr>
                   <th (click)="ordenarPor('period')" class="text-start">
                     Periodo
@@ -104,7 +103,7 @@
                   <th class="text-start">Propietario</th>
                   <th class="text-end">Documento</th>
                   <th class="text-end">Lote</th>
-                  <th class=" text-end">Monto Primer Pago</th>
+                  <th class="text-end">Monto Primer Pago</th>
                   <th class="text-end">Monto Segundo Pago</th>
                   <th class="text-end">Monto Pagado</th>
                   <th class="text-center">Acciones</th>
@@ -125,32 +124,32 @@
                   <td class="text-start">{{ getOwnerName(expense.owner_id) }}</td>
                   <td class="text-end">{{ getOwnerDni(expense.owner_id) }}</td>
                   <td class="text-nowrap text-end">{{ getOwnerPlots(expense.owner_id) }}</td>
-                  <td class="text-nowrap text-end"> {{ expense.first_expiration_amount | currency:'ARS':'symbol':'1.2-2':'es-AR'}}</td>
-                  <td class="text-nowrap text-end">{{ expense.second_expiration_amount | currency:'ARS':'symbol':'1.2-2':'es-AR'}}</td>
-                  <td class="text-nowrap text-end"> {{ expense.amount_payed | currency:'ARS':'symbol':'1.2-2':'es-AR'}}</td>
+                  <td class="text-nowrap text-end"> {{ expense.first_expiration_amount | currency:'ARS':'symbol':'1.2-2':'es-AR' }}</td>
+                  <td class="text-nowrap text-end">{{ expense.second_expiration_amount | currency:'ARS':'symbol':'1.2-2':'es-AR' }}</td>
+                  <td class="text-nowrap text-end"> {{ expense.amount_payed | currency:'ARS':'symbol':'1.2-2':'es-AR' }}</td>
                   <td class="text-center">
                     <div class="dropdown">
-                        <button class="btn btn-light btn-sm" type="button" 
-                                id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-three-dots-vertical"></i>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
-                          <li>
-                            <a class="dropdown-item" href="#" data-bs-toggle="modal" 
-                               data-bs-target="#viewMoreModal" (click)="seeDetails(expense)">
-                                Ver más
-                            </a>
-                          </li>
-                          <li><hr class="dropdown-divider"></li>
-                          <li>
-                            <a [ngClass]="{'disabled': expense.status === 'Pago'}"  class="dropdown-item" href="#" data-bs-toggle="modal" 
-                               data-bs-target="#detallesModal" (click)="seeDetails(expense)">
-                                Editar
-                            </a>
-                          </li>
-                        </ul>                        
+                      <button class="btn btn-light btn-sm" type="button" 
+                              id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-three-dots-vertical"></i>
+                      </button>
+                      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                        <li>
+                          <a class="dropdown-item" href="#" data-bs-toggle="modal" 
+                             data-bs-target="#viewMoreModal" (click)="seeDetails(expense)">
+                            Ver más
+                          </a>
+                        </li>
+                        <li *ngIf="expense.status !== 'Pago'"><hr class="dropdown-divider"></li>
+                        <li *ngIf="expense.status !== 'Pago'">
+                          <a class="dropdown-item" href="#" data-bs-toggle="modal" 
+                             data-bs-target="#detallesModal" (click)="seeDetails(expense)">
+                            Editar
+                          </a>
+                        </li>
+                      </ul>
                     </div>
-                </td>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -705,7 +704,7 @@
               <div class="">
                 <div class="card-body">
                   <p><strong>Nombre:</strong> {{ getOwnerName(selectedExpense.owner_id) }}</p>
-                  <p><strong>Tipo de DNI:</strong> {{ selectedExpense.dni_type }}</p>
+                  <p><strong>Tipo de DNI:</strong> {{ getOwnerDni(selectedExpense.owner_id) }}</p>
                   <p><strong>Periodo:</strong> {{ selectedExpense.period }}</p>
                   <p><strong>Fecha de Emisión:</strong> {{ selectedExpense.issueDate | date: 'dd/MM/yyyy' }}</p>
                 </div>
@@ -730,9 +729,9 @@
               <div class="">
                 <div class="card-body">
                   <p><strong>Primer Vencimiento:</strong> {{ selectedExpense.first_expiration_date | date: 'dd/MM/yyyy' }}</p>
-                  <p><strong>Monto Primer Vencimiento:</strong> ${{ selectedExpense.first_expiration_amount }}</p>
+                  <p><strong>Monto Primer Vencimiento:</strong> {{ selectedExpense.first_expiration_amount | currency:'ARS':'symbol':'1.2-2':'es-AR' }}</p>
                   <p><strong>Segundo Vencimiento:</strong> {{ selectedExpense.second_expiration_date | date: 'dd/MM/yyyy' }}</p>
-                  <p><strong>Monto Segundo Vencimiento:</strong> ${{ selectedExpense.second_expiration_amount }}</p>
+                  <p><strong>Monto Segundo Vencimiento:</strong> {{ selectedExpense.second_expiration_amount | currency:'ARS':'symbol':'1.2-2':'es-AR' }}</p>
                 </div>
               </div>
             </div>
@@ -741,8 +740,8 @@
             <div class="col-md-6">
               <div class="">
                 <div class="card-body">
-                  <p><strong>Monto Actual:</strong> ${{ selectedExpense.actual_amount }}</p>
-                  <p><strong>Monto Pagado:</strong> ${{ selectedExpense.amount_payed || 0 }}</p>
+                  <p><strong>Monto Actual:</strong> {{ selectedExpense.actual_amount | currency:'ARS':'symbol':'1.2-2':'es-AR' }}</p>
+                  <p><strong>Monto Pagado:</strong> {{ selectedExpense.amount_payed | currency:'ARS':'symbol':'1.2-2':'es-AR' }}</p>
                 </div>
               </div>
             </div>

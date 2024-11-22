@@ -224,7 +224,6 @@ export class IepAttentionCallComponent implements OnInit{
             if (result.isConfirmed) {
               this.resetForm();
               this.closeModal.emit();
-              this.router.navigate(['/llamados']);
             }
           });
         },
