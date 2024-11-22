@@ -1,11 +1,11 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { DashboardService } from '../../users-servicies/dashboard.service';
+import { DashboardService } from '../../../users-servicies/dashboard.service';
 import { ChartType, GoogleChartsModule } from 'angular-google-charts';
 import {
   OwnersPlotsDistribution,
   PlotsByBlock,
-  PlotsStats,
-} from '../../users-models/dashboard/plots-stats';
+  PlotsStats
+} from '../../../users-models/dashboard/plots-stats';
 import {
   FormControl,
   FormGroup,
@@ -13,12 +13,13 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { UsersMultipleSelectComponent } from '../../users-components/utils/users-multiple-select/users-multiple-select.component';
-import { PlotTypeModel } from '../../users-models/plot/PlotType';
-import { PlotStateModel } from '../../users-models/plot/PlotState';
-import { PlotService } from '../../users-servicies/plot.service';
+import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
+import { PlotTypeModel } from '../../../users-models/plot/PlotType';
+import { PlotStateModel } from '../../../users-models/plot/PlotState';
+import { PlotService } from '../../../users-servicies/plot.service';
 import { UsersKpiComponent } from "../users-kpi/users-kpi.component";
 import { Router } from '@angular/router';
+import { RoutingService } from '../../../../common/services/routing.service';
 
 @Component({
   selector: 'app-users-graphic-plots-stats',
@@ -28,7 +29,7 @@ import { Router } from '@angular/router';
     ReactiveFormsModule,
     FormsModule,
     CommonModule,
-    UsersMultipleSelectComponent,
+    CustomSelectComponent,
     UsersKpiComponent
 ],
   templateUrl: './users-graphic-plots-stats.component.html',
@@ -37,7 +38,7 @@ import { Router } from '@angular/router';
 export class UsersGraphicPlotsStatsComponent implements OnInit {
   private readonly apiService = inject(DashboardService);
   private readonly plotService = inject(PlotService);
-  private readonly router = inject(Router);
+  private readonly routerService = inject(RoutingService);
 
   plotsByBlock: PlotsByBlock[] = [];
   ownerDistribution: OwnersPlotsDistribution[] = [];
@@ -465,7 +466,7 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
     this.loadData();
   }
 
-  changeView(view: string){
-    this.router.navigate(['home/charts/users' + view]);
+  changeView(){
+    this.routerService.redirect('main/users/dashboard');
   }
 }

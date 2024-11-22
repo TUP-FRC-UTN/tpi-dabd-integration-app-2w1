@@ -17,6 +17,8 @@ import { General } from "../models/general";
 import { NotificationRegisterService } from "../service/notification-register.service";
 import { SelectMultipleComponent } from "../select-multiple/select-multiple.component";
 
+declare var bootstrap : any;
+
 @Component({
   selector: 'app-notification-home',
   standalone: true,
