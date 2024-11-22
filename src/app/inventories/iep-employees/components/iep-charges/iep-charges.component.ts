@@ -7,6 +7,7 @@ import { ChargeService } from '../../services/charge.service';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
+import $ from 'jquery';
 import Swal from 'sweetalert2';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { UsersMockIdService } from '../../../common-services/users-mock-id.service';

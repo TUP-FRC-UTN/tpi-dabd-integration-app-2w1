@@ -24,6 +24,7 @@ export class IepNuevoIngresoEgresoComponent implements OnInit {
 
 
   idUser=0
+  SwalMessage: string|undefined;
   formulario:FormGroup = new FormGroup({});
   formularioEgreso:FormGroup = new FormGroup({});
   selectedType: string = 'I';
@@ -33,14 +34,7 @@ export class IepNuevoIngresoEgresoComponent implements OnInit {
       private serviceS :  SuppliersService,
       private serviceMovment : IncreaseDecrementService,
       private serviceUsers : UsersMockIdService
-    ) 
-  {  
-    
-  }
-  
-
-  
-
+    ) {}
   productos: ProductXDetailDto [] = [];
   suppliers : Supplier[]=[];
   
@@ -48,19 +42,22 @@ export class IepNuevoIngresoEgresoComponent implements OnInit {
     this.formulario = new FormGroup({
       selectedArticule: new FormControl('',Validators.required),  
       selectedSupplier : new FormControl('',Validators.required),
-      amount : new FormControl(0,[Validators.required,Validators.min(1)]),
-      priceUnit : new FormControl('',[Validators.required,Validators.min(1)]),
+      amount : new FormControl('',[Validators.required,Validators.min(1)]),
+      // priceUnit : new FormControl('',[Validators.required,Validators.min(1)]),
       justify : new FormControl('',Validators.required)
     });
 
     this.formularioEgreso = new FormGroup({
       selectedArticule: new FormControl('',Validators.required),  
-      amount : new FormControl(0,[Validators.required,Validators.min(1)],[this.stockInsuficiente()]),
+      amount : new FormControl('',[Validators.required,Validators.min(1)],[this.stockInsuficiente()]),
       justify : new FormControl('',Validators.required)
     });
     this.formularioEgreso.get('amount')?.valueChanges.subscribe((x)=>{ this.logErrorsEgreso()})
     this.formulario.get('amount')?.valueChanges.subscribe((x)=>{ this.logErrorsFormulario()})
-
+    this.formularioEgreso.get('selectedArticule')?.valueChanges.subscribe((x)=>{ 
+      this.formularioEgreso.get('amount')?.setValue(0)
+      this.logErrorsEgreso()
+    })
     this.loadSuppliers();
     this.loadProductos();
     this.idUser= this.serviceUsers.getMockId()
@@ -90,7 +87,7 @@ export class IepNuevoIngresoEgresoComponent implements OnInit {
     dto= {
     amount: this.formulario.get('amount')?.value,
     date: new Date(Date.now()),
-    unitPrice: this.formulario.get('priceUnit')?.value,
+    // unitPrice: this.formulario.get('priceUnit')?.value,
     productId: this.formulario.get('selectedArticule')?.value,
     type: this.selectedType,
     supplierId: this.formulario.get('selectedSupplier')?.value,
@@ -102,7 +99,7 @@ export class IepNuevoIngresoEgresoComponent implements OnInit {
       dto ={
         amount: this.formularioEgreso.get('amount')?.value,
         date: new Date(Date.now()),
-        unitPrice: undefined,
+        // unitPrice: undefined,
         productId: this.formularioEgreso.get('selectedArticule')?.value,
         type: this.selectedType,
         supplierId: undefined,
@@ -113,33 +110,53 @@ export class IepNuevoIngresoEgresoComponent implements OnInit {
     this.serviceMovment.createMovement(dto,this.idUser).subscribe({
     next: response => {
       console.log(JSON.stringify(response))
-      Swal.fire({
-        title: '¡Guardado!',
-        text: "Movimiento guardado con exito",
-        icon: 'success',
-        confirmButtonText: 'Aceptar',
-        showCancelButton: false,
-        confirmButtonColor: '#3085d6'
-      }).then(() => {
-        this.formulario.reset()
-        this.goTo('/main/inventories/stock-movements-history')
-      });
+      this.SwalMessage = "Movimiento registrado con éxito."
+      this.showSuuccessMessage()
       console.log("PASO: ", response);
     },
     error: error => {
-      
+      this.handleErrors(error);
+    }})}
+
+    showSuuccessMessage(){
+      Swal.fire({
+        title: '¡Guardado!',
+        text: this.SwalMessage,
+        icon: 'success',
+        confirmButtonText: 'Aceptar',
+        showCancelButton: false,
+      }).then(() =>{
+        this.formulario.reset();
+        this.goTo('/main/inventories/stock-movements-history');
+      });
+    }
+    
+    showErrorMessage(){
       Swal.fire({
         title: 'Error',
-        text: "Error en el servidor intente nuevamente mas tarde",
+        text: this.SwalMessage,
         icon: 'error',
         confirmButtonText: 'Aceptar',
         confirmButtonColor: '#3085d6'
       });
-   
-      console.log("error:"+error.error.message)
-      console.error(error);
-             
-    }})}
+    }
+    
+    handleErrors(err: any) { 
+      console.error('Error:', err);
+      if(err.error.message=='400 Insufficient stock quantity'){
+        this.SwalMessage = "El stock al que intenta actualizar es menor al stock actual del producto."
+        this.showErrorMessage()
+      }else{
+        if(err.error.message=='404 Supplier not found'){
+          this.SwalMessage = "El proveedor ingresado no fue encontrado."
+          this.showErrorMessage();
+        }else if(err.error.message=='404 Product not found.'){
+          this.SwalMessage = "El producto ingresado no fue encontrado."
+          this.showErrorMessage();
+        }
+      }
+      return null;
+    }
 
   logErrorsFormulario() {
     Object.keys(this.formulario.controls).forEach(controlName => {

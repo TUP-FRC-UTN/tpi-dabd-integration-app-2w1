@@ -80,61 +80,90 @@ export class IepPutEmployeesComponent implements OnInit {
       this.loadEmployeeData();
     });
   }
-  loadEmployeeData(): void {
-    this.empleadoService.getEmployeeById2(this.employeeId).subscribe({
-      next: (employee : EmpPutEmployeesResponse) => {
-        // Datos personales
-        this.nombre = employee.name;
-        this.apellido = employee.surname;
-        this.dni = employee.documentValue;
-        this.cuil = employee.cuil;
-        // Datos laborales
-        this.salario = employee.salary;
-        // this.startTimeContract = employee.contractStartTime;
-        if (employee.contractStartTime?.length === 3) {
-          const [year, month, day] = employee.contractStartTime;
-          const formattedMonth = month.toString().padStart(2, '0');
-          const formattedDay = day.toString().padStart(2, '0');
-          this.startTimeContract = `${year}-${formattedMonth}-${formattedDay}`;
-        }
-        this.license = employee.license;
-        if (employee.startTime?.length === 2) {
-          const [hour, minute] = employee.startTime;
-          this.horaEntrada = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-        }
-        if (employee.endTime?.length === 2) {
-          const [hour, minute] = employee.endTime;
-          this.horaSalida = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-        }
-        // Días laborales
-        this.lunes = employee.mondayWorkday;
-        this.martes = employee.tuesdayWorkday;
-        this.miercoles = employee.wednesdayWorkday;
-        this.jueves = employee.thursdayWorkday;
-        this.viernes = employee.fridayWorkday;
-        this.sabado = employee.saturdayWorkday;
-        this.domingo = employee.sundayWorkday;
-        // Cargo
-        if (employee.charge) {
-          const cargoEncontrado = this.cargos.find(c => c.id === employee.charge.id);
-          if (cargoEncontrado) {
-            this.cargoSelected = cargoEncontrado;
-          }
-        }
-        // Empleado tercerizado
-        if (employee.supplierId !== null) {
-          this.terciorizedEmployee = true;
-          const proveedorEncontrado = this.suppliers.find(s => s.id === employee.supplierId);
-          if (proveedorEncontrado) {
-            this.selectedSupplier = proveedorEncontrado;
-          }
-        }
+  address: any = {};
+  loadAddressData(): void {
+    this.empleadoService.getAdressById(this.addressId).subscribe({
+      next: (data) => {
+        console.log('Datos de la dirección:', data);
+        this.address = data;
+        this.calle = data.street;
+        this.dpto = data.apartment || '';
+        this.piso = data.floor || '';
+        this.provinciaSelect = this.provincias.find(p => p.nombre === data.city);
+        this.localidadSelect = this.provinciaSelect?.ciudades.find(l => l.nombre === data.locality);
+        this.numeroCalle = data.number_street;
+        this.codigoPostal = data.postal_code;
+        
       },
-      error: (error) => {
-        console.error('Error al cargar los datos del empleado:', error);
-      }
+      error: (error) => console.error('Error al cargar dirección:', error)
     });
   }
+  addressId: number = 0;
+loadEmployeeData(): void {
+  this.empleadoService.getEmployeeById2(this.employeeId).subscribe({
+    next: (employee: EmpPutEmployeesResponse) => {
+      // Cargar datos del empleado
+      this.nombre = employee.name;
+      this.apellido = employee.surname;
+      this.dni = employee.documentValue;
+      this.cuil = employee.cuil;
+      this.addressId = employee.addressId || 0;
+      console.log('addressId:', this.addressId);
+      this.salario = employee.salary;
+      if (employee.contractStartTime?.length === 3) {
+        const [year, month, day] = employee.contractStartTime;
+        const formattedMonth = month.toString().padStart(2, '0');
+        const formattedDay = day.toString().padStart(2, '0');
+        this.startTimeContract = `${year}-${formattedMonth}-${formattedDay}`;
+      }
+      this.license = employee.license;
+      if (employee.startTime?.length === 2) {
+        const [hour, minute] = employee.startTime;
+        this.horaEntrada = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+      }
+      if (employee.endTime?.length === 2) {
+        const [hour, minute] = employee.endTime;
+        this.horaSalida = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+      }
+      this.lunes = employee.mondayWorkday;
+      this.martes = employee.tuesdayWorkday;
+      this.miercoles = employee.wednesdayWorkday;
+      this.jueves = employee.thursdayWorkday;
+      this.viernes = employee.fridayWorkday;
+      this.sabado = employee.saturdayWorkday;
+      this.domingo = employee.sundayWorkday;
+      if (employee.charge) {
+        const cargoEncontrado = this.cargos.find(c => c.id === employee.charge.id);
+        if (cargoEncontrado) {
+          this.cargoSelected = cargoEncontrado;
+        }
+      }
+      if (employee.supplierId !== null) {
+        this.terciorizedEmployee = true;
+        const proveedorEncontrado = this.suppliers.find(s => s.id === employee.supplierId);
+        if (proveedorEncontrado) {
+          this.selectedSupplier = proveedorEncontrado;
+        }
+      }
+      this.loadContactsData();
+      if (this.addressId) {
+        this.loadAddressData();
+      }
+    },
+    error: (error) => {
+      console.error('Error al cargar los datos del empleado:', error);
+    }
+  });
+}
+loadContactsData(): void {
+  this.empleadoService.getContactById2(this.dni).subscribe({
+    next: (data) => {
+      this.telefono = data[1].value;
+      this.mail = data[0].value;
+    },
+    error: (error) => console.error('Error al cargar datos de contacto:', error)
+  });
+}
   loadProvincias(): void {
     this.postEmployeeService.getProvinces().subscribe({
       next: (data) => this.provincias = data,
@@ -196,7 +225,7 @@ export class IepPutEmployeesComponent implements OnInit {
     const addressDto = {
       street: this.calle || '',
       numberStreet: this.numeroCalle || 0,
-      apartment: this.dpto || '',
+      apartment: this.dpto || '0',
       floor: this.piso || 0,
       postalCode: this.codigoPostal  || '',
       city: this.provinciaSelect?.nombre || '',
@@ -238,7 +267,7 @@ export class IepPutEmployeesComponent implements OnInit {
       confirmButtonText: 'Aceptar'
     }).then(() => {
       if (type === 'success') {
-        this.router.navigate(['/home/employee-list']);
+        this.router.navigate(['main/employees/employees']);
       }
     });
   }
@@ -262,6 +291,10 @@ export class IepPutEmployeesComponent implements OnInit {
     this.terciorizedEmployee = !this.terciorizedEmployee;
   }
   cancelar(): void {
-    this.router.navigate(['/home/employee-list']);
+    this.router.navigate(['main/employees/employees']);
+  }
+
+  toggleLicense(): void {
+    this.license = !this.license;
   }
 }
