@@ -579,20 +579,12 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
     // Método para abrir el modal de observación
     
     openObservationModal() {
-      if (this.hasChanges()) {
-        const modalRef = this.modalService.open(this.observationContent, {
-          backdrop: 'static'
-        });
-        modalRef.result.then(
-          (result) => {
-            if (result === 'confirm') {
-              this.saveChanges();
-            }
-          },
-          () => {
-            // Modal dismissed
-          }
-        );
+      const observationModalElement = document.getElementById('observationModalExpenses');
+      if (observationModalElement) {
+        const modalInstance = new window.bootstrap.Modal(observationModalElement, { backdrop: 'static' });
+        modalInstance.show();
+      } else {
+        console.error('No se encontró el modal de observación');
       }
     }
 
