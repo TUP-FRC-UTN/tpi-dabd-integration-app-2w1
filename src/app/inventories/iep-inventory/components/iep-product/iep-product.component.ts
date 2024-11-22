@@ -3,7 +3,7 @@ import { ProductService } from '../../services/product.service';
 import { Observable } from 'rxjs';
 import { FormsModule, NgForm } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ProductCategory } from '../../models/product-category';
 import { Supplier } from '../../models/suppliers';
 import { SuppliersService } from '../../services/suppliers.service';
@@ -12,7 +12,8 @@ import { CreateProductDtoClass } from '../../models/create-product-dto-class';
 import { CategoriaService } from '../../services/categoria.service';
 import { CreateCategoryDto } from '../../models/create-category-dto';
 import { NgSelectModule } from '@ng-select/ng-select';
-
+import { UpdateProductDto } from '../../models/update-product-dto';
+import { AuthService } from '../../../../users/users-servicies/auth.service';
 @Component({
   selector: 'app-product',
   standalone: true,
@@ -21,6 +22,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
   styleUrl: './iep-product.component.css'
 })
 export class IepProductComponent {
+  private dtoUpdate: UpdateProductDto|undefined;
   private productService: ProductService;
   private providerService: SuppliersService;
   categories: ProductCategory[] = [];
@@ -28,6 +30,7 @@ export class IepProductComponent {
   providers: Supplier[] = [];
   providers$: Observable<Supplier[]>= new Observable<Supplier[]>();
   dto: CreateProductDtoClass = new CreateProductDtoClass();
+  dtoBeforeUpdate: CreateProductDtoClass = new CreateProductDtoClass();
   categoriesError: boolean = false;
   providersError: boolean = false;
   help: boolean = false;
@@ -39,24 +42,72 @@ export class IepProductComponent {
   errorMessage: string|undefined;
   newCategory: string = ''; 
   categoryOfModal: number | undefined;
-
+  idProductToEdit: number | undefined;
 
   constructor(productService: ProductService,
     providersService: SuppliersService,
     private categoryService:CategoriaService,
-    private router : Router ) {
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
+    private userService : AuthService) {
+
+    this.idProductToEdit = this.activatedRoute.snapshot.params['id'];
+    console.log(this.idProductToEdit);
     this.productService = productService;
     this.providerService = providersService;
     this.success = false;
+    this.setProductToEdit();
   }
+
+  dtoIsEqual():boolean{
+    if(this.dto.name == this.dtoBeforeUpdate.name && 
+      this.dto.reusable == this.dtoBeforeUpdate.reusable && 
+      this.dto.minAmountWarning == this.dtoBeforeUpdate.minAmountWarning 
+      && this.dto.description == this.dtoBeforeUpdate.description 
+      && this.dto.category_id 
+      == this.dtoBeforeUpdate.category_id){
+        return true;
+    }
+    return false;
+  }
+
+  setProductToEdit(){
+    if(this.idProductToEdit!=undefined){
+      this.productService.getProductById(this.idProductToEdit).subscribe({
+        next: product => {
+          this.dto = product;
+          this.dtoBeforeUpdate.category_id = this.dto.category_id;
+          this.dtoBeforeUpdate.description = this.dto.description;
+          this.dtoBeforeUpdate.minAmountWarning = this.dto.minAmountWarning;
+          this.dtoBeforeUpdate.name = this.dto.name;
+          this.dtoBeforeUpdate.reusable = this.dto.reusable;
+          console.log("asi se carga")
+          console.log(this.dto);
+        },
+        error: error => {
+          console.error(error);
+          this.showProductCouldntBeFoundAlert();
+        }
+      });
+    }
+  }
+
+  showProductCouldntBeFoundAlert() {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'El producto no pudo ser encontrado para su modificación',
+      confirmButtonText: 'Intentar de nuevo'
+    });
+  }
+
 
   logear(){
     console.log(this.dto.reusable)
-
   }
 
   logearrr(){
-    console.log("pasoo este es el valor "+this.dto.minAmountWarning)
+    console.log(this.dto.minAmountWarning)
 
   }
 
@@ -95,13 +146,25 @@ export class IepProductComponent {
     });
   }
   }
-
   showSuccessAlert() {
     Swal.fire({
       icon: 'success',
       title: 'Registro creado',
       text: this.successMessage,
       confirmButtonText: 'OK'
+    }).then(() => {
+      window.history.back();
+    });
+  }
+
+  showUpdateSuccessAlert() {
+    Swal.fire({
+      icon: 'success',
+      title: 'Registro actualizado',
+      text: this.successMessage,
+      confirmButtonText: 'OK'
+    }).then(() => {
+      this.router.navigate(['/main/inventories/inventory']);
     });
   }
 
@@ -115,27 +178,9 @@ export class IepProductComponent {
     });
   }
 
-  onSubmit(form: NgForm) {
-    if (form.valid) {
-      if (this.dto.supplier_id == null || this.dto.supplier_id === 0) {
-        this.dto.supplier_id = undefined;
-      }
-      if(this.dto.unitPrice == null || this.dto.unitPrice === 0) {
-        this.dto.unitPrice = 0;
-      }
-      if(this.dto.minAmountWarning == null || this.dto.minAmountWarning === 0) {
-        this.dto.minAmountWarning = 0;
-      }
-      if(this.dto.reusable == null|| this.dto.reusable === undefined) {
-        this.dto.reusable = false;
-      }
-      this.abrirModal = true;
-      console.log("enviadoo"+JSON.stringify(this.dto))
-      this.dto.state_id = 1;
-      this.createProduct$ = this.productService.createProduct(this.dto, 1);
+  createProduct(form:NgForm){
+    this.createProduct$ = this.productService.createProduct(this.dto,this.userService.getUser().id);
       console.log(this.createProduct$);
-      
-
       this.createProduct$.subscribe({
         next: response => {
           console.log("aca ta la respuesta"+JSON.stringify(response))
@@ -166,6 +211,71 @@ export class IepProductComponent {
           console.log('Petición completada');
         }
       });
+  }
+
+
+  updateProduct(form: NgForm) {
+    
+    console.log('d');
+    console.log(this.dto);
+    const mappedDto: UpdateProductDto = {
+      id: this.idProductToEdit ?? 0, 
+      name: this.dto.name ?? '',
+      reusable: this.dto.reusable ?? false,
+      minAmountWarning: this.dto.minAmountWarning ?? 0,
+      description: this.dto.description ?? '',
+      categoryId: this.dto.category_id ?? 0,
+    };
+
+    console.log(JSON.stringify(mappedDto));
+    this.productService.updateProduct(mappedDto,this.userService.getUser().id).subscribe({
+      next: response => {
+        this.successMessage = response.message;
+        this.showUpdateSuccessAlert();
+        console.log("PASO: ", response);
+        form.reset();
+       
+      },
+      error: error => {
+        console.error(error);
+        if(error.error.message === '404 Product not found') {
+          this.errorMessage = 'El producto no pudo ser encontrado para su modificación';
+        }else if( error.error.message === '404 Category not found') {
+          this.errorMessage = 'La categoría ingresada no existe';
+        }else{
+          this.errorMessage = 'Ha ocurrido un error al actualizar el producto.';
+        }
+        this.success = false;
+        this.showErrorAlert();
+      },
+      complete: () => {
+        console.log('Petición completada');
+      }
+    });
+}
+
+  onSubmit(form: NgForm) {
+    if (form.valid) {
+      if (this.dto.supplier_id == null || this.dto.supplier_id === 0) {
+        this.dto.supplier_id = undefined;
+      }
+      if(this.dto.unitPrice == null || this.dto.unitPrice === 0) {
+        this.dto.unitPrice = 0;
+      }
+      if(this.dto.minAmountWarning == null || this.dto.minAmountWarning === 0) {
+        this.dto.minAmountWarning = 0;
+      }
+      if(this.dto.reusable == null|| this.dto.reusable === undefined) {
+        this.dto.reusable = false;
+      }
+      this.abrirModal = true;
+      this.dto.state_id = 1;
+      this.dto.description = this.dto.description ?? '   ';
+      if(this.idProductToEdit!=undefined){
+        this.updateProduct(form);
+      }else{
+        this.createProduct(form);
+      }
     }
   }
 
@@ -180,7 +290,6 @@ export class IepProductComponent {
         console.log(this.categories);
         this.categoriesError = false;
         this.requestInProgress = false;
-
       },
       error: error => {
         console.error(error);

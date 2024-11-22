@@ -5,9 +5,9 @@ import * as XLSX from 'xlsx';
 // Imports de DataTable con soporte para Bootstrap 5
 import $ from 'jquery';
 import 'datatables.net-bs5'; // DataTables con Bootstrap 5
-import 'datatables.net-buttons-bs5'; // Botones con estilos de Bootstrap 5
-import 'datatables.net-buttons/js/buttons.html5';
-import 'datatables.net-buttons/js/buttons.print';
+// import 'datatables.net-buttons-bs5'; // Botones con estilos de Bootstrap 5
+// import 'datatables.net-buttons/js/buttons.html5';
+// import 'datatables.net-buttons/js/buttons.print';
 
 //Imports propios de multas
 import { PenaltiesModalConsultComplaintComponent } from '../modals/penalties-get-complaint-modal/penalties-get-complaint.component';
@@ -22,6 +22,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
+import { AuthService } from '../../../../users/users-servicies/auth.service';
 
 
 @Component({
@@ -52,7 +53,8 @@ export class PenaltiesListComplaintComponent implements OnInit {
   constructor(
     private _modal: NgbModal,
     private complaintService: ComplaintService,
-    private routingService: RoutingService
+    private routingService: RoutingService,
+    private authService: AuthService
   ) {
     (window as any).viewComplaint = (id: number) => this.viewComplaint(id);
     (window as any).changeState = (state: string, id: number, userId: number) =>
@@ -132,20 +134,21 @@ export class PenaltiesListComplaintComponent implements OnInit {
           data: null,
           className: 'align-middle',
           searchable: false,
-          render: (data) =>
-            `<div class="text-center">
-                <div class="btn-group">
-                  <div class="dropdown">
-                    <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
-                    <ul class="dropdown-menu">
-                      <li><a class="dropdown-item" onclick="viewComplaint(${data.id})">Ver más</a></li>
-                        ${data.complaintState == "Pendiente" ? `
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" onclick="changeState('REJECTED', ${data.id}, ${data.userId})">Rechazar</a></li>` : ``}
-                      </ul>
-                 </div>
+          render: (data) => `
+            <div class="text-center">
+              <div class="btn-group">
+                <div class="dropdown">
+                  <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" onclick="viewComplaint(${data.id})">Ver más</a></li>
+                    ${data.complaintState == "Pendiente" ? `
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" onclick="changeState('REJECTED', ${data.id}, ${this.authService.getUser().id})">Rechazar</a></li>
+                    <li><a class="dropdown-item" onclick="changeState('SOLVED', ${data.id}, ${this.authService.getUser().id})">Resuelta</a></li>` : ``}
+                  </ul>
+                </div>
               </div>
-             </div>`
+            </div>`
         },
       ],
       dom:
@@ -261,6 +264,8 @@ export class PenaltiesListComplaintComponent implements OnInit {
         return 'text-bg-success';
       case 'Pendiente':
         return 'text-bg-warning';
+      case 'Resuelta':
+        return 'text-bg-primary';
       case 'Rechazada':
         return 'text-bg-danger';
       default:

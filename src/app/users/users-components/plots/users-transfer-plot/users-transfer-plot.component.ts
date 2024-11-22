@@ -1,10 +1,11 @@
-import { Component, inject, Input, OnInit } from '@angular/core';
+import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
+import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
 import { OwnerService } from '../../../users-servicies/owner.service';
 import { Owner } from '../../../users-models/owner/Owner';
 import { PlotService } from '../../../users-servicies/plot.service';
 import { GetPlotModel } from '../../../users-models/plot/GetPlot';
 import { AuthService } from '../../../users-servicies/auth.service';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CustomSelectComponent } from "../../../../common/components/custom-select/custom-select.component";
 import Swal from 'sweetalert2';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -15,7 +16,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
   imports: [CustomSelectComponent, ReactiveFormsModule],
   templateUrl: './users-transfer-plot.component.html'
 })
-export class UsersTransferPlotComponent implements OnInit {
+export class UsersTransferPlotComponent implements OnInit, OnDestroy {
 
   constructor(public activeModal: NgbActiveModal, private fb: FormBuilder) {
     this.reactiveForm = this.fb.group({
@@ -36,15 +37,21 @@ export class UsersTransferPlotComponent implements OnInit {
   private readonly ownersService = inject(OwnerService);
   private readonly plotService = inject(PlotService);
   private readonly authService = inject(AuthService);
+  private readonly suscriptonService = inject(SuscriptionManagerService);
 
   ngOnInit() {
     this.reactiveForm.get('actualOwner')?.disable();
     this.loadAllOwners();
   }
 
+  //Desuscribirse de todos los observables
+  ngOnDestroy() {
+    this.suscriptonService.unsubscribeAll();
+  }
+
   //Cargar todos los propietarios
   loadAllOwners() {
-    this.ownersService.getAll().subscribe({
+    const sus = this.ownersService.getAll().subscribe({
       next: (data: Owner[]) => {
         this.owners = data.map(owner => ({
           value: owner.id,
@@ -57,6 +64,9 @@ export class UsersTransferPlotComponent implements OnInit {
         console.log('No se pudo cargar los propietarios, ' + error);
       }
     });
+
+    //Agregar suscripción
+    this.suscriptonService.addSuscription(sus);
   }
 
   //Cargar el propietario actual
@@ -73,6 +83,9 @@ export class UsersTransferPlotComponent implements OnInit {
         console.log('No se pudo cargar la información del propietario, ' + error);
       }
     });
+
+    //Agregar suscripción
+    this.suscriptonService.addSuscription(sus);
   }
 
   loadPlotOwner(id : number){
@@ -120,4 +133,3 @@ export class UsersTransferPlotComponent implements OnInit {
       });
   }
 }
-

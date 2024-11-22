@@ -10,9 +10,9 @@ import * as XLSX from 'xlsx';
 // Imports de DataTable con soporte para Bootstrap 5
 import $ from 'jquery';
 import 'datatables.net-bs5'; // DataTables con Bootstrap 5
-import 'datatables.net-buttons-bs5'; // Botones con estilos de Bootstrap 5
-import 'datatables.net-buttons/js/buttons.html5';
-import 'datatables.net-buttons/js/buttons.print';
+// import 'datatables.net-buttons-bs5'; // Botones con estilos de Bootstrap 5
+// import 'datatables.net-buttons/js/buttons.html5';
+// import 'datatables.net-buttons/js/buttons.print';
 import { RoutingService } from '../../../../common/services/routing.service';
 import moment from 'moment';
 import jsPDF from 'jspdf';
@@ -20,6 +20,7 @@ import autoTable from 'jspdf-autotable';
 import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
 import { PenaltiesUpdateStateReasonModalComponent } from '../modals/penalties-update-state-reason-modal/penalties-update-state-reason-modal.component';
 import { PenaltiesUpdateStateReasonReportModalComponent } from '../modals/penalties-update-state-reason-report-modal/penalties-update-state-reason-report-modal.component';
+import { PlotService } from '../../../../users/users-servicies/plot.service';
 
 
 
@@ -34,8 +35,6 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
   //Variables
   report: ReportDTO[] = [];                       //
   reportfilter: ReportDTO[] = [];                 //
-  // filterDateStart: Date = new Date();             //
-  // filterDateEnd: Date = new Date();               //
   states: { key: string; value: string }[] = [];  //
   table: any;                                     //Tabla base
   searchTerm: string = '';                        //Valor de la barra de busqueda
@@ -45,6 +44,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
   selectedState: string = '';
   selectedStates: string[] = [];   //Valor select
   today: string = '';
+  plots: any[] = [];
 
   options: { value: string, name: string }[] = []
   @ViewChild(CustomSelectComponent) customSelect!: CustomSelectComponent;
@@ -54,7 +54,8 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
     private reportServices: SanctionService,
     private _modal: NgbModal,
     private router: Router,
-    private routingService: RoutingService
+    private routingService: RoutingService,
+    private plotService: PlotService
 
   ) {
     (window as any).viewReport = (id: number) => this.viewReport(id);
@@ -68,9 +69,10 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
     this.reportServices.refreshTable$.subscribe(() => {
       this.refreshData();
     });
-    this.refreshData()
+    this.refreshData();
+    this.loadPlots();
 
-    this.getTypes()
+    this.getTypes();
 
     const that = this; // para referenciar metodos afuera de la datatable
 
@@ -103,6 +105,18 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
   }
 
 
+  loadPlots() {
+    this.plotService.getAllPlots().subscribe({
+      next: (data) => {
+        this.plots = data;
+        console.log('Lotes cargados:', data);
+      },
+      error: (error) => {
+        console.error('error: ', error);
+      }
+    })
+  }
+
 
   // Función para convertir la fecha al formato `YYYY-MM-DD`
   private formatDateToString(date: Date): string {
@@ -111,6 +125,11 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
     return adjustedDate.toLocaleDateString('en-CA'); // Formato estándar `YYYY-MM-DD`
   }
 
+
+  getPlotData(plotId: number) {
+    let plot = this.plots.find((plot) => plot.id === plotId);
+    return `Nro: ${plot?.plot_number} - Manzana: ${plot?.block_number}`;
+  }
 
   // Configures the DataTable display properties and loads data.
   updateDataTable() {
@@ -150,8 +169,10 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
         {
           data: 'plotId',
           className: 'align-middle',
-          render: (data) =>
-            `<div class="text-end">${data}</div>`
+          render: (data) => {
+            console.log("datos" + data)
+            return `<div class="text-end">${data}</div>`
+          }
         },
         {
           data: 'description',
@@ -170,13 +191,15 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
                   <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
                   <ul class="dropdown-menu">
                     <li><a class="dropdown-item" onclick="viewReport(${data.id})">Ver más</a></li>
-                    ${data.reportState === 'Abierto' || data.reportState === 'Nuevo' || data.reportState === 'Pendiente' ?
+                                              ${data.reportState === 'Cerrado' || data.reportState === 'Pendiente' ?
+              `<li><a class="dropdown-item" data-action="changeState" data-id="${data.id}" data-state="OPEN"">Abrir</a></li>` : ''}
+                    ${data.reportState === 'Abierto' ?
               `<li><hr class="dropdown-divider"></li> <li><a class="dropdown-item" onclick="editReport(${data.id})">Editar</a></li>` : ''}
-                      ${data.reportState === 'Abierto' || data.reportState === 'Pendiente' ?
+                      ${data.reportState === 'Abierto' ?
               `<li><a class="dropdown-item" data-action="newSaction" data-id="${data.id}"">Sancionar</a></li>` : ''}
                         ${data.reportState === 'Abierto' || data.reportState === 'Pendiente' ?
               `<li><a class="dropdown-item" data-action="changeState" data-id="${data.id}" data-state="REJECTED"">Rechazar</a></li>` : ''}
-                          ${data.reportState === 'Abierto' || data.reportState === 'Pendiente' ?
+                          ${data.reportState === 'Abierto' ?
               `<li><a class="dropdown-item" data-action="changeState" data-id="${data.id}" data-state="CLOSED"">Cerrar</a></li>` : ''}
                  </ul>
                 </div>
@@ -198,29 +221,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
         zeroRecords: "No se encontraron resultados",
         loadingRecords: "Cargando...",
         processing: "Procesando...",
-      },
-      //This sets the buttons to export
-      //the table data to Excel and PDF.
-      buttons: [
-        {
-          extend: 'excel',
-          text: 'Excel',
-          className: 'btn btn-success export-excel-btn',
-          title: 'Listado de Denuncias',
-          exportOptions: {
-            columns: [0, 1, 2, 3], // This indicates the columns that will be exported to Excel.
-          },
-        },
-        {
-          extend: 'pdf',
-          text: 'PDF',
-          className: 'btn btn-danger export-pdf-btn',
-          title: 'Listado de denuncias',
-          exportOptions: {
-            columns: [0, 1, 2, 3], // This indicates the columns that will be exported to PDF.
-          },
-        }
-      ]
+      }
     });
 
   }
@@ -322,33 +323,6 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
   }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -387,89 +361,6 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
     }
   }
 
-  CreateDataTable() {
-    //   if ($.fn.dataTable.isDataTable('#reportsTables')) {//creo que es por la funcion
-    //     $('#reportsTables').DataTable().clear().destroy();
-    //   }
-
-    //   let table = $('#reportsTables').DataTable({
-    //     data: this.reportfilter,
-    //     columns: [
-    //       {
-    //         data: 'createdDate',
-    //         render: (data) => this.reportServices.formatDate(data),
-    //       },
-    //       {
-    //         data: 'reportState',
-    //         render: (data) => `<div class="d-flex justify-content-center"><div class="${this.getStatusClass(data)} btn w-75 text-center border rounded-pill" >${data}</div></div>`
-    //       },
-    //       { data: 'plotId', render: (data) => ` <div class="text-start">Nro: ${data}</div>` },
-    //       { data: 'description' },
-    //       {
-    //         data: null,
-    //         render: (data) => `
-    //              <div class="btn-group gap-2">
-    //                   <div class="dropdown">
-    //                       <button type="button" class="btn btn-light border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
-    //                       <ul class="dropdown-menu">
-    //                           <li><a class="dropdown-item" onclick="viewComplaint(${data.id})">Ver más</a> </li>
-    //                           <li><hr class="dropdown-divider"></li>
-    //                           <li><a class="dropdown-item" onclick="selectState('ATTACHED', ${data.id}, ${data.userId})">Marcar como Anexada</a></li>
-    //                           <li><a class="dropdown-item" onclick="selectState('REJECTED', ${data.id}, ${data.userId})">Marcar como Rechazada</a></li>
-    //                           <li><a class="dropdown-item" onclick="selectState('PENDING', ${data.id}, ${data.userId})">Marcar como Pendiente</a></li>
-    //                           <li><hr class="dropdown-divider"></li>
-
-    //                       </ul>
-    //                   </div>
-    //               </div>`,
-    //       }
-    //     ],
-    //     paging: true,
-    //     pageLength: 10,
-    //     lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
-    //     dom: 't<"d-flex justify-content-between"<lf>"d-flex justify-content-between"p>',
-    //     searching: false,
-    //     language: {
-    //       lengthMenu: '<select class="form-select">' +
-    //         '<option value="5">5</option>' +
-    //         '<option value="10">10</option>' +
-    //         '<option value="25">25</option>' +
-    //         '<option value="50">50</option>' +
-    //         '<option value="-1">All</option>' +
-    //         '</select>'
-    //     },
-    //     buttons: [
-    //       {
-    //         extend: 'excel',
-    //         text: 'Excel',
-    //         className: 'btn btn-success export-excel-btn',
-    //         title: 'Listado de Denuncias',
-    //         exportOptions: {
-    //           columns: [0, 1, 2, 3],
-    //         },
-    //       },
-    //       {
-    //         extend: 'pdf',
-    //         text: 'PDF',
-    //         className: 'btn btn-danger export-pdf-btn',
-    //         title: 'Listado de denuncias',
-    //         exportOptions: {
-    //           columns: [0, 1, 2, 3],
-    //         },
-    //       },
-    //     ],
-    //   });
-
-    //   $('#exportExcelBtn').on('click', function () {
-    //     table.button('.buttons-excel').trigger();
-    //   });
-
-    //   $('#exportPdfBtn').on('click', function () {
-    //     table.button('.buttons-pdf').trigger();
-    //   });
-    // }
-
-  }
 
   viewReport(i: number) {
     const modal = this._modal.open(PenaltiesModalReportComponent, {

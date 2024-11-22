@@ -67,7 +67,7 @@ export class UsersNewPlotComponent implements OnInit, OnDestroy {
       ])
     })
 
-    //Validar que la superficie construida no sea mayor a la superficie total
+    //Validar que la superficie construida no sea mayor a la superficie total, cuando se cambia la superficie construida
     const sus = this.formReactivo.get('totalBuild')?.valueChanges.subscribe(() => {
       this.formReactivo.get('totalBuild')?.setValidators([Validators.max(this.formReactivo.get('totalArea')?.value), Validators.min(0)]);
     });
@@ -84,9 +84,10 @@ export class UsersNewPlotComponent implements OnInit, OnDestroy {
           this.formReactivo.get('totalBuild')?.enable();
         }
     });
-
+    
     //Agregar suscripción
     [sus, sus2, sus3].forEach(s => s && this.suscriptionService.addSuscription(s));
+
   }
 
   ngOnInit(): void {

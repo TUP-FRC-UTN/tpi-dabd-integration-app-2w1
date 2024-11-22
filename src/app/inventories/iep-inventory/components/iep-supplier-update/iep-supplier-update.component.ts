@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule, RouterOutlet } from '@angular/router';
-import { ProvidersService } from '../../services/providers.service';
 import { SuppliersService } from '../../services/suppliers.service';
 import { Supplier } from '../../models/suppliers';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { error } from 'jquery';
 import Swal from 'sweetalert2';
+import { AuthService } from '../../../../users/users-servicies/auth.service';
 
 @Component({
   selector: 'app-iep-supplier-update',
@@ -23,21 +22,11 @@ export class IepSupplierUpdateComponent implements OnInit{
 
   onSubmit() {
 
-    Swal.fire({
-      icon: "success",
-      title: "Actualización Exitosa",
-      text: "Los datos se han actualizado correctamente.",
-      confirmButtonText: "Aceptar" 
-    }).then(() => {
-      this.router.navigate(['/home/suppliers']);
-    });
-
-
     if (this.proveedorForm.valid) {
       const supplierUpdate: Supplier = {
         id: this.id, 
         name: this.proveedorForm.value.name,
-       cuit: this.proveedorForm.value.cuit,
+        cuit: this.proveedorForm.value.cuit,
         address: this.proveedorForm.value.address,
         supplierType: this.proveedorForm.value.supplierType, 
         description: this.proveedorForm.value.description,
@@ -47,14 +36,35 @@ export class IepSupplierUpdateComponent implements OnInit{
       };
   
       this.supplierService.updateSupplier(supplierUpdate).subscribe(
-        response => {
-          //alert('Proveedor actualizado exitosamente');
-          this.router.navigate(['/suppliers'])
+          {
+        next: response=> {
+          console.log(JSON.stringify(response))
+          Swal.fire({
+            title: '¡Guardado!',
+            text: "Proveedor actualizado con exito",
+            icon: 'success',
+            confirmButtonText: 'Aceptar',
+            showCancelButton: false,
+            confirmButtonColor: '#3085d6'
+          }).then(() => {
+            this.router.navigate(['/main/providers/suppliers'])});
+          console.log("PASO: ", response);
         },
-        error => {
-          console.error('Error al actualizar el proveedor', error);
-          alert('Error al actualizar el proveedor');
+        error: error => {
+          
+          Swal.fire({
+            title: 'Error',
+            text: "'Error al actualizar el proveedor'",
+            icon: 'error',
+            confirmButtonText: 'Aceptar',
+            confirmButtonColor: '#3085d6'
+          });
+       
+          console.log("error:"+error.error.message)
+          console.error(error);
+                 
         }
+      }
       );
     }
   }
@@ -67,8 +77,8 @@ export class IepSupplierUpdateComponent implements OnInit{
     this.proveedorForm = this.fb.group({
       name: ['', Validators.required],
       cuit: ['', Validators.required],
-      phoneNumber: ['', [Validators.required]],
-      email: ['', [Validators.required, Validators.email]],
+      phoneNumber: ['', [Validators.required,Validators.pattern('^[0-9]*$')]],
+      email: ['', [Validators.required, Validators.email, this.emailDomainValidator]],
       supplierType: ['', Validators.required],
       address: ['', Validators.required],
       createdUser: [0],
@@ -104,13 +114,21 @@ export class IepSupplierUpdateComponent implements OnInit{
     }
   }
   
-
+  emailDomainValidator(control: AbstractControl) {
+    const email = control.value;
+    if (email && email.endsWith('.com') || email.endsWith('.com.ar') || email.endsWith('.net') || 
+    email.endsWith('.mx') || email.endsWith('.org') || email.endsWith('.gov') || email.endsWith('.edu')) {
+      return null; 
+    } else {
+      return { emailDomain: true }; 
+    }
+  }
 
   isFieldInvalid(field: string): boolean {
     const control = this.proveedorForm.get(field);
     return control ? control.invalid && (control.touched || control.dirty) : false;
   }
   
-constructor(private activateRoute:ActivatedRoute,private supplierService:SuppliersService,private fb: FormBuilder,private router:Router){}
+constructor(private activateRoute:ActivatedRoute,private supplierService:SuppliersService,private fb: FormBuilder,private router:Router,private userService : AuthService){}
 
 }

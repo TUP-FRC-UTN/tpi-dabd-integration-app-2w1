@@ -14,7 +14,6 @@ export class ExpenseGenerationExpenseService {
 
 
   private ApiBaseUrl = environment.services.expenseGeneration + "/api/expenses/";
-  private urlAllOwners = environment.services.expenseGeneration + "/api/v1/owners/active"
   private urlOwnerId =  environment.services.expenseGeneration + "/api/v1/owners/"
   constructor(private http: HttpClient) { }
 
@@ -86,7 +85,7 @@ export class ExpenseGenerationExpenseService {
   }
 
   getAllOwners(): Observable<Owner[]> {
-    return this.http.get<Owner[]>(`${this.urlAllOwners}`).pipe(
+    return this.http.get<Owner[]>(environment.services.expenseGeneration + "/api/v1/owners/active").pipe(
       catchError(this.handleError)
     );
   }
@@ -122,15 +121,15 @@ updateExpense(expenseData: ExpenseUpdateDTO, observation: string): Observable<an
     .set('Content-Type', 'application/json')
     .set('X-Update-Observation', observation);
 
-  return this.http.put(`http://localhost:8021/api/expenses/update`, expenseData, { headers })
+  return this.http.put(environment.services.expenseGeneration + '/api/expenses/update', expenseData, { headers })
     .pipe(
       catchError(this.handleError)
     );
 }
 
 getMultipliers(): Observable<{ latePayment: number; expiration: number }> {
-  const latePaymentUrl = `${this.ApiBaseUrl}late-payment-multiplier`;
-  const expirationUrl = `${this.ApiBaseUrl}expiration-multiplier`;
+  const latePaymentUrl = environment.services.expenseGeneration + `/api/expenses/late-payment-multiplier`;
+  const expirationUrl = environment.services.expenseGeneration +`/api/expenses/expiration-multiplier`;
 
   return forkJoin({
     latePayment: this.http.get<number>(latePaymentUrl),
@@ -141,13 +140,21 @@ getMultipliers(): Observable<{ latePayment: number; expiration: number }> {
 }
 
 getGenerationDay(): Observable<number> {
-  return this.http.get<number>(`${this.ApiBaseUrl}generation-day`).pipe(
+  return this.http.get<number>(environment.services.expenseGeneration + `/api/expenses/generation-day`).pipe(
     catchError(this.handleError)
   );
 }
 
+
+
+generateAllExpenses(startDate: string, endDate: string): Observable<any> {
+  return this.http.post(
+    `${environment.services.expenseGeneration}/api/expenses/create/all?startDate=${startDate}&endDate=${endDate}`,
+    {} 
+  );}
+
 updateLatePaymentMultiplier(multiplier: number, observation: string): Observable<any> {
-  const url = `${this.ApiBaseUrl}late-payment-multiplier`;
+  const url = environment.services.expenseGeneration + `/api/expenses/late-payment-multiplier`;
   return this.http.put(url, JSON.stringify(multiplier), {
     headers: new HttpHeaders({
       'Content-Type': 'application/json',
@@ -159,7 +166,7 @@ updateLatePaymentMultiplier(multiplier: number, observation: string): Observable
 }
 
 updateExpirationMultiplier(multiplier: number, observation: string): Observable<any> {
-  const url = `${this.ApiBaseUrl}expiration-multiplier`;
+  const url = environment.services.expenseGeneration + `/api/expenses/expiration-multiplier`;
   return this.http.put(url, JSON.stringify(multiplier), {
     headers: new HttpHeaders({
       'Content-Type': 'application/json',
@@ -171,7 +178,7 @@ updateExpirationMultiplier(multiplier: number, observation: string): Observable<
 }
 
 updateGenerationDay(day: number, observation: string): Observable<any> {
-  const url = `${this.ApiBaseUrl}generation-day`;
+  const url = environment.services.expenseGeneration + `/api/expenses/generation-day`;
   return this.http.put(url, JSON.stringify(day), {
     headers: new HttpHeaders({
       'Content-Type': 'application/json',
@@ -181,8 +188,6 @@ updateGenerationDay(day: number, observation: string): Observable<any> {
     catchError(this.handleError)
   );
 }
-
-
 
 
 }

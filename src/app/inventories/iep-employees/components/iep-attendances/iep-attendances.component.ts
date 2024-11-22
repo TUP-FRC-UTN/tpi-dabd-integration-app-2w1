@@ -8,10 +8,13 @@ import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import { NgLabelTemplateDirective, NgSelectModule } from '@ng-select/ng-select';
 import { IepAttendancesNgselectComponent } from "../iep-attendances-ngselect/iep-attendances-ngselect.component";
-
-declare var $: any;
-declare var DataTable: any;
-declare var bootstrap: any;
+import { EmpPostConfigurationResponse } from '../../Models/emp-post-configuration';
+import { PillowTimeLateArrivalService } from '../../services/pillow-time-late-arrival.service';
+import { AuthService } from '../../../../users/users-servicies/auth.service';
+import $ from 'jquery';
+import 'datatables.net'; // Importación de DataTables
+import 'datatables.net-dt'; // Estilos para DataTables
+import 'datatables.net-bs5';
 
 @Component({
   selector: 'app-iep-attendances',
@@ -22,37 +25,53 @@ declare var bootstrap: any;
 })
 export class IepAttendancesComponent implements OnInit{
   
-
   Asistencias: EmpListadoAsistencias[] = [];
   filteredAsistencias: EmpListadoAsistencias[] = [];
   private table: any;
   router = inject(Router);
   
+
   empleadoId: number = 0;
   empleadoName: string = "";
   startDate!: string;
   endDate!: string;
   estadosFiltrados: any[] = [];
+  fechaMaxima: string='';
 
   id: number = 0;
   nuevoEstado: string = "";
   justificationPutText: string = "";
   justificationGetText: string = "";
+  actualConfig:EmpPostConfigurationResponse={
+    pillowLastArrival: 0,
+    pillowJustify: 0,
+    userId: 0
+  };
 
   constructor(
     private empleadoService: EmpListadoEmpleadosService,
-    private route: ActivatedRoute
-  ) {}
+    private route: ActivatedRoute,
+    private pillowTimeLateArrivalService: PillowTimeLateArrivalService,
+    private mockid: AuthService 
+  ) {
+    const hoy = new Date();
+    this.fechaMaxima = hoy.toISOString().split('T')[0];
+  }
   
   ngOnInit(): void {
     const name = Number(this.route.snapshot.paramMap.get('id'));  // Esto devuelve un string
     if (name) { this.empleadoId = name;}  // Guardamos el string
-
+    this.pillowTimeLateArrivalService.actualConfig().subscribe(data=>{
+      this.actualConfig=data;
+      console.log("Data"+data);
+    })
     this.loadAsistencias();
     this.initializeDates();
     this.setInitialDates();
   }
 
+
+  
   initializeDates(): void {
     const today = new Date();
     const firstDayOfLastMonth = new Date(today.getFullYear(), today.getMonth() - 0, 1);
@@ -61,6 +80,29 @@ export class IepAttendancesComponent implements OnInit{
     thirtyDaysAgo.setDate(today.getDate() - 30);
     this.startDate = this.formatDate(thirtyDaysAgo);
     this.endDate = this.formatDate(today);
+  }
+
+
+
+  reSetInitialDates(): void {
+    const today = new Date();
+    const thirtyDaysAgo = new Date(today);
+    thirtyDaysAgo.setDate(today.getDate() - 30);
+
+    const startDateInput: HTMLInputElement = document.getElementById(
+      'startDate'
+    ) as HTMLInputElement;
+    const endDateInput: HTMLInputElement = document.getElementById(
+      'endDate'
+    ) as HTMLInputElement;
+
+    startDateInput.value = ""
+    endDateInput.value = ""
+
+    // Establecer los límites de las fechas
+    endDateInput.max = this.formatDateForInput(today);
+    startDateInput.max = endDateInput.value;
+    endDateInput.min = startDateInput.value;
   }
 
   setInitialDates(): void {
@@ -91,6 +133,7 @@ export class IepAttendancesComponent implements OnInit{
   loadAsistencias(): void {
     const asistSubscription = this.empleadoService.getAttendances().subscribe({
       next: (asistencias) => {
+        console.log('Asistencias cargadas:', asistencias);
         this.Asistencias = asistencias;
         this.filteredAsistencias = asistencias;
         this.filtrar();
@@ -103,11 +146,11 @@ export class IepAttendancesComponent implements OnInit{
   private initializeAsistenciasTable(): void {
 
     if (this.table) {
-      this.table.destroy();
-      $('#empleadosTable').empty();
+     this.table.destroy();
+     // $('#empleadosTable').empty();
     }
 
-    this.table = $('#empleadosTable').DataTable({
+    this.table = $('#empleadosTable').DataTable({ 
       pageLength: 5,
       lengthChange: true,
       searching: false,
@@ -170,7 +213,7 @@ export class IepAttendancesComponent implements OnInit{
   
             // Lógica para los estados AUSENTE y JUSTIFICADO
             let dropdown = '';   
-            if (row.state === "AUSENTE") {
+            if (row.state === "AUSENTE" && this.isValidDateToJustify(row.date)) {
               dropdown = `
                 <div class="text-center">
                   <div class="btn-group">
@@ -210,6 +253,7 @@ export class IepAttendancesComponent implements OnInit{
           },
         }
       ],
+      
     });
 
      $('#empleadosTable').off('click', '.btn-cambiar-estado').on('click', '.btn-cambiar-estado', (event: 
@@ -239,11 +283,30 @@ export class IepAttendancesComponent implements OnInit{
 
         button.prop('disabled', false);
      });
-
-    // $('#empleadosTable').on('click', '.btn-modal', (event: any) => {
-    // });
   }
-
+  
+  isValidDateToJustify(date:any):boolean{
+    const [day, month, year] = date.split('/').map((part: string) => parseInt(part, 10));
+  
+    // Crea la fecha usando el formato correcto
+    const inputDate = new Date(year, month - 1, day); // En JavaScript, los meses van de 0 a 11
+  
+    // Obtiene la fecha actual y la establece a la medianoche para comparar solo la fecha
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Calcula la diferencia en milisegundos entre la fecha actual y la fecha de entrada
+    const diffInMs = today.getTime() - inputDate.getTime();
+    
+    // Convierte la diferencia a días
+    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+    
+    // Devuelve true si la diferencia está dentro del rango permitido y la fecha no es futura
+    const isValid = diffInDays <= this.actualConfig.pillowJustify && diffInDays >= 0;
+  
+    console.log(`Fecha ingresada: ${date}, Días de diferencia: ${diffInDays},rango ${this.actualConfig.pillowJustify}, Válido: ${isValid}`);
+    return isValid;
+  }
   onStartDateChange(): void {
     const startDateInput: HTMLInputElement = document.getElementById('startDate') as HTMLInputElement;
     const endDateInput: HTMLInputElement = document.getElementById('endDate') as HTMLInputElement;
@@ -321,7 +384,7 @@ export class IepAttendancesComponent implements OnInit{
   
   limpiarFiltro() {
     this.estadosFiltrados = [];
-    this.setInitialDates();
+    this.reSetInitialDates();
     this.loadAsistencias();
   }
 
@@ -457,6 +520,6 @@ export class IepAttendancesComponent implements OnInit{
 
   // Volver al menu de empleados
   volverInventario(): void {
-    this.router.navigate(["home/employee-list"]);
+    this.router.navigate(["main/employees/employees"]);
   }
 }

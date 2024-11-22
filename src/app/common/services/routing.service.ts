@@ -16,21 +16,21 @@ export class RoutingService {
     {
       icon: 'bi-bell',
       name: 'Notificaciones',
-      roles: ['SuperAdmin', 'Gerente general'],
+      roles: ['SuperAdmin'],
       childButtons: [
         {
           icon: 'bi-mailbox',
           name: 'Enviar',
           title: 'Envío de notificaciones',
           route: 'main/notifications/admin-post-notification',
-          roles: ['SuperAdmin', 'Gerente general'],
+          roles: ['SuperAdmin'],
         },
         {
           icon: 'bi-clipboard',
-          name: 'Agregar',
+          name: 'Registro',
           title: 'Registro de notificaciones',
           route: 'main/notifications/admin-all-notifications',
-          roles: ['SuperAdmin', 'Gerente general'],
+          roles: ['SuperAdmin'],
         },
       ],
     },
@@ -42,7 +42,7 @@ export class RoutingService {
       name: 'Familia',
       title: 'Grupo familiar',
       route: 'main/users/family',
-      roles: ['Propietario', 'Inquilino'],
+      roles: ['Propietario', 'Inquilino', 'Familiar mayor'],
     },
     {
       //Btn con hijos
@@ -79,13 +79,7 @@ export class RoutingService {
       //Sanciones
       icon: 'bi-exclamation-triangle',
       name: 'Multas',
-      roles: [
-        'SuperAdmin',
-        'Gerente general',
-        'Gerente multas',
-        'Propietario',
-        'Inquilino',
-      ],
+      roles: ['SuperAdmin', 'Gerente multas', 'Propietario', 'Inquilino', 'Familiar mayor'],
       childButtons: [
         {
           //Denuncias
@@ -93,7 +87,7 @@ export class RoutingService {
           name: 'Denunciar',
           title: 'Registrar Denuncia',
           route: 'main/complaints/post-complaint',
-          roles: ['SuperAdmin', 'Propietario', 'Inquilino'],
+          roles: ['Propietario', 'Inquilino', 'Familiar mayor'],
         },
         {
           //botón listado denuncia
@@ -101,21 +95,7 @@ export class RoutingService {
           name: 'Denuncias',
           title: 'Listado de Denuncias',
           route: 'main/complaints/list-complaint',
-          roles: ['SuperAdmin', 'Gerente general', 'Gerente multas'],
-        },
-        {
-          //Listado multas y advertencias
-          icon: 'bi-receipt',
-          name: 'Multas/Advertencias',
-          title: 'Listado de Multas y Advertencias',
-          route: 'main/sanctions/sanctions-list',
-          roles: [
-            'SuperAdmin',
-            'Gerente general',
-            'Gerente multas',
-            'Propietario',
-            'Inquilino',
-          ],
+          roles: ['SuperAdmin', 'Gerente multas'],
         },
         {
           //Listado Informes
@@ -123,16 +103,16 @@ export class RoutingService {
           name: 'Informes',
           title: 'Listado de Informes',
           route: 'main/sanctions/report-list',
-          roles: ['SuperAdmin', 'Gerente general', 'Gerente multas'],
+          roles: ['SuperAdmin', 'Gerente multas'],
         },
-        // {
-        //   //Listado de motivos de infracciones
-        //   icon: "bi-slash-circle",
-        //   name: "Motivos",
-        //   title: "Listado de Motivos",
-        //   route: "main/sanctions/report-list",
-        //   roles: ["SuperAdmin", "Gerente general", "Gerente multas"]
-        // }
+        {
+          //Listado multas y advertencias
+          icon: 'bi-receipt',
+          name: 'Multas/Advertencias',
+          title: 'Listado de Multas y Advertencias',
+          route: 'main/sanctions/sanctions-list',
+          roles: ['SuperAdmin', 'Gerente multas', 'Propietario', 'Inquilino', 'Familiar mayor'],
+        }
       ],
     },
     ///////////////////////////////////////////////////////////////////////////////
@@ -140,17 +120,17 @@ export class RoutingService {
     {
       //botón Listar Gastos para el Propietario
       icon: 'bi-currency-dollar',
-      name: 'Mis Gastos',
+      name: 'Gastos',
       title: 'Mis Gastos',
       route: 'main/expenses/view-expense-owner',
-      roles: ['SuperAdmin', 'Propietario'], //Inquilino?
+      roles: ['Propietario'], //Inquilino?
     },
     {
       //Boton General para el Administrador (padre)
       icon: 'bi-person-gear',
       name: 'Gastos',
       title: 'Gestion de Gastos',
-      roles: ['SuperAdmin', 'Gerente general', 'Gerente finanzas'],
+      roles: ['SuperAdmin', 'Gerente finanzas'],
       childButtons: [
         {
           //botón Listar Gastos para el Administrador
@@ -158,7 +138,7 @@ export class RoutingService {
           name: 'Listado',
           title: 'Listado de Gastos',
           route: 'main/expenses/view-expense-admin',
-          roles: ['SuperAdmin', 'Gerente general', 'Gerente finanzas'],
+          roles: ['SuperAdmin', 'Gerente finanzas'],
         },
         {
           //botón Lista Categoria de Gastos
@@ -166,7 +146,7 @@ export class RoutingService {
           name: 'Categorias',
           title: 'Gestion Categoria gastos',
           route: 'main/expenses/view-category',
-          roles: ['SuperAdmin', 'Gerente general', 'Gerente finanzas'],
+          roles: ['SuperAdmin', 'Gerente finanzas'],
         },
         {
           //botón Registrar Gasto
@@ -174,7 +154,7 @@ export class RoutingService {
           name: 'Registrar',
           title: 'Registrar Gasto',
           route: 'main/expenses/register-expense',
-          roles: ['SuperAdmin', 'Gerente general', 'Gerente finanzas'],
+          roles: ['SuperAdmin', 'Gerente finanzas'],
         },
       ],
     },
@@ -183,37 +163,29 @@ export class RoutingService {
     {
       icon: 'bi-wallet',
       name: 'Boletas',
-      title: 'Mis Boletas (owner)',
+      title: 'Mis Boletas',
       route: 'main/invoices/expense-generation-user-view',
-      roles: ['SuperAdmin', 'Propietario', 'Inquilino'],
+      roles: ['Propietario', 'Inquilino'],
     },
     {
       icon: 'bi-person-lines-fill',
       name: 'Boletas',
-      title: 'Lista de Boletas (Gerente)',
+      title: 'Lista de Boletas',
       route: 'main/invoices/expense-generation-admin-view',
-      roles: ['SuperAdmin', 'Gerente general', 'Gerente finanzas'],
+      roles: ['SuperAdmin', 'Gerente finanzas'],
     },
-    // Esto no tendria que estar aca si se agrega el boton de dashboard
-    // {
-    //   icon: "bi-bar-chart-line",
-    //   name: "Informes",
-    //   title: "Informes Financieros",
-    //   route: "main/expense-generation-accountant-view",
-    //   roles: ["SuperAdmin", "Gerente general", "Contador"],
-    // },
     ///////////////////////////////////////////////////////////////////////////////
     //Botones de inventario
     {
       icon: 'bi-boxes',
       name: 'Inventario',
-      roles: ['SuperAdmin', 'Gerente general', 'Gerente inventario'],
+      roles: ['SuperAdmin', 'Gerente inventario'],
       childButtons: [
         {
           icon: 'bi-inboxes-fill',
           name: 'Productos',
           title: 'Listado de Productos',
-          roles: ['SuperAdmin', 'Gerente general', 'Gerente inventario'],
+          roles: ['SuperAdmin', 'Gerente inventario'],
           route: 'main/inventories/inventory',
         },
         {
@@ -221,29 +193,21 @@ export class RoutingService {
           name: 'Historial',
           title: 'Historial de Stock',
           route: 'main/inventories/stock-movements-history',
-          roles: ['SuperAdmin', 'Gerente general', 'Gerente inventario'],
-        },
-        {
-          icon: 'bi-arrow-left-right',
-          name: 'Movimientos',
-          title: 'Movimientos de Inventario',
-          route: 'main/inventories/warehouse-movements',
-          roles: ['SuperAdmin', 'Gerente general', 'Gerente inventario'],
+          roles: ['SuperAdmin', 'Gerente inventario'],
         },
         {
           icon: 'bi-truck',
           name: 'Proveedores',
           title: 'Listado de Proveedores',
           route: 'main/providers/suppliers',
-          roles: ['SuperAdmin', 'Gerente general', 'Gerente inventario'],
+          roles: ['SuperAdmin', 'Gerente inventario'],
         },
-        // Este boton no tiene ruta, el componente no existe actualmente
         {
           icon: 'bi-tags-fill',
           name: 'Categorias',
           title: 'Cateogorías de Productos',
           route: 'main/inventories/categories-list',
-          roles: ['SuperAdmin', 'Gerente general', 'Gerente inventario'],
+          roles: ['SuperAdmin', 'Gerente inventario'],
         },
       ],
     },
@@ -251,28 +215,21 @@ export class RoutingService {
       icon: 'bi-person-vcard',
       name: 'Empleados',
       title: 'Lista de Empleados',
-      roles: ['SuperAdmin', 'Gerente general', 'Gerente empleados'],
+      roles: ['SuperAdmin', 'Gerente empleados'],
       childButtons: [
         {
           icon: 'bi-person-lines-fill',
           name: 'Listado',
           title: 'Listado de Empleados',
           route: 'main/employees/employees',
-          roles: ['SuperAdmin', 'Gerente general', 'Gerente empleados'],
-        },
-        {
-          icon: 'bi-card-checklist',
-          name: 'Desempeño',
-          title: 'Historial de Desempeño',
-          route: 'main/employees/performance',
-          roles: ['SuperAdmin', 'Gerente general', 'Gerente empleados'],
+          roles: ['SuperAdmin', 'Gerente empleados'],
         },
         {
           icon: 'bi-person-badge-fill',
           name: 'Cargos',
           title: 'Cargos de Empleados',
           route: 'main/employees/charges',
-          roles: ['SuperAdmin', 'Gerente general', 'Gerente empleados'],
+          roles: ['SuperAdmin', 'Gerente empleados'],
         },
       ],
     },
@@ -281,36 +238,37 @@ export class RoutingService {
     {
       icon: 'bi-shield-fill-exclamation',
       name: 'Accesos',
-      roles: [
-        'SuperAdmin',
-        'Gerente general',
-        'Seguridad',
-        'Propietario',
-        'Inquilino',
-      ],
+      roles: ['SuperAdmin', 'Seguridad'],
       childButtons: [
         {
           icon: 'bi bi-person-lines-fill',
           name: 'Informe',
           title: 'Informe de Ingresos/Egresos',
           route: 'main/entries/reports',
-          roles: ['SuperAdmin', 'Gerente general', 'Seguridad'],
+          roles: ['SuperAdmin', 'Seguridad'],
         },
         {
           icon: 'bi bi-door-open-fill',
           name: 'Registro',
           title: 'Añadir Visitante',
           route: 'main/entries/visitor',
-          roles: ['SuperAdmin', 'Gerente general', 'Propietario', 'Inquilino'],
+          roles: ['SuperAdmin'],
         },
         {
           icon: 'bi bi-car-front-fill',
           name: 'Vehiculos',
           title: 'Registro de Vehículos',
           route: 'main/entries/vehicles',
-          roles: ['SuperAdmin', 'Gerente general', 'Seguridad'],
+          roles: ['SuperAdmin', 'Seguridad'],
         },
       ],
+    },
+    {
+      icon: 'bi bi-door-open-fill',
+      name: 'Registro',
+      title: 'Añadir Visitante',
+      route: 'main/entries/visitor',
+      roles: ['Propietario', 'Inquilino', 'Familiar mayor'],
     },
   ];
 

@@ -7,8 +7,10 @@ import { ChargeService } from '../../services/charge.service';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
+import $ from 'jquery';
 import Swal from 'sweetalert2';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { UsersMockIdService } from '../../../common-services/users-mock-id.service';
 declare var bootstrap: any; // Añadir esta declaración al principio
 
 @Component({
@@ -53,10 +55,12 @@ export class IepChargesComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(
     private fb: FormBuilder,
     private cargoService: ChargeService,
+    private mockid:UsersMockIdService
   ) {
     this.cargoForm = this.fb.group({
       charge: ['', Validators.required],
-      description: ['', Validators.required]
+      description: ['', Validators.required],
+      
     });
   }
 
@@ -377,6 +381,10 @@ closeInfoModal(): void{
           className: 'text-center',
           orderable: false,
           render: (data: any) => {
+            let deleteButtonClass = '';
+            if (!data.active) {
+              deleteButtonClass = 'disabled'; // Agregar clase "disabled" al botón de eliminar
+            }
             return `
                 <div class="dropdown d-flex justify-content-center">
               <div class="dropdown">
@@ -386,8 +394,7 @@ closeInfoModal(): void{
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                   <li><a class="dropdown-item edit-btn" href="#" data-bs-target="#editChargeModal" data-bs-toggle="modal" data-id="${data.id}">Editar</a></li>
-                  <li class="dropdown-divider"></li>
-                  <li><a class="dropdown-item delete-btn" href="#" data-id="${data.id}">Eliminar</a></li>
+                  <li><a class="dropdown-item delete-btn ${deleteButtonClass}" href="#" data-id="${data.id}">Eliminar</a></li>
                 </ul>
               </div>
               </div>`;
@@ -593,6 +600,4 @@ onSubmitEdit(): void {
       });
     }
   }
-
-
 }

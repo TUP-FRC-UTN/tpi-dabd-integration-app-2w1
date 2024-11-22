@@ -1,17 +1,11 @@
-
 import { CommonModule } from '@angular/common';
 import { Component, AfterViewInit, AfterViewChecked, ElementRef, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-
-import { GetWarehouseMovementRequest } from '../../models/GetWarehouseMovementRequest';
-import { WarehouseMovement } from '../../models/getWarehouseMovementResponse';
 import { ProductService } from '../../services/product.service';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { DtoProducto } from '../../models/dto-producto';
-import { WarehouseTypePipe } from '../../pipes/warehouse-type.pipe';
-import { fromEvent, distinctUntilChanged, debounceTime } from 'rxjs';
 import { WarehouseMovementService } from '../../services/warehouse-movement.service';
 import { WarehouseMovementByProduct } from '../../models/WarehouseMovementByProduct';
 import { NgSelectModule } from '@ng-select/ng-select';
@@ -26,7 +20,7 @@ type FilterColumn = 'general' | 'applicant' | 'detailProducts' | 'movement_type'
   styleUrls: ['./iep-warehouse-movement-search.component.css']
 })
 export class IepWarehouseMovementSearchComponent implements AfterViewInit, AfterViewChecked {
-  
+  fechaMaxima: string;
   movements: WarehouseMovementByProduct[] = [];
   filteredMovements: WarehouseMovementByProduct[] = [];
   products: DtoProducto[] = [];
@@ -129,6 +123,7 @@ onEndDateChange(value: string): void {
   ngOnInit() {
     // Cargar los datos con los filtros ya configurados
     this.warehouseMovementService.getWarehouseMovements().subscribe((movements) => {
+      console.log(movements);
       this.movements = movements;
       this.filteredMovements = this.movements;
       this.initializeDataTable()
@@ -146,7 +141,10 @@ onEndDateChange(value: string): void {
   constructor(
     private warehouseMovementService: WarehouseMovementService,
     private productService: ProductService
-  ) { }
+  ) { 
+    const hoy = new Date();
+    this.fechaMaxima = hoy.toISOString().split('T')[0];
+  }
   ngAfterViewInit() {
     
   }

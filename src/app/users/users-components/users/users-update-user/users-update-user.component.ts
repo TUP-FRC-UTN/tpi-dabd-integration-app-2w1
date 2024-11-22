@@ -346,7 +346,7 @@ export class UsersUpdateUserComponent implements OnInit, OnDestroy {
       this.routingService.redirect('main/users/family', 'Mi familia');
     } else {
 
-      this.routingService.redirect('main/users/list', 'Listado de usuarios');
+      this.routingService.redirect('main/users/list', 'Listado de Usuarios');
     }
   }
 

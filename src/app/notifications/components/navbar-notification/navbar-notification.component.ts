@@ -19,6 +19,7 @@ import { Inventory } from '../../models/inventory';
 import { Payments } from '../../models/payments';
 import { Notifications } from '../../models/notifications';
 import { Subscription } from 'rxjs';
+import { AuthService } from '../../../users/users-servicies/auth.service';
 
 type Notification = Access | Fine | General | Payments | Inventory;
 declare var bootstrap: any;
@@ -35,7 +36,7 @@ export class NavbarNotificationComponent implements OnInit, OnDestroy {
 
   showNotificationsDropdown = false;
   notifications: Notification[] = [];
-  userId: number = 1;
+  userId: number = 0;
   selectedNotification: Notification | null = null;
   subscription = new Subscription();
 
@@ -46,7 +47,8 @@ export class NavbarNotificationComponent implements OnInit, OnDestroy {
     private notificationService: NotificationService,
     private router: Router,
     private elementRef: ElementRef,
-    private renderer: Renderer2
+    private renderer: Renderer2,
+    private authservice: AuthService
   ) {
     this.clickListener = this.renderer.listen('document', 'click', (event) => {
       if (
@@ -57,8 +59,26 @@ export class NavbarNotificationComponent implements OnInit, OnDestroy {
       }
     });
   }
+  lstNotification: Notifications = {
+    fines: [],
+    access: [],
+    payments: [],
+    generals: [],
+    inventories: [],
+  };
+  counterNotificationsNoRead = 0;
+  NotificationsNoRead() {
+    this.counterNotificationsNoRead = 0;
+    this.notifications.forEach((a) => {
+      if (a.markedRead === false) {
+        this.counterNotificationsNoRead += 1;
+      }
+    });
+    console.log(this.counterNotificationsNoRead);
+  }
 
   ngOnInit(): void {
+    this.userId = this.authservice.getUser().id;
     this.fetchNotifications();
     this.initializeModal();
   }
@@ -123,6 +143,7 @@ export class NavbarNotificationComponent implements OnInit, OnDestroy {
               new Date(b.created_datetime).getTime() -
               new Date(a.created_datetime).getTime()
           );
+          this.NotificationsNoRead();
         },
         error: (error) => console.log(error),
       });

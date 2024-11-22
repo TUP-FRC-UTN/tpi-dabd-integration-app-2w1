@@ -27,6 +27,7 @@ import { ExpenseProvidersNgSelectComponent } from "../expense-providers-ng-selec
 import { ExpensesTypeExpenseNgSelectComponent } from "../expenses-type-expense-ng-select/expenses-type-expense-ng-select.component";
 import { ExpensesOwnersNgSelectComponent } from "../expenses-owners-ng-select/expenses-owners-ng-select.component";
 import { FileService } from '../../services/expenseFileService/file.service';
+import { PenaltiesComplaintDashboardComponent } from '../../../penalties/components/complaintComponents/penalties-complaint-dashboard/penalties-complaint-dashboard.component';
 
 @Component({
   selector: 'app-expenses-register-expense',
@@ -123,6 +124,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   }
 
   isFieldValid(fieldName: string, control: any): boolean {
+
     return !control.errors && control.touched;
   }
 
@@ -140,7 +142,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
 
   
   redirectToViewAdmin() {
-    this.router.navigate(["/viewExpenseAdmin"])
+    this.router.navigate(["/main/expenses/view-expense-admin"])
     }
     loadFile(fileId: string): void {
       this.fileService.getFile(fileId).subscribe({
@@ -206,7 +208,6 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       
       // Determinar el número de cuotas basado en installmentList
       const installments = data.installmentList?.length || 1;
-      debugger
       // Mapear al modelo Expense con validaciones para cada campo
       this.expense = {
         id: data.id ?? 0,
@@ -326,92 +327,6 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       }
     }
   }
-  //Metodo para permitir solo numeros y la letra F en invoiceNumber
-  onInvoiceNumberInput(event: KeyboardEvent): void {
-    const input = event.target as HTMLInputElement;
-    const key = event.key.toLowerCase();
-    const cursorPosition = input.selectionStart || 0;
-    const currentValue = this.expense.invoiceNumber || '';
-
-    // Permitir teclas de control siempre
-    if (['backspace', 'delete', 'arrowleft', 'arrowright', 'tab'].includes(key.toLowerCase())) {
-      return;
-    }
-
-    // Prevenir cualquier entrada que no sea número o 'f'
-    if (!/^\d|f$/.test(key)) {
-      event.preventDefault();
-      return;
-    }
-
-    // Manejo especial para la letra 'f'
-    if (key === 'f') {
-      // Solo permitir 'f' si:
-      // 1. El campo está vacío y el cursor está al inicio, o
-      // 2. Estamos reemplazando todo el contenido (selección completa)
-      const isFullSelection = input.selectionStart === 0 && input.selectionEnd === currentValue.length;
-      
-      if (!isFullSelection && (cursorPosition !== 0 || currentValue.includes('F'))) {
-        event.preventDefault();
-        return;
-      }
-
-      // Convertir a mayúscula
-      event.preventDefault();
-      const start = input.selectionStart || 0;
-      const end = input.selectionEnd || 0;
-      
-      this.expense.invoiceNumber = 
-        'F' + 
-        currentValue.substring(end).replace(/^F/, '');
-      
-      // Mantener el cursor en la posición correcta
-      setTimeout(() => {
-        input.setSelectionRange(1, 1);
-      }, 0);
-      return;
-    }
-
-    // Para números
-    if (/^\d$/.test(key)) {
-      // Si hay una 'F' al inicio y estamos en posición 0, mover el cursor después de la F
-      if (currentValue.startsWith('F') && cursorPosition === 0) {
-        event.preventDefault();
-        setTimeout(() => {
-          const newValue = currentValue + key;
-          this.expense.invoiceNumber = newValue;
-          input.setSelectionRange(newValue.length, newValue.length);
-        }, 0);
-      }
-    }
-  }
-
-  // Método para manejar el pegado de texto en invoiceNumber
-  onInvoiceNumberPaste(event: ClipboardEvent): void {
-    event.preventDefault();
-    const pastedText = event.clipboardData?.getData('text') || '';
-    const input = event.target as HTMLInputElement;
-    const currentValue = this.expense.invoiceNumber || '';
-    
-    // Limpiar el texto pegado (solo números y posiblemente una F al inicio)
-    let cleanedText = pastedText.replace(/[^0-9f]/gi, '');
-    
-    // Manejar la F inicial si existe
-    if (cleanedText.toLowerCase().includes('f')) {
-      cleanedText = cleanedText.replace(/f/gi, '');
-      if (input.selectionStart === 0 && !currentValue.includes('F')) {
-        cleanedText = 'F' + cleanedText;
-      }
-    }
-    
-    // Si ya hay una F al inicio, preservarla
-    if (currentValue.startsWith('F') && input.selectionStart! > 0) {
-      this.expense.invoiceNumber = 
-        'F' + cleanedText;
-    } else {
-      this.expense.invoiceNumber = cleanedText;
-    }
-  }
 
   loadDate() {
     const today = new Date();
@@ -455,10 +370,89 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     return owner ? `${owner.name} ${owner.lastname}` : '';
   }
 
+  onKeyPress(event: KeyboardEvent): void {
+    const input = event.target as HTMLInputElement;
+    if (!(input instanceof HTMLInputElement)) {
+      return;
+    }
+    const currentValue = input.value;
+    const newChar = event.key;
+    const cursorPosition = input.selectionStart;
+  
+    // Permitir números y el punto decimal
+    if (!/^\d$/.test(newChar) && newChar !== '.') {
+      event.preventDefault();
+      return;
+    }
+  
+    // Evitar múltiple punto decimal
+    if (newChar === '.' && currentValue.includes('.')) {
+      event.preventDefault();
+      return;
+    }
+  
+    // Validar formato de decimales
+    const newValue = this.getNewValue(currentValue, newChar, cursorPosition);
+    if (!/^\d*\.?\d{0,2}$/.test(newValue)) {
+      event.preventDefault();
+      return;
+    }
+  
+    // Validar rango permitido
+    if (parseFloat(newValue) > 100) {
+      event.preventDefault();
+      return;
+    }
+  }
+  
+
+  onPaste(event: ClipboardEvent): void {
+    const input = event.target as HTMLInputElement;
+    if (!(input instanceof HTMLInputElement)) {
+      return;
+    }
+  
+    event.preventDefault();
+    
+    const pastedData = event.clipboardData?.getData('text');
+    if (!pastedData) {
+      return;
+    }
+  
+    let cleanValue = pastedData.replace(/[^0-9.]/g, ''); // Permitir solo números y punto
+    if (!/^\d*\.?\d{0,2}$/.test(cleanValue)) { // Limitar a 2 decimales
+      cleanValue = '0';
+    }
+  
+    const value = parseFloat(cleanValue);
+    const finalValue = !isNaN(value) ? Math.min(100, Math.max(0, value)) : 0;
+    input.value = finalValue.toFixed(2);
+  
+    const index = parseInt(input.getAttribute('data-index') || '0', 10);
+    this.onProportionChange(finalValue, index);
+  }
+
+  private getNewValue(currentValue: string, newChar: string, cursorPosition: number | null): string {
+    if (cursorPosition === null) return currentValue + newChar;
+    
+    return currentValue.slice(0, cursorPosition) + newChar + currentValue.slice(cursorPosition);
+  }
   onProportionChange(value: number, index: number): void {
-    // Mantener el valor actualizado al escribir, pero limitarlo en el evento `blur`
-    this.distributions[index].proportion = value;
-    this.validateTotalProportion();
+    if (value > 100) {
+      this.distributions[index].proportion = 100;
+    } else {
+      this.distributions[index].proportion = parseFloat(value.toFixed(2));
+    }
+    this.expense.distributions = [...this.distributions];
+    const isValid = this.validateTotalProportion();
+  
+    const totalPercentage = this.expense.distributions.reduce(
+      (sum, dist) => sum + (Number(dist.proportion) || 0),
+      0
+    );
+    if (totalPercentage >= 100) {
+      console.log("Porcentaje mayor o igual a 100");
+    }
   }
 
   onBlur(event: any, index: number): void {
@@ -467,32 +461,41 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       this.distributions[index].proportion = 100;
     } else if (value < 1) {
       this.distributions[index].proportion = 1;
+    } else {
+      this.distributions[index].proportion = parseFloat(value.toFixed(2));
     }
     this.validateTotalProportion();
   }
-
   validateTotalProportion(): boolean {
     const total = this.expense.distributions.reduce(
       (sum, distribution) => sum + distribution.proportion,
       0
     );
+  
     return total === 100;
+  }
+  validateNoZeroProportion(): boolean {
+    return this.expense.distributions.every(
+      distribution => distribution.proportion > 0
+    );
   }
 
   public deleteDistribution(index: number): void {
     this.expense.distributions.splice(index, 1);
   }
 
-  prepareDistributions(): void {
-    this.expense.distributions.forEach((distribution) => {
-      distribution.proportion = distribution.proportion / 100;
-    });
-  }
-  repairDistributions(): void {
-    this.expense.distributions.forEach((distribution) => {
-      distribution.proportion = distribution.proportion * 100;
-    });
-  }
+  // prepareDistributions(): void {
+  //   this.expense.distributions.forEach(d => {
+  //     console.log(this.expense.distributions)
+  //     d.proportion=d.proportion/100
+      
+  //   });
+  // }
+  // repairDistributions(): void {
+  //   this.expense.distributions.forEach((distribution) => {
+  //     distribution.proportion = distribution.proportion * 100;
+  //   });
+  // }
   clearForm(): void {
     if (this.fileInput) {
       this.fileInput.nativeElement.value = '';
@@ -556,21 +559,21 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   }
   isLoading = false;
   save(): void {
-    
     if (!this.validateForm()) {
-      return; // Evita múltiples envíos
+      return; 
     }
+    console.log(this.expense)
     if (this.expense.typeExpense === 'INDIVIDUAL') {
       if (!this.validateTotalProportion()) {
         return;
       }
-      this.prepareDistributions();
+      //this.prepareDistributions();
+      console.log(this.expense)
     } else {
       // Si el tipo de gasto es COMUN o EXTRAORDINARIO, vaciamos las distribuciones
       this.expense.distributions = [];
     }
     this.isLoading = true;
-    debugger
     // Llamamos al servicio para registrar el gasto
     const serviceCall = this.isEditMode
     // Llamar al servicio de actualización si es true
@@ -580,7 +583,6 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
 
     serviceCall.subscribe({
       next: (response) => {
-        debugger
         if (response && response.status === 200) {
           // Mensaje de éxito estándar
           Swal.fire({

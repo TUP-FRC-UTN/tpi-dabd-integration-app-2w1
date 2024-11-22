@@ -20,13 +20,9 @@
                     <app-expenses-type-expense-ng-select 
                       [(selectedType)]="expense.typeExpense" 
                       [multiple]="false" 
-                      [noteCredit]="false">
+                      [noteCredit]="false" [showValidBorder]="true">
                     </app-expenses-type-expense-ng-select>
-                    @if(formSubmitted && !expense.typeExpense) {
-                      <div class="invalid-feedback d-block">
-                        El tipo es requerido
-                      </div>
-                    }
+                  
                     
                   </div>
                 </div>
@@ -74,7 +70,9 @@
                     <app-expense-providers-ng-select 
                       [(selectedProvider)]="expense.providerId" 
                       [emptyValue]="true" 
-                      [multiple]="false">
+                      [multiple]="false"
+                      [showValidBorder]="true"
+                      >
                     </app-expense-providers-ng-select>
                   </div>
                 </div>
@@ -87,13 +85,10 @@
                   <div class="position-relative flex-grow-1">
                     <app-expense-categories-ng-select 
                       [(selectedCategory)]="expense.categoryId" 
-                      [multiple]="false">
+                      [multiple]="false"
+                      [showValidBorder]="true"
+                      >
                     </app-expense-categories-ng-select>
-                    @if(formSubmitted && !isCategoryValid()) {
-                      <div class="invalid-feedback d-block">
-                        La categoría es requerida
-                      </div>
-                    }
                   </div>
                 </div>
               </div>
@@ -333,16 +328,18 @@
                         </td>
                         <td>
                           <input
-                            type="number"
-                            [(ngModel)]="distribution.proportion"
-                            min="1"
-                            max="100"
-                            style="text-align: end"
-                            class="form-control"
-                            name="proportion{{ i }}"
-                            #distributionInput="ngModel"
-                            (ngModelChange)="onProportionChange($event, i)"
-                            (blur)="onBlur($event, i)"
+                          type="number"
+                          step="0.01"
+                          [(ngModel)]="distribution.proportion"
+                          min="1"
+                          max="100"
+                          style="text-align: end"
+                          class="form-control"
+                          name="proportion{{ i }}"
+                          (ngModelChange)="onProportionChange($event, i)"
+                          (keypress)="onKeyPress($event)"
+                          (paste)="onPaste($event)"
+                          (blur)="onBlur($event, i)"
                           />
                         </td>
                         <td>
@@ -365,7 +362,12 @@
                       </tr>
                     </tbody>
                   </table>
-                  @if(!validateTotalProportion() && distributions.length > 0) {
+                  @if(!validateNoZeroProportion()) {
+                    <span class="text-danger"
+                      >La proporcion no debe ser igual a 0</span
+                    >
+                    }
+                  @else if(!validateTotalProportion()) {
                   <span class="text-danger"
                     >La suma de las proporciones debe ser igual a 100</span
                   >
@@ -466,7 +468,7 @@
         </p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
       </div>
     </div>
   </div>

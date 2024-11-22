@@ -10,7 +10,7 @@ import { HttpClient } from '@angular/common/http';
 import { NotificationGeneralDTO } from '../../models/DTOs/NotificationGeneralDTO';
 import { UserDTO } from '../../models/DTOs/UserDTO';
 import Swal from 'sweetalert2';
-import { ReactiveFormsModule, FormsModule, NgForm } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule, NgForm, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { environment } from '../../../common/environments/environment';
 
@@ -38,20 +38,37 @@ export class PostNotificationAdminComponent implements AfterViewInit, OnInit{
   constructor(private notificationService: NotificationService) {}
 
   selectValue : string = "1";
+  usersRbtValue : string = "allUsers"
+  formSubmitted = false;
+  awaitingResponse : boolean = false;
   users : UserApiDTO[] = []
   subscription = new Subscription()
   ngOnDestroy(): void {
     this.subscription.unsubscribe()
   }
-  
+  form : FormGroup = new FormGroup({
+    subject : new FormControl("",Validators.required),
+    description : new FormControl("", Validators.required),
+    usersRbt : new FormControl("allUsers"),
+    selectValue : new FormControl("1")
+  })
+
   ngOnInit(): void {
     
       const users = this.httpClient.get<UserApiDTO[]>
-      (environment.services.notifications + "/general/getUsers")
+      (environment.services.notifications + "/general/getUsers") 
       .subscribe(response =>
         {this.users = response;
           this.fillTable();
           console.log(this.users);
+      })
+
+      this.form.get("usersRbt")?.valueChanges.subscribe({
+        next: (value) => {this.usersRbtValue = value}
+      })
+
+      this.form.get("selectValue")?.valueChanges.subscribe({
+        next : (value) => {this.selectValue = value}
       })
   }
 
@@ -59,10 +76,10 @@ export class PostNotificationAdminComponent implements AfterViewInit, OnInit{
     let table = $("#myTable").DataTable();
     for (let user of this.users) {
 
-      table.row.add([user.name,user.lastname,user.dni,user.email, '<input type="checkbox" class="userCheckbox" />']).draw(false);
+      table.row.add([user.name,user.lastname,user.dni,user.email, '<input type="checkbox" class="userCheckbox form-check-input border border-secondary" />']).draw(false);
     }
   }
-  radioButtonValue : string = "allUsers";
+  
   
 
   ngAfterViewInit(): void {
@@ -126,30 +143,36 @@ export class PostNotificationAdminComponent implements AfterViewInit, OnInit{
 
   selectedUser: string = ''; 
 
-  onSubmit(form: NgForm) {
-    console.log('click: ', form.value);
-
+  onSubmit() {
+    this.formSubmitted=true
+    if (this.form.invalid) {
+      return;
+    }
+    console.log('click: ', this.form.value);
     
 
-    if (form.valid && this.selectValue != "1") {
+    if (this.form.valid && this.selectValue != "1") {
 
-      if (this.radioButtonValue == "allUsers") {
+      if (this.usersRbtValue == "allUsers") {
         this.newNotification.users = this.mapUserApiDTOToUserDTO(this.users);
         
       }
-      else if (this.radioButtonValue == "onlyTo"){
+      else if (this.usersRbtValue == "onlyTo"){
         this.newNotification.users = this.getSelectedUsers()
       }
-      else if (this.radioButtonValue == "exclude") {
+      else if (this.usersRbtValue == "exclude") {
         this.newNotification.users = this.getFilteredUsers();
       }
 
+      this.newNotification.subject = this.form.get("subject")?.value
+      this.newNotification.description = this.form.get("description")?.value
       this.newNotification.channel = this.selectValue;
       
+      this.awaitingResponse = true;
       const postNotification =this.notificationService.postNotification(this.newNotification).subscribe({
+
         next: (response: any) => {
           console.log('Notificacion enviada: ', response);
-          console.log(this.newNotification.users[0].telegramChatId);
           Swal.fire({
             title: '¡Notificación enviada!',
             text: 'La notificacion ha sido enviada correctamente.',
@@ -157,10 +180,18 @@ export class PostNotificationAdminComponent implements AfterViewInit, OnInit{
             showConfirmButton: true,
             confirmButtonText: 'Aceptar'
           });
+          this.awaitingResponse = false;
           
         },
         error: (error) => {
-          console.error('Error al enviar la notificacion: ', error);
+          Swal.fire({
+            title: 'Error',
+            text: 'Ocurrió un error al enviar las notificaciones',
+            icon: 'error',
+            showConfirmButton: true,
+            confirmButtonText: 'Aceptar'
+          });
+          this.awaitingResponse = false
         }
       });
       this.subscription.add(postNotification)
@@ -198,7 +229,6 @@ export class PostNotificationAdminComponent implements AfterViewInit, OnInit{
           email: component.users.find(user => user.dni == rowData[2])?.email || "test@test.com",
           telegramChatId: component.users.find(user => user.dni == rowData[2])?.telegram_id || 801000,
         };
-        console.log("mira bro" +user.telegramChatId + " " + user.dni + " " + user.id);
         users.push(user);
       }
     }); 
@@ -216,7 +246,7 @@ export class PostNotificationAdminComponent implements AfterViewInit, OnInit{
         apellido: user.lastname,
         dni: 999999,
         email: user.email,
-        telegramChatId : 0
+        telegramChatId : user.telegram_id
       }
       userDTOArray.push(userDTO);
     }
@@ -226,9 +256,11 @@ export class PostNotificationAdminComponent implements AfterViewInit, OnInit{
   getFilteredUsers() : UserDTO[] {
     let selectedUsers = this.getSelectedUsers();
 
-    const filteredUsers = this.users.filter(
-      user => !selectedUsers.some(selectedUser => selectedUser.id === user.id)
+    let filteredUsers : any[] = []
+    filteredUsers = this.users.filter(
+      (user) => !selectedUsers.some((selected) => selected.id === user.id)
     );
+    
     
     let filteredUserDTOArray = this.mapUserApiDTOToUserDTO(filteredUsers);
     

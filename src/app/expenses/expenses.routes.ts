@@ -5,14 +5,39 @@ import { ReportExpenseComponent } from "./components/expenses-report/expenses-re
 import { ViewGastosAdminComponent } from "./components/expenses-view-expense-admin/expenses-view-expense-admin.component";
 import { ViewOwnerExpenseComponent } from "./components/expenses-view-expense-owner/expenses-view-expense-owner.component";
 import { ExpensesViewCategoryComponent } from "./components/expenses-view-category/expenses-view-category.component";
+import { authGuard } from "../users/guards/auth.guard";
+import { roleGuard } from "../notifications/guard";
 
 export const EXPENSES_ROUTES: Routes = [
-    { path: '', component: ExpensesHomeComponent },
-    { path: 'view-expense-admin', component: ViewGastosAdminComponent },
-    { path: 'register-expense/:id', component: ExpensesRegisterExpenseComponent },
-    { path: 'register-expense', component: ExpensesRegisterExpenseComponent },
-    { path: 'view-category', component: ExpensesViewCategoryComponent },
-    { path: 'view-expense-owner', component: ViewOwnerExpenseComponent },
-    { path: 'dashboard', component: ReportExpenseComponent },
- 
+    {
+        path: '',
+        canActivateChild: [authGuard, roleGuard],
+        data: { roles: ['SuperAdmin', 'Gerente finanzas', 'Propietario'] },
+        children: [
+            {
+                path: 'view-expense-admin', component: ViewGastosAdminComponent,
+                data: { roles: ['SuperAdmin', 'Gerente finanzas'] }
+            },
+            {
+                path: 'register-expense/:id', component: ExpensesRegisterExpenseComponent,
+                data: { roles: ['SuperAdmin', 'Gerente finanzas'] }
+            },
+            {
+                path: 'register-expense', component: ExpensesRegisterExpenseComponent,
+                data: { roles: ['SuperAdmin', 'Gerente finanzas'] }
+            },
+            {
+                path: 'view-category', component: ExpensesViewCategoryComponent,
+                data: { roles: ['SuperAdmin', 'Gerente finanzas'] }
+            },
+            {
+                path: 'view-expense-owner', component: ViewOwnerExpenseComponent,
+                data: { roles: ['Propietario'] }
+            },
+            {
+                path: 'dashboard', component: ReportExpenseComponent,
+                data: { roles: ['SuperAdmin', 'Gerente finanzas'] }
+            },
+        ]
+    }
 ];

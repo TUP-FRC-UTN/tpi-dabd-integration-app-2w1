@@ -96,7 +96,7 @@
           <div *ngFor="let item of expensesToPay" class="d-flex justify-content-center">
             <div class="card text-center border-0 mb-3" style="width: 18rem;">
               <div class="card-body">
-                <h5 class="card-title">{{ item.period | date:"MM/yyyy" }}</h5>
+                <h5 class="card-title">{{ item.period}}</h5>
                 <p class="card-text">{{ item.actual_amount | currency }}</p>
               </div>
             </div>

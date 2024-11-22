@@ -1,10 +1,10 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { Subscription } from 'rxjs';
+import { map, Subscription, switchMap } from 'rxjs';
 import { FormsModule, NgSelectOption } from '@angular/forms';
-
+import $, { param } from 'jquery';
 import { EmpListadoEmpleados } from '../../Models/emp-listado-empleados';
 import { EmpListadoAsistencias } from '../../Models/emp-listado-asistencias';
 import { EmployeePerformance } from '../../Models/listado-desempeño';
@@ -16,8 +16,6 @@ import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
 import { NgSelectModule } from '@ng-select/ng-select';
 
-declare var $: any;
-declare var DataTable: any;
 
 // Interfaz para los filtros
 interface EmployeeFilters {
@@ -31,7 +29,7 @@ interface EmployeeFilters {
 @Component({
   selector: 'app-iep-list-employees',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgSelectModule],
+  imports: [CommonModule, FormsModule, NgSelectModule, RouterLink],
   templateUrl: './iep-list-employees.component.html',
   styleUrls: ['./iep-list-employees.component.css'],
 })
@@ -227,7 +225,7 @@ this.table.rows.add(filteredData).draw();
   ngOnInit(): void {
     this.loadEmpleados();
     this.initializeDates();
-    this.bindEditButtons();
+    //this.bindEditButtons();
   }
 
   getFormattedDate(): string {
@@ -239,7 +237,7 @@ this.table.rows.add(filteredData).draw();
   }
 
   goTo(path: string) {
-    this.router.navigate([path]);
+    this.router.navigate(['/main/employees/' + path]);
   }
   exportToPdf(): void {
     const doc = new jsPDF();
@@ -425,12 +423,21 @@ this.table.rows.add(filteredData).draw();
     const empSubscription = this.empleadoService.getEmployees().subscribe({
       next: (empleados) => {
         this.Empleados = empleados;
-        console.log('Empleados:', this.Empleados);
-        this.ventana = 'Informacion';
-        // Obtener posiciones únicas
-        this.uniquePositions = [
-          ...new Set(empleados.map((emp) => emp.position)),
-        ].sort();
+        console.log('Empleados con detalles completos:', empleados.map(emp => ({
+          id: emp.id,
+          fullName: emp.fullName,
+          active: emp.active,
+          license: emp.license
+        })));
+        
+        const estadosMapeados = empleados.map((emp) => 
+          emp.active ? (emp.license ? 'Licencia' : 'Activo') : 'Inactivo'
+        );
+        
+        console.log('Mapeo de estados:', estadosMapeados);
+        
+        this.uniqueStates = [...new Set(estadosMapeados)].sort();
+
         //cargar estados unicos, en caso de que sea activo, validar si esta en licencia
         this.uniqueStates = [
           ...new Set(
@@ -449,6 +456,7 @@ this.table.rows.add(filteredData).draw();
         // Actualizar el combobox y restaurar el filtro
         setTimeout(() => {
           this.updatePositionFilter();
+          this.updateStateFilter();
           if (currentFilter) {
             this.positionFilter = currentFilter;
             this.applyFilters();
@@ -512,17 +520,19 @@ this.table.rows.add(filteredData).draw();
       order: [[0, 'asc']], // Ordenar por fecha de forma descendente
       columns: [
         {
-          data: 'active',
+          data: null,
           title: 'Estado',
           className: 'align-middle text-center',
-          render: (data: boolean, type: any, row: any) => {
-            // Si el empleado está activo, valida la clave 'license' y si es true, retorna "Licencia"
-            if (data) {
-              return row.license
-                ? '<span class="badge border rounded-pill text-bg-yellow">Licencia</span>'
-                : '<span class="badge border rounded-pill text-bg-green">Activo</span>';
+          render: (data: any, type: any, row: any) => {
+            console.log('Row:', row);
+            if (row.active === false) {  
+              return '<span class="badge border rounded-pill" style="background-color: #dc3545; color: white;">Inactivo</span>';
             }
-            return '<span class="badge border rounded-pill text-bg-red">Inactivo</span>';
+            if (row.active === true && row.license === true) {
+              
+              return '<span class="badge border rounded-pill" style="background-color: #ffc107; color: black;">Licencia</span>';
+            }
+            return '<span class="badge border rounded-pill" style="background-color: #198754; color: white;">Activo</span>';
           },
         },
         {
@@ -561,7 +571,7 @@ this.table.rows.add(filteredData).draw();
         {
           data: 'salary',
           title: 'Salario',
-          className: 'align-middle',
+          className: 'align-left',
           render: (data: number | bigint) => {
             let formattedAmount = new Intl.NumberFormat('es-AR', {
               minimumFractionDigits: 2,
@@ -593,12 +603,16 @@ this.table.rows.add(filteredData).draw();
                   <li><button class="dropdown-item consultar-desempeño" data-empleado-id="${
                     data.id
                   }">Ver desempeño</button></li>
-                  
+
+                  <li><a class="dropdown-item modificar-btn" data-empleado-id="${data.id}" href="#">Actualizar</a></li>
+
                   ${
                     puedeEliminar
                       ? `
                     <li class="dropdown-divider"></li>
-                    <li><button class="dropdown-item eliminar-btn" data-empleado-id="${data.id}">Eliminar</button></li>
+                    <li><button class="dropdown-item eliminar-btn" data-empleado-id="${data.id}"
+                    data-bs-toggle="modal" data-bs-target="#deleteModal">Eliminar</button></li>
+
                   `
                       : ''
                   }
@@ -619,14 +633,16 @@ this.table.rows.add(filteredData).draw();
       event.preventDefault();
       const empleadoId = $(event.currentTarget).data('empleado-id');
       console.log(empleadoId);
-      this.router.navigate([`home/employee/attendance/${empleadoId}`]);
+      this.router.navigate([`main/employees/attendance/${empleadoId}`]);
     });
 
     $('#empleadosTable').on('click', '.consultar-desempeño', (event: any) => {
       event.preventDefault();
       const empleadoId = $(event.currentTarget).data('empleado-id');
-      this.router.navigate([`home/employee/performance/${empleadoId}`]); // Redirige al componente de desempeño con el ID del empleado
+      this.router.navigate([`main/employees/performance/${empleadoId}`]); // Redirige al componente de desempeño con el ID del empleado
     });
+
+    
 
     $('#empleadosTable').on('click', '.modificar-btn', (event: any) => {
       event.preventDefault();
@@ -634,13 +650,14 @@ this.table.rows.add(filteredData).draw();
       this.editarEmpleado(id);
     });
 
-      // Manejador de clics para los botones de eliminar
+
+  
+
+  // Manejador de clics para los botones de eliminar
   $('#empleadosTable').on('click', '.eliminar-btn', (event: any) => {
     event.preventDefault();
     // Obtener el ID del empleado al que se hace clic
     this.empleadoIdToDelete = $(event.currentTarget).data('empleado-id');
-    // Mostrar el modal
-    $('#deleteModal').modal('show');
   });
 
     // Event handler para el botón de eliminar
@@ -707,22 +724,37 @@ this.table.rows.add(filteredData).draw();
   
 
   editarEmpleado(id: any): void {
-    this.router.navigate(['/empleados/modificar', id]);
+    //this.router.navigate(['employee/update/', id]);
+    if (id) {
+      this.router.navigate([`main/employees/employee/update/${id}`]);
+    }
   }
 
-  bindEditButtons(): void {
-    const self = this; // Guardamos el contexto del componente
-    $('#empleadosTable').on('click', '.edit-button', () => {
-      const id = $(this).data('id'); // Obtenemos el ID del atributo data-id
-      self.editarEmpleado(id); // Llama al método editarEmpleado
-    });
-  }
+
+  // bindEditButtons(): void {
+  //   const self = this; // Guardamos el contexto del componente
+  //   $('#empleadosTable').on('click', '.edit-button', () => {
+  //     const id = $(this).data('id'); // Obtenemos el ID del atributo data-id
+  //     self.editarEmpleado(id); // Llama al método editarEmpleado
+  //   });
+  // }
 
   consultarEmpleado(id: number): void {
     const empByIdSubscription = this.empleadoService
       .getEmployeeById(id)
+      .pipe(
+        switchMap(empleado => 
+          this.empleadoService.getContactById(Number(empleado.documentValue)).pipe(
+            map(contacts => ({ 
+              empleado, 
+              email: contacts[0]?.value,
+              phone: contacts[1]?.value
+            }))
+          )
+        )
+      )
       .subscribe({
-        next: (empleado) => {
+        next: ({empleado, email, phone}) => {
           const fechaContrato = new Date(
             empleado.contractStartTime[0],
             empleado.contractStartTime[1] - 1,
@@ -748,6 +780,8 @@ this.table.rows.add(filteredData).draw();
             empleado.documentValue
           }</p>
                 <p><strong>CUIL:</strong> ${empleado.cuil}</p>
+                 <p><strong>Email:</strong> ${email || 'No disponible'}</p>
+                <p><strong>Teléfono:</strong> ${phone || 'No disponible'}</p>
               </div>
               <div class="col-md-6">
                 <h6><strong>Información Laboral</strong></h6>

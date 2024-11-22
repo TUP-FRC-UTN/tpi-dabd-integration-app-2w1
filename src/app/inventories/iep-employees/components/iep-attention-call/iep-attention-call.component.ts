@@ -10,6 +10,8 @@ import { HttpErrorResponse } from "@angular/common/http";
 import { RequestWakeUpCallDTO, RequestWakeUpCallGroupDTO } from "../../Models/llamado-atencion";
 import { ListadoDesempeñoService } from "../../services/listado-desempeño.service";
 import Swal from 'sweetalert2';
+import { UsersMockIdService } from "../../../common-services/users-mock-id.service";
+import { AuthService } from "../../../../users/users-servicies/auth.service";
 
 @Component({
   selector: 'app-iep-attention-call',
@@ -33,13 +35,19 @@ export class IepAttentionCallComponent implements OnInit{
   filteredEmployees: EmployeeGetResponseDTO[] = [];
   selectedEmployeeIds: Set<number> = new Set<number>();
   formSubmitted: boolean = false;
-
+  fechaMaxima: string;
+  UpdateUser: number= 0;
+  createduser: number= 0;
+  
   constructor(
     private router: Router,
     private fb: FormBuilder,
     private wakeUpCallService: LlamadoAtencionService,
-    private ListDesempeño: ListadoDesempeñoService
+    private ListDesempeño: ListadoDesempeñoService,
+    private UsersMockIdService: AuthService
   ) {
+    const hoy = new Date();
+    this.fechaMaxima = hoy.toISOString().split('T')[0];
     const today = new Date().toISOString().split('T')[0];
     this.wakeUpCallForm = this.fb.group({
       fecha: [today, [Validators.required, this.fechaMaximaValidator]],
@@ -53,6 +61,9 @@ export class IepAttentionCallComponent implements OnInit{
   ngOnInit() {
     this.loadEmployees();
     console.log('ID del empleado:', this.employeeId);
+    this.UpdateUser = this.UsersMockIdService.getUser().id;
+    this.createduser = this.UsersMockIdService.getUser().id;
+    
   }
 
   fechaMaximaValidator(control: any) {
@@ -197,8 +208,8 @@ export class IepAttentionCallComponent implements OnInit{
         fecha: formValues.fecha,
         desempeno: formValues.desempeno,
         observation: formValues.observaciones,
-        lastUpdateUser: 1,
-        created_user: 1
+        lastUpdateUser: this.UpdateUser,
+        created_user: this.createduser
       };
   
       this.wakeUpCallService.crearWakeUpCallGrupo(request).subscribe({
@@ -213,7 +224,6 @@ export class IepAttentionCallComponent implements OnInit{
             if (result.isConfirmed) {
               this.resetForm();
               this.closeModal.emit();
-              this.router.navigate(['/llamados']);
             }
           });
         },

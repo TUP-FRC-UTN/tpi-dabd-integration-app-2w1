@@ -2,6 +2,7 @@ import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http
 import { Injectable } from '@angular/core';
 
 import { catchError, map, Observable, of, throwError } from 'rxjs';
+import { environment } from '../../common/environments/environment';
 
 declare var MercadoPago: any;
 @Injectable({
@@ -12,7 +13,7 @@ export class ExpenseGenerationPaymentService {
   constructor(private http: HttpClient) { }
 
 
-  private readonly StripeURL = "http://localhost:8020";
+  private readonly StripeURL = environment.services.stripeService;
 
 
   createPaymentIntent(requestBody: { amount: number; currency: string; cardHolderName: string; dni: string; }): Observable<{ clientSecret: string; paymentIntentId: string }> {
@@ -25,13 +26,13 @@ export class ExpenseGenerationPaymentService {
     ).pipe(
       catchError(error => {
         console.error("Error en la creación del PaymentIntent:", error);
-        return of({ clientSecret: '', paymentIntentId: '' }); // Valor por defecto en caso de error
+        return of({ clientSecret: '', paymentIntentId: '' }); 
       })
     );
   }
 
   confirmPayment(paymentIntentId: string): Observable<any> {
-    return this.http.post(`${this.StripeURL}/confirm-payment/${paymentIntentId}`, {}).pipe(
+    return this.http.post( environment.services.stripeService + `/confirm-payment/${paymentIntentId}`, {}).pipe(
       catchError(error => {
         console.error("Error confirmando el pago:", error);
         throw error;

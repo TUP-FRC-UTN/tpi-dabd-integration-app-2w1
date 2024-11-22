@@ -27,6 +27,7 @@ import { Inventory } from "../../models/inventory";
 import { NgSelectComponent } from "@ng-select/ng-select";
 import { single, Subscription } from "rxjs";
 import { SelectMultipleComponent } from "../../select-multiple/select-multiple.component";
+import { AuthService } from "../../../users/users-servicies/auth.service";
 
 
 @Component({
@@ -49,7 +50,7 @@ import { SelectMultipleComponent } from "../../select-multiple/select-multiple.c
 export class NotificationComponent implements OnInit {
   //Titulo de la pagina
   @Output() sendTitle = new EventEmitter<string>();
-  userId = 1;
+  userId : number = 0;
   rolactual: string = "";
   accessList: Access[] = [];
   finesList: Fine[] = [];
@@ -97,7 +98,8 @@ export class NotificationComponent implements OnInit {
   constructor(
     private service: NotificationService,
     private datePipe: DatePipe,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private authservice : AuthService
   ) {
     this.dateFilterForm = new FormGroup({
       startDate: new FormControl(new Date(), [Validators.required]),
@@ -109,8 +111,8 @@ export class NotificationComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.userId = this.authservice.getUser().id;
     this.getNotificationsFromAPI(this.userId);
-    
 
     $(document).on("click", ".mark-read-btn", (event) => {
       console.log("CLICK EN MARCAR LEIDA");
@@ -171,6 +173,18 @@ export class NotificationComponent implements OnInit {
       columnDefs: [
         { targets: 0, className: "text-center align-middle" },
         { targets: 4, className: "text-center" },
+        {
+          // Truncar la descripción (columna 3, índice 3)
+          targets: 3, 
+          render: function (data: string) {
+            const maxLength = 80; // Máxima longitud de caracteres
+            if (data && data.length > maxLength) {
+              return data.substring(0, maxLength) + '...'; // Truncar y añadir '...'
+            }
+            return data; // Si el texto no es largo, devolverlo tal cual
+          }
+        },
+
       ],
       dom: '<"mb-3"t>' + '<"d-flex justify-content-between"lp>',
       select: { style: "os" },
@@ -253,7 +267,7 @@ export class NotificationComponent implements OnInit {
         this.fillTable();
       },
       error: () => {
-        alert("Error al obtener las notificaciones del back-end");
+        console.log("Error al obtener las notificaciones del back-end");
       },
     });
     this.subscription.add(getNotifications)

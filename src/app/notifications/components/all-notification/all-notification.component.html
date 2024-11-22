@@ -118,6 +118,42 @@
 </div>
 </section>
 
+
+<div class="modal fade" id="infoModal" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Listado de categorías</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>En esta pantalla podrá ver un listado de todas las notificaciones enviadas, y usar filtros para organizarlas.</p>
+        <p>También, al hacer click en cada notificación podrá ver el detalle de la misma, como si la notificación fue leíada o no.</p>
+        <ul>
+          <li>
+            <strong>Botones</strong>:
+            <ul>
+              <li>
+                <button class="btn btn-success mt-2 bi-file-earmark-excel mb-2"></button> Exporta el contenido de la tabla a Excel.
+              </li>
+              <li>
+                <button class="btn btn-danger bi-file-earmark-pdf mb-2"></button> Exporta el contenido de la tabla a PDF.
+              </li>
+              <li>
+                <button class="bi bi-trash mb-2 btn btn-secondary">
+                </button> Elimina los filtros de búsqueda.
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div> 
+
 <style>
   .table tbody tr:hover {
     background-color: #e9ecef;

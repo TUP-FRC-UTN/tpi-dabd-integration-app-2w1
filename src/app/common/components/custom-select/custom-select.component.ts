@@ -23,6 +23,9 @@ export class CustomSelectComponent {
   //Lista de las validaciones que este necesitara usar
   @Input() validations: ValidatorFn | null | undefined = null
 
+    //Lista de las validaciones que este necesitara usar
+    @Input() placeholder: string = 'Seleccione...'
+
   //Listado de ids de los objetos seleccionados (el value del select)
   @Output() selectedOptionsChange = new EventEmitter<any[]>();
 

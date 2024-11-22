@@ -304,9 +304,9 @@ export class NewUserComponent implements OnInit, OnDestroy {
   //Redirige a la ruta especificada 
   redirect() {
     if (this.authService.getActualRole() == "Propietario") {
-      this.routingService.redirect('/main/users/family', 'Mi familia');
+      this.routingService.redirect('/main/users/family', 'Mi Familia');
     } else {
-      this.routingService.redirect('/main/users/list', 'Listado de usuarios');
+      this.routingService.redirect('/main/users/list', 'Listado de Usuarios');
     }
   }
 

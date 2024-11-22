@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, inject, OnInit, Output, ViewChild } from '@angular/core';
 import { SanctionService } from '../../../services/sanctions.service';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -13,9 +13,6 @@ import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 // Imports de DataTable con soporte para Bootstrap 5
 import $ from 'jquery';
 import 'datatables.net-bs5'; // DataTables con Bootstrap 5
-import 'datatables.net-buttons-bs5'; // Botones con estilos de Bootstrap 5
-import 'datatables.net-buttons/js/buttons.html5';
-import 'datatables.net-buttons/js/buttons.print';
 import { RoutingService } from '../../../../common/services/routing.service';
 import moment from 'moment';
 
@@ -23,6 +20,8 @@ import jsPDF from 'jspdf';
 import { SanctionsDTO } from '../../../models/SanctionsDTO';
 import autoTable from 'jspdf-autotable';
 import { CustomSelectComponent } from "../../../../common/components/custom-select/custom-select.component";
+import { AuthService } from '../../../../users/users-servicies/auth.service';
+import { PlotService } from '../../../../users/users-servicies/plot.service';
 
 
 @Component({
@@ -46,20 +45,23 @@ export class PenaltiesSanctionsListComponent implements OnInit {
   selectedState: string = '';
   selectedStates: string[] = [];
   today: string = '';
+  plots: any[] = [];
 
   options: { name: string, value: any }[] = []
   @ViewChild(CustomSelectComponent) customSelect!: CustomSelectComponent;
 
-  
+
   //Init
   ngOnInit(): void {
     //Metodo para recargar la datatable desde dentro de un modal en el modal
     this.sanctionService.refreshTable$.subscribe(() => {
       this.refreshData();
+      
     });
 
-    this.getStates()
-    this.refreshData()
+    this.getStates();
+    this.refreshData();
+    this.loadPlots();
     //Esto es para acceder al metodo desde afuera del datatable
     const that = this; // para referenciar metodos afuera de la datatable
     $('#sanctionsTable').on('click', 'a.dropdown-item', function (event) {
@@ -102,12 +104,26 @@ export class PenaltiesSanctionsListComponent implements OnInit {
     return adjustedDate.toLocaleDateString('en-CA'); // Formato estándar `YYYY-MM-DD`
   }
 
+  loadPlots() {
+    this.plotService.getAllPlots().subscribe({
+      next: (data) => {
+        this.plots = data;
+        console.log('Lotes cargados:', data);
+      },
+      error: (error) => {
+        console.error('error: ', error);
+      }
+    })
+  }
+
 
   //Constructor
   constructor(
     private _modal: NgbModal,
     private sanctionService: SanctionService,
-    private routingService: RoutingService
+    private routingService: RoutingService,
+    private authService: AuthService,
+    private plotService: PlotService
   ) {
     (window as any).viewFine = (id: number) => this.viewFine(id);
   }
@@ -153,7 +169,7 @@ export class PenaltiesSanctionsListComponent implements OnInit {
           data: 'plotId',
           className: 'align-middle',
           render: (data) =>
-            `<div class="text-end">${data}</div>`
+            `<div>${this.getPlotData(data)}</div>`
         },
         {
           data: 'amount',
@@ -188,9 +204,12 @@ export class PenaltiesSanctionsListComponent implements OnInit {
                           <button type="button" class="btn btn-light border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
                           <ul class="dropdown-menu">
                             <li><a class="dropdown-item" onclick="viewFine(${data.id})">Ver más</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" data-action="updateFine" data-id="${data.id}"'>Editar</a></li>
-                            ${data.fineState == "Pendiente" ? `<li><a class="dropdown-item" data-action="newDisclaimer" data-id="${data.id}">Descargo</a></li>` : ``}
+                            ${this.getPermisionsToEdit() ? `
+                              <li><hr class="dropdown-divider"></li>
+                              <li><a class="dropdown-item" data-action="updateFine" data-id="${data.id}"'>Editar</a></li>` : ``}
+                            ${data.fineState == "Pendiente" && (this.getPermisionsToEdit() || this.getPermissionsToDischarge())  ? 
+                            `<li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" data-action="newDisclaimer" data-id="${data.id}">Descargo</a></li>` : ``}
                           </ul>
                         </div>
                       </div>
@@ -212,6 +231,23 @@ export class PenaltiesSanctionsListComponent implements OnInit {
         processing: "Procesando..."
       },
     });
+  }
+
+  permisionToEdit : boolean = false
+  getPermisionsToEdit(){
+    if(this.authService.getActualRole() === 'SuperAdmin' ||  
+    this.authService.getActualRole() === 'Gerente multas'){
+      this.permisionToEdit = true
+    }
+    return this.permisionToEdit;
+  }
+  permisionToDischarge: boolean = false
+  getPermissionsToDischarge(){
+    if(this.authService.getActualRole() === 'Propietario' ||
+      this.authService.getActualRole() === 'Inquilino'){
+      this.permisionToDischarge = true
+    }
+    return this.permisionToDischarge;
   }
 
 
@@ -347,18 +383,43 @@ export class PenaltiesSanctionsListComponent implements OnInit {
 
   //Actualiza todos los datos de la tabla consultando con la api
   refreshData() {
-    this.sanctionService.getAllSactions().subscribe((data) => {
-      this.sanctions = data;
-      this.sanctionsfilter = [...data];
-      this.updateDataTable();
-      this.filterDate()
-    });
+    let plotIds = this.authService.getUser().plotId;
+    
+    if (this.authService.getActualRole() === 'SuperAdmin' || 
+    this.authService.getActualRole() === 'Gerente multas') {
+      this.sanctionService.getAllSactions().subscribe((data) => {
+        this.sanctions = [...data];
+        this.sanctionsfilter = [...this.sanctions];
+        this.updateDataTable();
+        this.filterDate();
+        console.log('Multas y advertencias cargadas:', data);
+      });
+    }
+
+    else {
+      this.sanctions = [];
+
+      plotIds.forEach(plotId => {
+        this.sanctionService.getAllSactions(plotId).subscribe((data) => {
+          this.sanctions = [...this.sanctions, ...data];
+          this.sanctionsfilter = [...this.sanctions];
+          this.updateDataTable();
+          this.filterDate();
+          console.log(`Multas y advertencias cargadas para el lote ${plotId}: `, data);
+        });
+      });
+    }
   }
 
 
   //Redirige a la pagina para dar de alta un descargo
   newDisclaimer(id: number) {
     this.routingService.redirect(`main/sanctions/post-disclaimer/${id}`, "Registrar Descargo")
+  }
+
+  getPlotData(plotId: number) {
+    let plot = this.plots.find((plot) => plot.id === plotId);
+    return `Nro: ${plot?.plot_number} - Manzana: ${plot?.block_number}`;
   }
 
 

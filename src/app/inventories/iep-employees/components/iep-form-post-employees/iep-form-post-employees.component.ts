@@ -1,6 +1,6 @@
 import { CommonModule, JsonPipe, NgFor } from '@angular/common';
 import { Component, importProvidersFrom, Inject, OnInit } from '@angular/core';
-import { Form, FormsModule, NgForm } from '@angular/forms';
+import { Form, FormBuilder, FormGroup, FormsModule, NgForm, PatternValidator, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Ciudad, Provincia } from '../../Models/emp-provincia';
 import { Observable } from 'rxjs';
 import { Provider } from '../../../iep-inventory/models/provider';
@@ -9,19 +9,42 @@ import { AddressDto, Charge, DocumentTypeEnum, PostEmployeeDto } from '../../Mod
 import { post } from 'jquery';
 import { EmpPostEmployeeService } from '../../services/emp-post-employee.service';
 import Swal from 'sweetalert2';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { AuthService } from '../../../../users/users-servicies/auth.service';
+import { ChargeService } from '../../services/charge.service';
+declare var bootstrap: any; // Añadir esta declaración al principio
 
 
 @Component({
   selector: 'app-iep-form-post-employees',
   standalone: true,
-  imports: [FormsModule, CommonModule,NgSelectModule],
+  imports: [FormsModule, CommonModule, NgSelectModule, RouterLink, ReactiveFormsModule],
   templateUrl: './iep-form-post-employees.component.html',
   styleUrl: './iep-form-post-employees.component.css',
 })
 export class IEPFormPostEmployeesComponent implements OnInit {
-  constructor(private serviceCombos: EmpPostEmployeeService , private router : Router) {}
+ 
+  
+  constructor(private serviceCombos: EmpPostEmployeeService , private router : Router,private userService: AuthService, private fb: FormBuilder,private cargoService: ChargeService,) {
+    const currentDate = new Date();
+    // Definir la fecha mínima (3 meses en el pasado)
+    const minDate = new Date();
+    minDate.setMonth(currentDate.getMonth() - 3);
+
+    // Definir la fecha máxima (3 meses en el futuro)
+    const maxDate = new Date();
+    maxDate.setMonth(currentDate.getMonth() + 3);
+    // Formatear fechas para el input de tipo "date"
+    this.minDate = minDate.toISOString().split('T')[0];
+    this.maxDate = maxDate.toISOString().split('T')[0];
+
+    this.cargoForm = this.fb.group({
+      charge: ['', Validators.required],
+      description: ['', Validators.required],
+      
+    });
+  }
 
   isInfoModalVisible: boolean = false;
 
@@ -40,6 +63,9 @@ export class IEPFormPostEmployeesComponent implements OnInit {
   validateDni$:Observable<any> = new Observable<any>();
   validateCuil$:Observable<any>=new Observable<any>();
 
+  minDate: string;
+  maxDate: string;
+
   lunes:boolean=true;
   martes:boolean=true;
   miercoles:boolean=true;
@@ -50,7 +76,7 @@ export class IEPFormPostEmployeesComponent implements OnInit {
 
   documentTypeEnum=DocumentTypeEnum
 
-  userId: number=0
+  userId: number=0;
   nombre: string = '';
   apellido: string = '';
   cuil: string = '';
@@ -60,14 +86,16 @@ export class IEPFormPostEmployeesComponent implements OnInit {
   mail: string = '';
   calle: string = '';
   numeroCalle: number = 0;
-  piso: number = 0;
+  piso?: number = undefined;
   dpto: string = '';
-  codigoPostal: string = '5000';
+  codigoPostal: string = '';
   salario?: number;
   horaSalida: string = '17:00';
   horaEntrada: string = '08:00';
   startTimeContract: string = new Date().toISOString().split('T')[0];
 
+  cargoForm: FormGroup;
+  isCreateModalOpen = false;
  
 
   success:boolean=false;
@@ -88,7 +116,7 @@ export class IEPFormPostEmployeesComponent implements OnInit {
 
   cargoSelected?:Charge
   provinciaSelect? : Provincia =this.provincias.find(provincia => provincia.nombre === 'Cordoba');
-  localidadSelect?:Ciudad ;
+  localidadSelect?:Ciudad;
   
   postDto:PostEmployeeDto = new PostEmployeeDto();
   adressDto:AddressDto =new AddressDto();
@@ -96,13 +124,18 @@ export class IEPFormPostEmployeesComponent implements OnInit {
   isValidDni:boolean =true;
 
   isValidCuil:boolean=true;
+  isValidCuilFinish: boolean = true;
 
   cambio() {
-    console.log("Lunes:", this.lunes); // Debería mostrar true o false
-    console.log("Martes:", this.martes); // Debería mostrar true o false
+    console.log("Lunes:", this.lunes); 
+    console.log("Martes:", this.martes); 
 }
 
- 
+dniChange(): void {
+  if(this.documentType === DocumentTypeEnum.DNI){
+    this.dni = this.cuil?.substring(3, 11);
+  }
+}
 
   public validateDate() {
     if (this.startTimeContract != null) {
@@ -116,61 +149,20 @@ export class IEPFormPostEmployeesComponent implements OnInit {
       this.invalidDate = selectedDate < today;
       return;
     }
-    // Si la fecha seleccionada es anterior a la actual, setea `isInvalidDate` en true
     this.invalidDate = false;
   }
 
-
-  public validateCuil(){
-    console.log("pre validando"+this.cuil)
-    if(this.cuil!=null&&this.cuil!=undefined ){
-
-      console.log("prevalidando2")
-        this.validateCuil$ = this.serviceCombos.validateCuil(this.cuil)
-        this.validateCuil$.subscribe({
-          next: response => {
-            console.log("respuestaa"+response)
-            this.isValidCuil = !response;
-            console.log(this.isValidCuil)
-
-
-
-    // Verificar cada control en el formulario y registrar errores
- //   Object.keys(form.controls).forEach(field => {
-   //   const control = form.controls[field];
-      
-   //   if (control.invalid) {
-   //       console.log(`Campo '${field}' inválido. Errores:`, control.errors);
-   //   }
-  //  });
-
-   
-      }
-       
-            })
-
-    }
-
-
-  }
-
   public validateDni(){
-
     if(this.dni!=null&&this.dni!=undefined && this.documentType!=null&& this.documentType!=undefined){
-
       if(this.dni.length>7){
-
         this.validateDni$ = this.serviceCombos.validateDni(this.dni,this.documentType)
         this.validateDni$.subscribe({
           next: response => {
             this.isValidDni = !response;
-          }
-            
-            })
+          }       
+        })
       }
-
     }
-
   }
 
  
@@ -188,8 +180,8 @@ export class IEPFormPostEmployeesComponent implements OnInit {
           this.adressDto.city=this.provinciaSelect?.nombre
           this.adressDto.locality=this.provinciaSelect?.nombre
           this.adressDto.postalCode=this.codigoPostal
-          this.adressDto.apartment=this.dpto
-          this.adressDto.floor=this.piso
+          this.adressDto.apartment=this.dpto || "0"
+          this.adressDto.floor=this.piso || 0
           this.adressDto.numberStreet=this.numeroCalle
 
           if(this.postDto!=null){
@@ -243,8 +235,9 @@ export class IEPFormPostEmployeesComponent implements OnInit {
 
 
             this.postDto.charge=this.cargoSelected?.id
-            this.postDto.userId=this.userId
+            this.postDto.userId=this.userService.getUser().id
 
+            console.log("Id user"+ this.postDto.userId)
             console.log("Antes del Post (formato JSON):", JSON.stringify(this.postDto, null, 2))
             this.createEmployee$ = this.serviceCombos.createProduct(this.postDto);
             console.log(this.createEmployee$);
@@ -265,6 +258,7 @@ export class IEPFormPostEmployeesComponent implements OnInit {
                   confirmButtonColor: '#3085d6'
                 }).then(() => {
                   this.resetForm(form)
+                  this.router.navigate(['/main/employees/employees']);
                 });
                 console.log("PASO: ", response);
               },
@@ -319,12 +313,60 @@ export class IEPFormPostEmployeesComponent implements OnInit {
   }
 
 
-  public loadCharges(): void {
+
+
+   validarCUILFormato(cuil: string): boolean {
+    // Elimina guiones o espacios del CUIL
+    console.log(cuil)
+    const cuilLimpio = cuil.replace(/[-\s]/g, "");
+
+    // Verifica que tenga 11 dígitos
+    if (!/^\d{11}$/.test(cuilLimpio)) {
+        return false;
+    }
+    console.log("paso 1")
+
+    // Separa los componentes del CUIL
+    const tipo = parseInt(cuilLimpio.substring(0, 2), 10);
+    const tipoAndDni = cuilLimpio.substring(0, 10);
+    const dni = parseInt(cuilLimpio.substring(2, 10), 10);
+    const digitoVerificador = parseInt(cuilLimpio.substring(10, 11), 10);
+
+    // Verifica que el tipo sea válido (20, 23, 24, 27, 30, 33, 34)
+    const tiposValidos = [20, 23, 24, 27];
+    if (!tiposValidos.includes(tipo)) {
+        this.isValidCuilFinish= false
+        return false;
+    }
+   
+    console.log("paso3")
+    // Calcula el dígito verificador
+     const multiplicadores = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2]; // Último 1 es para el dígito verificador
+    let suma = 0;
+
+    for (let i = 0; i < multiplicadores.length; i++) {
+      suma += parseInt(tipoAndDni[i], 10) * multiplicadores[i];
+  }
+
+    const resto = suma % 11;
+    const digitoCalculado = resto === 0 ? 0 : 11 - resto;
+
+    if( digitoCalculado != digitoVerificador){
+      this.isValidCuilFinish = false
+      return true
+    } 
+    console.log("paso3")
+    // Verifica que el dígito verificador sea correcto
+    this.isValidCuilFinish = true;
+    return true
+}
+
+
+
+  loadCharges(): void {
     this.serviceCombos.getCharges().subscribe({
-      next: (c) => {
-        this.cargos = c;
-        console.log("cargoss"+c)
-      },
+      next: (data) => this.cargos = data,
+      error: (error) => console.error('Error al cargar cargos:', error)
     });
   }
 
@@ -371,7 +413,7 @@ export class IEPFormPostEmployeesComponent implements OnInit {
    this.cuil = '';
    this.documentType=DocumentTypeEnum.DNI;
    this.piso = 0;
-   this.codigoPostal = '5000';
+   this.codigoPostal = '';
    this.salario=0
    this.horaSalida = '17:00';
    this. horaEntrada = '08:00';
@@ -383,15 +425,123 @@ export class IEPFormPostEmployeesComponent implements OnInit {
   this.showModal=!this.showModal
  }
 
+ reset():void{
+  this.cargoForm.reset();
+}
+
   ngOnInit(): void {
    this.loadSupplier();
    this.loadProvincias();
    this.loadCharges();
    console.log(this.provincias);
-   
   }
 
-    ERROR_MESSAGES = {
+    // Modal management methods
+    openCreateModal(): void {
+      this.cargoForm.reset();
+      this.isCreateModalOpen = true;
+      document.body.classList.add('modal-open');
+    }
+  
+    closeCreateModal(): void {
+      this.isCreateModalOpen = false;
+      document.body.classList.remove('modal-open');
+      this.cargoForm.reset();
+    }
+
+    closeModale(modalId: string) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        const modalInstance = bootstrap.Modal.getInstance(modal);
+        modalInstance?.hide();
+      }
+  
+      const modalElement = document.getElementById(modalId);
+      if (modalElement) {
+        const modal = bootstrap.Modal.getInstance(modalElement);
+        if (modal) {
+          modal.hide();
+        }
+        
+        // Limpieza completa del modal y sus efectos
+        setTimeout(() => {
+          // Remover clases del body
+          document.body.classList.remove('modal-open');
+          document.body.style.removeProperty('padding-right');
+          document.body.style.removeProperty('overflow');
+          
+          // Remover todos los backdrops
+          const backdrops = document.getElementsByClassName('modal-backdrop');
+          while (backdrops.length > 0) {
+            backdrops[0].remove();
+          }
+  
+          // Limpiar el modal
+          modalElement.classList.remove('show');
+          modalElement.style.display = 'none';
+          modalElement.setAttribute('aria-hidden', 'true');
+          modalElement.removeAttribute('aria-modal');
+          modalElement.removeAttribute('role');
+          
+          // Remover cualquier estilo inline que Bootstrap pueda haber añadido
+          const allModals = document.querySelectorAll('.modal');
+          allModals.forEach(modal => {
+            (modal as HTMLElement).style.display = 'none';
+          });
+        }, 100);
+      }
+    }
+
+    onSubmitCreate(): void {
+      if (this.cargoForm.valid) {
+          const chargeValue = this.cargoForm.get('charge')?.value;
+          console.log("Nuevo cargo: "+chargeValue);
+          this.cargoService.getAllCargos().subscribe(cargos => {
+              const exists = cargos.some(cargo => cargo.charge === chargeValue);
+  
+              if (exists) {
+                  Swal.fire({
+                      title: 'Error',
+                      text: `El cargo "${chargeValue}" ya existe. Por favor, elige otro nombre.`,
+                      icon: 'error',
+                      confirmButtonText: 'Aceptar'
+                  }).then(() => {
+                      this.closeModale('createChargeModal'); // Cerrar modal en caso de error
+                  });
+                  return;
+              }
+  
+              this.cargoService.createCargo(this.cargoForm.value).subscribe({
+                  next: () => {
+                      Swal.fire({
+                          title: '¡Creado!',
+                          text: 'El cargo ha sido creado correctamente.',
+                          icon: 'success',
+                          confirmButtonText: 'Aceptar'
+                      }).then(() => {
+                          this.closeModale('createChargeModal'); // Cerrar modal tras éxito
+                          this.cargoForm.reset();
+                          this.loadCharges();
+                      });
+                  },
+                  error: () => {
+                      Swal.fire({
+                          title: 'Error',
+                          text: 'Ocurrió un error al crear el cargo.',
+                          icon: 'error',
+                          confirmButtonText: 'Aceptar',
+                          confirmButtonColor: '#3085d6'
+                      }).then(() => {
+                          this.closeModale('createChargeModal'); // Cerrar modal en caso de error
+                          this.cargoForm.reset();
+                      });
+                  }
+              });
+          });
+      }
+    }
+
+  ERROR_MESSAGES = {
     'Cuil exists in the system': 'Ya existe un empleado con ese cuil',
     'Document exists in the system': 'Ya existe un empleado con ese dni',
     'Error in contact server': 'El servidor de contacto fallo, intente nuevamente mas tarde',
