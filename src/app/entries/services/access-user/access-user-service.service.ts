@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AccessMovementEntryDto,AccessMovementExitDto,AccessSuppEmpDto } from '../../models/access-employee-allowed/access-user-allowed';
 import { HttpClient, HttpHeaders,  } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { map, Observable, tap } from 'rxjs';
 import { AccessUserAllowedInfoDto } from '../../models/access-visitors/access-VisitorsModels';
 import { AccessRegistryUpdateService } from '../access-registry-update/access-registry-update.service';
 import { AccessAuthRangeInfoDtoOwner } from '../../models/access-visitors/interface/access-owner';
@@ -67,6 +67,15 @@ export class AccessUserServiceService {
   registerExitEmployeers(body: any): Observable<any> {
     return this.http.put(API_ENDPOINTS.REGISTER_EXIT_EMPLOYEERS, body);
   }
+
+  fetchVisitorsByNeighbor(neighborId: number): Observable<AccessUserAllowedInfoDto[]> {
+    return this.http.get<AccessUserAllowedInfoDto[]>(API_ENDPOINTS.USERS_ALLOWED).pipe(
+      map(visitors => visitors.filter(visitor => 
+        visitor.userType.description.toUpperCase() === 'VISITOR' && 
+        visitor.authRanges.some(range => range.neighbor_id === neighborId)
+      ))
+    );
+   }
 
  loadSuppEmpData(): void {
    this.getSuppEmpData().subscribe({

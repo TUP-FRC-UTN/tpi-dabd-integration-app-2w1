@@ -204,7 +204,7 @@ export class PenaltiesSanctionsListComponent implements OnInit {
                           <button type="button" class="btn btn-light border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
                           <ul class="dropdown-menu">
                             <li><a class="dropdown-item" onclick="viewFine(${data.id})">Ver más</a></li>
-                            ${this.getPermisionsToEdit() ? `
+                            ${this.getPermisionsToEdit() && (data.fineState === "Apelada" || data.fineState === "Pendiente") ? `
                               <li><hr class="dropdown-divider"></li>
                               <li><a class="dropdown-item" data-action="updateFine" data-id="${data.id}"'>Editar</a></li>` : ``}
                             ${data.fineState == "Pendiente" && (this.getPermisionsToEdit() || this.getPermissionsToDischarge())  ? 
@@ -419,7 +419,7 @@ export class PenaltiesSanctionsListComponent implements OnInit {
 
   getPlotData(plotId: number) {
     let plot = this.plots.find((plot) => plot.id === plotId);
-    return `Nro: ${plot?.plot_number} - Manzana: ${plot?.block_number}`;
+    return plot ? `Nro: ${plot?.plot_number} - Manzana: ${plot?.block_number}`: "N/A";
   }
 
 

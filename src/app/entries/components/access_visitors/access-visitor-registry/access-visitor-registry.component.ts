@@ -51,6 +51,8 @@ import { AccessRegistryUpdateService } from '../../../services/access-registry-u
 declare var bootstrap: any;
 import { AccesesVisitorsTempComponent } from '../acceses-visitors-temp/acceses-visitors-temp.component';
 import { AuthService } from '../../../../users/users-servicies/auth.service';
+import { AccessUserReportService } from '../../../services/access_report/access_httpclient/access_usersApi/access-user-report.service';
+import { User } from '../../../models/access-report/User';
 
 @Component({
   selector: 'access-app-visitor-registry',
@@ -81,6 +83,7 @@ export class AccessVisitorRegistryComponent
   private observations: string = '';
   private userId: number = 0;
   constructor(private userService: AccessUserServiceService, private emergencyService : AccessEmergenciesService, private authService: AuthService) {}
+  private readonly accessUserReportService = inject(AccessUserReportService)
   selectedVehiclePlate: string ='';
   dataTable: any;
   plateVehicle:string='';
@@ -89,6 +92,8 @@ export class AccessVisitorRegistryComponent
   private readonly ngZone: NgZone = inject(NgZone);
   userAllowedGetAll:AccessUserAllowedInfoDto[] = [];
   modalValid: boolean = false;
+
+  listUser : User[] = []
 
   //carga TODOS los invitados al iniciar la pantalla
   ngOnInit(): void {
@@ -136,6 +141,15 @@ export class AccessVisitorRegistryComponent
     )
     this.subscription.add(ub)
     this.subscription.add(registryUpdated);
+
+    this.accessUserReportService.getAllUsers().subscribe({
+      next : (data) => {
+        this.listUser = data;
+      },
+      error : (error) => {
+        console.log(error);
+      }
+    })
   }
 
   onVehicleChange(plate: string): void {
@@ -144,7 +158,11 @@ export class AccessVisitorRegistryComponent
       this.selectedVehiclePlate=plate
       this.plateVehicle=plate
  // Deseleccionamos
-    } else {
+    }else if(plate === 'none'){
+      this.selectedVehiclePlate = '';
+      this.plateVehicle = '';
+    } 
+    else {
       // Si se selecciona una nueva patente, la guardamos
       this.selectedVehiclePlate = plate;
       this.plateVehicle=plate
@@ -467,6 +485,13 @@ loadUsersAllowedData(): Observable<boolean> {
               let statusButton = '';
               let actionButtons = '';
 
+              let fullName = '';
+              if(visitor.last_name === ""){
+                fullName = visitor.name;
+              } else {
+                fullName = `${visitor.last_name}, ${visitor.name}`;
+              }
+
               switch (status) {
                 case 'Ingresado':
                   statusButton = `<span class="badge  text-bg-success">Ingresado</span>`;
@@ -488,20 +513,19 @@ loadUsersAllowedData(): Observable<boolean> {
               </span> 
               </div>`;
               return [
-                `${visitor.last_name}, ${visitor.name}`,
+                fullName,
                 userTypeIconWithClick,
                 `<div class="text-start">${this.getDocumentType(visitor).substring(0,1) + " - " +visitor.document}</div>`,
                 `<div class="text-start">
                 <select class="form-select" id="vehicles${index}" name="vehicles${index}">
-                    <option value="" disabled selected>Seleccione un vehículo</option>
+                     <option value="sin_vehiculo" selected>Sin vehículo</option>
                     ${visitor.vehicles?.length > 0 ? visitor.vehicles.map(vehicle => `
                         <option value="${vehicle.plate}">${vehicle.plate} ${vehicle.vehicle_Type.description
-                        === 'Car' ? 'Coche' : 
+                        === 'Car' ? 'Auto' : 
                       vehicle.vehicle_Type.description === 'MotorBike' ? 'Motocicleta' : 
                       vehicle.vehicle_Type.description === 'Truck' ? 'Camión' : 
                       vehicle.vehicle_Type.description } </option>
                     `).join('') : ''}
-                    <option value="sin_vehiculo">Sin vehículo</option>
                 </select>
             </div>`,
                 `<div class="text-center">
@@ -575,7 +599,7 @@ loadUsersAllowedData(): Observable<boolean> {
                   <i class="bi bi-briefcase text-dark"></i>
                 </button>`
       }
-      case "Supplier" : {   //turquesa / verde agua (teal)
+      case "Supplied" : {   //turquesa / verde agua (teal)
         return `<button style="background-color: #FFCECE;border: bisque;" class="btn btn-warning" title="Proveedor">
                   <i class="bi bi-truck text-dark"></i>
                 </button>`
@@ -623,7 +647,7 @@ loadUsersAllowedData(): Observable<boolean> {
       }
 
       default : {
-      return  `<button style="background-color: #FFB0B0;border: bisque;" class="btn btn-primary" title="???">
+      return  `<button style="background-color: black;border: bisque;" class="btn btn-primary" title="???">
                   <i class="bi bi-question-lg"></i>
                 </button> `
       }
@@ -637,8 +661,8 @@ loadUsersAllowedData(): Observable<boolean> {
     { value: 'neighbour', label: 'Vecino', descriptions: ['Owner', 'Tenant'] },
     { value: 'visitor', label: 'Visitante', descriptions: ['Visitor'] },
     { value: 'employee', label: 'Empleado', descriptions: ['Employeed'] },
-    { value: 'service', label: 'Servicio', descriptions: ['Supplier', 'Worker', 'Delivery', 'Cleaning', 'Gardener'] },
-    { value: 'supplier', label: 'Proveedor', descriptions: ['Supplier'] },
+    { value: 'service', label: 'Servicio', descriptions: ['Supplied', 'Worker', 'Delivery', 'Cleaning', 'Gardener'] },
+    { value: 'supplied', label: 'Proveedor', descriptions: ['Supplied'] },
     { value: 'worker', label: 'Obrero', descriptions: ['Worker'] },
     { value: 'delivery', label: 'Delivery', descriptions: ['Delivery'] },
     { value: 'cleaning', label: 'Personal de Limpieza', descriptions: ['Cleaning'] },
@@ -694,7 +718,7 @@ loadUsersAllowedData(): Observable<boolean> {
 
       if (visitor.userType.description === 'Owner' || visitor.userType.description === 'Tenant') {
         accessObservable = this.prepareEntryMovement(visitor,vehiclePlate);
-      } else if (visitor.userType.description === 'Employeed' || visitor.userType.description === 'Supplier') {
+      } else if (visitor.userType.description === 'Employeed' || visitor.userType.description === 'Supplier' || visitor.userType.description === 'Supplied') {
         accessObservable = this.prepareEntryMovementEmp(visitor, vehiclePlate);
       } else {
         //es para visitors y los otros tipos q funcionan igual
@@ -715,7 +739,7 @@ loadUsersAllowedData(): Observable<boolean> {
               this.subscription.add(sub2);
 
             } else {
-              console.error('Falló al registrar egreso');
+              console.error('Falló al registrar ingreso');
             }
           },
           error: (error) => {
@@ -733,7 +757,7 @@ loadUsersAllowedData(): Observable<boolean> {
         exitObservable = this.prepareExitMovement(visitor,vehiclePlate);
         
 
-      } else if (visitor.userType.description === 'Employeed' || visitor.userType.description === 'Supplier') {
+      } else if (visitor.userType.description === 'Employeed' || visitor.userType.description === 'Supplier' || visitor.userType.description === 'Supplied') {
         exitObservable = this.prepareExitMovementEmp(visitor, vehiclePlate);
 
       } else {
@@ -1033,6 +1057,18 @@ loadUsersAllowedAfterRegistrationData(): Observable<boolean> {
         const vehicless = plate ? visitor.vehicles.find(v => v.plate === plate) || undefined : undefined;
         const firstRange = visitor.authRanges[0];
         const now = new Date();
+        let hasMovement=false;
+
+        for(const auth of visitor.authRanges){
+          let startDate = new Date(auth.init_date);
+          let endDate = new Date(auth.end_date);
+
+        if (startDate <= now && endDate >= now) {
+          hasMovement = true; 
+          break; 
+        }
+
+        }
   
         // Construir objeto de movimiento
         this.movement = {
@@ -1055,7 +1091,8 @@ loadUsersAllowedAfterRegistrationData(): Observable<boolean> {
           },
           userId: this.userId
         };
-  
+
+     
         // Preparar mensaje del modal
         const modalMessage = `¿Está seguro que desea registrar el ingreso de ${visitor.name} ${visitor.last_name}?`;
         document.getElementById('modalMessage')!.textContent = modalMessage;
@@ -1076,6 +1113,20 @@ loadUsersAllowedAfterRegistrationData(): Observable<boolean> {
         // Configurar el botón de confirmación
         const confirmButton = document.getElementById('confirmButton')!;
         confirmButton.onclick = () => {
+          if (!hasMovement) {
+            Swal.fire({
+              title: 'No se puede registrar el ingreso',
+              text: 'El vecino no tiene un rango de autorización válido para ingresar.',
+              icon: 'error',
+              confirmButtonText: 'Cerrar',
+            }).then(() => {
+              observer.next(false);
+              observer.complete();
+              modal.hide();
+            });
+            return;
+          }
+    
           this.ownerService.registerOwnerRenterEntry(this.movement).subscribe({
             next: (response) => {
               modal.hide();
@@ -1478,10 +1529,13 @@ private prepareExitMovement(visitor: AccessUserAllowedInfoDtoOwner, plate: strin
 
   prepareEntryVisitor(visitor: AccessUserAllowedInfoDto, vehiclePlate: string): Observable<boolean>{
     return new Observable<boolean>((observer) => {
-  
-      try {
-        // Preparar mensaje del modal
-        const modalMessage = `¿Está seguro que desea registrar el ingreso de ${visitor.name} ${visitor.last_name}?`;
+     
+       try {
+
+        const neighbor = this.listUser.filter(x => x.id === visitor.neighbor_id)
+        const nameNeighbor = neighbor.at(0)?.name + " " +  neighbor.at(0)?.lastname
+       
+        const modalMessage = `¿Está seguro que desea registrar el ingreso de ${visitor.name} ${visitor.last_name}? Ingresará al lote de ${nameNeighbor}`;
         document.getElementById('modalMessageIngresoEmp')!.textContent = modalMessage;
   
         // Obtener el modal
