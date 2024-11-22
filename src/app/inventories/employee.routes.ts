@@ -28,4 +28,3 @@ export const EMPLOYEE_ROUTES: Routes = [
             { path: 'dashboard', component: IepChartsEmployeesComponent },
         ]
     }
-];
