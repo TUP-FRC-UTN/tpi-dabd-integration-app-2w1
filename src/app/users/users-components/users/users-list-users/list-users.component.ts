@@ -436,7 +436,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
     }
 
     // Limpiar filtros de columnas y búsqueda general
-    table.column(1).search(''); // Limpiar columna específica
+    table.column(2).search(''); // Limpiar columna específica
     table.search(''); // Limpiar búsqueda general
 
     // Redibujar la tabla
@@ -445,11 +445,9 @@ export class ListUsersComponent implements OnInit, OnDestroy {
 
   //Filtrar por rol
   fillOptionsSelected(options: any) {
-    var optionsFilter = options.map((option: any) => option).join('|'); // Usar '|' para permitir múltiples filtros
+    var optionsFilter = options.map((option: any) => option).join('|');
     const table = $('#myTable').DataTable();
-
-    // Filtrar por el contenido de la columna de tipo de lote, teniendo en cuenta que puede tener unicamente 1 valor, pero se tiene que filtrar x varios
-    table.column(1).search(optionsFilter, true, false).draw(); 
+    table.column(2).search(optionsFilter, true, false).draw(); 
   }
 
   // //Metodo para filtrar la tabla en base a las 2 fechas

@@ -89,7 +89,8 @@ export class UsersTransferPlotComponent implements OnInit {
     let message : string = '¿Estás seguro de que desea transferir el lote?'
     
     if(this.plotLength == 1){
-      message = `¿Estás seguro de que deseas transferir el lote? El propietario ${this.actualOwner.name} ${this.actualOwner.lastname} - ${this.actualOwner.dni} se dará de baja por inexistencia de lotes a su nombre`
+      message = `¿Estás seguro de que deseas transferir el lote? 
+      El propietario ${this.actualOwner.name} ${this.actualOwner.lastname} - ${this.actualOwner.dni} se dará de baja por inexistencia de lotes a su nombre`
     }
     return message;
   }

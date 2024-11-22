@@ -27,13 +27,7 @@
         <div class="row">
           <label class="col-2 col-form-label">Tipo de Documento</label>
           <div class="col-10">
-            <!-- <select id="selectOption" class="form-select" formControlName="dniType" [ngClass]="onValidate('dniType')">
-              <option value="" disabled selected>Seleccione una opción</option>
-              <option value="1">DNI</option>
-              <option value="2">Pasaporte</option>
-            </select> -->
-            <!-- CheckMe -->
-            <app-custom-select [options]="[{value: 1, name: 'DNI'}, {value: 2, name: 'Pasaporte'}, {value: 2, name: 'CUIT/CUIL'}]"
+            <app-custom-select [options]="[{value: 1, name: 'DNI'}, {value: 2, name: 'Pasaporte'}, {value: 3, name: 'CUIT/CUIL'}]"
               [selectedOptions]="reactiveForm.get('dniType')?.value"
               (selectedOptionsChange)="reactiveForm.get('dniType')?.setValue($event)"
               [validations]="reactiveForm.get('dniType')?.validator" />

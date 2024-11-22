@@ -398,7 +398,6 @@ export class UsersUpdateOwnerComponent implements OnInit, OnDestroy {
       
       console.log(ownerPut);
       
-
       //llama al service
       const sus = this.ownerService.putOwner(ownerPut, Number(this.id)).subscribe({
         next: () => {

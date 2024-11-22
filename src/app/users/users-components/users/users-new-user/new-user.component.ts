@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators, FormBuilder } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators, FormBuilder, AbstractControl, ValidationErrors } from '@angular/forms';
 import { RolModel } from '../../../users-models/users/Rol';
 import { UserService } from '../../../users-servicies/user.service';
 import { UserPost } from '../../../users-models/users/UserPost';
@@ -67,7 +67,8 @@ export class NewUserComponent implements OnInit, OnDestroy {
       dni: new FormControl('', [
         Validators.required,
         Validators.pattern(/^\d+$/),
-        Validators.minLength(8)
+        Validators.minLength(8),
+        this.validarCuit.bind(this)
       ],
         this.validatorService.validateUniqueDni()
       ),
@@ -93,6 +94,7 @@ export class NewUserComponent implements OnInit, OnDestroy {
   private readonly suscriptionService = inject(SuscriptionManagerService);
   @ViewChild(CustomSelectComponent) customSelectComponent!: CustomSelectComponent;
 
+  documentType: string = '';
   reactiveForm: FormGroup;
   rolesSelected: string[] = [];
   roles: RolModel[] = [];
@@ -126,6 +128,10 @@ export class NewUserComponent implements OnInit, OnDestroy {
       this.reactiveForm.get("plot")?.disable();
       this.reactiveForm.get("plot")?.setValue("Sin lote");
     }
+
+    this.reactiveForm.get('dniType')?.valueChanges.subscribe(() => {
+      this.documentTypeChange();
+    });
       
   }
 
@@ -223,7 +229,7 @@ export class NewUserComponent implements OnInit, OnDestroy {
           optionsFilter.forEach(o => this.options.push({ value: o, name: o }))        
         }
         else if (this.authService.getActualRole() == "SuperAdmin") {
-          let optionsFilter = this.options.filter(rol => this.options.includes(rol) && rol != "Propietario");
+          let optionsFilter = this.options.filter(rol => this.options.includes(rol) && rol != "Propietario" && rol != "Familiar mayor" && rol != "Familiar menor" && rol != "Inquilino");
           this.options = [];
           optionsFilter.forEach(o => this.options.push({ value: o, name: o }))
 
@@ -242,6 +248,56 @@ export class NewUserComponent implements OnInit, OnDestroy {
     //Agregar suscripción+
     this.suscriptionService.addSuscription(sus);
   }
+
+  // filtros ------------------------------------------------------
+
+  validarCuit(control: AbstractControl): ValidationErrors | null {
+    const cuit = control.value;
+
+    console.log(this.documentType);
+    
+    if (Number(this.documentType) !== 3) {
+      return null;
+    }
+
+    if (!cuit || cuit.length !== 11 || !/^\d+$/.test(cuit)) {
+      return { invalidCuit: 'El formato de CUIT es incorrecto' };
+    }
+
+    const base = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
+
+    let aux = 0;
+    for (let i = 0; i < 10; i++) {
+      aux += parseInt(cuit[i], 10) * base[i];
+    }
+
+    aux = 11 - (aux % 11);
+
+    if (aux === 11) {
+      aux = 0;
+    }
+    if (aux === 10) {
+      aux = 9;
+    }
+
+    return aux === parseInt(cuit[10], 10) ? null : { invalidCuit: 'El CUIT es inválido' };
+  }
+
+  documentTypeChange() {
+    this.documentType = this.reactiveForm.get('dniType')?.value;
+
+    const dniControl = this.reactiveForm.get('dni');
+
+    dniControl?.setErrors(null);
+
+    if (this.documentType == '3') {     
+      const validationResult = this.validarCuit(dniControl!);      
+      if (validationResult) {
+        dniControl?.setErrors(validationResult);
+      }
+    }
+  }
+
 
   //------------------------------------------------------Redireccionar------------------------------------------------------
 
@@ -305,6 +361,8 @@ export class NewUserComponent implements OnInit, OnDestroy {
 
       },
       error: (error) => {
+        console.log(error);
+        
         //Mostramos que hubo un error
         Swal.fire({
           title: 'Error',
@@ -382,6 +440,8 @@ export class NewUserComponent implements OnInit, OnDestroy {
           return 'Este correo electrónico ya está en uso.';
         case 'dniTaken':
           return 'Este DNI ya está en uso.';
+        case 'invalidCuit':
+          return 'El CUIT ingresado es inválido.';
         default:
           return 'Error no identificado en el campo.';
       }

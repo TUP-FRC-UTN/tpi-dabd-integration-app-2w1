@@ -69,15 +69,24 @@ export class UsersNewPlotComponent implements OnInit, OnDestroy {
 
     //Validar que la superficie construida no sea mayor a la superficie total
     const sus = this.formReactivo.get('totalBuild')?.valueChanges.subscribe(() => {
-      this.formReactivo.get('totalBuild')?.setValidators([Validators.max(this.formReactivo.get('totalArea')?.value), Validators.min(1)]);
+      this.formReactivo.get('totalBuild')?.setValidators([Validators.max(this.formReactivo.get('totalArea')?.value), Validators.min(0)]);
     });
 
     const sus2 = this.formReactivo.get('totalArea')?.valueChanges.subscribe(() => {
-      this.formReactivo.get('totalBuild')?.setValidators([Validators.max(this.formReactivo.get('totalArea')?.value), Validators.min(1)]);
+      this.formReactivo.get('totalBuild')?.setValidators([Validators.max(this.formReactivo.get('totalArea')?.value), Validators.min(0)]);
+    });
+
+    const sus3 = this.formReactivo.get('type')?.valueChanges.subscribe(() => {
+        if(this.formReactivo.get('type')?.value == 3){
+          this.formReactivo.get('totalBuild')?.setValue(0);
+          this.formReactivo.get('totalBuild')?.disable();
+        }else{
+          this.formReactivo.get('totalBuild')?.enable();
+        }
     });
 
     //Agregar suscripción
-    [sus, sus2].forEach(s => s && this.suscriptionService.addSuscription(s));
+    [sus, sus2, sus3].forEach(s => s && this.suscriptionService.addSuscription(s));
   }
 
   ngOnInit(): void {

@@ -210,6 +210,9 @@ export class UsuariosNewOwnerComponent implements OnInit, OnDestroy {
   validarCuit(control: AbstractControl): ValidationErrors | null {
     const cuit = control.value;
 
+    console.log('Validando CUIT:', cuit);
+    
+
     if (this.documentType !== '3') {
       return null;
     }
@@ -237,17 +240,6 @@ export class UsuariosNewOwnerComponent implements OnInit, OnDestroy {
     return aux === parseInt(cuit[10], 10) ? null : { invalidCuit: 'El CUIT es inválido' };
   }
 
-  //Valida que la fecha sea menor a la actual
-  dateLessThanTodayValidator(): ValidatorFn {
-    return (control: AbstractControl): ValidationErrors | null => {
-      const inputDate = new Date(control.value);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      return inputDate >= today ? { dateTooHigh: true } : null;
-    }
-  }
-
-
   documentTypeChange() {
     this.documentType = this.formReactivo.get('documentType')?.value;
 
@@ -260,6 +252,16 @@ export class UsuariosNewOwnerComponent implements OnInit, OnDestroy {
       if (validationResult) {
         dniControl?.setErrors(validationResult);
       }
+    }
+  }
+
+  //Valida que la fecha sea menor a la actual
+  dateLessThanTodayValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const inputDate = new Date(control.value);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      return inputDate >= today ? { dateTooHigh: true } : null;
     }
   }
 
