@@ -1,38 +1,32 @@
 import { Routes } from "@angular/router";
 import { AccessVehiclesViewComponent } from "./components/access_vehicles-register/access-vehicles-view/access-vehicles-view.component";
-import { AccessRegisterVisitorsComponent } from "./components/access_visitors/access_visitors_register/access-register-visitors/access-register-visitors.component";
-import { roleWhitelistGuard } from "./guards/role-whitelist.guard";
+import { AccessContainerVisitorsRegistrationComponent } from "./components/access_visitors/access_visitors_register/access-container-visitors-registration/access-container-visitors-registration.component";
+import { MetricsComponent } from "./components/metrics/metrics.component";
+import { authGuard } from "../users/guards/auth.guard";
+import { roleGuard } from "../users/guards/role.guard";
 
 export const ENTRY_ROUTES: Routes = [
-    { 
-        path: 'reports', 
-        loadComponent: () => import('./components/entries_reports/entries-global-report/access-global-report.component').then(c => c.AccessGlobalReportComponent),
-        canActivate: [roleWhitelistGuard], 
-        data: {
-            roles: ['Gerente General', 'Seguridad']
-        } },
-    { 
-        path: 'visitor', 
-        component: AccessRegisterVisitorsComponent,
-        canActivate: [roleWhitelistGuard],
-        data: {
-            roles: ['Propietario', 'Inquilino', 'Gerente General']
-        }
-    },
-    { 
-        path: 'vehicles',
-        component: AccessVehiclesViewComponent,
-        canActivate: [roleWhitelistGuard],
-        data: {
-            roles: ['Gerente General', 'Propietario', 'Inquilino', 'Seguridad']
-        }
-    },
-    { 
-        path: 'dashboard', 
-        loadComponent: () => import('./components/metrics/metrics.component').then(c => c.MetricsComponent),
-        canActivate: [roleWhitelistGuard],
-        data: {
-            roles: ['Gerente General']
-        }
-    },
-];
+    {
+        path: '',
+        canActivateChild: [authGuard, roleGuard],
+        data: { roles: ['SuperAdmin', 'Propietario', 'Inquilino', 'Familiar mayor'] },
+        children: [
+            {
+                path: 'reports', component: AccessGlobalReportComponent,
+                data: { roles: ['SuperAdmin', 'Seguridad'] }
+            },
+            {
+                path: 'visitor', component: AccessContainerVisitorsRegistrationComponent,
+                data: { roles: ['SuperAdmin', 'Propietario', 'Inquilino', 'Familiar mayor'] }
+            },
+            {
+                path: 'vehicles', component: AccessVehiclesViewComponent,
+                data: { roles: ['SuperAdmin', 'Seguridad'] }
+            },
+            {
+                path: 'dashboard', component: MetricsComponent,
+                data: { roles: ['SuperAdmin'] }
+            },
+        ]
+    }
+

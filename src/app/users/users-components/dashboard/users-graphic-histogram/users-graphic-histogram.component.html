@@ -14,10 +14,10 @@
         </div>
 
         <div class="col-auto d-flex gap-1 ms-auto">
-            <button class="btn btn-primary filterbutton" data-bs-toggle="modal" title="Filtros Avanzados"
+            <!-- <button class="btn btn-primary filterbutton" data-bs-toggle="modal" title="Filtros Avanzados"
                 data-bs-target="#filtrosAvanzados">
                 <i class="bi bi-funnel-fill"></i>
-            </button>
+            </button> -->
             <button type="button" class="btn btn-secondary bi bi-trash filterbutton" (click)="clearFilters()"
                 title="Limpiar Filtros"></button>
         </div>
@@ -29,9 +29,9 @@
         <div class="card-body">
 
             <h4 class="card-title">Distribución de Usuarios por Rango de Edad y por Estado
-                <button type="button"
-                class="btn btn-sm btn-link text-muted bi bi-arrow-left fs-5 float-end" title="Volver"
-                (click)="changeView()"></button></h4>
+                <button type="button" class="btn btn-sm btn-link text-muted bi bi-arrow-left fs-5 float-end"
+                    title="Volver" (click)="changeView()"></button>
+            </h4>
             <hr>
             <div class="row">
 
@@ -64,15 +64,15 @@
                             [amount]="ageDistribution.statics.averageAge"
                             [customStyles]="{ 'background-color': '#d8ffedde' }" formatPipe="age"
                             tooltip="Promedio de edad de los usuarios registrados"></app-users-kpi>
-    
+
                         <div *ngIf="error" class="error-container">
                             <i class="bi bi-exclamation-triangle-fill error-icon"></i>
                             <p>{{ error }}</p>
                         </div>
-    
+
                         @if(!error){
-                        <google-chart class="mt-2" [type]="pieChart" [data]="pieChartData" [options]="pieChartOptions" [width]="400"
-                            [height]="200">
+                        <google-chart class="mt-2" [type]="pieChart" [data]="pieChartData" [options]="pieChartOptions"
+                            [width]="400" [height]="200">
                         </google-chart>
                         }
                     </div>
@@ -80,14 +80,18 @@
 
                 <div class="col-md-7">
                     <div>
+                        @if(loading){
+                        <div class="loading">Cargando...</div>
+                        }
+
+
                         @if(error){
                         <div class="error-container">
                             <i class="bi bi-exclamation-triangle-fill error-icon"></i>
                             <p>{{ error }}</p>
                         </div>
                         }
-
-                        @if(!error){
+                        @if(!loading && !error){
                         <google-chart [type]="columnChart" [data]="barChartData" [options]="barChartOptions"
                             [width]="600" [height]="400">
                         </google-chart>
@@ -95,8 +99,59 @@
                     </div>
                 </div>
             </div>
-
         </div>
+    </div>
+</div>
 
+<div class="modal fade" id="infoModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Reporte</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <ul>
+                    <li>
+                        <p>
+                            <strong>Distribución de Usuarios por Rango de Edad y por Estado</strong>:
+                            Este gráfico presenta un análisis de la distribución de usuarios por rango de edad y por
+                            estado (activos e inactivos).
+
+                            En la parte superior izquierda se muestra información resumen sobre la cantidad total de
+                            usuarios y el promedio de edad.
+                            Debajo se indica el rango de edad mínimo y máximo de los usuarios.
+                        </p>
+                        <p>
+                            El gráfico de barras representa la distribución de usuarios activos e inactivos por
+                            diferentes rangos de edad.
+                            Esto permite visualizar cómo se distribuye la población de usuarios en función de su edad.
+                        </p>
+                        <p>
+                            El gráfico circular muestra la distribución general de usuarios por estado, ya sea activos o
+                            inactivos.
+                        </p>
+                    </li>
+
+                    <li>
+                        <strong>Botones</strong>:
+                        <ul>
+                            <!-- <li><button class="btn btn-primary bi bi-funnel-fill mb-2"></button> Permite aplicar filtros
+                                avanzados.
+                            </li> -->
+                            <li><button class="btn btn-secondary bi bi-trash mb-2"></button> Elimina los filtros
+                                aplicados.
+                            </li>
+                            <li><button class="btn btn-sm btn-link text-muted bi bi-arrow-left fs-5"></button> Vuelve a
+                                la pantalla
+                                principal.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+            </div>
+        </div>
     </div>
 </div>

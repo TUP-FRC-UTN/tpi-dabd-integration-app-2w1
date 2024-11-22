@@ -84,7 +84,8 @@ export class CustomSelectComponent {
       date: () => 'La fecha ingresada es inválida.',
       url: () => 'El formato de URL ingresado no es válido.',
       number: () => 'Este campo solo acepta números.',
-      customError: () => 'Error personalizado: verifique el dato ingresado.'
+      customError: () => 'Error personalizado: verifique el dato ingresado.',
+      customsErrors: (error) => 'Error: ' + error.message
     };
 
     return errorMessages[errorKey]?.(errorValue) ?? 'Error no identificado en el campo.';

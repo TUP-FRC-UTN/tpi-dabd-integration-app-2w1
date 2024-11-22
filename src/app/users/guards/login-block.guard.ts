@@ -10,14 +10,9 @@ export const loginBlockGuard: CanActivateFn = (route, state) => {
 
   //Verifica si el usuario está logueado
   if(authService.isLoggedIn()){
-
-    //Lo redirige a home
-    router.navigate(['/home']);
-
-    //No lo deja ingresar
-    return false;
+    return true;
   }
 
-  //Sino lo deja acceder
-  return true;
+  router.navigate(['/home']);
+  return false;
 };
