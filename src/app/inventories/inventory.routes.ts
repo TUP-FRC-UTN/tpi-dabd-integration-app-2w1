@@ -9,7 +9,7 @@ import { IepSuppliersFormComponent } from "./iep-inventory/components/iep-suppli
 import { IepNuevoIngresoEgresoComponent } from "./iep-inventory/components/iep-nuevo-ingreso-egreso/iep-nuevo-ingreso-egreso.component";
 import { IepSupplierUpdateComponent } from "./iep-inventory/components/iep-supplier-update/iep-supplier-update.component";
 import { authGuard } from "../users/guards/auth.guard";
-import { roleGuard } from "../notifications/guard";
+import { roleGuard } from "../users/guards/role.guard";
 
 export const INVENTORY_ROUTES: Routes = [
     {

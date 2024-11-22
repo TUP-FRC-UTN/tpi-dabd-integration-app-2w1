@@ -6,7 +6,7 @@ import { ViewGastosAdminComponent } from "./components/expenses-view-expense-adm
 import { ViewOwnerExpenseComponent } from "./components/expenses-view-expense-owner/expenses-view-expense-owner.component";
 import { ExpensesViewCategoryComponent } from "./components/expenses-view-category/expenses-view-category.component";
 import { authGuard } from "../users/guards/auth.guard";
-import { roleGuard } from "../notifications/guard";
+import { roleGuard } from "../users/guards/role.guard";
 
 export const EXPENSES_ROUTES: Routes = [
     {

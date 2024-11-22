@@ -3,7 +3,7 @@ import { NotificationHomeComponent } from "./notification-home/notification-home
 import { AllNotificationComponent } from "./components/all-notification/all-notification.component";
 import { NotificationComponent } from "./components/notification/notification.component";
 import { PostNotificationAdminComponent } from "./components/post-notification-admin/post-notification-admin.component";
-import { roleGuard } from "./guard";
+import { roleGuard } from "../users/guards/role.guard";
 import { authGuard } from "../users/guards/auth.guard";
 
 export const NOTIFICATION_ROUTES: Routes = [

@@ -71,12 +71,12 @@ export class UsersTransferPlotComponent implements OnInit, OnDestroy {
 
   //Cargar el propietario actual
   loadActualOwner() {
-    this.ownersService.getOwnerByPlotId(this.plotId).subscribe({
-      next: (data: Owner[]) => {        
+    const sus = this.ownersService.getOwnerByPlotId(this.plotId).subscribe({
+      next: (data: Owner[]) => {
         this.actualOwner = data.find(owner => owner.active == true)!;
         this.owners = this.owners.filter(owner => owner.value != this.actualOwner.id);
         this.reactiveForm.get('actualOwner')?.setValue(this.actualOwner.name + ' ' + this.actualOwner.lastname + ' - ' + this.actualOwner.dni);
-      
+
         this.loadPlotOwner(this.actualOwner.id);
       },
       error: (error) => {
@@ -88,20 +88,20 @@ export class UsersTransferPlotComponent implements OnInit, OnDestroy {
     this.suscriptonService.addSuscription(sus);
   }
 
-  loadPlotOwner(id : number){
+  loadPlotOwner(id: number) {
     this.plotService.getPlotsByOwnerId(id).subscribe({
-      next: (data : GetPlotModel[]) =>{
+      next: (data: GetPlotModel[]) => {
         this.plotLength = data.length
       }
     })
   }
 
-  confirmAction(){
+  confirmAction() {
     this.confirm = true;
 
-    let message : string = '¿Estás seguro de que desea transferir el lote?'
-    
-    if(this.plotLength == 1){
+    let message: string = '¿Estás seguro de que desea transferir el lote?'
+
+    if (this.plotLength == 1) {
       message = `¿Estás seguro de que deseas transferir el lote? 
       El propietario ${this.actualOwner.name} ${this.actualOwner.lastname} - ${this.actualOwner.dni} se dará de baja por inexistencia de lotes a su nombre`
     }

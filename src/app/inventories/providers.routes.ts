@@ -4,7 +4,7 @@ import { IepSupplierListComponent } from "./iep-inventory/components/iep-supplie
 import { IepSupplierUpdateComponent } from "./iep-inventory/components/iep-supplier-update/iep-supplier-update.component";
 import { IepSuppliersFormComponent } from "./iep-inventory/components/iep-suppliers-form/iep-suppliers-form.component";
 import { authGuard } from "../users/guards/auth.guard";
-import { roleGuard } from "../notifications/guard";
+import { roleGuard } from "../users/guards/role.guard";
 
 export const PROVIDERS_ROUTES: Routes = [
     {

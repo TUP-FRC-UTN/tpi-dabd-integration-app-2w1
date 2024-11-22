@@ -328,6 +328,10 @@ export class UsuariosNewOwnerComponent implements OnInit, OnDestroy {
     this.routingService.redirect('/main/owners/list', 'Listado de Propietarios');
   }
 
+  redirectPlot(){
+    this.routingService.redirect('/main/plots/add', 'Listado de Lotes');
+  }
+
   //Cambiar visibilidad de la contraseña
   togglePasswordVisibility(): void {
     this.passwordVisible = !this.passwordVisible;

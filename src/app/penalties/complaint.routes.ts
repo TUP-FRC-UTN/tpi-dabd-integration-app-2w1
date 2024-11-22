@@ -3,7 +3,7 @@ import { PenaltiesListComplaintComponent } from "../penalties/components/complai
 import { PenaltiesPostComplaintComponent } from "./components/complaintComponents/penalties-post-complaint/penalties-post-complaint.component";
 import { PenaltiesComplaintDashboardComponent } from "./components/complaintComponents/penalties-complaint-dashboard/penalties-complaint-dashboard.component";
 import { authGuard } from "../users/guards/auth.guard";
-import { roleGuard } from "../notifications/guard";
+import { roleGuard } from "../users/guards/role.guard";
 
 export const COMPLAINT_ROUTES: Routes = [
     {

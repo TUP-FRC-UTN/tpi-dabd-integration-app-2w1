@@ -9,7 +9,7 @@ import { NewReportComponent } from "./components/sanctionsComponents/penalties-p
 import { PenaltiesUpdateFineComponent } from "./components/sanctionsComponents/penalties-update-fine/penalties-update-fine.component";
 import { PenaltiesFineDashboardComponent } from "./components/sanctionsComponents/penalties-fine-dashboard/penalties-fine-dashboard.component";
 import { authGuard } from "../users/guards/auth.guard";
-import { roleGuard } from "../notifications/guard";
+import { roleGuard } from "../users/guards/role.guard";
 
 
 export const SANCTION_ROUTES: Routes = [

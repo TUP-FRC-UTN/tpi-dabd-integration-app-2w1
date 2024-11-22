@@ -5,7 +5,7 @@ import { UsersUpdateOwnerComponent } from "./users-components/owners/users-updat
 import { UsersReportComponent } from "./users-components/dashboard/users-report/users-report.component";
 import { UsersGraphicPlotsStatsComponent } from "./users-components/dashboard/users-graphic-plots-stats/users-graphic-plots-stats.component";
 import { authGuard } from "./guards/auth.guard";
-import { roleGuard } from "../notifications/guard";
+import { roleGuard } from "../users/guards/role.guard";
 
 export const OWNER_ROUTES: Routes = [
   {

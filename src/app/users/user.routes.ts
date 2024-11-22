@@ -7,7 +7,7 @@ import { UsersUpdateUserComponent } from "./users-components/users/users-update-
 import { UsersReportComponent } from "./users-components/dashboard/users-report/users-report.component";
 import { UsersGraphicHistogramComponent } from "./users-components/dashboard/users-graphic-histogram/users-graphic-histogram.component";
 import { authGuard } from "./guards/auth.guard";
-import { roleGuard } from "../notifications/guard";
+import { roleGuard } from "../users/guards/role.guard";
 
 export const USER_ROUTES: Routes = [
   {
@@ -17,7 +17,8 @@ export const USER_ROUTES: Routes = [
     children: [
       {
         path: 'profile',
-        component: UsersProfileComponent
+        component: UsersProfileComponent,
+        data: ['SuperAdmin', 'Gerente general', 'Propietario', 'Familiar mayor', 'Inquilino', 'Gerente multas', 'Gerente inventario']
       },
       {
         path: 'family',
@@ -31,11 +32,11 @@ export const USER_ROUTES: Routes = [
       },
       {
         path: 'add', component: NewUserComponent,
-        data: { roles: ['SuperAdmin', 'Gerente general'] }
+        data: { roles: ['SuperAdmin', 'Gerente general', 'Propietario'] }
       },
       {
         path: 'edit/:id', component: UsersUpdateUserComponent,
-        data: { roles: ['SuperAdmin', 'Gerente general'] }
+        data: { roles: ['SuperAdmin', 'Gerente general', 'Propietario'] }
       },
       {
         path: 'dashboard', component: UsersReportComponent,

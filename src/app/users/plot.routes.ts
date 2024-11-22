@@ -7,7 +7,7 @@ import { UsersGraphicBlocksComponent } from "./users-components/dashboard/users-
 import { UsersGraphicPlotsStatsComponent } from "./users-components/dashboard/users-graphic-plots-stats/users-graphic-plots-stats.component";
 import { UsersGraphicPlotComponent } from "./users-components/dashboard/users-graphic-plot/users-graphic-plot.component";
 import { authGuard } from "./guards/auth.guard";
-import { roleGuard } from "../notifications/guard";
+import { roleGuard } from "../users/guards/role.guard";
 
 export const PLOT_ROUTES: Routes = [
   {

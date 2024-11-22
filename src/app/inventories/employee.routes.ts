@@ -9,7 +9,7 @@ import { IepChartsEmployeesComponent } from "./iep-employees/components/iep-char
 import { IepPillowLaterArrivalConfigComponent } from "./iep-employees/components/iep-pillow-later-arrival-config/iep-pillow-later-arrival-config.component";
 import { IepAttendancesComponent } from "./iep-employees/components/iep-attendances/iep-attendances.component";
 import { authGuard } from "../users/guards/auth.guard";
-import { roleGuard } from "../notifications/guard";
+import { roleGuard } from "../users/guards/role.guard";
 
 export const EMPLOYEE_ROUTES: Routes = [
     {

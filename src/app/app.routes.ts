@@ -7,8 +7,7 @@ import { UsersRecoveryPasswordComponent } from './common/components/users-recove
 import { UnauthorizedComponent } from './common/components/unauthorized/unauthorized.component';
 import { UsersHomeComponent } from './common/components/users-home/users-home.component';
 import { authGuard } from './users/guards/auth.guard';
-import { roleGuard } from './notifications/guard';
-
+import { roleGuard } from './users/guards/role.guard';
 export const routes: Routes = [
     {
         //si se deja vacío por defecto redirige al login
@@ -52,7 +51,7 @@ export const routes: Routes = [
             {
                 path: 'expenses',
                 loadChildren: () => import("./expenses/expenses.routes").then((m) => m.EXPENSES_ROUTES),
-                data: { roles: ['SuperAdmin', 'Gerente finanzas'] }
+                data: { roles: ['SuperAdmin', 'Gerente finanzas', 'Propietario'] }
             },
             {
                 path: 'employees',

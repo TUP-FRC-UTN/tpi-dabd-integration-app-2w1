@@ -5,7 +5,7 @@ import { ExpenseGenerationUserViewComponent } from "./expense-generation-user-vi
 import { ExpenseGenerationCounterView2Component } from "./expense-generation-counter-view-2/expense-generation-counter-view-2.component";
 import { ExpenseGenerationPaymentFormComponent } from "./expense-generation-payment-form/expense-generation-payment-form.component";
 import { authGuard } from "../users/guards/auth.guard";
-import { roleGuard } from "../notifications/guard";
+import { roleGuard } from "../users/guards/role.guard";
 
 export const INVOICE_ROUTES: Routes = [
     {

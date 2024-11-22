@@ -4,7 +4,7 @@ import { AccessVehiclesViewComponent } from "./components/access_vehicles-regist
 import { AccessContainerVisitorsRegistrationComponent } from "./components/access_visitors/access_visitors_register/access-container-visitors-registration/access-container-visitors-registration.component";
 import { MetricsComponent } from "./components/metrics/metrics.component";
 import { authGuard } from "../users/guards/auth.guard";
-import { roleGuard } from "../notifications/guard";
+import { roleGuard } from "../users/guards/role.guard";
 
 export const ENTRY_ROUTES: Routes = [
     {

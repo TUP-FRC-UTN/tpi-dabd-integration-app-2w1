@@ -188,7 +188,7 @@
               <app-custom-select [options]="availablePlots" [multiple]="true"
                   [selectedOptions]="formReactivo.get('plots')?.value"  class="col-11"
                   (selectedOptionsChange)="formReactivo.get('plots')?.setValue($event)" />
-              <span class="input-group-text m-0 col-1"(click)="redirect('/main/plots/add')" style="cursor: pointer;">
+              <span class="input-group-text m-0 col-1"(click)="redirectPlot()" style="cursor: pointer;">
                 <i class="bi-plus-lg"></i>
               </span>
             </div>   
