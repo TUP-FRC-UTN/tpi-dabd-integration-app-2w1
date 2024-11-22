@@ -22,7 +22,7 @@ export const USER_ROUTES: Routes = [
       {
         path: 'family',
         component: UsersFamiliarGroupComponent,
-        data: { roles: ['Propietario', 'Familiar mayor'] }
+        data: { roles: ['Propietario', 'Familiar mayor', 'Familiar menor', 'Inquilino'] }
       },
 
       {
