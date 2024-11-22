@@ -283,10 +283,8 @@ export class IepAttendancesComponent implements OnInit{
 
         button.prop('disabled', false);
      });
-
-    // $('#empleadosTable').on('click', '.btn-modal', (event: any) => {
-    // });
   }
+  
   isValidDateToJustify(date:any):boolean{
     const [day, month, year] = date.split('/').map((part: string) => parseInt(part, 10));
   

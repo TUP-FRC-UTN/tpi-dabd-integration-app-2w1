@@ -86,7 +86,7 @@ export class IEPFormPostEmployeesComponent implements OnInit {
   mail: string = '';
   calle: string = '';
   numeroCalle: number = 0;
-  piso: number = 0;
+  piso?: number = undefined;
   dpto: string = '';
   codigoPostal: string = '';
   salario?: number;
@@ -127,11 +127,15 @@ export class IEPFormPostEmployeesComponent implements OnInit {
   isValidCuilFinish: boolean = true;
 
   cambio() {
-    console.log("Lunes:", this.lunes); // Debería mostrar true o false
-    console.log("Martes:", this.martes); // Debería mostrar true o false
+    console.log("Lunes:", this.lunes); 
+    console.log("Martes:", this.martes); 
 }
 
- 
+dniChange(): void {
+  if(this.documentType === DocumentTypeEnum.DNI){
+    this.dni = this.cuil?.substring(3, 11);
+  }
+}
 
   public validateDate() {
     if (this.startTimeContract != null) {
@@ -145,62 +149,20 @@ export class IEPFormPostEmployeesComponent implements OnInit {
       this.invalidDate = selectedDate < today;
       return;
     }
-    // Si la fecha seleccionada es anterior a la actual, setea `isInvalidDate` en true
     this.invalidDate = false;
   }
 
-/*
-  public validateCuil(){
-    console.log("pre validando"+this.cuil)
-    let rsta =  this.validarCUILFormato(this.cuil)
-    if(!rsta ){ return}
-    if(this.cuil!=null&&this.cuil!=undefined ){
-
-      console.log("prevalidando2")
-        this.validateCuil$ = this.serviceCombos.validateCuil(this.cuil)
-        this.validateCuil$.subscribe({
-          next: response => {
-            console.log("respuestaa"+response)
-            this.isValidCuil = !response;
-            console.log(this.isValidCuil)
-            this.validarCUILFormato(this.cuil)
-
-    // Verificar cada control en el formulario y registrar errores
- //   Object.keys(form.controls).forEach(field => {
-   //   const control = form.controls[field];
-      
-   //   if (control.invalid) {
-   //       console.log(`Campo '${field}' inválido. Errores:`, control.errors);
-   //   }
-  //  });
-
-   
-      }
-       
-            })
-
-    }
-
-
-  }*/
-
   public validateDni(){
-
     if(this.dni!=null&&this.dni!=undefined && this.documentType!=null&& this.documentType!=undefined){
-
       if(this.dni.length>7){
-
         this.validateDni$ = this.serviceCombos.validateDni(this.dni,this.documentType)
         this.validateDni$.subscribe({
           next: response => {
             this.isValidDni = !response;
-          }
-            
-            })
+          }       
+        })
       }
-
     }
-
   }
 
  
@@ -376,9 +338,7 @@ export class IEPFormPostEmployeesComponent implements OnInit {
         this.isValidCuilFinish= false
         return false;
     }
-    /*else {
-      this.isValidCuilFinish=true
-    }*/
+   
     console.log("paso3")
     // Calcula el dígito verificador
      const multiplicadores = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2]; // Último 1 es para el dígito verificador

@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { Subscription } from 'rxjs';
+import { map, Subscription, switchMap } from 'rxjs';
 import { FormsModule, NgSelectOption } from '@angular/forms';
 import $, { param } from 'jquery';
 import { EmpListadoEmpleados } from '../../Models/emp-listado-empleados';
@@ -525,15 +525,14 @@ this.table.rows.add(filteredData).draw();
           className: 'align-middle text-center',
           render: (data: any, type: any, row: any) => {
             console.log('Row:', row);
-            if (row.active === false) {
-                
-                return '<span class="badge border rounded-pill text-bg-red">Inactivo</span>';
+            if (row.active === false) {  
+              return '<span class="badge border rounded-pill" style="background-color: #dc3545; color: white;">Inactivo</span>';
             }
             if (row.active === true && row.license === true) {
               
-                return '<span class="badge border rounded-pill text-bg-yellow">Licencia</span>';
+              return '<span class="badge border rounded-pill" style="background-color: #ffc107; color: black;">Licencia</span>';
             }
-            return '<span class="badge border rounded-pill text-bg-green">Activo</span>';
+            return '<span class="badge border rounded-pill" style="background-color: #198754; color: white;">Activo</span>';
           },
         },
         {
@@ -743,8 +742,19 @@ this.table.rows.add(filteredData).draw();
   consultarEmpleado(id: number): void {
     const empByIdSubscription = this.empleadoService
       .getEmployeeById(id)
+      .pipe(
+        switchMap(empleado => 
+          this.empleadoService.getContactById(Number(empleado.documentValue)).pipe(
+            map(contacts => ({ 
+              empleado, 
+              email: contacts[0]?.value,
+              phone: contacts[1]?.value
+            }))
+          )
+        )
+      )
       .subscribe({
-        next: (empleado) => {
+        next: ({empleado, email, phone}) => {
           const fechaContrato = new Date(
             empleado.contractStartTime[0],
             empleado.contractStartTime[1] - 1,
@@ -770,6 +780,8 @@ this.table.rows.add(filteredData).draw();
             empleado.documentValue
           }</p>
                 <p><strong>CUIL:</strong> ${empleado.cuil}</p>
+                 <p><strong>Email:</strong> ${email || 'No disponible'}</p>
+                <p><strong>Teléfono:</strong> ${phone || 'No disponible'}</p>
               </div>
               <div class="col-md-6">
                 <h6><strong>Información Laboral</strong></h6>

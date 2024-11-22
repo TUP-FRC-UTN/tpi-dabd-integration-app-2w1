@@ -44,3 +44,19 @@ export interface Employee {
   endTime: [number, number];   // [Hora, Minuto]
   supplierId: number | null;
 }
+
+export interface ContactConsDTO {
+  id: number;
+  userId: number;
+  personType: PersonTypeResponseDto;
+  contacType: ContactTypeResponseDTO;
+  value: string;
+}
+export interface PersonTypeResponseDto {
+  id: number;
+  type: string;
+}
+export interface ContactTypeResponseDTO {
+  id: number;
+  type: string;
+}
