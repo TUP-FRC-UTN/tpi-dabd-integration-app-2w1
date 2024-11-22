@@ -5,7 +5,8 @@ import { Router, RouterModule } from '@angular/router';
 import { iepBackButtonComponent } from '../../../common-components/iep-back-button/iep-back-button.component';
 import { CommonModule } from '@angular/common';
 import Swal from 'sweetalert2';
-import { debounceTime, distinctUntilChanged, max, switchMap } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, max, of, switchMap } from 'rxjs';
+import { AuthService } from '../../../../users/users-servicies/auth.service';
 
 
 @Component({
@@ -18,15 +19,16 @@ import { debounceTime, distinctUntilChanged, max, switchMap } from 'rxjs';
 export class IepSuppliersFormComponent {
   proveedorForm!: FormGroup;
 
-  constructor(private fb: FormBuilder, private supplierService: SuppliersService, private router: Router) { }
+  constructor(private fb: FormBuilder, private supplierService: SuppliersService, private router: Router, private userService: AuthService) { }
 
   ngOnInit(): void {
     this.proveedorForm = this.fb.group({
       name: ['', Validators.required],
       cuit: ['', [
         Validators.required, this.validarCUIT()]],
-      phoneNumber: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
-      email: ['', [Validators.required, Validators.email]],
+      phoneNumber: ['', [Validators.required, Validators.pattern('[1-9]{10}$')]],
+      createdUser:[this.userService.getUser().id],
+      email: ['', [Validators.required, Validators.email, this.emailDomainValidator]],
       supplierType: ['OTHER', Validators.required],
       address: ['', Validators.required],
       discontinued: [false]
@@ -40,61 +42,55 @@ export class IepSuppliersFormComponent {
 
   onSubmit() {
 
-
-
-
     if (this.proveedorForm.valid) {
       const formData = this.proveedorForm.value;
       console.log(formData);
-      this.supplierService.createSupplier(formData).subscribe((response) => {
-        this.proveedorForm.reset();
-        this.router.navigate(['/suppliers']);
-
-      });
-
+     
       const formAccess = {
+        cratedUserId: formData.createdUser,
         name: formData.name,
         cuil: formData.cuit,
         email: formData.email,
-
       }
 
-      this.supplierService.createSupplierAccess(formAccess).subscribe({
+      this.supplierService.createSupplierAccess(formAccess).pipe(
+        switchMap(response => {
+          console.log( "Proveedor cargado: " +JSON.stringify(response))
 
-        next: response => {
-          console.log(JSON.stringify(response))
-          Swal.fire({
-            title: '¡Guardado!',
-            text: "Proveedor guardado con exito",
-            icon: 'success',
-            confirmButtonText: 'Aceptar',
-            showCancelButton: false,
-            confirmButtonColor: '#3085d6'
-          }).then(() => {
-            this.router.navigate(['/suppliers'])
-          });
-          ;
-          console.log("PASO: ", response);
-        },
-        error: error => {
-
+          return this.supplierService.createSupplier(formData)
+        }),
+        catchError(error => {
+          console.error("Error en el flujo:", error);
+  
           Swal.fire({
             title: 'Error',
-            text: "Error en el servidor intente nuevamente mas tarde",
+            text: 'Error en el servidor, intente nuevamente más tarde',
             icon: 'error',
             confirmButtonText: 'Aceptar',
-            confirmButtonColor: '#3085d6'
+            confirmButtonColor: '#3085d6',
           });
-
-          console.log("error:" + error.error.message)
-          console.error(error);
-
+  
+          return of(null);
+        })
+      ).subscribe({
+        next: response => {
+          if (response) {
+            console.log("Acceso creado:", JSON.stringify(response));
+  
+            Swal.fire({
+              title: '¡Guardado!',
+              text: 'Proveedor guardado con éxito',
+              icon: 'success',
+              confirmButtonText: 'Aceptar',
+              confirmButtonColor: '#3085d6',
+            }).then(() => {
+              this.router.navigate(['main/providers/suppliers']);
+            });
+          }
         }
-      })
+      });
     }
   }
-
-
 
   isFieldInvalid(field: string): boolean {
     const control = this.proveedorForm.get(field);
@@ -123,70 +119,13 @@ export class IepSuppliersFormComponent {
 
           if (exists) {
             cuitControl?.setErrors({ cuitExists: true });
-          } else {
-            cuitControl?.setErrors(null);
-          }
+          } 
         },
         (error) => {
           console.error('Error al verificar el CUIT', error);
         }
       );
   }
-
-  /* isValidCuilFinish: boolean = false;
-
-  validarCUITFormato(): ValidatorFn {
-    return (control: AbstractControl): ValidationErrors | null => {
-      if (!control.value) {
-        return null;
-      }
-  
-      const cuit = control.value.toString().trim();
-      
-      // Validar ÚNICAMENTE el formato con guiones (XX-XXXXXXXX-X)
-      const formatoConGuiones = /^\d{2}-\d{8}-\d{1}$/;
-      
-      if (!formatoConGuiones.test(cuit)) {
-        return {
-          invalidCUIT: 'El formato debe ser XX-XXXXXXXX-X (incluyendo los guiones)'
-        };
-      }
-  
-      // Eliminar guiones para la validación del dígito verificador
-      const cuitLimpio = cuit.replace(/-/g, '');
-      
-      // Validar tipo de CUIT
-      const tipo = parseInt(cuitLimpio.substring(0, 2), 10);
-      const tiposValidos = [20, 23, 24, 27, 30, 33, 34];
-      if (!tiposValidos.includes(tipo)) {
-        return {
-          invalidCUIT: 'El tipo de CUIT no es válido (debe comenzar con: 20, 23, 24, 27, 30, 33 o 34)'
-        };
-      }
-  
-      // Validar dígito verificador
-      const multiplicadores = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
-      const digitoVerificador = parseInt(cuitLimpio.charAt(10), 10);
-  
-      let suma = 0;
-      for (let i = 0; i < 10; i++) {
-        suma += parseInt(cuitLimpio.charAt(i), 10) * multiplicadores[i];
-      }
-  
-      let resto = suma % 11;
-      let digitoCalculado = resto === 0 ? 0 : 11 - resto;
-  
-      if (digitoCalculado !== digitoVerificador) {
-        return {
-          invalidCUIT: 'El dígito verificador no es válido'
-        };
-      }
-  
-      return null;
-    };
-  }
-    */
-
 
   emailExists: boolean = false;
 
@@ -207,9 +146,7 @@ export class IepSuppliersFormComponent {
 
           if (exists) {
             emailControl?.setErrors({ emailExists: true });
-          } else {
-            emailControl?.setErrors(null);
-          }
+          } 
         },
         (error) => {
           console.error('Error al verificar el Email', error);
@@ -260,8 +197,10 @@ export class IepSuppliersFormComponent {
   
         // Verifica que los primeros 2 dígitos sean un tipo válido (20, 23, 24, 27, 30, 33, 34)
         const tipo = parseInt(cuilLimpio.substring(0, 2), 10);
-        const tiposValidos = [20, 23, 24, 27, 30, 33, 34];
+        console.log(tipo);
+        const tiposValidos = [30, 33, 34];
         if (!tiposValidos.includes(tipo)) {
+          console.log("no es valido")
           return { cuilInvalido: true };
         }
         // Calcula el dígito verificador
@@ -280,5 +219,15 @@ export class IepSuppliersFormComponent {
       }
       return null; 
     };
+  }
+
+  emailDomainValidator(control: AbstractControl) {
+    const email = control.value;
+    if (email && email.endsWith('.com') || email.endsWith('.com.ar') || email.endsWith('.net') || 
+    email.endsWith('.mx') || email.endsWith('.org') || email.endsWith('.gov') || email.endsWith('.edu')) {
+      return null; 
+    } else {
+      return { emailDomain: true }; 
+    }
   }
 }
