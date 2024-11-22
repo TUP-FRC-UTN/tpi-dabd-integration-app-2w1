@@ -188,12 +188,25 @@
 
                   <strong>Tipo:</strong> 
                     {{ 
-                      vehicle.vehicle_Type.description === 'Car' ? 'Coche' : 
+                      vehicle.vehicle_Type.description === 'Car' ? 'Auto' : 
                       vehicle.vehicle_Type.description === 'Motorbike' ? 'Motocicleta' : 
-                      vehicle.vehicle_Type.description === 'Truck' ? 'Camión' : 
+                      vehicle.vehicle_Type.description === 'Truck' ? 'Camión' :
+                      vehicle.vehicle_Type.description === 'Van' ? 'Camioneta' :  
                       vehicle.vehicle_Type.description 
                     }}
                 </div>
+              </div>
+              <div class="form-check">
+                <input 
+                  class="form-check-input" 
+                  type="radio" 
+                  id="no-vehicle" 
+                  value="none" 
+                  [(ngModel)]="selectedVehiclePlate"
+                  (change)="onVehicleChange('none')">
+                <label class="form-check-label" for="no-vehicle">
+                  Sin vehículo
+                </label>
               </div>
               <ng-template #noVehicle>
                 <p class="mb-1">No tiene registro</p>

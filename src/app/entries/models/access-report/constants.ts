@@ -130,7 +130,6 @@ export const TIPOS_VEHICULO: SelectOption[] = [
   { value: 'car', label: 'Auto' },
   { value: 'motorcycle', label: 'Moto' },
   { value: 'truck', label: 'Camión' },
-  { value: 'bike', label: 'Bicicleta' },
   { value: 'van', label: 'Camioneta' },
   { value: 'walk', label: 'Sin vehículo' }
 ];

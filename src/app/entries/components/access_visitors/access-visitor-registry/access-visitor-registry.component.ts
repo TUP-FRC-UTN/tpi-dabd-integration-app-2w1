@@ -158,7 +158,11 @@ export class AccessVisitorRegistryComponent
       this.selectedVehiclePlate=plate
       this.plateVehicle=plate
  // Deseleccionamos
-    } else {
+    }else if(plate === 'none'){
+      this.selectedVehiclePlate = '';
+      this.plateVehicle = '';
+    } 
+    else {
       // Si se selecciona una nueva patente, la guardamos
       this.selectedVehiclePlate = plate;
       this.plateVehicle=plate
@@ -514,15 +518,14 @@ loadUsersAllowedData(): Observable<boolean> {
                 `<div class="text-start">${this.getDocumentType(visitor).substring(0,1) + " - " +visitor.document}</div>`,
                 `<div class="text-start">
                 <select class="form-select" id="vehicles${index}" name="vehicles${index}">
-                    <option value="" disabled selected>Seleccione un vehículo</option>
+                     <option value="sin_vehiculo" selected>Sin vehículo</option>
                     ${visitor.vehicles?.length > 0 ? visitor.vehicles.map(vehicle => `
                         <option value="${vehicle.plate}">${vehicle.plate} ${vehicle.vehicle_Type.description
-                        === 'Car' ? 'Coche' : 
+                        === 'Car' ? 'Auto' : 
                       vehicle.vehicle_Type.description === 'MotorBike' ? 'Motocicleta' : 
                       vehicle.vehicle_Type.description === 'Truck' ? 'Camión' : 
                       vehicle.vehicle_Type.description } </option>
                     `).join('') : ''}
-                    <option value="sin_vehiculo">Sin vehículo</option>
                 </select>
             </div>`,
                 `<div class="text-center">
