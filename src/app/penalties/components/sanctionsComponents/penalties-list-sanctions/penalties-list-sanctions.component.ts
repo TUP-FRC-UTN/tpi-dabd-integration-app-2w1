@@ -204,7 +204,7 @@ export class PenaltiesSanctionsListComponent implements OnInit {
                           <button type="button" class="btn btn-light border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
                           <ul class="dropdown-menu">
                             <li><a class="dropdown-item" onclick="viewFine(${data.id})">Ver más</a></li>
-                            ${this.getPermisionsToEdit() && data.fineState != "Pendiente de pago" ? `
+                            ${this.getPermisionsToEdit() && (data.fineState === "Apelada" || data.fineState === "Pendiente") ? `
                               <li><hr class="dropdown-divider"></li>
                               <li><a class="dropdown-item" data-action="updateFine" data-id="${data.id}"'>Editar</a></li>` : ``}
                             ${data.fineState == "Pendiente" && (this.getPermisionsToEdit() || this.getPermissionsToDischarge())  ? 
