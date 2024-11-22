@@ -13,12 +13,11 @@ export const USER_ROUTES: Routes = [
   {
     path: '',
     canActivateChild: [authGuard, roleGuard],
-    data: { roles: ['SuperAdmin', 'Gerente general', 'Propietario', 'Familiar mayor'] },
+    data: { roles: ['SuperAdmin', 'Gerente general', 'Inquilino', 'Propietario', 'Familiar mayor', 'Familiar menor', 'Gerente multas', 'Gerente inventario', 'Gerente finanzas', 'Seguridad', 'Gerente empleados'] },
     children: [
       {
         path: 'profile',
-        component: UsersProfileComponent,
-        data: ['SuperAdmin', 'Gerente general', 'Propietario', 'Familiar mayor', 'Inquilino', 'Gerente multas', 'Gerente inventario']
+        component: UsersProfileComponent
       },
       {
         path: 'family',
