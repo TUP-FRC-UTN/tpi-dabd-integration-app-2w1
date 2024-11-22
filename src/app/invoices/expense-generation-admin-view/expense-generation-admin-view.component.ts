@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule, registerLocaleData } from '@angular/common';
 import { ExpenseGenerationExpenseService } from '../expense-generation-services/expense-generation-expense.service';
 import { ExpenseGenerationExpenseInterface } from '../expense-generation-interfaces/expense-generation-expense-interface';
@@ -16,6 +16,8 @@ import { BehaviorSubject } from 'rxjs';
 import localeEsAr from '@angular/common/locales/es-AR';
 import { environment } from '../../common/environments/environment';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { CustomSelectComponent } from '../../common/components/custom-select/custom-select.component';
+
 registerLocaleData(localeEsAr, 'es-AR');
 
 declare var window: any;
@@ -23,7 +25,7 @@ declare var window: any;
 @Component({
   selector: 'app-expense-generation-admin-view',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, CustomSelectComponent],
   templateUrl: './expense-generation-admin-view.component.html',
   styleUrls: ['./expense-generation-admin-view.component.css'],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -170,7 +172,10 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
     { value: 11, label: '11 - Noviembre' },
     { value: 12, label: '12 - Diciembre' },
   ];
-  listStatus: string[] = ['Pendiente', 'Pago', 'Exceptuado'];
+  listStatus: any[] = [{value: 'Pendiente', name: 'Pendiente'}, 
+    {value: 'Pago', name: 'Pago'}, 
+    {value: 'Exceptuado', name: 'Exceptuado'}];
+
   typedoc = ['DNI', 'PASAPORTE', 'CUIT/CUIL'];
   filter = {
     from: '',
@@ -183,7 +188,7 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
   };
   multiplier: number = 1;
 
-  status = ['Pendiente', 'Pago', 'Exceptuado'];
+  // status = ['Pendiente', 'Pago', 'Exceptuado'];
   showStatusDropdown = false;
   constructor(private expenseService: ExpenseGenerationExpenseService, private modalService: NgbModal,) {}
 
@@ -217,6 +222,12 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
       this.filter.selectedPeriod.splice(index, 1);
     }
     this.filter$.next({ ...this.filter });
+  }
+
+  updateState(states : any[]){
+    this.selectedFilters = states;
+    this.filter.status = states.join(',');
+    this.searchTickets();
   }
 
   toggleStatus(status: string) {
@@ -254,7 +265,7 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
 
   filteredStatusList(): string[] {
     return this.listStatus.filter((status) =>
-      status.toLowerCase().includes(this.statusFilter.toLowerCase())
+      status.name.toLowerCase().includes(this.statusFilter.toLowerCase())
     );
   }
 
@@ -579,20 +590,12 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
     // Método para abrir el modal de observación
     
     openObservationModal() {
-      if (this.hasChanges()) {
-        const modalRef = this.modalService.open(this.observationContent, {
-          backdrop: 'static'
-        });
-        modalRef.result.then(
-          (result) => {
-            if (result === 'confirm') {
-              this.saveChanges();
-            }
-          },
-          () => {
-            // Modal dismissed
-          }
-        );
+      const observationModalElement = document.getElementById('observationModalExpenses');
+      if (observationModalElement) {
+        const modalInstance = new window.bootstrap.Modal(observationModalElement, { backdrop: 'static' });
+        modalInstance.show();
+      } else {
+        console.error('No se encontró el modal de observación');
       }
     }
 

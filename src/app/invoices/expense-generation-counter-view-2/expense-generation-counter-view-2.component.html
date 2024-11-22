@@ -119,9 +119,9 @@
                   class="btn btn-sm btn-link text-muted bi bi-arrows-angle-expand fs-5 float-end" title="Expandir"
                   (click)="makeBig(3)"></button></h4>
               <hr>
-              <div class="col-12  flex-grow-1 d-flex align-items-center justify-content-center">
+              <div class="col-12  flex-grow-1 d-flex align-items-center justify-content-center ">
                 <google-chart [type]="columnChartType" [data]="columnChartData" [options]="columnChartOptions"
-                  class="w-100">
+                  class="w-100 ">
                 </google-chart>
 
               </div>
@@ -466,7 +466,7 @@
             <div class="card bg-secondary-subtle border-0 shadow mb-3">
               <div class="card-body">
                 <p><b>PERIODO:</b> {{item.period}} </p>
-                <p><b>MONTO:</b> {{item.actual_amount | currency:'ARS':'symbol-narrow':'1.0-0'}} </p>
+                <p><b>MONTO:</b> {{item.first_expiration_amount | currency:'ARS':'symbol-narrow':'1.0-0'}} </p>
               </div>
             </div>
           </div>

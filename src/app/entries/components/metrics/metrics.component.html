@@ -596,25 +596,56 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLabel">
-          Información del Dashboard
+          Reportes
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
         <p>
-          Bienvenido al Dashboard de Accesos. Este panel te permite:
+          Los gráficos pueden filtrarse por fecha (desde - hasta) y también se pueden aplicar filtros avanzados de forma dinámica. 
         </p>
+        
+        <p class="mb-0"><strong>Gráficos</strong>:</p>
         <ul>
           <li>
-            Visualizar estadísticas de Ingresos/Egresos en tiempo real,
-            incluyendo gráficos y tablas detalladas.
+            <p>
+              <strong>Comparación de Movimientos</strong>: <br> 
+              Muestra una comparativa entre los Ingresos y Egresos.<br>
+              Incluye seis KPI que indican los Ingresos y Egresos del mes y año actual, 
+              como también el mes con más Ingresos y el mes con más Egresos.
+            </p>
           </li>
-          <li>Generar reportes personalizados basados en fechas y años.</li>
           <li>
-            Acceder a un historial completo de tipos de personas que ingresan y
-            más.
+            <p>
+              <strong>TOP 5 Personas con más Ingresos/Egresos</strong>: <br>
+              Muestra el Top 5 de las personas con más Movimientos registrados, indicando su nombre, 
+              tipo y cantidad de Ingresos y Egresos. <br>
+              Incluye un KPI por cada tipo de persona, indicando su porcentaje y total.
+            </p>
+          </li>
+          <li>
+            <p>
+              <strong>Cantidad de Movimientos, según Tipo de Ingresante</strong>: <br>
+              Muestra todos los Movimientos, del período indicado, según el tipo de persona. <br>
+              Incluye un KPI por cada tipo de persona, indicando su porcentaje y total.
+            </p>
           </li>
         </ul>
+        <ul>          
+          <li>
+          <strong>Botones</strong>:
+          <ul>
+            <li><button class="btn btn-primary bi bi-funnel-fill mb-2"></button> Permite aplicar filtros avanzados.
+            </li>
+            <li><button class="btn btn-secondary bi bi-trash mb-2"></button> Elimina los filtros aplicados.
+            </li>
+            <li><button class="btn btn-sm btn-link text-muted bi bi-arrow-left fs-5"></button> Vuelve a la pantalla principal.
+            </li>
+            <li><button class="btn btn-sm btn-link text-muted bi bi-arrows-angle-expand fs-5"></button> Expande el gráfico.
+            </li>
+          </ul>
+        </li>
+      </ul>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">

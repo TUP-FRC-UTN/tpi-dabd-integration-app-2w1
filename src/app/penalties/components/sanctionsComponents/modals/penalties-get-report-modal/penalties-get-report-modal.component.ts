@@ -3,6 +3,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { SanctionService } from '../../../../services/sanctions.service';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
+import { SanctionsDTO } from '../../../../models/SanctionsDTO';
 
 @Component({
   selector: 'app-penalties-modal-report',
@@ -18,7 +19,8 @@ export class PenaltiesModalReportComponent implements OnInit{
   public service = inject(SanctionService)
   @Input() id:number = 0
   report: any;
-  constructor(public activeModal: NgbActiveModal){
+  advetencias : SanctionsDTO[] = [];
+  constructor(public activeModal: NgbActiveModal, private reportServices: SanctionService) {
 
   }
   ngOnInit(): void {
@@ -52,6 +54,15 @@ export class PenaltiesModalReportComponent implements OnInit{
       (error) => {
         console.error('Error:', error);
       });
+      
+      this.reportServices.getAllSactions().subscribe(
+        response => {
+          this.advetencias = response.filter((a)=>a.reportId==this.id && a.fineState==null);
+
+        }, error => {
+          alert(error)
+        }
+      )
   }
   
 
