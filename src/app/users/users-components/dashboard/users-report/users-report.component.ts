@@ -92,12 +92,7 @@ export class UsersReportComponent implements OnInit{
 
   private setupFilters() {
     // Suscribirse a cambios en los filtros y actualizar los datos en consecuencia
-    this.subscriptions.add(
-      this.startDate.valueChanges.subscribe(() => this.applyFilters())
-    );
-    this.subscriptions.add(
-      this.endDate.valueChanges.subscribe(() => this.applyFilters())
-    );
+
     this.subscriptions.add(
       this.plotTypes.valueChanges.subscribe(value => {
         this.selectedPlotType = value ? Number(value) : undefined;
@@ -129,6 +124,10 @@ export class UsersReportComponent implements OnInit{
           this.loadingPieChart = false;
           this.processPlotStateData(data);
           this.updateTotalLots(data);
+
+          if(data.length === 0) {
+            this.errorPieChart = 'No se encontraron datos para los filtros seleccionados';
+          }
         },
         error: () => {
           this.errorPieChart = 'Error al cargar los datos de estado de los lotes';
@@ -171,7 +170,7 @@ export class UsersReportComponent implements OnInit{
         case 'Comercial':
           this.commercialLots = item.count;
           break;
-        case 'Baldío':
+        case 'Baldio':
           this.emptyLots = item.count;
           break;
       }
@@ -182,25 +181,6 @@ export class UsersReportComponent implements OnInit{
     this.totalLots = data.reduce((acc, curr) => acc + curr.count, 0);
   }
 
- /* filterByDate() {
-    const startDateValue = this.startDate.value;
-    const endDateValue = this.endDate.value;
-
-    if (startDateValue && endDateValue) {
-      const start = new Date(startDateValue);
-      const end = new Date(endDateValue);
-
-      if (start > end) {
-        console.error('Fecha inicial no puede ser mayor a la fecha final');
-        return;
-      }
-
-      const formattedStartDate = this.formatDate(start);
-      const formattedEndDate = this.formatDate(end);
-
-      //this.updateDashboardData(formattedStartDate, formattedEndDate);
-    }
-  }*/
 
   //-------------Grafico de torta para mostrar la cantidad de lotes por estado-------------
 
@@ -425,28 +405,6 @@ export class UsersReportComponent implements OnInit{
     }
   }
 
-  filterByDateBlocks() {
-    const startDateValue = this.startDate.value;
-    const endDateValue = this.endDate.value;
-    this.startDate.setErrors(null);
-
-    if (startDateValue && endDateValue) {
-      const start = new Date(startDateValue);
-      const end = new Date(endDateValue);
-      this.errorRange = null;
-
-      if (start > end) {
-        this.errorRange = 'La fecha de inicio no puede ser mayor a la fecha de fin';
-        return;
-      }
-
-      const formattedStartDate = this.formatDate(start);
-      const formattedEndDate = this.formatDate(end);
-
-      this.updateDashboardBlocks(formattedStartDate, formattedEndDate);
-      
-    }
-  }
 
   private updateDashboardBlocks(startDate: string, endDate: string) {
     
@@ -464,7 +422,7 @@ export class UsersReportComponent implements OnInit{
           this.blocksNumber = stats.map(block => block.blockNumber).sort((a, b) => a - b);
           
           if (this.blocksNumber.length === 0) {
-            this.errorBlocksChart = 'No se encontraron datos para las fechas seleccionadas';
+            this.errorBlocksChart = 'No se encontraron datos para los filtros seleccionados';
           }
           this.blocksSubject.next(stats);
 
@@ -624,14 +582,12 @@ export class UsersReportComponent implements OnInit{
       this.updateDashboardBlocks(formattedStartDate, formattedEndDate);
       this.updateDashboardDataAge(formattedStartDate, formattedEndDate);
       this.updateDashboardData(formattedStartDate, formattedEndDate);
-      this.loadPlotStateData(formattedStartDate, formattedEndDate);
-      this.loadPlotTypeData(formattedStartDate, formattedEndDate);
     }
   }
   private updateDashboardData(startDate: string, endDate: string) {
-    // Llamamos a los métodos de backend con los parámetros de fecha
-    this.loadPlotStateData(startDate, endDate);
-    this.loadPlotTypeData(startDate, endDate);
+    const plotType = this.selectedPlotType;
+    this.loadPlotStateData(startDate, endDate, plotType);
+    this.loadPlotTypeData(startDate, endDate, plotType);
   }
 
   private updateDashboardDataAge(startDate: string, endDate: string) {
@@ -670,17 +626,7 @@ export class UsersReportComponent implements OnInit{
   }
 
   //-------------Grafico de barras para la distribución de edades-------------
-  // changeView(view: string) {
-  //   this.router.navigate(['/main/charts/users/' + view]);
-  // }
 
-  // private formatDate(date: Date): string {
-  //   return date.toISOString().split('T')[0];
-  // }
-
-  // onKPISelect() {
-  //   this.router.navigate(['/main/charts/users/blocks']);
-  // }
 
   redirect(url : string){
     this.routerService.redirect('/main' + url);

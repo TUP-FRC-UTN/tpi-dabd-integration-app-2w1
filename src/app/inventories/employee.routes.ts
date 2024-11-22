@@ -8,15 +8,24 @@ import { IepPutEmployeesComponent } from "./iep-employees/components/iep-put-emp
 import { IepChartsEmployeesComponent } from "./iep-employees/components/iep-charts-employees/iep-charts-employees.component";
 import { IepPillowLaterArrivalConfigComponent } from "./iep-employees/components/iep-pillow-later-arrival-config/iep-pillow-later-arrival-config.component";
 import { IepAttendancesComponent } from "./iep-employees/components/iep-attendances/iep-attendances.component";
+import { authGuard } from "../users/guards/auth.guard";
+import { roleGuard } from "../users/guards/role.guard";
 
 export const EMPLOYEE_ROUTES: Routes = [
-    { path: 'employees', component: IepListEmployeesComponent },
-    { path: "register-employee", component: IEPFormPostEmployeesComponent },
-    { path: "attendance/:id", component: IepAttendancesComponent },
-    { path: 'attention-call', component: IepAttentionCallComponent },
-    { path: 'performance/:id', component: IepPerformancelistComponent },
-    { path: 'employee/update/:id', component: IepPutEmployeesComponent },
-    { path: 'charges', component: IepChargesComponent },
-    { path: 'pillow-late-arrival', component: IepPillowLaterArrivalConfigComponent },
-    { path: 'dashboard', component: IepChartsEmployeesComponent }, // Cambiar por el componente correspondiente
+    {
+        path: '',
+        canActivateChild: [authGuard, roleGuard],
+        data: { roles: ['SuperAdmin', 'Gerente inventario'] },
+        children: [
+            { path: 'employees', component: IepListEmployeesComponent },
+            { path: "register-employee", component: IEPFormPostEmployeesComponent },
+            { path: "attendance/:id", component: IepAttendancesComponent },
+            { path: 'attention-call', component: IepAttentionCallComponent },
+            { path: 'performance/:id', component: IepPerformancelistComponent },
+            { path: 'employee/update/:id', component: IepPutEmployeesComponent },
+            { path: 'charges', component: IepChargesComponent },
+            { path: 'pillow-late-arrival', component: IepPillowLaterArrivalConfigComponent },
+            { path: 'dashboard', component: IepChartsEmployeesComponent },
+        ]
+    }
 ];

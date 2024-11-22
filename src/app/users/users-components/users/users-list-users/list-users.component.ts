@@ -88,24 +88,25 @@ export class ListUsersComponent implements OnInit, OnDestroy {
             order: [[0, 'asc']],
             pageLength: 5,
             columns: [
-              {
-                title: 'Fecha de Creación',
-                className: 'text-start',
-                width: '20%',
-                render: (data, type, row, meta) => {
-                  if (type === 'display') {
-                    // Mostrar la fecha formateada en la tabla
-                    return moment(data, 'DD/MM/YYYY').format('DD/MM/YYYY');
-                  } else {
-                    // Usar un formato que DataTables pueda ordenar correctamente
-                    return moment(data, 'DD/MM/YYYY').toDate();
-                  }
-                }
-              }
-              ,
+              // {
+              //   title: 'Fecha de Creación',
+              //   className: 'text-start',
+              //   width: '20%',
+              //   render: (data, type, row, meta) => {
+              //     if (type === 'display') {
+              //       // Mostrar la fecha formateada en la tabla
+              //       return moment(data, 'DD/MM/YYYY').format('DD/MM/YYYY');
+              //     } else {
+              //       // Usar un formato que DataTables pueda ordenar correctamente
+              //       return moment(data, 'DD/MM/YYYY').toDate();
+              //     }
+              //   }
+              // }
+              // ,
 
               { title: 'Nombre', width: '20%' },
-              { title: 'Rol', width: '30%' },
+              {title: 'Documento', className: 'text-end', width: '20%'},
+              { title: 'Rol', className: 'text-center',width: '30%' },
               {
                 title: 'Lotes', className: 'text-start', width: '15%',
                 render: (data) => {
@@ -166,8 +167,9 @@ export class ListUsersComponent implements OnInit, OnDestroy {
               '<"mb-3"t>' +
               '<"d-flex justify-content-between"lp>',
             data: this.users.map(user => [
-              user.create_date,
+              // user.create_date,
               `${user.lastname}, ${user.name}`,  //Nombre completo
+              user.dni,                                //Documento
               this.showRole(user.roles),              //Roles
               user.plot_id,                                //Nro. de lote (puedes ajustar esto)                 
               '<button class="btn btn-info">Ver más</button>'  //Ejemplo de acción
@@ -184,8 +186,6 @@ export class ListUsersComponent implements OnInit, OnDestroy {
               emptyTable: "No hay datos disponibles en la tabla"
             },
           });
-
-          table.order([[0, 'desc']]).draw();
 
           //Alinear la caja de búsqueda a la derecha
           const searchInputWrapper = $('#myTable_filter');
@@ -445,41 +445,39 @@ export class ListUsersComponent implements OnInit, OnDestroy {
 
   //Filtrar por rol
   fillOptionsSelected(options: any) {
-    var optionsFilter = options.map((option: any) => option).join('|'); // Usar '|' para permitir múltiples filtros
+    var optionsFilter = options.map((option: any) => option).join('|');
     const table = $('#myTable').DataTable();
-
-    // Filtrar por el contenido de la columna de tipo de lote, teniendo en cuenta que puede tener unicamente 1 valor, pero se tiene que filtrar x varios
     table.column(2).search(optionsFilter, true, false).draw(); 
   }
 
-  //Metodo para filtrar la tabla en base a las 2 fechas
-  filterByDate() {
-    const table = $('#myTable').DataTable();
+  // //Metodo para filtrar la tabla en base a las 2 fechas
+  // filterByDate() {
+  //   const table = $('#myTable').DataTable();
 
-    // Convertir las fechas seleccionadas a objetos Date para comparar
-    const start = this.initialDate.value ? (new Date(this.initialDate.value)).toISOString().split('T')[0] : null;
-    const end = this.endDate.value ? (new Date(this.endDate.value)).toISOString().split('T')[0] : null;
+  //   // Convertir las fechas seleccionadas a objetos Date para comparar
+  //   const start = this.initialDate.value ? (new Date(this.initialDate.value)).toISOString().split('T')[0] : null;
+  //   const end = this.endDate.value ? (new Date(this.endDate.value)).toISOString().split('T')[0] : null;
 
-    // Limpiar cualquier filtro previo relacionado con fechas
-    $.fn.dataTable.ext.search.splice(0, $.fn.dataTable.ext.search.length);
+  //   // Limpiar cualquier filtro previo relacionado con fechas
+  //   $.fn.dataTable.ext.search.splice(0, $.fn.dataTable.ext.search.length);
 
-    // Agregar una nueva función de filtro
-    $.fn.dataTable.ext.search.push((settings: any, data: any, dataIndex: any) => {
-      // Convertir la fecha de la fila (data[0]) a un objeto Date
-      const rowDateParts = data[0].split('/'); // Asumiendo que la fecha está en formato DD/MM/YYYY
-      const rowDate = (new Date(`${rowDateParts[2]}-${rowDateParts[1]}-${rowDateParts[0]}`)).toISOString().split('T')[0]; // Convertir a formato YYYY-MM-DD
+  //   // Agregar una nueva función de filtro
+  //   $.fn.dataTable.ext.search.push((settings: any, data: any, dataIndex: any) => {
+  //     // Convertir la fecha de la fila (data[0]) a un objeto Date
+  //     const rowDateParts = data[0].split('/'); // Asumiendo que la fecha está en formato DD/MM/YYYY
+  //     const rowDate = (new Date(`${rowDateParts[2]}-${rowDateParts[1]}-${rowDateParts[0]}`)).toISOString().split('T')[0]; // Convertir a formato YYYY-MM-DD
 
 
 
-      // Realizar las comparaciones
-      if (start && rowDate < start) return false;
-      if (end && rowDate > end) return false;
-      return true;
-    });
+  //     // Realizar las comparaciones
+  //     if (start && rowDate < start) return false;
+  //     if (end && rowDate > end) return false;
+  //     return true;
+  //   });
 
-    // Redibujar la tabla con el filtro aplicado
-    table.draw();
-  }
+  //   // Redibujar la tabla con el filtro aplicado
+  //   table.draw();
+  // }
 
   //----------------------------------------------------Funciones----------------------------------------------------
 
@@ -496,7 +494,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
     localDate.setHours(0, 0, 0, 0);
 
     //Sumar un día
-    localDate.setDate(localDate.getDate() + 1);
+    localDate.setDate(localDate.getDate());
 
     const options: Intl.DateTimeFormatOptions = { day: '2-digit', month: '2-digit', year: 'numeric' };
     return new Intl.DateTimeFormat('es-ES', options).format(localDate);
@@ -709,19 +707,18 @@ export class ListUsersComponent implements OnInit, OnDestroy {
     doc.text(title, 15, 20);
     doc.setFontSize(12);
 
-    const formattedDesde = this.formatDate(new Date(this.initialDate.value));
-    const formattedHasta = this.formatDate(new Date(this.endDate.value));
-    doc.text(`Fechas: Desde ${formattedDesde} hasta ${formattedHasta}`, 15, 30);
+    const date = this.formatDate(new Date());
+    doc.text(`Fecha: ${date}`, 15, 30);
 
-    const columns = ['Fecha de creación', 'Nombre', 'Rol', 'Lotes'];
+    const columns = ['Nombre', 'Dcomuento', 'Roles', 'Lotes'];
 
     const table = $('#myTable').DataTable();
 
     const visibleRows = table.rows({ search: 'applied' }).data().toArray();
 
     const rows = visibleRows.map((row: any) => [
-      row[0], // Fecha de creación
-      `${row[1]}`,               // Nombre
+      `${row[0]}`,               // Nombre
+      `${row[1]}`,              // Documento
       `${this.getContentBetweenArrows(row[2])}`, // Rol
       `${row[3]}` // Lote
     ]);
@@ -739,7 +736,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
         3: { cellWidth: 30 }
       },
     });
-    doc.save(`${formattedDesde}_${formattedHasta}_listado_usuarios.pdf`);
+    doc.save(`${date}_listado_usuarios.pdf`);
   }
 
   //Exportar a Excel
@@ -750,37 +747,36 @@ export class ListUsersComponent implements OnInit, OnDestroy {
     const visibleRows = table.rows({ search: 'applied' }).data().toArray();
 
     // Obtener las fechas 'Desde' y 'Hasta' solo para el nombre del archivo
-    const formattedDesde = this.formatDate(new Date(this.initialDate.value));
-    const formattedHasta = this.formatDate(new Date(this.endDate.value));
+    const date = this.formatDate(new Date());
 
     // Mapeamos las filas visibles a un formato adecuado para los datos de Excel
     const dataRows = visibleRows.map((row: any) => {
       // Extraemos los datos de la fila
-      const fechaCreacion = row[0]; // Fecha de creación
-      const nombre = row[1]; // Nombre
+      const nombre = row[0]; // Nombre
+      const documento = row[1]; // Documento
       const rol = Array.isArray(row[2])
         ? row[2].map((r: string) => this.getContentBetweenArrows(r).join(', ')).join(', ')
         : this.getContentBetweenArrows(row[2]).join(', '); // Aplicamos getContentBetweenArrows si es un array o un string
-      const lote = Array.isArray(row[3]) ? row[3].join(', ') : row[3]; // Si lote es un array, lo unimos por comas
+      const lote = Array.isArray(row[3]) ? row[3].join(', ') : row[4]; // Si lote es un array, lo unimos por comas
 
       // Creamos el objeto para cada fila
       return {
-        'Fecha de Creación': fechaCreacion,
         'Nombre': nombre,
+        'Documento': documento,
         'Rol': rol,  // Aplicado getContentBetweenArrows a 'rol'
         'Lote': lote // Convertido a string
       };
     });
 
     // Crear la hoja de trabajo con los datos de los usuarios
-    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(dataRows, { header: ['Fecha de Creación', 'Nombre', 'Rol', 'Lote'] });
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(dataRows, { header: ['Nombre', 'Documento', 'Rol', 'Lote'] });
 
     // Crear el libro de trabajo
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Usuarios');
 
     // Guardar el archivo Excel con las fechas de los filtros
-    const fileName = `${formattedDesde}_${formattedHasta}_listado_usuarios.xlsx`;
+    const fileName = `${date}_listado_usuarios.xlsx`;
     XLSX.writeFile(wb, fileName);
   }
 }
