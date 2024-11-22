@@ -89,21 +89,7 @@ export class ReportModifyComponent implements OnInit {
   }
 
   updateReport(): void {
-    Swal.fire({
-      title: '¿Está seguro?',
-      text: '¿Desea actualizar el informe?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Actualizar',
-      cancelButtonText: 'Cancelar',
-      reverseButtons: true, 
-      customClass: {
-        confirmButton: 'btn btn-success ms-2',
-        cancelButton: 'btn btn-secondary'
-      },
-      buttonsStyling: false
-    }).then((result) => {
-      if (result.isConfirmed) {
+    
         const userId = 1;
 
         const complaintsIds = this.selectedComplaints.length > 0
@@ -136,8 +122,7 @@ export class ReportModifyComponent implements OnInit {
           });
         });
       }
-    });
-  }
+ 
 
   cancel(){
     this.routingService.redirect("main/sanctions/report-list", "Listado de Informes")

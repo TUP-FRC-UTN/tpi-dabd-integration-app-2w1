@@ -130,7 +130,6 @@ export const TIPOS_VEHICULO: SelectOption[] = [
   { value: 'car', label: 'Auto' },
   { value: 'motorcycle', label: 'Moto' },
   { value: 'truck', label: 'Camión' },
-  { value: 'bike', label: 'Bicicleta' },
   { value: 'van', label: 'Camioneta' },
   { value: 'walk', label: 'Sin vehículo' }
 ];
@@ -244,5 +243,21 @@ export const BADGE_STYLES = {
       color: '#dc3545',  // Rojo para salida
       text: 'Salida'
     }
+  };
+
+  export const TIPOS_DOCUMENTO: SelectOption[] = [
+    { value: 'DNI', label: 'DNI' },
+    { value: 'PASSPORT', label: 'Pasaporte' }, 
+    { value: 'CUIT', label: 'CUIT' }
+   ];
+   
+  export const documentTypeMap: { [key: string]: string } = {
+    'DNI': '1',
+    'PASSPORT': '2',
+    'CUIT': '3'
+  };
+
+  export const userTypeMap: { [key: string]: string } = {
+    'Visitor': '1',     
   };
   
