@@ -792,6 +792,7 @@ export class ExpenseGenerationCounterView2Component {
   
     console.log('Plataforma top:', topPlatformEntry);
   
+
     this.principalKpis[0].amount = totalIncome;
     this.principalKpis[1].amount = totalDebt;
     this.principalKpis[2].amount = delinquentCount;
@@ -821,7 +822,6 @@ export class ExpenseGenerationCounterView2Component {
       return '';
     }
     try {
-      // Si ya está en formato YYYY-MM, lo devuelve directamente
       if (typeof period === 'string' && /^\d{4}-\d{2}$/.test(period)) {
         return period;
       }
