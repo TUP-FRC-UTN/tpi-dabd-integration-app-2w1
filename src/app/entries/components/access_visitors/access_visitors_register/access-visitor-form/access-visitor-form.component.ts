@@ -97,7 +97,7 @@ export class AccessVisitorFormComponent implements OnInit, OnDestroy {
   }
 
   loadUsersType(): void {
-    const insuranceSubscription = this.visitorHttpService.getUsersType().subscribe({
+    const insuranceSubscription = this.visitorHttpService.getUsersType2().subscribe({
       next: (types: UserType[]) => {
         this.usersType = types;
         console.log('Tipos de usuario cargados:', this.usersType);
@@ -200,13 +200,13 @@ export class AccessVisitorFormComponent implements OnInit, OnDestroy {
       // Obtén la referencia al control `email`
       const emailControl = this.value()?.get('email');
 
-      // Aplica la validación de `required` solo si `indexUserType` es `1`
-      if (this.emailActivated() && this.indexUserType === 1) {
-        emailControl?.setValidators([Validators.required, Validators.email, Validators.maxLength(70)]);
-      } else {
-        // Elimina la validación de `required` si `indexUserType` no es `1`
-        emailControl?.setValidators([Validators.email, Validators.maxLength(70)]);
-      }
+      // // Aplica la validación de `required` solo si `indexUserType` es `1`
+      // if (this.emailActivated() && this.indexUserType === 1) {
+      //   emailControl?.setValidators([Validators.required, Validators.email, Validators.maxLength(70)]);
+      // } else {
+      //   // Elimina la validación de `required` si `indexUserType` no es `1`
+      //   emailControl?.setValidators([Validators.email, Validators.maxLength(70)]);
+      // }
       // Actualiza el estado de validación del control
       emailControl?.updateValueAndValidity();
     }

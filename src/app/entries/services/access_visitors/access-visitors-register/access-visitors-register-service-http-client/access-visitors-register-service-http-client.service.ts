@@ -75,6 +75,7 @@ export class AccessVisitorsRegisterServiceHttpClientService {
      })
    );
  }
+ 
  getUsersType2(): Observable<UserType[]> {
   return this.http.get<UserType[]>(API_ENDPOINTS.USERS_TYPE).pipe(
     map(response => {
@@ -169,4 +170,5 @@ export class AccessVisitorsRegisterServiceHttpClientService {
      })
    );
  }
+
 }

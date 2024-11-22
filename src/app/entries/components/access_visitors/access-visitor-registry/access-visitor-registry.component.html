@@ -203,17 +203,22 @@
               </ng-template>
               <br>
 
+
               <!-- Rango de fechas autorizado -->
               <p class="fw-bold mb-1">Rango de Fechas Autorizado:</p>
               <div *ngIf="selectedVisitor.authRanges.length > 0; else noDays">
                 <ul class="list-unstyled">
                   <li><strong>Desde:</strong> {{ selectedVisitor.authRanges.at(selectedVisitor.authRanges.length-1)?.init_date| date : "dd/MM/yyyy" }}</li>
                   <li><strong>Hasta:</strong> {{ selectedVisitor.authRanges.at(selectedVisitor.authRanges.length-1)?.end_date | date : "dd/MM/yyyy" }}</li>
+                
                 </ul>
               </div>
               <ng-template #noDays>
                 <p class="mb-1">No hay rango de fechas cargado.</p>
               </ng-template>
+            </div>
+            <div>
+
             </div>
           </div>
 

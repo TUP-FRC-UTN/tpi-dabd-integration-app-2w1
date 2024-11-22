@@ -26,6 +26,7 @@ export class AccesesVisitorsTempComponent implements OnInit {
     this.user = user; 
     console.log('Selected user:', this.user);
   }
+  
   private userId?: number;
   SelectedNeighborhood: { id: number; label: string } = { id: 0, label: '' };
   visitorForm!: FormGroup; 
@@ -269,13 +270,21 @@ sendVisitor(): void {
       });
       },
       error: (error) => {
-          Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: 'No se puede enviar el registro.',
-          });
-          console.error('Error sending visitor record', error);
-      }
-  });
-  }
+        if (error.status === 400) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'La persona ya tiene una autorizacion otorgada',
+            });
+        } else { 
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No se puede enviar el registro.',
+            });
+        }
+    }
+    });
+}
+
 }

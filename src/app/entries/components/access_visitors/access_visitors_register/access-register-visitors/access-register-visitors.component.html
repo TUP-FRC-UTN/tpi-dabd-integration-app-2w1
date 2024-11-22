@@ -1,10 +1,12 @@
 <div class="card mx-2 mx-md-5 shadow-lg p-3 mb-5 bg-body-tertiary rounded navbarMargin">
-    <div class="mb-3">
+    <div class="col-md-6 mb-2">
+        <div class=""></div>
         <select class="form-select" [(ngModel)]="selectedComponent">
             <option value="eventual">Visitas Eventuales</option>
             <option value="registration">Visitas Permanentes</option>
         </select>
     </div>
+    <hr class="my-4 border-2 border-gray-300">
  
     @if (selectedComponent === 'registration') {
         <app-access-container-visitors-registration></app-access-container-visitors-registration>
