@@ -235,8 +235,6 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
   }
 
   private loadData() {
-    this.errorBarChart = null;
-    this.errorPieChart = null;
     this.loadingBarChart = true;
     this.loadingPieChart = true;
     this.loadStats();
@@ -244,6 +242,7 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
     this.loadPieChart();
     this.processFilterOptions();
   }
+
 
    loadStats() {
     this.apiService.getPlotsStats().subscribe({
@@ -373,20 +372,7 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
     };
   }
 
-  clearFilters() {
-    this.startDate.reset();
-    this.endDate.reset();
-    this.filterForm.reset();
-    this.errorRangeDate = null;
-    this.errorBarChart = null;
-    this.errorPieChart = null;
-    this.filteredPlotsByBlock = [...this.plotsByBlock];
-    this.filteredOwnerDistribution = [...this.ownerDistribution];
-    this.filteredPlotsStats = { ...this.plotsStats };
-    this.processData();
-    this.processPieChartData();
-  }
-
+  
   filterByDate() {
     this.errorRangeDate = null;
 
@@ -428,6 +414,7 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
         next: (stats) => {
           this.filteredPlotsStats = stats;
           this.updateKPIs(stats);
+          this.processFilterOptions();
         },
         error: (error) => {
           console.error('Error al obtener estadísticas:', error);
@@ -490,5 +477,15 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
       }
       return null;
     };
+  }
+
+  clearFilters() {
+    this.startDate.reset();
+    this.endDate.reset();
+    this.filterForm.reset();
+    this.errorRangeDate = null;
+    this.errorBarChart = null;
+    this.errorPieChart = null;
+    this.loadData();
   }
 }
