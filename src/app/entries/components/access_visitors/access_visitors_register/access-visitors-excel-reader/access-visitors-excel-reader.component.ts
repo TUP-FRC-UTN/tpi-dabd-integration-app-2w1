@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import * as XLSX from 'xlsx';
-import * as ExcelJS from 'exceljs';
 import { AccessVisitor, UserType } from '../../../../models/access-visitors/access-visitors-models';
 import { AccessVisitorsRegisterServiceHttpClientService } from '../../../../services/access_visitors/access-visitors-register/access-visitors-register-service-http-client/access-visitors-register-service-http-client.service';
 import { Subscription } from 'rxjs';
@@ -110,38 +109,6 @@ export class AccessVisitorsExcelReaderComponent implements OnInit, OnDestroy {
       return [];
     }
     return visitors;
-  }
-
-  async downloadTemplate() {
-    const workBook = new ExcelJS.Workbook();
-    const sheet = workBook.addWorksheet('Invitados');
-    sheet.columns = [
-      { header: 'Nombre', width: 15 },
-      { header: 'Apellido', width: 15 },
-      { header: 'Documento', width: 15 },
-      { header: 'Tipo Documento', width: 20 },
-      { header: 'Tipo Visitante', width: 20 }
-    ]
-    
-    for (let i = 2; i <= 9999; i++) {
-      sheet.getCell('D' + i).dataValidation = {
-        type: 'list',
-        allowBlank: false,
-        formulae: ['"' + this.documentTypes.join(',') + '"']
-      }
-      sheet.getCell('E' + i).dataValidation = {
-        type: 'list',
-        allowBlank: false,
-        formulae: ['"' + this.userTypes.map(v => v.description).join(',') + '"']
-      }
-    }
-
-    const buffer = await workBook.xlsx.writeBuffer();
-    const blob = new Blob([buffer]);
-    const link = document.createElement('a');
-    link.href = window.URL.createObjectURL(blob);
-    link.setAttribute('download', 'lista_invitados.xlsx');
-    link.click();
   }
 
   rowIsEmpty(row: any): boolean {

@@ -1,15 +1,15 @@
 @if (userTypes.length > 0) {
-    <div class="row mx-0">
-        <div class="col-auto p-0">
-            <button class="btn btn-secondary" (click)="downloadTemplate()" title="Descargar plantilla">
-                <i class="bi bi-file-earmark-arrow-down"></i>
-            </button>
-        </div>
-        <div class="col-auto">
-            <label for="fileInput" class="btn btn-success" title="Cargar lista de invitados">
-                <i class="bi bi-paperclip"></i>
-            </label>
-            <input id="fileInput" type="file" accept=".xlsx" (input)="fileInputed($event)" class="d-none">
-        </div>
-    </div>
 }
+<div class="row mx-0">
+    <div class="col-auto p-0">
+        <a class="btn btn-secondary" title="Descargar plantilla" href="https://storage.googleapis.com/tup-entries/lista_invitados.xlsx">
+            <i class="bi bi-file-earmark-arrow-down"></i>
+        </a>
+    </div>
+    <div class="col-auto">
+        <label for="fileInput" class="btn btn-success" title="Cargar lista de invitados">
+            <i class="bi bi-paperclip"></i>
+        </label>
+        <input id="fileInput" type="file" accept=".xlsx" (input)="fileInputed($event)" class="d-none">
+    </div>
+</div>
