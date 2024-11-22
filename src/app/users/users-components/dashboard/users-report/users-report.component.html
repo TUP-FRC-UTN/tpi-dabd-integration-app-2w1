@@ -44,8 +44,9 @@
                     route="/main/plots/dashboard/plot-info"></app-users-kpi>
 
                 <app-users-kpi class="mb-2" title="Cantidad de Lotes" icon="bi bi bi-houses" [amount]="totalLots"
-                    [customStyles]="{ 'background-color': '#d8ffedde' }" formatPipe="text"
-                    tooltip="Número total de lotes" [selectable]="true" route="/main/plots/dashboard/plot"></app-users-kpi>
+                    [customStyles]="{ 'background-color': '#e7f1ff' }" formatPipe="text"
+                    tooltip="Número total de lotes" [selectable]="true"
+                    route="/main/plots/dashboard/plot"></app-users-kpi>
 
                 <app-users-kpi class="mb-2" title="Usuarios Registrados" icon="bi bi-hourglass-split"
                     [amount]="ageDistribution.statics.totalUsers" [customStyles]="{ 'background-color': '#e7f1ff' }"
@@ -88,7 +89,8 @@
                                 <h5 class="card-title align-items-center">Distribución de Edades de Usuarios<button
                                         type="button"
                                         class="btn btn-sm btn-link text-muted bi bi-arrows-angle-expand fs-5 float-end"
-                                        title="Expandir" (click)="redirect('/users/dashboard/user-histogram')"></button></h5>
+                                        title="Expandir" (click)="redirect('/users/dashboard/user-histogram')"></button>
+                                </h5>
                                 <hr>
                                 <div class="col-12 hover-scale flex-grow-1 d-flex align-items-center ">
                                     <google-chart [type]="columnChart" [data]="barChartData" [options]="barChartOptions"
@@ -110,7 +112,8 @@
                                 <h5 class="card-title align-items-center">Análisis Comparativo de Manzanas<button
                                         type="button"
                                         class="btn btn-sm btn-link text-muted bi bi-arrows-angle-expand fs-5 float-end"
-                                        title="Expandir" (click)="redirect('/plots/dashboard/plot-blocks')"></button></h5>
+                                        title="Expandir" (click)="redirect('/plots/dashboard/plot-blocks')"></button>
+                                </h5>
                                 <hr>
                                 <div class="col-12 hover-scale flex-grow-1 d-flex align-items-center ">
                                     <google-chart [type]="chartType" [data]="chartData" [options]="chartOptions"
@@ -176,6 +179,87 @@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                     <!-- <button type="button" class="btn btn-primary" (click)="applyAdvancedFilters()">Aplicar Filtro</button> -->
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="infoModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Reporte</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    En esta pantalla podrá visualizar diferentes tipos de reportes. Cada uno puede expandirse
+                    para ver más información.
+                </p>
+                <p>
+                    Los gráficos pueden filtrarse por fecha (desde y hasta) y aplicar filtros avanzados de forma
+                    dinámica.
+                </p>
+                <ul>
+                    <li>
+                        <strong>Estado de los Lotes</strong>:
+                        Este gráfico ofrece un análisis del estado actual de los lotes. Al expandirse incluye cuatro KPI
+                        que muestran la cantidad total de lotes, la cantidad de lotes residenciales, la cantidad de
+                        lotes comerciales y la cantidad de lotes baldíos.
+                        <p>
+                            El gráfico circular muestra la distribución de los lotes según su estado actual.
+                        </p>
+                    </li>
+
+                    <li>
+                        <p>
+                            <strong>Distribución de Usuarios por Rango de Edad y por Estado</strong>:
+                            Este gráfico presenta un análisis de la distribución de usuarios por rango de edad y por
+                            estado (activos e inactivos).
+
+                            Al expandirse incluye cuatro KPI que muestran la cantidad total de
+                            usuarios, el promedio de edad y el rango de edad mínimo y máximo de los usuarios.
+                        </p>
+                        <p>
+                            El gráfico de barras representa la distribución de usuarios activos e inactivos por
+                            diferentes rangos de edad.
+                        </p>
+                        <p>
+                            El gráfico circular muestra la distribución general de usuarios por estado, ya sea activos o
+                            inactivos.
+                        </p>
+                    </li>
+
+                    <li>
+                        <p>
+                            <strong>Análisis Comparativo de Manzanas</strong>: Este gráfico muestra una comparativa
+                            entre dos manzanas a elección del usuario. Por defecto está configurado para mostrar la
+                            comparación entre dos manzanas, Mzna 1 y Mzna 2.
+                          </p>
+                          <p>
+                            Incluye cuatro KPI que muestran el área total, el área total construida, el porcentaje total
+                            construido y el porcentaje total no construido entre las manzanas seleccionadas.
+                          </p>
+                    </li>
+
+                    <li>
+                        <strong>Botones</strong>:
+                        <ul>
+                            <li><button class="btn btn-primary bi bi-funnel-fill mb-2"></button> Permite aplicar filtros
+                                avanzados.
+                            </li>
+                            <li><button class="btn btn-secondary bi bi-trash mb-2"></button> Elimina los filtros
+                                avanzados aplicados.
+                            </li>
+                            <li><button class="btn btn-sm btn-link text-muted bi bi-arrow-left fs-5"></button> Vuelve a
+                                la pantalla
+                                principal.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
             </div>
         </div>
     </div>
