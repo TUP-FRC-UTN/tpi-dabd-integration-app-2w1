@@ -1,0 +1,257 @@
+<form [formGroup]="value()!" class="needs-validation" novalidate>
+    <div class="row g-3">
+        <div class="col-12 col-md-6">
+            <div class="d-flex align-items-center">
+                <label for="authorizedType" class="form-label me-3 text-nowrap" style="width: 150px;">Tipo
+                    Autorizado</label>
+                <div class="flex-grow-1">
+                    <select id="authorizedType" class="form-select" formControlName="authorizedType"
+                        [class.is-valid]="value()?.get('authorizedType')?.valid && value()?.get('authorizedType')?.touched"
+                        [class.is-invalid]="value()?.get('authorizedType')?.invalid && value()?.get('authorizedType')?.touched"
+                        required (change)="onAuthorizedTypeChange($event)">
+                        <option *ngFor="let type of usersType" [value]="type.id">
+                            {{ type.description }}
+                        </option>
+                    </select>
+                    <div class="invalid-feedback"
+                        *ngIf="value()?.get('authorizedType')?.errors?.['required'] && value()?.get('authorizedType')?.touched">
+                        Por favor seleccione un tipo de autorización.
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="d-flex align-items-center">
+                <label for="documentType" class="form-label me-3 text-nowrap" style="width: 150px;">Tipo
+                    Documento</label>
+                <div class="flex-grow-1">
+                    <select id="documentType" class="form-select" formControlName="documentType"
+                        [class.is-valid]="value()?.get('documentType')?.valid && value()?.get('documentType')?.touched"
+                        [class.is-invalid]="value()?.get('documentType')?.invalid && value()?.get('documentType')?.touched"
+                        required>
+                        <option value="1">DNI</option>
+                        <option value="2">Pasaporte</option>
+                        <option value="3">CUIT</option>
+                    </select>
+                    <div class="invalid-feedback"
+                        *ngIf="value()?.get('documentType')?.invalid && value()?.get('documentType')?.touched">
+                        Por favor seleccione un tipo de documento.
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="d-flex align-items-center">
+                <label for="firstName" class="form-label me-3 text-nowrap" style="width: 150px;">Nombre</label>
+                <div class="flex-grow-1">
+                    <input type="text" class="form-control" id="firstName" formControlName="firstName"
+                        [class.is-valid]="value()?.get('firstName')?.valid && value()?.get('firstName')?.touched"
+                        [class.is-invalid]="value()?.get('firstName')?.invalid && value()?.get('firstName')?.touched">
+                    <div class="invalid-feedback"
+                        *ngIf="value()?.get('firstName')?.errors && value()?.get('firstName')?.touched">
+                        <div *ngIf="value()?.get('firstName')?.errors?.['required']">El nombre es requerido.
+                        </div>
+                        <div *ngIf="value()?.get('firstName')?.errors?.['maxlength']">El nombre no puede exceder
+                            45 caracteres.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="d-flex align-items-center">
+                <label for="document" class="form-label me-3 text-nowrap" style="width: 150px;">Documento</label>
+                <div class="flex-grow-1">
+                    <input type="text" class="form-control" id="document" formControlName="document"
+                        (input)="onDocumentInput($event)"
+                        [class.is-valid]="value()?.get('document')?.valid && value()?.get('document')?.touched"
+                        [class.is-invalid]="value()?.get('document')?.invalid && value()?.get('document')?.touched">
+                    <div class="invalid-feedback"
+                        *ngIf="value()?.get('document')?.errors && value()?.get('document')?.touched">
+                        <div *ngIf="value()?.get('document')?.errors?.['required']">El documento es requerido.
+                        </div>
+                        <div *ngIf="value()?.get('document')?.errors?.['invalidDniFormat']">El documento no tiene el formato requerido(Debe tener 7 u 8)
+                        </div>
+                        <div *ngIf="value()?.get('document')?.errors?.['invalidPassportFormat']">El pasaporte no tiene el formato requerido(Ingresar letras, números, longitud entre 6 y 9 caracteres)
+                        </div>
+                        <div *ngIf="value()?.get('document')?.errors?.['dniAlreadyPropietario']">Este DNI
+                            corresponde a un propietario registrado. Los propietarios no requieren autorización
+                            adicional.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="d-flex align-items-center">
+                <label for="lastName" class="form-label me-3 text-nowrap" style="width: 150px;">Apellido</label>
+                <div class="flex-grow-1">
+                    <input type="text" class="form-control" id="lastName" formControlName="lastName"
+                        [class.is-valid]="value()?.get('lastName')?.valid && value()?.get('lastName')?.touched"
+                        [class.is-invalid]="value()?.get('lastName')?.invalid && value()?.get('lastName')?.touched">
+                    <div class="invalid-feedback"
+                        *ngIf="value()?.get('lastName')?.errors && value()?.get('lastName')?.touched">
+                        <div *ngIf="value()?.get('lastName')?.errors?.['required']">El apellido es requerido.
+                        </div>
+                        <div *ngIf="value()?.get('lastName')?.errors?.['maxlength']">El apellido no puede exceder
+                            45 caracteres.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (emailActivated() && indexUserType===1) {
+        <div class="col-12 col-md-6">
+            <div class="d-flex align-items-center">
+                <label for="email" class="form-label me-3 text-nowrap" style="width: 150px;">Email</label>
+                <div class="flex-grow-1">
+                    <input type="email" class="form-control" id="email" formControlName="email"
+                        [class.is-valid]="value()?.get('email')?.valid && value()?.get('email')?.touched"
+                        [class.is-invalid]="value()?.get('email')?.invalid && value()?.get('email')?.touched">
+                    <div class="invalid-feedback"
+                        *ngIf="value()?.get('email')?.errors && value()?.get('email')?.touched">
+                        <div *ngIf="value()?.get('email')?.errors?.['required']">El email es requerido.</div>
+                        <div *ngIf="value()?.get('email')?.errors?.['email']">Por favor, ingrese un email válido.
+                        </div>
+                        <div *ngIf="value()?.get('email')?.errors?.['maxlength']">El email no puede exceder 70
+                            caracteres.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        }
+        @if (vehicleActivated()) {
+            <div class="col-12 col-md-6 col-lg-6">
+                <div class="input-group-text">
+                    <input class="form-check-input w-10" type="checkbox" role="switch" id="hasVehicle"
+                        formControlName="hasVehicle" style="transform: scale(1.2);">
+                    <label class="form-check-label w-50 text-end" for="hasVehicle">Vehículo</label>
+                </div>
+            </div>
+    
+            <ng-container *ngIf="value()?.get('hasVehicle')?.value">
+                <div class="col-12 col-md-6">
+                    <div class="d-flex align-items-center">
+                        <label for="licensePlate" class="form-label me-3 text-nowrap"
+                            style="width: 150px;">Patente</label>
+                        <div class="flex-grow-1">
+                            <input type="text" class="form-control" id="licensePlate" formControlName="licensePlate"
+                                (input)="onLicensePlateInput($event)"
+                                [class.is-valid]="value()?.get('licensePlate')?.valid && value()?.get('licensePlate')?.touched"
+                                [class.is-invalid]="value()?.get('licensePlate')?.invalid && value()?.get('licensePlate')?.touched">
+                            <div class="invalid-feedback"
+                                *ngIf="value()?.get('licensePlate')?.errors && value()?.get('licensePlate')?.touched">
+                                <div *ngIf="value()?.get('licensePlate')?.errors?.['required']">La patente es
+                                    requerida.</div>
+                                <div *ngIf="value()?.get('licensePlate')?.errors?.['pattern']">Formato de patente
+                                    inválido.</div>
+                                <div *ngIf="value()?.get('licensePlate')?.errors?.['maxlength']">La patente no puede
+                                    exceder 7 caracteres.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="col-12 col-md-6">
+                    <div class="d-flex align-items-center">
+                        <label for="vehicleType" class="form-label me-3 text-nowrap" style="width: 150px;">Tipo
+                            Vehiculo</label>
+                        <div class="flex-grow-1">
+                            <select class="form-select" id="vehicleType" formControlName="vehicleType"
+                                [class.is-valid]="value()?.get('vehicleType')?.valid && value()?.get('vehicleType')?.touched"
+                                [class.is-invalid]="value()?.get('vehicleType')?.invalid && value()?.get('vehicleType')?.touched">
+                                <option *ngFor="let option of vehicleOptions" [value]="option.value">{{ option.label }}
+                                </option>
+                            </select>
+                            <div class="invalid-feedback"
+                                *ngIf="value()?.get('vehicleType')?.errors && value()?.get('vehicleType')?.touched">
+                                <div *ngIf="value()?.get('vehicleType')?.errors?.['required']">Por favor, seleccione
+                                    un tipo de vehículo.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="d-flex align-items-center">
+                        <label for="insurance" class="form-label me-3 text-nowrap" style="width: 150px;">Seguro</label>
+                        <div class="flex-grow-1">
+                            <select id="insurance" class="form-select" formControlName="insurance"
+                                [class.is-valid]="value()?.get('insurance')?.valid && value()?.get('insurance')?.touched"
+                                [class.is-invalid]="value()?.get('insurance')?.invalid && value()?.get('insurance')?.touched">
+                                @for (insurance of insurances; track $index) {
+                                    <option [value]="insurance">{{insurance}}</option>
+                                }
+                            </select>
+                            <div class="invalid-feedback"
+                                *ngIf="value()?.get('insurance')?.errors && value()?.get('insurance')?.touched">
+                                <div *ngIf="value()?.get('insurance')?.errors?.['required']">Por favor, seleccione un
+                                    seguro.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        }
+    </div>
+</form>
+
+<!-- modal mas info -->
+<div class="modal fade" id="infoModal" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Registro de Visitantes</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>
+            En esta pantalla podrá autorizar el Ingreso de una o más personas. <br>
+            Podrá crear una autorización con un rango de fechas, y luego especificar los días y el rango horario para cada uno de ellos. <br>
+            También podrá eliminar y editar el rango de cada persona que autorice.
+          </p>
+          <strong>Datos de la Persona</strong>:
+          <ul>
+            <li class="mb-2">
+                <span class="fw-semibold">Tipo Autorizado:</span> <br>
+                Indica el Tipo de persona que va a Ingresar.
+            </li>
+            <li class="mb-2">
+                <span class="fw-semibold">Vehículo:</span> <br>
+                Permite asignar un Vehículo a la persona autorizada.
+            </li>
+            <li class="mb-2">
+              <button class="btn btn-primary me-3">Agregar</button>
+              <span>Agrega a la Persona a la lista.</span>
+            </li>
+          </ul>
+
+          <strong>Tabla de Personas Autorizadas</strong>:
+          <ul>
+            <li class="mb-2">
+                <span class="fw-semibold">Columna Acciones</span>: <br>
+                Permite <span class="text-secondary">Modificar</span> y <span class="text-danger">Eliminar</span> a las personas en la lista. <br>
+            </li>
+          </ul>
+          
+          <strong>Días y Horarios Autorizados</strong>:
+          <ul class="mt-2">
+            <li class="mb-2">
+                <button class="btn btn-primary btn-sm me-3 px-4">+</button>
+                <span>Agrega los días y el rango horario indicados.</span>
+            </li>
+            <li class="mb-2">
+                <button class="btn btn-primary me-3">Registrar</button>
+                <span>Registra y Autoriza a todos en la lista.</span>
+            </li>
+            <li class="mb-2">
+                <button class="btn btn-danger me-3">Borrar</button>
+                <span>Elimina el día de los Días Autorizados.</span>
+            </li>
+          </ul>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
