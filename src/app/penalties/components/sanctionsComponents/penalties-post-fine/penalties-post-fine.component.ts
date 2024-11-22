@@ -51,7 +51,7 @@ export class PenaltiesPostFineComponent implements OnInit {
   private initForm(): void {
     this.reactiveForm = this.fb.group({
       infractionType: ['warning', Validators.required],
-      amount: [null, [Validators.required, Validators.min(1)]]
+      amount: [null, [Validators.required, Validators.min(1), Validators.max(999999)]]
     });
   }
 
