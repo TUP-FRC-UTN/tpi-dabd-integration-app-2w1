@@ -153,20 +153,21 @@
                         <div class="row">
                             <label for="telefono" class="col-form-label col-md-3">Teléfono</label>
                             <div class="col-md-9">
-                                <input type="text" 
-                                    class="form-control" 
-                                    id="telefono" 
-                                    name="telefono"
-                                    [(ngModel)]="telefono"
-                                    #telefonoModel="ngModel"
-                                    required 
-                                    pattern="^(0?15)?[1-9]\d{8}$"
-                                    [ngClass]="{
-                                        'is-invalid': telefonoModel.invalid && telefonoModel.touched, 
-                                        'is-valid': telefonoModel.valid && telefonoModel.touched
-                                    }">
+                                <input 
+                                type="text" 
+                                class="form-control" 
+                                id="telefono" 
+                                name="telefono"
+                                [(ngModel)]="telefono" 
+                                #telefonoModel="ngModel" 
+                                required
+                                pattern="^[0-9]{1,15}$" 
+                                [ngClass]="{
+                                    'is-invalid': telefonoModel.invalid && telefonoModel.touched, 
+                                    'is-valid': telefonoModel.valid && telefonoModel.touched
+                                }">
                                 <div *ngIf="telefonoModel.invalid && telefonoModel.touched" class="invalid-feedback">
-                                    La entrada no es válida. Asegúrate de no estar agregando 0351 o +54
+                                    "La entrada no es válida. Asegúrate de ingresar solo números (sin caracteres especiales)."
                                 </div>
                             </div>
                         </div>
@@ -240,18 +241,13 @@
                         <div class="row mb-3">
                             <label class="col-form-label col-md-3" for="piso">Piso</label>
                             <div class="col-md-9">
-                                <input type="text" 
-                                    class="form-control" 
-                                    id="piso" 
-                                    name="piso"
-                                    [(ngModel)]="piso"
-                                    #pisoModel="ngModel"
-                                    required 
-                                    pattern="^-?[0-9]\d*$"
-                                    [ngClass]="{'is-invalid': pisoModel.invalid && pisoModel.touched, 
-                                            'is-valid': pisoModel.valid && pisoModel.touched}">
+                                <input type="text" class="form-control" id="piso" name="piso" [(ngModel)]="piso"
+                                #pisoModel="ngModel" pattern="^-?[0-9]\d*$" [ngClass]="{
+                                'is-invalid': pisoModel.invalid && pisoModel.touched, 
+                                'is-valid': pisoModel.valid && pisoModel.touched
+                            }">
                                 <div *ngIf="pisoModel.invalid && pisoModel.touched" class="invalid-feedback">
-                                    La entrada no es válida. Asegúrate de usar solo números enteros
+                                    La entrada no es válida. Asegúrate de usar solo numeros enteros
                                 </div>
                             </div>
                         </div>
@@ -314,18 +310,13 @@
                         <div class="row mb-3">
                             <label class="col-form-label col-md-3" for="dpto">Departamento</label>
                             <div class="col-md-9">
-                                <input type="text" 
-                                    class="form-control" 
-                                    id="dpto" 
-                                    name="dpto"
-                                    [(ngModel)]="dpto"
-                                    #dptoModel="ngModel"
-                                    required 
-                                    pattern="^[a-zA-Z0-9]+$"
-                                    [ngClass]="{'is-invalid': dptoModel.invalid && dptoModel.touched, 
-                                            'is-valid': dptoModel.valid && dptoModel.touched}">
+                                <input type="text" class="form-control" id="dpto" name="dpto" [(ngModel)]="dpto"
+                                    #dptoModel="ngModel" pattern="^[a-zA-Z0-9]+$" [ngClass]="{
+                                    'is-invalid': dptoModel.invalid && dptoModel.touched, 
+                                    'is-valid': dptoModel.valid && dptoModel.touched
+                                }">
                                 <div *ngIf="dptoModel.invalid && dptoModel.touched" class="invalid-feedback">
-                                    La entrada no es válida. Asegúrate de no usar caracteres especiales
+                                    La entrada no es válida. Asegúrate de usar no usar caracteres especiales
                                 </div>
                             </div>
                         </div>
@@ -364,15 +355,16 @@
                                 </ng-select>
                             </div>
                         </div>
-                        <!-- Licencia -->
+                        <!-- Licencia del empleado -->
                         <div class="row mb-3">
                             <label class="col-form-label col-md-3" for="licencia">Licencia</label>
                             <div class="col-md-9">
-                                <input type="checkbox" 
-                                    id="licencia" 
-                                    name="licencia" 
-                                    [(ngModel)]="license"
-                                    #licenseModel="ngModel">
+                                <button type="button"
+                                        class="w-100"
+                                        [ngClass]="license ? 'btn btn-warning' : 'btn btn-success'"  
+                                        (click)="toggleLicense()">
+                                    {{ license ? 'Empleado en licencia' : 'Empleado activo' }} <!-- Cambia el texto según estado -->
+                                </button>
                             </div>
                         </div>
                     </div>

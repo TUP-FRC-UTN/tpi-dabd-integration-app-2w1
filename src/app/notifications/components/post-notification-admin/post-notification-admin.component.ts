@@ -56,7 +56,7 @@ export class PostNotificationAdminComponent implements AfterViewInit, OnInit{
   ngOnInit(): void {
     
       const users = this.httpClient.get<UserApiDTO[]>
-      ("http://localhost:8080" + "/general/getUsers")
+      (environment.services.notifications + "/general/getUsers") 
       .subscribe(response =>
         {this.users = response;
           this.fillTable();
@@ -76,7 +76,7 @@ export class PostNotificationAdminComponent implements AfterViewInit, OnInit{
     let table = $("#myTable").DataTable();
     for (let user of this.users) {
 
-      table.row.add([user.name,user.lastname,user.dni,user.email, '<input type="checkbox" class="userCheckbox" />']).draw(false);
+      table.row.add([user.name,user.lastname,user.dni,user.email, '<input type="checkbox" class="userCheckbox form-check-input border border-secondary" />']).draw(false);
     }
   }
   

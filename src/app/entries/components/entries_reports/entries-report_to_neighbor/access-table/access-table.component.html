@@ -323,3 +323,158 @@
     </div>
   </div>
 </div>
+
+<!-- modal mas info -->
+<div class="modal fade" id="infoModal" role="dialog">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Informe de Ingresos/Egresos</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>
+            En esta pantalla podrá consultar el registro de todos los Movimientos. <br>
+            Tambien podrá registrar Ingresos y Egresos, incluyendo un escáner de códigos QR para Visitantes. <br>
+            Además podrá generar reportes en formato Excel y PDF. <br>
+          </p>
+          
+          <li>
+            <strong>Botones Superior Izquierda</strong>:
+            <ul>
+              <li><button  class="btn btn-primary bi bi-funnel-fill mb-2"></button> Permite aplicar filtros avanzados.</li>
+              <li><button class="btn btn-secondary bi bi-trash mb-2"></button> Elimina los filtros avanzados aplicados.</li>
+            </ul>
+          </li>
+
+          <li>
+            <strong>Botones Superior Derecha</strong>:
+            <ul>
+                <li class="mb-2">
+                    <div class="col-auto ms-auto">
+                        <div class="d-flex">
+                            <button style="background-color: #FFDAB9;border: bisque;" class="btn btn-primary me-1 my-1">
+                                <i class="bi bi-briefcase text-dark"></i>
+                            </button>
+                            <button style="background-color: #FFCECE;border: bisque;" class="btn btn-warning m-1">
+                                <i class="bi bi-truck text-dark"></i>
+                            </button>
+                            <button style="background-color: #B0E0E6;border: bisque;" class="btn btn-primary m-1" >
+                                <i class="bi bi-person-raised-hand text-dark"></i>
+                            </button>
+                            <button style="background-color: #9FD8AB;border: bisque;" class="btn btn-primary m-1">
+                                <i class="bi-house text-dark"></i> 
+                            </button>
+                            <div class="mt-2">
+                                Filtra entre los principales Tipos de Ingresante.
+                            </div>
+                        </div>
+                    </div>
+                </li>
+
+                <li><button style="background-color: #444444;" class="btn border-0 btn-success bi-search mb-2"></button> 
+                    Muestra las Personas Autorizadas que no tienen Movimientos registrados.
+                </li>
+                <li><button style="background-color: #444444;" class="btn border-0 btn-success bi-qr-code-scan mb-2"></button> 
+                    Permite escanear códigos QR de Visitantes.
+                </li>
+
+                <li><button class="btn btn-success bi-file-earmark-excel mb-2"></button> Exporta el contenido de la tabla a Excel.</li>
+                <li><button class="btn btn-danger bi-file-earmark-pdf mb-2"></button> Exporta el contenido de la tabla a PDF.</li>
+            </ul>
+          </li>
+
+          <li>
+            <strong>Botones en la Tabla</strong>:
+            <ul>
+                <li class="mb-2">
+                    <div class="mt-2 fw-semibold">Columna Ingresante:</div>
+                    <div class="col-auto ms-auto">
+                        <div class="d-flex">
+                            <button style="background-color: #FFDAB9;border: bisque;" class="btn btn-primary me-1 my-1">
+                                <i class="bi bi-briefcase text-dark"></i>
+                            </button>
+                            <button style="background-color: #B0E0E6;border: bisque;" class="btn btn-primary m-1">
+                                <i class="bi bi-person-raised-hand text-dark"></i>
+                            </button>
+                            <button style="background-color: #FFB0B0;border: bisque;" class="btn btn-primary m-1">
+                                <i class='bi bi-tools text-dark'></i> 
+                            </button>
+                            <button style="background-color: #9FD8AB;border: bisque;" class="btn btn-primary m-1">
+                                <i class="bi-house text-dark"></i> 
+                            </button>
+                            <button style="background-color: #9fd8ab00;border: bisque;" class="btn btn-warning m-1">
+                                <i class="bi bi-dot"></i><i class="bi bi-dot"></i><i class="bi bi-dot"></i>
+                            </button>
+                            <div class="mt-2"> Permiten ver más información de la persona.</div>
+                        </div>
+                    </div>
+                </li> 
+                <li class="mb-2">
+                    <div class="mt-2 fw-semibold">Columna Tipo:</div>
+                    <div class="col-auto ms-auto mb-2">
+                        <div class="d-flex py-0">
+                            <button style="background-color: #28a745;color: white; border: #28a74600;" class="badge py-0 rounded-pill user-select-none">
+                                Entrada
+                            </button>
+                            <div class="ms-2 mt-2">Permite registrar el Egreso de la persona.</div>
+                        </div>
+                    </div>
+                    <div class="col-auto ms-auto">
+                        <div class="d-flex py-0">
+                            <button style="background-color: #dc3545;color: white; border: #dc354600;" class="badge py-0 rounded-pill user-select-none">
+                                Salida
+                            </button>
+                            <div class="ms-2 mt-2">Permite registrar el Ingreso de la persona.</div>
+                        </div>
+                    </div>
+                </li> 
+            </ul>
+          </li>
+
+          <li>
+            <strong>Botón Inferior Derecha</strong>:
+            <ul>
+              <li>
+                <button class="rounded-circle mb-2 btn btn-danger"> 
+                    <span class="bi bi-hospital"></span>
+                </button> 
+                Permite registrar Emergencias de forma rápida.
+            </li>
+            </ul>
+          </li>
+
+          <!-- info sobre modal Lista de Personas Autorizadas -->
+          <li>
+            <span class="me-2"><strong>Botones de la Lista de Personas Autorizadas</strong></span>
+            <i class="bi bi-arrow-right" 
+               style="font-size: 1.8rem; color: black; position: relative; top: 5px;"></i>
+            <button style="background-color: #444444;" class="btn border-0 btn-success bi-search ms-1 mb-2"></button>
+            <ul>
+              <li>
+                <button class="btn btn-secondary bi bi-trash mb-2"></button> Elimina los filtros avanzados aplicados.
+              </li>
+              <li><button style="background-color: #444444;" class="btn border-0 btn-success bi-qr-code-scan mb-2"></button> 
+                Permite escanear códigos QR de Visitantes.
+              </li>
+              <li><button class="btn border-0 btn-primary bi bi-plus-lg mb-2"></button> 
+                Permite autorizar temporalmente a una Persona, si el Vecino lo permite.
+              </li>
+              <li>
+                <button style="background-color: #2bad49; color: white;" class="mb-2 btn">
+                  Ingreso
+                </button>
+                Permite registrar el 1er Ingreso de la persona.
+              </li>
+            </ul>
+          </li>
+          
+          
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+        </div>
+      </div>
+    </div>
+  </div>

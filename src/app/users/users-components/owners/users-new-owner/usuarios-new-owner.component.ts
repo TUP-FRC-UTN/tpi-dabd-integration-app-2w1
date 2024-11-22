@@ -18,6 +18,7 @@ import { AuthService } from '../../../users-servicies/auth.service';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
 import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
+import { RoutingService } from '../../../../common/services/routing.service';
 
 @Component({
   selector: 'app-usuarios-new-owner',
@@ -35,6 +36,7 @@ export class UsuariosNewOwnerComponent implements OnInit, OnDestroy {
   private readonly plotService = inject(PlotService);
   private readonly validatorService = inject(ValidatorsService);
   private readonly suscriptionService = inject(SuscriptionManagerService);
+  private readonly routingService = inject(RoutingService);
 
   //Obtener el id del usuario logueado
   private readonly authService = inject(AuthService);
@@ -62,7 +64,7 @@ export class UsuariosNewOwnerComponent implements OnInit, OnDestroy {
   documentType: string = '';
 
   //Inicializa el formulario
-  constructor(private router: Router, private fb: FormBuilder) {
+  constructor(private fb: FormBuilder) {
     this.formReactivo = this.fb.group({
       name: new FormControl("", [
         Validators.required,
@@ -316,12 +318,12 @@ export class UsuariosNewOwnerComponent implements OnInit, OnDestroy {
   //Confirmar salida
   confirmExit() {
     this.formReactivo.reset();
-    this.redirect('/main/owners/list');
+    this.redirect();
   }
 
-  //Redireccionar
-  redirect(path: string) {
-    this.router.navigate([path]);
+  //Redirecciona al listado de propietarios
+  redirect() {
+    this.routingService.redirect('/main/owners/list', 'Listado de Propietarios');
   }
 
   //Cambiar visibilidad de la contraseña
@@ -429,7 +431,7 @@ export class UsuariosNewOwnerComponent implements OnInit, OnDestroy {
 
         //Resetea el fomulario
         this.resetForm()
-        this.router.navigate(['/main/owners/list']);
+        this.redirect();
       },
 
       //Se intercepta el error, si sucede

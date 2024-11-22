@@ -118,7 +118,6 @@ loadEmpleados(): void {
       this.empleados = [];
       this.empleados = Empleados;
       this.cargarSelectEmpleados();
-      //this.cargarTiposEmpleados();
      }
    })
  }
@@ -229,14 +228,6 @@ cargarSelectEmpleados(){
   });
 }
 
-// cargarTiposEmpleados(){
-//   const tipos: Set<string> = new Set();
-
-//   this.empleados.forEach(empleado => {
-//     tipos.add(empleado.position);
-//   });
-// }
-
 onStartDateChange(): void {
   const startDateInput: HTMLInputElement = document.getElementById('fechaInicio') as HTMLInputElement;
   const endDateInput: HTMLInputElement = document.getElementById('fechaFin') as HTMLInputElement;
@@ -305,13 +296,8 @@ filtrarAsistencias() {
       console.log(asistencia)
       return this.empleadosFiltrados.includes(asistencia.employeeId.toString())
    })
-
-  // this.empleadosFiltrados.forEach(element => {
-  //   console.log(element);
-  // });
   }
 }
-
 
 // Filtra los llamados en funcion de los valores de los filtros
 filtrarLlamados() {

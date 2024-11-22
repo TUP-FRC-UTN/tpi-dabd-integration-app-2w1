@@ -260,6 +260,7 @@ export class IepTableComponent implements OnInit, AfterViewInit, OnDestroy {
         {
           data: 'modificationType',
           title: 'Tipo de Movimiento',
+          className: 'text-center',
           render: (data: string) => {
             let colorClass;
             switch (data) {
@@ -275,8 +276,8 @@ export class IepTableComponent implements OnInit, AfterViewInit, OnDestroy {
         { data: 'product', title: 'Artículo' }, // Columna de producto
         {data: 'supplier',title : 'Proveedor'},
 
-        { data: 'amount', title: 'Cantidad' }, // Columna de cantidad
-        { data: 'stockAfterModification', title: 'Stock Resultante' },
+        { data: 'amount', title: 'Cantidad', className: 'text-end' }, // Columna de cantidad
+        { data: 'stockAfterModification', title: 'Stock Resultante', className: 'text-end' },
         { data: 'description', title: 'Justificativo' }, 
         // Columna de justificativo
 

@@ -67,10 +67,22 @@ export class PlotService {
     return this.http.get<PlotStateModel[]>(this.url + '/plots/states');
   }
 
+  transferPlot(plotId: number, ownerId: number, userId: number): Observable<GetPlotModel>{
+    const formData: FormData = new FormData();
+
+    formData.append('plotId', plotId.toString());
+    formData.append('ownerId', ownerId.toString());
+    formData.append('userId', userId.toString());    
+
+
+    return this.http.post<GetPlotModel>(`${environment.services.ownersAndPlots}/plotOwners/transfer`, formData);
+  }
+
   putPlot(id: number,  plot: PutPlot): Observable<PutPlot>{
 
     const formData: FormData = new FormData();
-  
+    formData.append('plot_number', plot.plot_number.toString());
+    formData.append('block_number', plot.block_number.toString());
     formData.append('total_area_in_m2', plot.total_area_in_m2.toString());
     formData.append('built_area_in_m2', plot.built_area_in_m2.toString());
     formData.append('plot_state_id', plot.plot_state_id.toString());

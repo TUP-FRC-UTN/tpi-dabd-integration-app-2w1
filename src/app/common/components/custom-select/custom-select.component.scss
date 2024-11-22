@@ -1,60 +1,67 @@
+::ng-deep {
+  .ng-select {
+    .ng-select-container {
+      max-height: 1px;
+      padding: 0;
 
-:host {
-    display: block;
-    
-    ::ng-deep {
-      .ng-select {
-        .ng-select-container {
-          max-height: 1px;
-          padding: 0;
-          
-          &:hover {
-            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.15);
-          }
-        }
-        
-        &.ng-select-focused:not(.ng-select-opened) > .ng-select-container {
-          box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
-        }
-        
-        &.is-invalid .ng-select-container {
-          border-color: #dc3545;
-          padding-right: calc(1.5em + 0.75rem);
-          background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
-          background-repeat: no-repeat;
-          background-position: right calc(0.375em + 0.1875rem) center;
-          background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
-          
-          &:hover {
-            box-shadow: 0 0 0 0.2rem rgba(220,53,69,.25);
-          }
-        }
-        
-        &.is-valid .ng-select-container {
-          border-color: #198754;
-          padding-right: calc(1.5em + 0.75rem);
-          background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
-          background-repeat: no-repeat;
-          background-position: right calc(0.375em + 0.1875rem) center;
-          background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
-          
-          &:hover {
-            box-shadow: 0 0 0 0.2rem rgba(25,135,84,.25);
-          }
-        }
-        
-        .ng-value-container {
-          padding: 0.375rem 0.75rem;
-        }
-        
-        &.ng-select-multiple {
-          .ng-value {
-            background-color: #e9ecef;
-            border-radius: 0.25rem;
-            margin: 0.125rem;
-            padding: 0.25rem 0.5rem;
-          }
-        }
+      /* Sombra solo al enfocar o mientras está seleccionado */
+      &:focus-within {
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
+      }
+    }
+
+    /* Estado válido */
+    &.is-valid .ng-select-container {
+      border-color: #198754;
+      /* Verde de Bootstrap */
+      box-shadow: none;
+      /* Sin sombra al no estar en foco */
+      padding-right: calc(1.5em + 0.75rem);
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right calc(0.375em + 0.1875rem) center;
+      background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+
+      /* Sombra verde solo al enfocar */
+      &:focus-within {
+        box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, .25);
+        /* Sombra verde */
+      }
+    }
+
+    /* Estado inválido */
+    &.is-invalid .ng-select-container {
+      border-color: #dc3545;
+      /* Rojo de Bootstrap */
+      box-shadow: none;
+      /* Sin sombra al no estar en foco */
+      padding-right: calc(1.5em + 0.75rem);
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right calc(0.375em + 0.1875rem) center;
+      background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+
+      /* Sombra roja solo al enfocar */
+      &:focus-within {
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, .25);
+        /* Sombra roja */
+      }
+    }
+
+    /* Ajuste del contenedor de valores */
+    .ng-value-container {
+      padding: 0.375rem 0.75rem;
+    }
+
+    /* Configuración para selección múltiple */
+    &.ng-select-multiple {
+      .ng-value {
+        background-color: #e9ecef;
+        /* Fondo gris claro */
+        border-radius: 0.25rem;
+        margin: 0.125rem;
+        padding: 0.25rem 0.5rem;
       }
     }
   }
+}

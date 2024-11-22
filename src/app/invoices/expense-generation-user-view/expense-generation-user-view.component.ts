@@ -71,6 +71,7 @@ export class ExpenseGenerationUserViewComponent implements OnInit {
   @Output() status = new EventEmitter<number>();
 
   ngOnInit() {
+    this.expenseService.clearSelectedExpenses;
     // Obtener el ID del usuario logueado
     const userId = this.authService.getUser().id;
     
@@ -139,8 +140,11 @@ export class ExpenseGenerationUserViewComponent implements OnInit {
 
   async openPdf(uuid: string) {
     try {
+      // Eliminar el prefijo 'uuid:' si existe
+      const cleanUuid = uuid.replace('uuid:', '');
+      
       const response = await fetch(
-        environment.services.expenseGeneration + `/api/expenses/pdf/${uuid}`
+        `${environment.services.expenseGeneration}/api/expenses/pdf/${cleanUuid}`
       );
       if (!response.ok) {
         alert('No se pudo cargar el pdf');
@@ -149,9 +153,9 @@ export class ExpenseGenerationUserViewComponent implements OnInit {
       const url = window.URL.createObjectURL(blob);
       window.open(url);
     } catch (error) {
-      console.error('There was an error opening the PDF:', error);
+      console.error('Hubo un error abriendo el PDF: ', error);
     }
-  }
+}
 
   async openReceipt(expense: ExpenseGenerationExpenseInterface) {
     try {
@@ -159,7 +163,7 @@ export class ExpenseGenerationUserViewComponent implements OnInit {
         const hasLetters = /[a-zA-Z]/.test(expense.payment_id);
         if (hasLetters) {
           const response = await fetch(
-            environment.services.expenseGeneration + `/generate-receipt/${expense.payment_id}`
+            environment.services.stripeService + `/generate-receipt/${expense.payment_id}`
           );
           if (!response.ok) {
             alert('No se pudo cargar el pdf');
@@ -169,7 +173,7 @@ export class ExpenseGenerationUserViewComponent implements OnInit {
           window.open(url);
         } else {
           const response = await fetch(
-            environment.services.expenseGeneration + `/api/receipts/${expense.payment_id}/pdf`
+            environment.services.mercadoPago + `/api/receipts/${expense.payment_id}/pdf`
           );
           if (!response.ok) {
             alert('No se pudo cargar el pdf');
@@ -302,9 +306,27 @@ export class ExpenseGenerationUserViewComponent implements OnInit {
     const initialString:string = expenseDetails.length>1 ? "Pago de las boletas de los periodos:" : "Pago de la boleta del periodo:";
 
     const description = `${initialString} ${expenses
-      .map((exp) => this.datePipe.transform(exp.period,"MM-yyyy")  )
+      .map((exp) => {
+        try {
+          if (!exp.period) return '';
+          
+          // Asegurarse de que tenemos el formato MM/YYYY
+          const period = exp.period.includes('-') 
+            ? exp.period.split('-').reverse().join('/') 
+            : exp.period;
+          
+          const [month, year] = period.split('/');
+          const date = new Date(+year, +month - 1, 1);
+          
+          return isNaN(date.getTime()) 
+            ? exp.period 
+            : (this.datePipe.transform(date, "MM-yyyy") || exp.period);
+        } catch {
+          return exp.period; // Retornar el periodo original en caso de error
+        }
+      })
+      .filter(Boolean) // Eliminar strings vacíos
       .join(', ')}`;
-
     const paymentData = {
       description: description,
       amount: totalAmount,

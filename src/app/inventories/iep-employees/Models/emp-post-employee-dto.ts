@@ -9,7 +9,6 @@ export class PostEmployeeDto{
   charge: number|undefined;
   contractStartTime?: Date|undefined;
   salary: number|undefined;
-  license: boolean|undefined;
   mondayWorkday: boolean|undefined;
   tuesdayWorkday: boolean|undefined;
   wednesdayWorkday: boolean|undefined;
@@ -20,10 +19,10 @@ export class PostEmployeeDto{
   startTime: string|undefined; 
   endTime: string|undefined;   
   supplierId?: number|undefined;
-  emailValue: string|undefined;
-  telephoneValue: number|undefined;
-  userId: number|undefined;
   adressDto: AddressDto|undefined
+  telephoneValue: number|undefined;
+  emailValue: string|undefined;
+  userId: number|undefined;
 
 
 }

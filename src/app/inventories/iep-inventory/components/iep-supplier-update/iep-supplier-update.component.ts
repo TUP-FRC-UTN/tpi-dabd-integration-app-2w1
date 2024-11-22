@@ -1,13 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule, RouterOutlet } from '@angular/router';
-import { ProvidersService } from '../../services/providers.service';
 import { SuppliersService } from '../../services/suppliers.service';
 import { Supplier } from '../../models/suppliers';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { error } from 'jquery';
 import Swal from 'sweetalert2';
-import { UserService } from '../../../../users/users-servicies/user.service';
 import { AuthService } from '../../../../users/users-servicies/auth.service';
 
 @Component({
@@ -80,8 +77,8 @@ export class IepSupplierUpdateComponent implements OnInit{
     this.proveedorForm = this.fb.group({
       name: ['', Validators.required],
       cuit: ['', Validators.required],
-      phoneNumber: ['', [Validators.required]],
-      email: ['', [Validators.required, Validators.email]],
+      phoneNumber: ['', [Validators.required,Validators.pattern('^[0-9]*$')]],
+      email: ['', [Validators.required, Validators.email, this.emailDomainValidator]],
       supplierType: ['', Validators.required],
       address: ['', Validators.required],
       createdUser: [0],
@@ -117,7 +114,15 @@ export class IepSupplierUpdateComponent implements OnInit{
     }
   }
   
-
+  emailDomainValidator(control: AbstractControl) {
+    const email = control.value;
+    if (email && email.endsWith('.com') || email.endsWith('.com.ar') || email.endsWith('.net') || 
+    email.endsWith('.mx') || email.endsWith('.org') || email.endsWith('.gov') || email.endsWith('.edu')) {
+      return null; 
+    } else {
+      return { emailDomain: true }; 
+    }
+  }
 
   isFieldInvalid(field: string): boolean {
     const control = this.proveedorForm.get(field);
