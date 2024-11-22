@@ -80,7 +80,6 @@ export class OwnerService {
 
     formData.append('userCreateId', owner.userCreateId.toString());
     formData.append('plotId', owner.plotId.toString());
-    formData.append('telegramId', owner.telegramId.toString());
     owner.files.forEach((file, index) => {
       formData.append('files', file);
     });
@@ -103,8 +102,10 @@ export class OwnerService {
     formData.append('active', owner.active.toString());
     formData.append('email', owner.email);
     formData.append('phoneNumber', owner.phoneNumber);
-    formData.append('userCreateId', owner.userUpdateId.toString());
-    formData.append('telegramId', "123123");
+    formData.append('userUpdateId', owner.userUpdateId.toString());
+    owner.roles.forEach((role, index) => {
+      formData.append(`roles[${index}]`, role);
+    });
     owner.plotId.forEach((plot) => {
       formData.append('plotId', plot.toString());
     });

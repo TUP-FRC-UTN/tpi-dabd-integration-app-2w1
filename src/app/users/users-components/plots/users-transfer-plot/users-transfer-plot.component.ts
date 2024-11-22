@@ -18,7 +18,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 })
 export class UsersTransferPlotComponent implements OnInit, OnDestroy {
 
-  constructor(public activeModal: NgbActiveModal ,private fb: FormBuilder ){
+  constructor(public activeModal: NgbActiveModal, private fb: FormBuilder) {
     this.reactiveForm = this.fb.group({
       actualOwner: [''],
       newOwner: ['', [Validators.required]]
@@ -29,15 +29,19 @@ export class UsersTransferPlotComponent implements OnInit, OnDestroy {
   actualOwner: Owner = new Owner();
   plot: GetPlotModel = new GetPlotModel();
   reactiveForm: FormGroup;
+  confirm: boolean = false;
+  plotLength: number = 0;
+
   @Input() plotId: number = 0;
+
   private readonly ownersService = inject(OwnerService);
   private readonly plotService = inject(PlotService);
   private readonly authService = inject(AuthService);
   private readonly suscriptonService = inject(SuscriptionManagerService);
 
-   ngOnInit() {
+  ngOnInit() {
     this.reactiveForm.get('actualOwner')?.disable();
-     this.loadAllOwners(); 
+    this.loadAllOwners();
   }
 
   //Desuscribirse de todos los observables
@@ -51,13 +55,13 @@ export class UsersTransferPlotComponent implements OnInit, OnDestroy {
       next: (data: Owner[]) => {
         this.owners = data.map(owner => ({
           value: owner.id,
-          name: `${owner.name}, ${owner.lastname}`
+          name: `${owner.name}, ${owner.lastname} - ${owner.dni}`
         }));
-        
-        this.loadActualOwner();   
+
+        this.loadActualOwner();
       },
       error: (error) => {
-        console.log('No se pudo cargar los propietarios, '+ error);
+        console.log('No se pudo cargar los propietarios, ' + error);
       }
     });
 
@@ -65,13 +69,15 @@ export class UsersTransferPlotComponent implements OnInit, OnDestroy {
     this.suscriptonService.addSuscription(sus);
   }
 
-  //Cargar propietario actual
+  //Cargar el propietario actual
   loadActualOwner() {
-    const sus = this.ownersService.getOwnerByPlotId(this.plotId).subscribe({
-      next: (data: Owner[]) => {
-        this.actualOwner = data.find(owner => owner.active == true)!;               
-        this.owners = this.owners.filter(owner => owner.value != this.actualOwner.id);    
-        this.reactiveForm.get('actualOwner')?.setValue(this.actualOwner.name + ' ' + this.actualOwner.lastname);
+    this.ownersService.getOwnerByPlotId(this.plotId).subscribe({
+      next: (data: Owner[]) => {        
+        this.actualOwner = data.find(owner => owner.active == true)!;
+        this.owners = this.owners.filter(owner => owner.value != this.actualOwner.id);
+        this.reactiveForm.get('actualOwner')?.setValue(this.actualOwner.name + ' ' + this.actualOwner.lastname + ' - ' + this.actualOwner.dni);
+      
+        this.loadPlotOwner(this.actualOwner.id);
       },
       error: (error) => {
         console.log('No se pudo cargar la información del propietario, ' + error);
@@ -82,11 +88,32 @@ export class UsersTransferPlotComponent implements OnInit, OnDestroy {
     this.suscriptonService.addSuscription(sus);
   }
 
-  //Transferir lote
-  transferPlot(){
-    const sus = this.plotService.transferPlot(this.plotId,
-       this.reactiveForm.get('newOwner')?.value,
-       this.authService.getUser().id).subscribe({
+  loadPlotOwner(id : number){
+    this.plotService.getPlotsByOwnerId(id).subscribe({
+      next: (data : GetPlotModel[]) =>{
+        this.plotLength = data.length
+      }
+    })
+  }
+
+  confirmAction(){
+    this.confirm = true;
+
+    let message : string = '¿Estás seguro de que desea transferir el lote?'
+    
+    if(this.plotLength == 1){
+      message = `¿Estás seguro de que deseas transferir el lote? 
+      El propietario ${this.actualOwner.name} ${this.actualOwner.lastname} - ${this.actualOwner.dni} se dará de baja por inexistencia de lotes a su nombre`
+    }
+    return message;
+  }
+
+
+  //Transferir el lote
+  transferPlot() {
+    this.plotService.transferPlot(this.plotId,
+      this.reactiveForm.get('newOwner')?.value,
+      this.authService.getUser().id).subscribe({
         next: () => {
           Swal.fire({
             icon: "success",
@@ -104,7 +131,5 @@ export class UsersTransferPlotComponent implements OnInit, OnDestroy {
           console.error('Error al trasnferir el lote:', error);
         }
       });
-
-      //Agregar suscripción
-      this.suscriptonService.addSuscription(sus);
-}}
+  }
+}

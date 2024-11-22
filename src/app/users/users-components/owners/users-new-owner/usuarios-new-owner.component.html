@@ -159,13 +159,39 @@
         </div>
       </div>
 
+      <!-- <div class="col-lg-6 mb-3">
+        <div class="row">
+          <label class="col-2 col-form-label">Contraseña</label>
+          <div class="col-10 position: relative">
+            <div class="input-group">
+              <input [type]="passwordVisible ? 'text' : 'password'" 
+                     class="form-control custom-input" 
+                     formControlName="password" 
+                     autocomplete="current-password" 
+                     [ngClass]="onValidate('password')">
+              <span class="input-group-text" (click)="togglePasswordVisibility()" style="cursor: pointer;">
+                <i class="bi" [ngClass]="passwordVisible ? 'bi-eye-slash' : 'bi-eye'"></i>
+              </span>
+              <div class="invalid-feedback">{{ showError("password") }}</div>
+            </div>     
+          </div>
+        </div>
+      </div> -->
+
 
       <div class="col-lg-6 mb-3">
         <div class="row">
           <label class="col-2 col-form-label">Lotes</label>
           <div class="col-10">
             <!-- ============================CheckMe======================= -->
-            <app-custom-select [options]="availablePlots" [multiple]="true" [selectedOptions]="formReactivo.get('plots')?.value" (selectedOptionsChange)="formReactivo.get('plots')?.setValue($event)" />
+            <div class="input-group w-100 p-0" style="width: auto;">
+              <app-custom-select [options]="availablePlots" [multiple]="true"
+                  [selectedOptions]="formReactivo.get('plots')?.value"  class="col-11"
+                  (selectedOptionsChange)="formReactivo.get('plots')?.setValue($event)" />
+              <span class="input-group-text m-0 col-1"(click)="redirect('/main/plots/add')" style="cursor: pointer;">
+                <i class="bi-plus-lg"></i>
+              </span>
+            </div>   
           </div>
         </div>
       </div>
