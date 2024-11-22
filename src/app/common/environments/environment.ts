@@ -1,7 +1,7 @@
 export const environment = {
   production: false,
   services: {
-    accesses: 'http://2w1-villadelcondor.dynns.com:8080/accesses',//'http://localhost:8090', //
+    accesses: 'http://localhost:8090',//'http://localhost:8090', //
     addresses: 'http://2w1-villadelcondor.dynns.com:8080/addresses',//'http://localhost:9064',
     complaints: 'http://localhost:9040',
     contacts: 'http://2w1-villadelcondor.dynns.com:8080/contacts', //'http://localhost:9010'

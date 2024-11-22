@@ -7,7 +7,7 @@
                 <ng-select 
                 [items]="visitors"
                 [bindLabel]="'name'"
-                placeholder="Buscar"
+                placeholder=""
                 [(ngModel)]="selectedVisitorId"
                 (change)="onVisitorSelect($event)"
                 [clearable]="true">
@@ -57,11 +57,15 @@
     <div class="row mt-3">
       <div class="col-12 d-flex justify-content-end">
         <button 
-          class="btn btn-success" 
-          (click)="onGiveTempAccess()"
-          [disabled]="!visitorForm.valid">
-          Autorizar
-        </button>
+        class="btn btn-success" 
+        (click)="onGiveTempAccess()"
+        [disabled]="!visitorForm.valid || isAuthorizing">
+        <span *ngIf="!isAuthorizing">Autorizar</span>
+        <span *ngIf="isAuthorizing">
+          <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+          Autorizando...
+        </span>
+      </button>
       </div>
     </div>
  </div>

@@ -25,6 +25,32 @@ export class AccessVisitorsEventualComponent implements OnInit {
  visitors: AccessUserAllowedInfoDto[] = [];
  selectedVisitorId: AccessUserAllowedInfoDto | null = null;
  selectedVisitor?: AccessUserAllowedInfoDto;
+ isAuthorizing: boolean = false;
+
+
+
+ resetForm() {
+    this.visitorForm.reset();
+    this.selectedVisitor = undefined;
+    this.visitorForm.get('firstName')?.enable();
+    this.visitorForm.get('lastName')?.enable();
+    this.visitorForm.get('document')?.enable();
+    this.visitorForm.get('authorizedType')?.enable();   
+    this.visitorForm.get('documentType')?.enable();
+    this.visitorForm.get('email')?.enable();
+ }
+
+ initForm() {
+    this.visitorForm = this.fb.group({
+      authorizedType: [''],
+      documentType: [''],
+      document: [''],
+      firstName: [''],
+      lastName: [''],
+      email: ['',[Validators.email]]
+    });
+
+ }
  
 
 
@@ -47,7 +73,7 @@ export class AccessVisitorsEventualComponent implements OnInit {
  ngOnInit() {
    const userId = this.authService.getUser().id;  
    this.loadVisitors(userId);
-  
+   this.initForm();
  }
 
  loadVisitors(neighborId: number) {
@@ -62,20 +88,10 @@ export class AccessVisitorsEventualComponent implements OnInit {
 
  onVisitorSelect(visitor: AccessUserAllowedInfoDto) {
   if (!visitor) {
-    this.visitorForm = this.fb.group({
-      authorizedType: [''],
-      documentType: [''],
-      document: [''],
-      firstName: [''],
-      lastName: [''],
-      email: ['']
-    });
-    console.log("pasa");
-    this.selectedVisitor = undefined;
-    return;
-  } 
-
-  if (visitor) {
+    this.resetForm();
+  }
+  else  {
+    
     console.log('Email del visitante:', visitor.email);
     this.visitorForm.get('firstName')?.disable();
     this.visitorForm.get('lastName')?.disable();
@@ -93,93 +109,108 @@ export class AccessVisitorsEventualComponent implements OnInit {
       email: visitor.email 
       
     });
+    this.selectedVisitor = visitor;
     
-    this.selectedVisitor = visitor;   
   }
  }
  onGiveTempAccess() {
-  if (this.visitorForm.valid || this.selectedVisitor) {
-    const formData = this.selectedVisitor ?? this.visitorForm.value;
-    if (!formData.authorizedType)
-      formData.authorizedType = userTypeMap[formData.userType.description];
-    if (!formData.documentType)
-      formData.documentType = documentTypeMap[formData.documentTypeDto.description];
-    console.log(formData);
-    const userId = this.authService.getUser().id;
-    console.log('Type:', formData.authorizedType);
-   
-    if (!formData.email) {
-      const visitorData: AccessVisitor3 = {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        document: formData.document,
-        documentType: parseInt(formData.documentType),
-        userType: parseInt(formData.authorizedType)
-      };
- 
-      const accessTempRegistData: accessTempRegist = {
-        visitor: visitorData,
-        guard_Id: 0,
-        neighbor_Id: userId
-      };
- 
-      this.giveTempAccess.giveTempRange(accessTempRegistData)
-        .subscribe({
-          next: (response) => {
-            this.visitorForm.reset();
-            this.selectedVisitor = undefined;
-            Swal.fire('Acceso temporal otorgado', 'El acceso temporal ha sido otorgado correctamente', 'success');
-          },
-          error: (error) => {
-           Swal.fire('Error', 'Ha ocurrido un error al otorgar el acceso temporal', 'error');
-          }
-        });
-    } 
-   
-    else {
-      const currentDate = new Date();
-      const endTimeToday = new Date();
-      endTimeToday.setHours(23, 59, 59);
-      const dayToday = currentDate.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
- 
-      const visitorRecord: AccessVisitorRecord = {
-        visitors: [{
+  if (this.isAuthorizing) return;
+  this.isAuthorizing = true;
+
+  setTimeout(() => {
+    if (this.visitorForm.valid || this.selectedVisitor) {
+      const formData = this.selectedVisitor ?? this.visitorForm.value;
+      if (!formData.authorizedType)
+        formData.authorizedType = userTypeMap[formData.userType.description];
+      if (!formData.documentType)
+        formData.documentType = documentTypeMap[formData.documentTypeDto.description];
+      console.log(formData);
+      const userId = this.authService.getUser().id;
+      console.log('Type:', formData.authorizedType);
+     
+      if (!formData.email) {
+        const visitorData: AccessVisitor3 = {
           firstName: formData.firstName,
           lastName: formData.lastName,
           document: formData.document,
           documentType: parseInt(formData.documentType),
-          email: formData.email,
-          hasVehicle: false,
-          userType: parseInt(formData.authorizedType),
-          visitDate: currentDate
-        }],
-        authRange: {
-          initDate: currentDate,
-          endDate: currentDate,
-          neighbourId: userId,
-          allowedDays: [{
-            day: {
-              name: dayToday,
-              value: true
-            } , 
-            startTime: currentDate,
-            endTime: endTimeToday,
-            crossesMidnight: false
-          }]
-        }
-      };
- 
-      this.giveTempAccess.postVisitorRecord(visitorRecord)
-        .subscribe({
-          next: (response) => {
-            this.visitorForm.reset();
-            Swal.fire('Acceso temporal otorgado', 'El acceso temporal ha sido otorgado correctamente', 'success');
-          },
-          error: (error) => {
-            Swal.fire('Error', 'Ha ocurrido un error al otorgar el acceso temporal', 'error');
+          userType: parseInt(formData.authorizedType)
+        };
+   
+        const accessTempRegistData: accessTempRegist = {
+          visitor: visitorData,
+          guard_Id: 0,
+          neighbor_Id: userId
+        };
+   
+        this.giveTempAccess.giveTempRange(accessTempRegistData)
+          .subscribe({
+            next: (response) => {
+              this.resetForm();
+              this.isAuthorizing = false;
+              Swal.fire('Autorización otorgada', 'La autorización ha sido otorgada correctamente', 'success');
+            },
+            error: (error) => {
+              this.isAuthorizing = false;
+              if(error.status === 400){
+                Swal.fire('Error', 'Ya tiene una autorizacion otorgada', 'error');
+              }
+              else{
+                Swal.fire('Error', 'Ha ocurrido un error al otorgar la autorización', 'error');
+              }
+              this.resetForm();
+            }
+          });
+      } 
+     
+      else {
+        const currentDate = new Date();
+        const endTimeToday = new Date();
+        endTimeToday.setHours(23, 59, 59);
+        const dayToday = currentDate.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
+   
+        const visitorRecord: AccessVisitorRecord = {
+          visitors: [{
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            document: formData.document,
+            documentType: parseInt(formData.documentType),
+            email: formData.email,
+            hasVehicle: false,
+            userType: parseInt(formData.authorizedType),
+            visitDate: currentDate
+          }],
+          authRange: {
+            initDate: currentDate,
+            endDate: currentDate,
+            neighbourId: userId,
+            allowedDays: [{
+              day: {
+                name: dayToday,
+                value: true
+              }, 
+              startTime: currentDate,
+              endTime: endTimeToday,
+              crossesMidnight: false
+            }]
           }
-        });
+        };
+   
+        this.giveTempAccess.postVisitorRecord(visitorRecord)
+          .subscribe({
+            next: (response) => {
+              this.resetForm();
+              this.isAuthorizing = false;
+              Swal.fire('Acceso temporal otorgado', 'El acceso temporal ha sido otorgado correctamente', 'success');
+            },
+            error: (error) => {
+              this.resetForm();
+              this.isAuthorizing = false;
+              Swal.fire('Error', 'Ha ocurrido un error al otorgar el acceso temporal', 'error');
+            }
+          });
+      }
     }
-  }
+  }, 1500); 
 }
 }
