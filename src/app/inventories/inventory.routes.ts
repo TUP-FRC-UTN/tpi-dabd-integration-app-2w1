@@ -8,18 +8,24 @@ import { IepProductComponent } from "./iep-inventory/components/iep-product/iep-
 import { IepSuppliersFormComponent } from "./iep-inventory/components/iep-suppliers-form/iep-suppliers-form.component";
 import { IepNuevoIngresoEgresoComponent } from "./iep-inventory/components/iep-nuevo-ingreso-egreso/iep-nuevo-ingreso-egreso.component";
 import { IepSupplierUpdateComponent } from "./iep-inventory/components/iep-supplier-update/iep-supplier-update.component";
+import { authGuard } from "../users/guards/auth.guard";
+import { roleGuard } from "../notifications/guard";
 
 export const INVENTORY_ROUTES: Routes = [
-
- { path: '', component: InventoryEmployeeProviderHomeComponent }, //agregado para desarrollar
-    
-    { path: 'inventory', component: IepInventoryComponent },
-    { path: 'new-product', component: IepProductComponent},
-    { path: 'product-update/:id', component: IepProductComponent },
-    { path: 'stock-movements-history', component: IepTableComponent },
-    { path: 'stock-increase', component: IepNuevoIngresoEgresoComponent },
-    { path: 'new-provider', component: IepSuppliersFormComponent },
-    { path: "supplier-update/:id", component: IepSupplierUpdateComponent },
-    { path: 'categories-list', component: IepCategoriesListComponent }, 
-    { path: 'dashboard', component: IepChartsInventoryComponent }, 
+    {
+        path: '',
+        canActivateChild: [authGuard, roleGuard],
+        data: { roles: ['SuperAdmin', 'Gerente inventario'] },
+        children: [
+            { path: 'inventory', component: IepInventoryComponent },
+            { path: 'new-product', component: IepProductComponent },
+            { path: 'product-update/:id', component: IepProductComponent },
+            { path: 'stock-movements-history', component: IepTableComponent },
+            { path: 'stock-increase', component: IepNuevoIngresoEgresoComponent },
+            { path: 'new-provider', component: IepSuppliersFormComponent },
+            { path: "supplier-update/:id", component: IepSupplierUpdateComponent },
+            { path: 'categories-list', component: IepCategoriesListComponent },
+            { path: 'dashboard', component: IepChartsInventoryComponent },
+        ]
+    }
 ];
