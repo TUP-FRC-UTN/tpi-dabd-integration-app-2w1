@@ -7,12 +7,14 @@ import { IepPerformancelistComponent } from "./iep-employees/components/iep-perf
 import { IepPutEmployeesComponent } from "./iep-employees/components/iep-put-employees/iep-put-employees.component";
 import { IepChartsEmployeesComponent } from "./iep-employees/components/iep-charts-employees/iep-charts-employees.component";
 import { IepPillowLaterArrivalConfigComponent } from "./iep-employees/components/iep-pillow-later-arrival-config/iep-pillow-later-arrival-config.component";
+import { IepAttendancesComponent } from "./iep-employees/components/iep-attendances/iep-attendances.component";
 
 export const EMPLOYEE_ROUTES: Routes = [
     { path: 'employees', component: IepListEmployeesComponent },
     { path: "register-employee", component: IEPFormPostEmployeesComponent },
+    { path: "attendance/:id", component: IepAttendancesComponent },
     { path: 'attention-call', component: IepAttentionCallComponent },
-    { path: 'performance', component: IepPerformancelistComponent },
+    { path: 'performance/:id', component: IepPerformancelistComponent },
     { path: 'employee/update/:id', component: IepPutEmployeesComponent },
     { path: 'charges', component: IepChargesComponent },
     { path: 'pillow-late-arrival', component: IepPillowLaterArrivalConfigComponent },
