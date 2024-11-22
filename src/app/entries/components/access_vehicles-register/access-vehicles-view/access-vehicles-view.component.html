@@ -6,21 +6,20 @@
 
   <form [formGroup]="formVehicle" class="needs-validation" novalidate (ngSubmit)="onSubmit()">
     <!-- Document Info -->
-    <div class="card mt-3 mb-3">
-      <div class="card-body pb-5">
-        <div class="row g-3 mb-5 align-items-center">
-          <!-- Campo Documento -->
-          <div class="col-md-6">
+    <div class="card mt-1 mb-3">
+      <div class="card-body pb-2">
+        <div class="row g-3 mb-3">
+          <!--* Campo Documento *-->
+          <div class="col-6">
             <div class="d-flex align-items-center">
-              <label for="document" class="form-label me-2" style="width: 120px;">Documento</label>
-              <div class="position-relative">
-                <input type="text" class="form-control flex-grow-1" id="document" formControlName="document"
+              <label for="document" class="form-label me-1" style="width: 120px;">Documento</label>
+              <div class="position-relative flex-grow-1">
+                <input type="text" class="form-control mb-0" id="document" formControlName="document"
                   [class.is-valid]="formVehicle.get('document')?.valid && formVehicle.get('document')?.touched"
                   [class.is-invalid]="formVehicle.get('document')?.invalid && formVehicle.get('document')?.touched">
-                <!-- Mensajes de error para Documento -->
-                <div class="invalid-feedback position-absolute [120px]">
-                  <div
-                    *ngIf="formVehicle.get('document')?.hasError('userNotFound') && formVehicle.get('document')?.touched">
+                <!--* Mensajes de error para Documento *-->
+                <div class="invalid-feedback position-absolute [120px] mt-0">
+                  <div *ngIf="formVehicle.get('document')?.hasError('userNotFound') && formVehicle.get('document')?.touched">
                     El documento no existe.
                   </div>
                   <div *ngIf="formVehicle.get('document')?.hasError('apiError') && formVehicle.get('document')?.touched">
@@ -44,28 +43,25 @@
               </div>
             </div>
           </div>
-
-          <!-- Campo Tipo de Documento -->
-          <div class="col-md-6">
+          <!--* Campo Tipo de Documento *-->
+          <div class="col-6">
             <div class="d-flex align-items-center">
-              <label for="documentType" class="form-label me-2" style="width: 120px;">Tipo de Documento</label>
-              <div class="position-relative">
+              <label for="documentType" class="form-label me-2" style="width: 120px;">Tipo Documento</label>
+              <div class="position-relative flex-grow-1">
                 <select class="form-control" id="documentType" formControlName="documentType"
                   [class.is-valid]="formVehicle.get('documentType')?.valid && formVehicle.get('documentType')?.touched"
                   [class.is-invalid]="formVehicle.get('documentType')?.invalid && formVehicle.get('documentType')?.touched">
-                  <option value="">Seleccione tipo de documento</option>
                   <option value="DNI">DNI</option>
                   <option value="PASSPORT">Pasaporte</option>
                   <option value="CUIT">CUIT</option>
                 </select>
-                <div class="invalid-feedback position-absolute">
+                <div class="invalid-feedback position-absolute mt-0">
                   @if(formVehicle.get('documentType')?.invalid && formVehicle.get('documentType')?.touched){
                     @if(formVehicle.get('documentType')?.errors?.['required']){
                       <div>El tipo es requerido</div>
                     }
                   }
                 </div>
-                <!-- Espacio para mensajes de error del tipo de documento si los hubiera -->
               </div>
             </div>
           </div>
@@ -76,11 +72,11 @@
       <div class="card mt-3 mb-3">
         <div class="card-body">
           <div class="row g-3 mb-3">
-            <div class="col-12">
-              <h5>Datos del Usuario:</h5>
-              <p>Nombre: {{ userAllowed?.name }} </p>
-              <p>Apellido: {{ userAllowed?.last_name }}</p>
-              <p>Email: {{ userAllowed?.email }}</p>
+            <div class="col-12 d-flex align-items-center">
+              <h5 class="mb-0 me-4">Datos del Usuario:</h5>
+              <p class="mb-0 me-4">Nombre: {{ userAllowed?.name }}</p>
+              <p class="mb-0 me-4">Apellido: {{ userAllowed?.last_name }}</p>
+              <p class="mb-0">Email: {{ userAllowed?.email }}</p>
             </div>
           </div>
         </div>
@@ -120,10 +116,18 @@
     <!-- Vehicle Forms -->
     <div class="card mt-3 mb-3">
       <div class="card-body">
-        <h5>Alta de Vehículos:</h5>
+        <div class="row justify-content-between mb-2">
+          <h5 class="col">Alta de Vehículos:</h5>
+          <div class="col text-end">
+            <button type="button" class="btn btn-primary" (click)="addVehicle()">
+              Agregar
+            </button>
+          </div>
+        </div>
         <div formArrayName="vehicles">
           @for (vehicleGroup of VehiclesArray.controls; track $index) {
-          <div [formGroupName]="$index" class="g-3 mb-3 border-bottom pb-3">
+          <hr>
+          <div [formGroupName]="$index" class="g-3 mb-2">
             <div class="row align-items-center mb-4">
               <!-- Campo Patente -->
               <div class="col-12 col-md-3">
@@ -152,7 +156,6 @@
                     <select class="form-control" [id]="'vehicleType'+$index" formControlName="vehicleType"
                       [class.is-valid]="vehicleGroup.get('vehicleType')?.valid && vehicleGroup.get('vehicleType')?.touched"
                       [class.is-invalid]="vehicleGroup.get('vehicleType')?.invalid && vehicleGroup.get('vehicleType')?.touched">
-                      <option value="">Seleccione el tipo de vehículo</option>
                       @for (option of vehicleOptions; track option.value) {
                         <option [value]="option.value">{{option.label}}</option>
                       }
@@ -161,7 +164,7 @@
                     <div class="invalid-feedback ms-[120px] position-absolute">
                       @if (vehicleGroup.get('vehicleType')?.errors?.['required'] &&
                         vehicleGroup.get('vehicleType')?.touched) {
-                        <div>Por favor, seleccione un tipo de vehículo.</div>
+                        <div>El tipo de vehículo es requerido.</div>
                       }
                     </div>
                   </div>
@@ -175,7 +178,6 @@
                     <select class="form-control" [id]="'insurance'+$index" formControlName="insurance"
                       [class.is-valid]="vehicleGroup.get('insurance')?.valid && vehicleGroup.get('insurance')?.touched"
                       [class.is-invalid]="vehicleGroup.get('insurance')?.invalid && vehicleGroup.get('insurance')?.touched">
-                      <option value="">Seleccione el seguro de vehículo</option>
                       @for (insurance of insurances; track $index) {
                         <option [value]="insurance">{{insurance}}</option>
                       }
@@ -184,7 +186,7 @@
                     <div class="invalid-feedback ms-[120px] position-absolute">
                       @if (vehicleGroup.get('insurance')?.errors?.['required'] &&
                         vehicleGroup.get('insurance')?.touched) {
-                        <div>Por favor, seleccione un seguro.</div>
+                        <div>El seguro es requerido.</div>
                       }
                     </div>
                   </div>
@@ -200,11 +202,7 @@
           </div>
           }
         </div>
-        <div class="col-12 md-3  text-end">
-          <button type="button" class="btn btn-primary" (click)="addVehicle()">
-            Añadir
-          </button>
-        </div>
+
       </div>
     </div>
     <!-- Add Vehicle Button -->
