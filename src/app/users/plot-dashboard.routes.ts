@@ -9,8 +9,8 @@ import { UsersGraphicPlotsStatsComponent } from "./users-components/dashboard/us
 import { UsersGraphicPlotComponent } from "./users-components/dashboard/users-graphic-plot/users-graphic-plot.component";
 
 export const PLOT_DASHBOARD: Routes = [
-    { path: 'plot-blocks', component: UsersGraphicBlocksComponent},
-    { path: 'plot-info', component: UsersGraphicPlotsStatsComponent},
-    { path: 'plot', component: UsersGraphicPlotComponent}
-    
+    { path: 'plot-blocks', component: UsersGraphicBlocksComponent },
+    { path: 'plot-info', component: UsersGraphicPlotsStatsComponent },
+    { path: 'plot', component: UsersGraphicPlotComponent }
+
 ];

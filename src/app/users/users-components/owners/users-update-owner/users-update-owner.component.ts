@@ -371,14 +371,15 @@ export class UsersUpdateOwnerComponent implements OnInit, OnDestroy {
       dateBirth: form.get('birthdate')?.value,
       ownerTypeId: form.get('ownerType')?.value,
       taxStatusId: Number(form.get('state').value),
-      dniTypeId: form.get('dniType')?.value,
+      dniTypeId: Number(form.get('dniType')?.value),
       businessName: form.get('bussinesName')?.value,
       phoneNumber: form.get('phoneNumber')?.value,
       email: form.get('email')?.value,
       files: this.files,
       userUpdateId: 1,
       active: true,
-      plotId: form.get('plots')?.value
+      plotId: form.get('plots')?.value,
+      roles: ['Propietario']
     } as PutOwnerDto
   }
 
@@ -394,9 +395,10 @@ export class UsersUpdateOwnerComponent implements OnInit, OnDestroy {
       //se crea el objeto
       let ownerPut = this.createObject(form);
 
+      console.log(this.id);
+      
       console.log(ownerPut);
       
-
       //llama al service
       const sus = this.ownerService.putOwner(ownerPut, Number(this.id)).subscribe({
         next: () => {

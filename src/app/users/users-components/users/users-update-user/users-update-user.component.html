@@ -1,5 +1,4 @@
 <section class="container p-5 border rounded border-3 border-secundary" style="min-height: 70vh;">
-    <h3>Editar Usuario</h3>
     <form [formGroup]="updateForm" (ngSubmit)="updateUser()">
         <div class="row">
 
@@ -26,17 +25,29 @@
                 </div>
             </div>
 
-
             <div class="col-lg-6 mb-3">
                 <div class="row">
-                    <label class="col-2 col-form-label">DNI</label>
-                    <div class="col-10">
-                        <input type="number" class="form-control" formControlName="dni" [ngClass]="onValidate('dni')">
-                        <div class="invalid-feedback">{{showError('dni')}}</div>
-                    </div>
+                  <label class="col-2 col-form-label">Tipo de Documento</label>
+                  <div class="col-10">
+                    <app-custom-select #dniComponent [options]="[{value: 1, name: 'DNI'}, {value: 2, name: 'Pasaporte'}, {value: 3, name: 'CUIT/CUIL'}]"
+                      [selectedOptions]="updateForm.get('dniType')?.value"
+                      (selectedOptionsChange)="updateForm.get('dniType')?.setValue($event)"
+                      [validations]="updateForm.get('dniType')?.validator" />
+                    <div class="invalid-feedback">{{showError('dniType')}}</div>
+                  </div>
                 </div>
-            </div>
+              </div>
 
+
+              <div class="col-lg-6 mb-3">
+                <div class="row">
+                  <label class="col-2 col-form-label">Documento</label>
+                  <div class="col-10">
+                    <input type="text" class="form-control" formControlName="dni" [ngClass]="onValidate('dni')">
+                    <div class="invalid-feedback">{{showError('dni')}}</div>
+                  </div>
+                </div>
+              </div>
 
             <div class="col-lg-6 mb-3">
                 <div class="row">
@@ -73,12 +84,11 @@
                 </div>
             </div>
 
-
             <div class="col-lg-6 mb-3">
                 <div class="row">
                     <label class="col-2 col-form-label">Roles</label>
                     <div class="col-10">
-                        <app-custom-select [options]="optionRoles"
+                        <app-custom-select [options]="optionRoles" #rolesSelect
                             [multiple]="true"
                             (selectedOptionsChange)="updateForm.get('roles')?.setValue($event)"
                             [selectedOptions]="updateForm.get('roles')?.value"

@@ -16,12 +16,6 @@
          [selectedOptions]="selectType.value || []"
          (selectedOptionsChange)="updateFilterType($event)"/>
     </div>
-    <div>
-      <input type="date" class="form-control me-3" formControlName="datebirth" style="width: 200px" [formControl]="initialDate" (change)="filterByDate()"/>
-    </div>
-    <div>
-      <input type="date" class="form-control me-3" formControlName="datebirth" style="width: 200px" [formControl]="endDate" (change)="filterByDate()"/>
-    </div>
     </div>
     <div class="d-flex">
       <div>
@@ -53,11 +47,11 @@
         <h5 class="modal-title" id="infoModalLabel">Información sobre la pantalla</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body overflow-auto" style="height: 600px;">
         <p>En esta pantalla se muestra una lista de propietarios, ordenado por su fecha de creación de manera descendente con las siguientes columnas:</p>
         <ul>
-          <li><strong>Fecha de creación</strong>: Muestra la fecha en la que se registró el propietario.</li>
           <li><strong>Nombre</strong>: Nombre completo del propietario.</li>
+          <li><strong>Tipo Documento</strong>: Tipo de Documento de identificación del propietario.(DNI , Pasaporte , CUIT/CUIL)</li>
           <li><strong>Documento</strong>: Documento de identificación del propietario.</li>
           <li><strong>Tipo</strong>: El tipo de propietario (por ejemplo, si es persona física o jurídica).</li>
           <li><strong>Lotes</strong>: Los lotes asociados al propietario.</li>
@@ -66,14 +60,27 @@
         <ul>
           <li><strong>Buscar</strong>: Permite buscar por cualquier texto relacionado con los propietarios.</li>
           <li><strong>Tipo</strong>: Un desplegable para seleccionar el tipo de propietario (por ejemplo, persona física o jurídica).</li>
-          <li><strong>Fecha de nacimiento</strong>: Filtros de fecha para seleccionar un rango de fechas y ver propietarios nacidos en ese periodo.</li>
           <li><strong>Restablecer filtros</strong>: El botón de "reset" borra todos los filtros aplicados y muestra la lista completa.</li>
         </ul>
-        <p>Además, puedes exportar la lista de propietarios a los siguientes formatos:</p>
-        <ul>
-          <li><strong>Excel</strong>: Exporta los datos en formato de hoja de cálculo Excel.</li>
-          <li><strong>PDF</strong>: Exporta los datos en formato PDF.</li>
-        </ul>
+        <li>
+          <strong>Botones</strong>:
+          <ul>
+            <li>
+              <button class="btn btn-secondary bi bi-trash mb-2"></button> Elimina los filtros aplicados.
+            </li>
+            <li>
+              <button class="btn btn-success mt-2 bi-file-earmark-excel mb-2"></button> Exporta el contenido de la tabla a Excel.
+            </li>
+            <li>
+              <button class="btn btn-danger bi-file-earmark-pdf mb-2"></button> Exporta el contenido de la tabla a PDF.
+            </li>
+            <li>
+              <button class="rounded-circle mb-2 btn btn-primary">
+                <span class="bi-plus-lg"></span>
+              </button> Abre el modal para registrar un nuevo propietario.
+            </li>
+          </ul>
+        </li>
       </div>
       
       <div class="modal-footer">

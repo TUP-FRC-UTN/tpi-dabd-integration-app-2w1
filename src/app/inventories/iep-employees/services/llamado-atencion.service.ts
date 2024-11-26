@@ -12,7 +12,6 @@ import { environment } from '../../../common/environments/environment';
 export class LlamadoAtencionService {
   // Base URLs
   private readonly BASE_URL: string = environment.services.employees + "/";
-  private readonly MOCK_API_URL: string = 'https://mocki.io/v1/';
 
   // Wake Up Calls endpoints
   private readonly WAKE_UP_CALLS_URL: string = `${this.BASE_URL}wakeUpCalls`;
@@ -22,9 +21,6 @@ export class LlamadoAtencionService {
   // Employees endpoints
   private readonly EMPLOYEES_URL: string = `${this.BASE_URL}employees`;
   private readonly EMPLOYEES_GET_ALL: string = `${this.EMPLOYEES_URL}/allEmployees`;
-
-  // Movements endpoints
-  private readonly MOVEMENTS_MOCK: string = `${this.MOCK_API_URL}dc644c6b-deab-431a-83d9-3d232a1dff05`;
 
   constructor(private http: HttpClient) {}
 
@@ -50,30 +46,6 @@ export class LlamadoAtencionService {
   getAllEmployees(): Observable<EmployeeGetResponseDTO[]> {
     return this.http.get<EmployeeGetResponseDTO[]>(this.EMPLOYEES_GET_ALL)
       .pipe(catchError(this.handleError));
-  }
-
-  getMovements(date: string): Observable<string[]> {
-    return this.http.get<MovementRecord[]>(this.MOVEMENTS_MOCK).pipe(
-      map(movements => {
-        const selectedDate = date.split('T')[0];
-        const filteredMovements = movements.filter(movement =>
-          movement.movementDatetime.startsWith(selectedDate)
-        );
-
-        const employeeMovements = new Map<string, string[]>();
-        filteredMovements.forEach(movement => {
-          const employeeTypes = employeeMovements.get(movement.document) || [];
-          employeeTypes.push(movement.movementType);
-          employeeMovements.set(movement.document, employeeTypes);
-        });
-
-        return Array.from(employeeMovements.entries())
-          .filter(([_, types]) =>
-            types.includes('ENTRADA') && types.includes('SALIDA')
-          )
-          .map(([document]) => document);
-      })
-    );
   }
 
   private handleError(error: HttpErrorResponse) {
