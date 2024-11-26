@@ -81,12 +81,11 @@ export const routes: Routes = [
             {
                 path: 'notifications',
                 loadChildren: () => import("./notifications/notification.routes").then((m) => m.NOTIFICATION_ROUTES),
-                data: { roles: ['SuperAdmin'] }
-            },
+                data: { roles: ['SuperAdmin', 'Gerente general', 'Inquilino', 'Propietario', 'Familiar mayor', 'Familiar menor', 'Gerente multas', 'Gerente inventario', 'Gerente finanzas', 'Seguridad', 'Gerente empleados'] }
             {
                 path: 'users',
                 loadChildren: () => import("./users/user.routes").then((m) => m.USER_ROUTES),
-                data: { roles: ['SuperAdmin', 'Gerente general', 'Propietario', 'Familiar mayor'] }
+                data: { roles: ['SuperAdmin', 'Gerente general', 'Inquilino', 'Propietario', 'Familiar mayor', 'Familiar menor', 'Gerente multas', 'Gerente inventario', 'Gerente finanzas', 'Seguridad', 'Gerente empleados'] }
             },
             {
                 path: 'plots',

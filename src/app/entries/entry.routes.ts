@@ -4,6 +4,7 @@ import { AccessContainerVisitorsRegistrationComponent } from "./components/acces
 import { MetricsComponent } from "./components/metrics/metrics.component";
 import { authGuard } from "../users/guards/auth.guard";
 import { roleGuard } from "../users/guards/role.guard";
+import { AccessGlobalReportComponent } from "./components/entries_reports/entries-global-report/access-global-report.component";
 
 export const ENTRY_ROUTES: Routes = [
     {
@@ -29,4 +30,5 @@ export const ENTRY_ROUTES: Routes = [
             },
         ]
     }
+];
 

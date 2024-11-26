@@ -10,13 +10,28 @@ export const NOTIFICATION_ROUTES: Routes = [
   {
     path: '',
     canActivateChild: [authGuard, roleGuard],
-    data: { roles: ['SuperAdmin'] },
+    data: { roles: ['SuperAdmin', 'Gerente general', 'Inquilino', 'Propietario', 'Familiar mayor', 'Familiar menor', 'Gerente multas', 'Gerente inventario', 'Gerente finanzas', 'Seguridad', 'Gerente empleados'] },
     children: [
-      { path: "show", component: NotificationComponent },
-      { path: "admin-post-notification", component: PostNotificationAdminComponent },
-      { path: "admin-all-notifications", component: AllNotificationComponent},
-      { path: 'test', component: AllNotificationComponent },
-      { path: 'dashboard', component: NotificationHomeComponent },
+      {
+        path: "show", component: NotificationComponent,
+        // data: { roles: ['SuperAdmin', 'Gerente general', 'Inquilino', 'Propietario', 'Familiar mayor', 'Familiar menor', 'Gerente multas', 'Gerente inventario', 'Gerente finanzas', 'Seguridad', 'Gerente empleados'] }
+      },
+      {
+        path: "admin-post-notification", component: PostNotificationAdminComponent,
+        data: { roles: ['SuperAdmin'] }
+      },
+      {
+        path: "admin-all-notifications", component: AllNotificationComponent,
+        data: { roles: ['SuperAdmin'] }
+      },
+      {
+        path: 'test', component: AllNotificationComponent,
+        data: { roles: ['SuperAdmin'] }
+      },
+      {
+        path: 'dashboard', component: NotificationHomeComponent,
+        data: { roles: ['SuperAdmin'] }
+      }
     ]
   }
 ];
