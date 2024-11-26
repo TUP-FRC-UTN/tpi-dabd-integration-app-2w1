@@ -83,6 +83,7 @@ export class PenaltiesSanctionsListComponent implements OnInit {
     });
     this.resetDates()
     this.today = new Date().toISOString().split('T')[0];
+    this.eraseFilters();
   }
 
 
