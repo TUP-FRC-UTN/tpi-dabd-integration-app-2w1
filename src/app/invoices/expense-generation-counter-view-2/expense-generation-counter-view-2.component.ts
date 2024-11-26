@@ -792,7 +792,6 @@ export class ExpenseGenerationCounterView2Component {
   
     console.log('Plataforma top:', topPlatformEntry);
   
-
     this.principalKpis[0].amount = totalIncome;
     this.principalKpis[1].amount = totalDebt;
     this.principalKpis[2].amount = delinquentCount;
