@@ -31,7 +31,7 @@ export const NOTIFICATION_ROUTES: Routes = [
       {
         path: 'dashboard', component: NotificationHomeComponent,
         data: { roles: ['SuperAdmin'] }
-      },
+      }
     ]
   }
 ];

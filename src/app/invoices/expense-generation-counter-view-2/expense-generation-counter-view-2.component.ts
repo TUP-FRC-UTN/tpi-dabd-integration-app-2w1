@@ -822,6 +822,7 @@ export class ExpenseGenerationCounterView2Component {
       return '';
     }
     try {
+      // Si ya está en formato YYYY-MM, lo devuelve directamente
       if (typeof period === 'string' && /^\d{4}-\d{2}$/.test(period)) {
         return period;
       }
