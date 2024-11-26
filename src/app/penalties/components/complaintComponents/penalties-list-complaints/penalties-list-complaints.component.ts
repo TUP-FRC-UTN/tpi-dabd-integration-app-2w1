@@ -167,7 +167,7 @@ export class PenaltiesListComplaintComponent implements OnInit {
                     <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
                     <ul class="dropdown-menu">
                       <li><a class="dropdown-item" onclick="viewComplaint(${data.id})">Ver más</a></li>
-                      ${data.complaintState === "Pendiente" ? `
+                      ${(data.complaintState === "Pendiente" || data.complaintState === "Nueva") ? `
                       <li><hr class="dropdown-divider"></li>
                       <li><a class="dropdown-item" onclick="changeState('REJECTED', ${data.id}, ${this.authService.getUser().id})">Rechazar</a></li>
                       <li><a class="dropdown-item" onclick="changeState('SOLVED', ${data.id}, ${this.authService.getUser().id})">Resuelta</a></li>` : ``}
