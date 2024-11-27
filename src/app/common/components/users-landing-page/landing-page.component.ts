@@ -11,20 +11,40 @@ import { RoutingService } from '../../services/routing.service';
   standalone: true,
   imports: [RouterOutlet, ReactiveFormsModule, CommonModule],
   templateUrl: './landing-page.component.html',
-  styleUrls: ['./landing-page.component.css'], 
+  styleUrls: ['./landing-page.component.css'],
 })
-export class LandingPageComponent implements OnInit  {
-  lotes: GetPlotModel[]=[];
+export class LandingPageComponent implements OnInit {
+  lotes: GetPlotModel[] = [];
   //Injects
-  private router = inject(Router);
+  private routingService = inject(RoutingService);
   private plotService = inject(PlotService);
   //-----------------------------------------implementar el servicio de notificaciones para enviar un mail-------------------------------
 
-  formMessage : FormGroup;
-  plotsCard : {number : number, blockNumber : number, totalArea : number, type : string, status : string}[] = [];
+  formMessage: FormGroup;
+  plotsCard: { number: number, blockNumber: number, totalArea: number, type: string, status: string }[] = [];
+
+  images: any[] = [
+    'https://www.villadelcondor.com/imagenes/villadelcondor1.jpg',
+    'https://www.villadelcondor.com/imagenes/villadelcondor2.jpg',
+    'https://www.villadelcondor.com/imagenes/villadelcondor3.jpg',
+    'https://www.villadelcondor.com/imagenes/villadelcondor4.jpg',
+    'https://www.villadelcondor.com/imagenes/villadelcondor5.jpg',
+    'https://www.villadelcondor.com/imagenes/villadelcondor6.jpg',
+    'https://www.villadelcondor.com/imagenes/villadelcondor7.jpg',
+    'https://www.villadelcondor.com/imagenes/villadelcondor8.jpg',
+    'https://www.villadelcondor.com/imagenes/villadelcondor9.jpg',
+    'https://www.villadelcondor.com/imagenes/villadelcondor10.jpg',
+    'https://www.villadelcondor.com/imagenes/villadelcondor11.jpg',
+    'https://www.villadelcondor.com/imagenes/villadelcondor12.jpg',
+    'https://www.villadelcondor.com/imagenes/villadelcondor14.jpg',
+    'https://www.villadelcondor.com/imagenes/villadelcondor15.jpg',
+    'https://www.villadelcondor.com/imagenes/villadelcondor16.jpg',
+    'https://www.villadelcondor.com/imagenes/villadelcondor17.jpg',
+    'https://www.villadelcondor.com/imagenes/villadelcondor18.jpg'
+  ];
 
   //Formulario para hacer consultas
-  constructor(private fb : FormBuilder, private routingService : RoutingService) {
+  constructor(private fb: FormBuilder) {
     this.formMessage = this.fb.group({
       name: new FormControl('', [Validators.required]),
       email: new FormControl('', [Validators.required, Validators.email]),
@@ -33,62 +53,67 @@ export class LandingPageComponent implements OnInit  {
   }
   loadMap(): void {
     const svgElement = document.getElementById('mapa') as HTMLObjectElement;
-    const svgDoc = svgElement.contentDocument; 
-      svgDoc?.getElementById('rio')?.setAttribute('fill','#4381C1')
-      svgDoc?.getElementById('path277')?.setAttribute('fill','#FDE2E4')
-      this.lotes.forEach(lote => {
-        const pathElement = svgDoc?.getElementById(lote.plot_number.toString());
-        if (pathElement) {
-          
-          switch (lote.plot_state) {
-            case 'Habitado':
-              pathElement.setAttribute('fill', '#CDDAFD');
-              break;
-            case 'En construccion':
-              pathElement.setAttribute('fill', '#f7a072');
-              break;
-            case 'Disponible':
-              pathElement.setAttribute('fill', '#BEE1E6');
-              break;
-          }
-                  // Evento de hover (mouseenter)
+    const svgDoc = svgElement.contentDocument;
+
+    //Colores de elementos unicos
+    svgDoc?.getElementById('river')?.setAttribute('fill', '#789DBC');
+    svgDoc?.getElementById('street')?.setAttribute('fill', '#6C757D');
+    svgDoc?.getElementById('entry')?.setAttribute('fill', '#6C757D');
+
+    this.lotes.forEach(lote => {
+      const pathElement = svgDoc?.getElementById(lote.plot_number.toString());
+      if (pathElement) {
+        switch (lote.plot_state) {
+          case 'Habitado':
+            pathElement.setAttribute('fill', '#FFE6A9');
+            break;
+          case 'En construccion':
+            pathElement.setAttribute('fill', '#DEAA79');
+            break;
+          case 'Disponible':
+            pathElement.setAttribute('fill', '#B1C29E');
+            break;
+        }
+
+        // Evento de hover (mouseenter)
         pathElement.addEventListener('mouseenter', () => {
-          pathElement.setAttribute('stroke', '#000'); // Borde negro
-          pathElement.setAttribute('stroke-width', '2'); // Ancho del borde
-          pathElement.setAttribute('opacity', '0.8'); // Opacidad reducida
+          pathElement.setAttribute('stroke-width', '3'); // Ancho del borde
+          pathElement.setAttribute('opacity', '0.6'); // Opacidad reducida
         });
 
         // Evento de salir del hover (mouseleave)
         pathElement.addEventListener('mouseleave', () => {
-          pathElement.removeAttribute('stroke'); // Elimina el borde
-          pathElement.removeAttribute('stroke-width');
+          pathElement.setAttribute('stroke-width', '1');
           pathElement.removeAttribute('opacity');
         });
-          pathElement.addEventListener('click', () => {
-            alert(`Hiciste clic en ${lote.id}`);
-            console.log(lote)
-          });
-        }
-      });
+
+        // Setteo de evento de clic
+        pathElement.addEventListener('click', () => {
+          alert(`Hiciste clic en ${lote.id}`);
+          console.log(lote);
+        });
+
+      }
+    });
   }
   ngOnInit(): void {
     this.getPlots();
   }
 
   //Trae los primeros 3 lotes disponibles
-  getPlots(){
+  getPlots() {
     this.plotService.getAllPlotsAvailables().subscribe({
       next: (data: GetPlotModel[]) => {
-        
-        const firstThreePlots = data.slice(0, 3);
+
+        const firstThreePlots = data.slice(0, 6);
         this.plotsCard = firstThreePlots.map(d => ({
           number: d.plot_number,
           blockNumber: d.block_number,
           totalArea: d.total_area_in_m2,
           type: d.plot_type,
           status: d.plot_state
-          }));
-          
+        }));
+
       },
       error: (err) => {
         console.error('Error al cargar los lotes', err);
@@ -106,13 +131,13 @@ export class LandingPageComponent implements OnInit  {
   }
 
   //Método para redireccionar
-  redirect(path : string){
+  redirect(path: string) {
     this.routingService.redirect('/login')
   }
 
   //Enviar el formulario con la consulta
-  sendMessage(){
-    if(this.formMessage.valid){
+  sendMessage() {
+    if (this.formMessage.valid) {
       //implementar enviar mensaje
     }
   }
@@ -129,11 +154,11 @@ export class LandingPageComponent implements OnInit  {
   //Mostrar los errores del los campos
   showError(controlName: string): string {
     const control = this.formMessage.get(controlName);
-  
+
     if (!control || !control.errors) return '';
-  
+
     const errorKey = Object.keys(control.errors)[0];
-  
+
     const errorMessages: { [key: string]: string } = {
       required: 'Este campo no puede estar vacío.',
       email: 'Formato de correo electrónico inválido.',
@@ -141,5 +166,5 @@ export class LandingPageComponent implements OnInit  {
 
     return errorMessages[errorKey] || 'Error desconocido';
   }
-  
+
 }

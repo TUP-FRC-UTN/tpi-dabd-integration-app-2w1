@@ -23,7 +23,7 @@ export class PenaltiesPostComplaintComponent implements OnInit {
   files: File[] = [];
   otroSelected: boolean = false;
   options: { name: string, value: any }[] = []
-  
+
   //Constructor
   constructor(
     private complaintService: ComplaintService,
@@ -38,11 +38,6 @@ export class PenaltiesPostComplaintComponent implements OnInit {
       fileControl: new FormControl(null),
     });
   }
-
-  updateSelect(data : any){
-    this.reactiveForm.get('complaintReason')?.setValue(data)
-  }
-
 
   //Init
   ngOnInit(): void {
@@ -61,6 +56,10 @@ export class PenaltiesPostComplaintComponent implements OnInit {
       // Actualizar el estado de validación de 'anotherReason'
       anotherReasonControl?.updateValueAndValidity();
     });
+  }
+
+  updateSelect(data: any) {
+    this.reactiveForm.get('complaintReason')?.setValue(data)
   }
 
 
@@ -84,10 +83,10 @@ export class PenaltiesPostComplaintComponent implements OnInit {
           timer: 1500,
           showConfirmButton: false
         });
-        if(this.getPermisionsToSeeList()){
+        if (this.getPermisionsToSeeList()) {
           this.routingService.redirect("main/complaints/list-complaint", "Listado de Denuncias")
         }
-        else{
+        else {
           this.routingService.redirect("/main/home", "Página Principal")
         }
       }, error => {
@@ -102,19 +101,19 @@ export class PenaltiesPostComplaintComponent implements OnInit {
     };
   }
 
-  //
+  //Retorna al listado a pagina principal
   cancel() {
-    if(this.getPermisionsToSeeList()){
+    if (this.getPermisionsToSeeList()) {
       this.routingService.redirect("main/complaints/list-complaint", "Listado de Denuncias")
     }
-    else{
+    else {
       this.routingService.redirect("/main/home", "Página Principal")
     }
 
   }
 
 
-  //
+  //Aplica estilos a los inputs dependiendo su estado de validacion
   onValidate(controlName: string) {
     const control = this.reactiveForm.get(controlName);
     return {
@@ -123,15 +122,11 @@ export class PenaltiesPostComplaintComponent implements OnInit {
     }
   }
 
-  show(){
-    console.log("Formulario:", this.reactiveForm.value)
-  }
 
-
-  //
+  //Retorna un string con el mensaje de error correspondiente
   showError(controlName: string): string {
     const control = this.reactiveForm.get(controlName);
-    
+
     if (control?.errors && control.invalid && (control.dirty || control.touched)) {
       const errorKey = Object.keys(control.errors)[0];
       return this.getErrorMessage(errorKey, control.errors[errorKey]);
@@ -139,6 +134,8 @@ export class PenaltiesPostComplaintComponent implements OnInit {
     return '';
   }
 
+
+  //Busca el mensaje de error correspondiente
   private getErrorMessage(errorKey: string, errorValue: any): string {
     const errorMessages: { [key: string]: (error: any) => string } = {
       required: () => 'Este campo no puede estar vacío.',
@@ -163,11 +160,13 @@ export class PenaltiesPostComplaintComponent implements OnInit {
   getTypes(): void {
     this.complaintService.getAllReportReasons().subscribe(
       (reasons: ReportReasonDto[]) => {
-        reasons.push({    id: 0,
+        reasons.push({
+          id: 0,
           reportReason: "Otro",
-          baseAmount: 0})
+          baseAmount: 0
+        })
         reasons.forEach((reason) => this.complaintTypes.push(reason.reportReason))
-        
+
         this.options = this.complaintTypes.map(opt => ({ name: opt, value: opt }))
       },
       (error) => {
@@ -177,31 +176,17 @@ export class PenaltiesPostComplaintComponent implements OnInit {
   }
 
 
-  // This method formats a date
-  // to send it to the input.
-  // Param 'date' The date to be formatted.
-  // Returns the date as a string in the format "yyyy-MM-dd".
-  formatDate(date: Date): string {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-
-    return `${year}-${month}-${day}`;
-  }
-
-
-  // This method updates the list of 
-  // files to the currently selected ones.
   onFileChange(event: any) {
     this.files = Array.from(FileList = event.target.files); //Convertir FileList a Array
   }
 
-  permisionToEdit : boolean = false
-  getPermisionsToSeeList(){
+
+  permisionToEdit: boolean = false
+  getPermisionsToSeeList() {
     console.log(this.authService.getActualRole());
-    
-    if(this.authService.getActualRole() === 'SuperAdmin' || 
-    this.authService.getActualRole() === 'Gerente multas'){
+
+    if (this.authService.getActualRole() === 'SuperAdmin' ||
+      this.authService.getActualRole() === 'Gerente multas') {
       this.permisionToEdit = true
     }
     return this.permisionToEdit;

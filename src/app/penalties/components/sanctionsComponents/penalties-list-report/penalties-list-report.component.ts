@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { SanctionService } from '../../../services/sanctions.service';
 import { ReportDTO } from '../../../models/reportDTO';
 import { CommonModule } from '@angular/common';
@@ -49,6 +49,8 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
   options: { value: string, name: string }[] = []
   @ViewChild(CustomSelectComponent) customSelect!: CustomSelectComponent;
 
+
+
   //Constructor
   constructor(
     private reportServices: SanctionService,
@@ -66,13 +68,12 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
 
   //Init
   ngOnInit(): void {
+    this.loadPlots();
+    this.getTypes();
     this.reportServices.refreshTable$.subscribe(() => {
       this.refreshData();
     });
     this.refreshData();
-    this.loadPlots();
-
-    this.getTypes();
 
     const that = this; // para referenciar metodos afuera de la datatable
 
@@ -95,6 +96,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
     this.today = new Date().toISOString().split('T')[0];
   }
 
+
   resetDates() {
     const today = new Date();
     this.filterDateEnd = this.formatDateToString(today); // Fecha final con hora 00:00:00
@@ -110,11 +112,17 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
       next: (data) => {
         this.plots = data;
         console.log('Lotes cargados:', data);
+        this.refreshData(); // Call refreshData after plots are loaded
       },
       error: (error) => {
         console.error('error: ', error);
       }
     })
+  }
+
+  getPlotData(plotId: number) {
+    let plot = this.plots.find((plot) => plot.id === plotId);
+    return plot ? `Nro: ${plot?.plot_number} - Manzana: ${plot?.block_number}`: "N/A";
   }
 
 
@@ -126,10 +134,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
   }
 
 
-  getPlotData(plotId: number) {
-    let plot = this.plots.find((plot) => plot.id === plotId);
-    return `Nro: ${plot?.plot_number} - Manzana: ${plot?.block_number}`;
-  }
+
 
   // Configures the DataTable display properties and loads data.
   updateDataTable() {
@@ -170,8 +175,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
           data: 'plotId',
           className: 'align-middle',
           render: (data) => {
-            console.log("datos" + data)
-            return `<div class="text-end">${data}</div>`
+            return `<div>${this.getPlotData(data)}</div>`
           }
         },
         {
@@ -191,11 +195,9 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
                   <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
                   <ul class="dropdown-menu">
                     <li><a class="dropdown-item" onclick="viewReport(${data.id})">Ver más</a></li>
-                                              ${data.reportState === 'Cerrado' || data.reportState === 'Pendiente' ?
-              `<li><a class="dropdown-item" data-action="changeState" data-id="${data.id}" data-state="OPEN"">Abrir</a></li>` : ''}
-                    ${data.reportState === 'Abierto' ?
+                    ${(data.reportState === 'Abierto' || data.reportState === 'Pendiente') ?
               `<li><hr class="dropdown-divider"></li> <li><a class="dropdown-item" onclick="editReport(${data.id})">Editar</a></li>` : ''}
-                      ${data.reportState === 'Abierto' ?
+                      ${(data.reportState === 'Abierto' || data.reportState === 'Pendiente') ?
               `<li><a class="dropdown-item" data-action="newSaction" data-id="${data.id}"">Sancionar</a></li>` : ''}
                         ${data.reportState === 'Abierto' || data.reportState === 'Pendiente' ?
               `<li><a class="dropdown-item" data-action="changeState" data-id="${data.id}" data-state="REJECTED"">Rechazar</a></li>` : ''}
@@ -302,12 +304,12 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
       response => {
         this.report = response;
         this.reportfilter = this.report;
-        this.updateDataTable()
-        this.filterDate()
+        this.updateDataTable();
+        this.filterDate();
       }, error => {
-        alert(error)
+        alert(error);
       }
-    )
+    );
   }
 
 

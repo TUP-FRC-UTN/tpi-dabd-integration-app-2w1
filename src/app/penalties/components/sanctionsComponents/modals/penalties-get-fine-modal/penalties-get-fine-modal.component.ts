@@ -107,6 +107,7 @@ export class PenaltiesModalFineComponent implements OnInit {
     });
     modal.componentInstance.id = this.fine.id;
     modal.componentInstance.fineState = state;
+    modal.componentInstance.fine = this.fine;
     modal.result
       .then((result) => {
         this.close()

@@ -1,28 +1,21 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgbModal, NgbModule, } from '@ng-bootstrap/ng-bootstrap';
-import * as XLSX from 'xlsx';
-
-// Imports de DataTable con soporte para Bootstrap 5
-import $ from 'jquery';
-import 'datatables.net-bs5'; // DataTables con Bootstrap 5
-// import 'datatables.net-buttons-bs5'; // Botones con estilos de Bootstrap 5
-// import 'datatables.net-buttons/js/buttons.html5';
-// import 'datatables.net-buttons/js/buttons.print';
-
-//Imports propios de multas
 import { PenaltiesModalConsultComplaintComponent } from '../modals/penalties-get-complaint-modal/penalties-get-complaint.component';
 import { PenaltiesModalStateReasonComponent } from '../modals/penalties-update-stateReason-modal/penalties-update-stateReason-modal.component';
 import { ComplaintService } from '../../../services/complaints.service';
 import { ComplaintDto } from '../../../models/complaint';
 import { RoutingService } from '../../../../common/services/routing.service';
-import moment from 'moment';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
 import { AuthService } from '../../../../users/users-servicies/auth.service';
+import moment from 'moment';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import * as XLSX from 'xlsx';
+import $ from 'jquery';
+import 'datatables.net-bs5';
 
 
 @Component({
@@ -34,7 +27,7 @@ import { AuthService } from '../../../../users/users-servicies/auth.service';
 })
 export class PenaltiesListComplaintComponent implements OnInit {
   //Variables
-  Complaint: ComplaintDto[] = [];                 //Lista de datos
+  complaints: ComplaintDto[] = [];                 //Lista de datos
   filterComplaint: ComplaintDto[] = [];           //Datos filtrados a mostrar
   filterComplaintsecond: ComplaintDto[] = [];     //Datos filtrados a mostrar 2??
   states: { key: string; value: string }[] = [];  //Lista de estados
@@ -48,6 +41,7 @@ export class PenaltiesListComplaintComponent implements OnInit {
 
   options: { value: string, name: string }[] = []
   @ViewChild(CustomSelectComponent) customSelect!: CustomSelectComponent;
+
 
   //Constructor
   constructor(
@@ -69,25 +63,6 @@ export class PenaltiesListComplaintComponent implements OnInit {
     this.eraseFilters();
   }
 
-  //Setea el valor default de las fechas
-  resetDates() {
-    const today = new Date();
-    this.filterDateEnd = this.formatDateToString(today); // Fecha final con hora 00:00:00
-
-    const previousMonthDate = new Date();
-    previousMonthDate.setMonth(previousMonthDate.getMonth() - 1);
-    this.filterDateStart = this.formatDateToString(previousMonthDate); // Fecha de inicio con hora 00:00:00
-  }
-  get maxDate(): string {
-    return this.formatDateToString(new Date());
-  }
-  //Función para convertir la fecha al formato `YYYY-MM-DD`
-  formatDateToString(date: Date): string {
-    // Crea una fecha ajustada a UTC-3 y establece la hora a 00:00:00 para evitar horas residuales
-    const adjustedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0);
-    return adjustedDate.toLocaleDateString('en-CA'); // Formato `YYYY-MM-DD`
-  }
-
 
   //Crea la tabla con sus configuraciones 
   updateDataTable() {
@@ -107,48 +82,75 @@ export class PenaltiesListComplaintComponent implements OnInit {
       columns: [
         {
           data: 'createdDate',
-          render: (data) => moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY'),
+          render: (data, type, row) => {
+            const boldClass = row.complaintState === 'Nueva' ? 'fw-bold' : '';
+            return `<span class="${boldClass}">${moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY')}</span>`;
+          },
           type: 'date-moment'
         },
         {
           data: 'complaintState',
           className: 'align-middle',
-          render: (data) => `
+          render: (data) => {
+            let displayText = data;
+            let badgeClass = this.getStatusClass(data);
+
+            if (data === "Nueva") {
+              displayText = "Pendiente";
+              badgeClass = "badge bg-warning";
+
+              return `
+                <div class="text-center">
+                  <div class="badge ${badgeClass} border rounded-pill text-body-emphasis">
+                    ${displayText}
+                  </div>
+                </div>`;
+            }
+
+            return `
               <div class="text-center">
-                <div class="badge ${this.getStatusClass(data)} border rounded-pill">${data}</div>
-              </div>`
+                <div class="badge ${badgeClass} border rounded-pill">${displayText}</div>
+              </div>`;
+          }
         },
         {
           data: 'description',
           className: 'align-middle',
-          render: (data) =>
-            `<div>${data}</div>`
+          render: (data, type, row) => {
+            const boldClass = row.complaintState === 'Nueva' ? 'fw-bold' : '';
+            return `<div class="${boldClass}">${data}</div>`;
+          }
         },
         {
           data: 'fileQuantity',
           className: 'align-middle',
-          render: (data) =>
-            `<i class="bi bi-paperclip"></i> ${data} Archivo adjunto`
+          render: (data, type, row) => {
+            const boldClass = row.complaintState === 'Nueva' ? 'fw-bold' : '';
+            return `<i class="bi bi-paperclip ${boldClass}"></i> <span class="${boldClass}">${data} Archivo adjunto</span>`;
+          }
         },
         {
           data: null,
           className: 'align-middle',
           searchable: false,
-          render: (data) => `
-            <div class="text-center">
-              <div class="btn-group">
-                <div class="dropdown">
-                  <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
-                  <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" onclick="viewComplaint(${data.id})">Ver más</a></li>
-                    ${data.complaintState == "Pendiente" ? `
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" onclick="changeState('REJECTED', ${data.id}, ${this.authService.getUser().id})">Rechazar</a></li>
-                    <li><a class="dropdown-item" onclick="changeState('SOLVED', ${data.id}, ${this.authService.getUser().id})">Resuelta</a></li>` : ``}
-                  </ul>
+          render: (data, type, row) => {
+            const boldClass = row.complaintState === 'Nueva' ? 'fw-bold' : '';
+            return `
+              <div class="text-center ${boldClass}">
+                <div class="btn-group">
+                  <div class="dropdown">
+                    <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
+                    <ul class="dropdown-menu">
+                      <li><a class="dropdown-item" onclick="viewComplaint(${data.id})">Ver más</a></li>
+                      ${(data.complaintState === "Pendiente" || data.complaintState === "Nueva") ? `
+                      <li><hr class="dropdown-divider"></li>
+                      <li><a class="dropdown-item" onclick="changeState('REJECTED', ${data.id}, ${this.authService.getUser().id})">Rechazar</a></li>
+                      <li><a class="dropdown-item" onclick="changeState('SOLVED', ${data.id}, ${this.authService.getUser().id})">Resuelta</a></li>` : ``}
+                    </ul>
+                  </div>
                 </div>
-              </div>
-            </div>`
+              </div>`;
+          }
         },
       ],
       dom:
@@ -183,9 +185,29 @@ export class PenaltiesListComplaintComponent implements OnInit {
   }
 
 
+  //Setea el valor default de las fechas
+  resetDates() {
+    const today = new Date();
+    this.filterDateEnd = this.formatDateToString(today); // Fecha final con hora 00:00:00
+
+    const previousMonthDate = new Date();
+    previousMonthDate.setMonth(previousMonthDate.getMonth() - 1);
+    this.filterDateStart = this.formatDateToString(previousMonthDate); // Fecha de inicio con hora 00:00:00
+  }
+  get maxDate(): string {
+    return this.formatDateToString(new Date());
+  }
+  //Función para convertir la fecha al formato `YYYY-MM-DD`
+  formatDateToString(date: Date): string {
+    // Crea una fecha ajustada a UTC-3 y establece la hora a 00:00:00 para evitar horas residuales
+    const adjustedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0);
+    return adjustedDate.toLocaleDateString('en-CA'); // Formato `YYYY-MM-DD`
+  }
+
+
   //
   filterComplaintData() {
-    let filteredComplaints = [...this.Complaint];  // Copiar los datos de las que no han sido filtradas aún
+    let filteredComplaints = [...this.complaints];  // Copiar los datos de las que no han sido filtradas aún
 
     //Filtra por los estados
     if (this.selectedStates.length > 0) {
@@ -281,14 +303,10 @@ export class PenaltiesListComplaintComponent implements OnInit {
   }
 
 
-  //Metodos propios de nuestro micro:
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
   //Consulta los datos del listado con la api
   refreshData() {
     this.complaintService.getAllComplaints().subscribe((data) => {
-      this.Complaint = data;
+      this.complaints = data;
       this.filterComplaint = [...data];
       this.updateDataTable();
       this.filterDate()

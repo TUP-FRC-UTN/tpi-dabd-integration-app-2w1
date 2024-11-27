@@ -29,7 +29,7 @@ export class PenaltiesUpdateFineComponent implements OnInit {
     this.userId = 1;
     this.fineIdFromList = 0; //Esto deberia venir del listado
     this.reactiveForm = formBuilder.group({
-      amountControl: new FormControl('', [Validators.required, Validators.min(1)])
+      amountControl: new FormControl('', [Validators.required, Validators.min(1), Validators.max(999999)])
     })
   }
 
