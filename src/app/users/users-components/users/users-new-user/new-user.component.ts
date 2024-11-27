@@ -315,26 +315,19 @@ export class NewUserComponent implements OnInit, OnDestroy {
 
     const fechaValue = this.reactiveForm.get('datebirth')?.value;
 
-    if(this.reactiveForm.get('email')?.value == ""){
-      this.reactiveForm.get('email')?.setValue(null);
-    }
-    if(this.reactiveForm.get('phone_number')?.value == ""){
-      this.reactiveForm.get('phone_number')?.setValue(null);
-    }
-
     const userData: UserPost = {
       name: this.reactiveForm.get('name')?.value || '',
       lastname: this.reactiveForm.get('lastname')?.value || '',
       username: this.reactiveForm.get('username')?.value || '',
       password: this.reactiveForm.get('password')?.value?.toString() || '',
-      email: this.reactiveForm.get('email')?.value || '',
+      email: this.reactiveForm.get('email')?.value || null,
       dni_type_id: Number(this.reactiveForm.get('dniType')?.value) || 0,
       dni: this.reactiveForm.get('dni')?.value?.toString() || "",
       active: true,
       avatar_url: "",
-      datebirth: fechaValue ? new Date(fechaValue).toISOString().split('T')[0] : '',
+      datebirth: fechaValue ? new Date(fechaValue).toISOString().split('T')[0] : null,
       roles: this.reactiveForm.get('roles')?.value || [],
-      phone_number: this.reactiveForm.get('phone_number')?.value?.toString() || '',
+      phone_number: this.reactiveForm.get('phone_number')?.value?.toString() || null,
       userUpdateId: this.reactiveForm.get('userUpdateId')?.value || 0,
       telegram_id: this.reactiveForm.get('telegram_id')?.value || 0
 

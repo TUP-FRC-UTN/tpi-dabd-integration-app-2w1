@@ -387,29 +387,19 @@ export class UsuariosNewOwnerComponent implements OnInit, OnDestroy {
 
   //Crear el propietario
   createOwner() {
-    if(this.formReactivo.get('email')?.value == ""){
-      this.formReactivo.get('email')?.setValue(null);
-    }
-    if(this.formReactivo.get('phone')?.value == ""){
-      this.formReactivo.get('phone')?.setValue(null);
-    }
-    if(this.formReactivo.get('birthdate')?.value == ""){
-      this.formReactivo.get('birthdate')?.setValue(null);
-    }
-    
     const owner: OwnerModel = {
       name: this.formReactivo.get('name')?.value || '',
       lastname: this.formReactivo.get('lastname')?.value || '',
       dni: this.formReactivo.get('dni')?.value || '',
       dni_type_id: Number(this.formReactivo.get('documentType')?.value) || 0, //Tipo de documento
-      dateBirth: this.formReactivo.get('birthdate')?.value || new Date(),
+      dateBirth: this.formReactivo.get('birthdate')?.value || null,
       ownerTypeId: Number(this.formReactivo.get('type')?.value || ""),
       taxStatusId: Number(this.formReactivo.get('state')?.value),
       active: true,
       username: this.formReactivo.get('username')?.value || '',
       password: this.formReactivo.get('password')?.value || '',
-      email: this.formReactivo.get('email')?.value || '',
-      phoneNumber: this.formReactivo.get('phone')?.value || '',
+      email: this.formReactivo.get('email')?.value || null,
+      phoneNumber: this.formReactivo.get('phone')?.value || null,
       avatarUrl: '',
       businessName: this.formReactivo.get('company')?.value || '',
       telegramId: 0,
