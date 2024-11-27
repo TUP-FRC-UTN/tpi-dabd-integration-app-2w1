@@ -48,14 +48,12 @@ export class NewUserComponent implements OnInit, OnDestroy {
         Validators.minLength(6),
         Validators.maxLength(30)
       ]),
-      email: new FormControl('', [
-        Validators.required,
+      email: new FormControl(null, [
         Validators.email
       ],
         this.validatorService.validateUniqueEmail()
       ),
-      phone_number: new FormControl('', [
-        Validators.required,
+      phone_number: new FormControl(null, [
         Validators.pattern(/^\d+$/),
         Validators.minLength(10),
         Validators.maxLength(20)
@@ -79,7 +77,7 @@ export class NewUserComponent implements OnInit, OnDestroy {
         Validators.maxLength(9)
       ]),
       active: new FormControl(true),
-      datebirth: new FormControl(DateService.formatDate(new Date("2000-01-02")), [Validators.required]),
+      datebirth: new FormControl(DateService.formatDate(new Date("2000-01-02"))),
       roles: new FormControl([], Validators.required),
       plot: new FormControl('', [Validators.required]),
       userUpdateId: new FormControl(this.authService.getUser().id)
@@ -316,6 +314,13 @@ export class NewUserComponent implements OnInit, OnDestroy {
   createUser() {
 
     const fechaValue = this.reactiveForm.get('datebirth')?.value;
+
+    if(this.reactiveForm.get('email')?.value == ""){
+      this.reactiveForm.get('email')?.setValue(null);
+    }
+    if(this.reactiveForm.get('phone_number')?.value == ""){
+      this.reactiveForm.get('phone_number')?.setValue(null);
+    }
 
     const userData: UserPost = {
       name: this.reactiveForm.get('name')?.value || '',

@@ -85,10 +85,8 @@ export class UsuariosNewOwnerComponent implements OnInit, OnDestroy {
       documentType: new FormControl("", [
         Validators.required]),
       birthdate: new FormControl(this.date, [
-        Validators.required,
         this.dateLessThanTodayValidator()]),
-      email: new FormControl("", [
-        Validators.required,
+      email: new FormControl(null, [
         Validators.email
       ],
         this.validatorService.validateUniqueEmail()
@@ -107,8 +105,7 @@ export class UsuariosNewOwnerComponent implements OnInit, OnDestroy {
         Validators.minLength(6),
         Validators.maxLength(30)]),
       rol: new FormControl(""),
-      phone: new FormControl('', [
-        Validators.required,
+      phone: new FormControl(null, [
         Validators.minLength(10),
         Validators.maxLength(20),
         Validators.pattern(/^\d+$/)]),
@@ -390,6 +387,16 @@ export class UsuariosNewOwnerComponent implements OnInit, OnDestroy {
 
   //Crear el propietario
   createOwner() {
+    if(this.formReactivo.get('email')?.value == ""){
+      this.formReactivo.get('email')?.setValue(null);
+    }
+    if(this.formReactivo.get('phone')?.value == ""){
+      this.formReactivo.get('phone')?.setValue(null);
+    }
+    if(this.formReactivo.get('birthdate')?.value == ""){
+      this.formReactivo.get('birthdate')?.setValue(null);
+    }
+    
     const owner: OwnerModel = {
       name: this.formReactivo.get('name')?.value || '',
       lastname: this.formReactivo.get('lastname')?.value || '',
