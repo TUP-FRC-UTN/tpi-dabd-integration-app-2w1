@@ -578,7 +578,7 @@
               <div class="">
                 <div class="card-body">
                   <p><strong>Nombre:</strong> {{ getOwnerName(selectedExpense.owner_id) }}</p>
-                  <p><strong>Tipo de DNI:</strong> {{ getOwnerDni(selectedExpense.owner_id) }}</p>
+                  <p><strong>Tipo de DNI:</strong> {{ selectedExpense.dni_type }}</p>
                   <p><strong>Periodo:</strong> {{ selectedExpense.period }}</p>
                   <p><strong>Fecha de Emisión:</strong> {{ selectedExpense.issueDate | date: 'dd/MM/yyyy' }}</p>
                 </div>
@@ -622,8 +622,8 @@
               <div class="">
 
                 <div class="card-body">
-                  <p><strong>Monto Actual:</strong> {{ selectedExpense.actual_amount | currency:'ARS':'symbol':'1.2-2':'es-AR' }}</p>
-                  <p><strong>Monto Pagado:</strong> {{ selectedExpense.amount_payed | currency:'ARS':'symbol':'1.2-2':'es-AR' }}</p>
+                  <p><strong>Monto Actual:</strong> ${{ selectedExpense.actual_amount }}</p>
+                  <p><strong>Monto Pagado:</strong> ${{ selectedExpense.amount_payed || 0 }}</p>
                 </div>
               </div>
             </div>
