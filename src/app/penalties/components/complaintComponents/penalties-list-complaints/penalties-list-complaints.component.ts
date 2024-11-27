@@ -1,28 +1,21 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgbModal, NgbModule, } from '@ng-bootstrap/ng-bootstrap';
-import * as XLSX from 'xlsx';
-
-// Imports de DataTable con soporte para Bootstrap 5
-import $ from 'jquery';
-import 'datatables.net-bs5'; // DataTables con Bootstrap 5
-// import 'datatables.net-buttons-bs5'; // Botones con estilos de Bootstrap 5
-// import 'datatables.net-buttons/js/buttons.html5';
-// import 'datatables.net-buttons/js/buttons.print';
-
-//Imports propios de multas
 import { PenaltiesModalConsultComplaintComponent } from '../modals/penalties-get-complaint-modal/penalties-get-complaint.component';
 import { PenaltiesModalStateReasonComponent } from '../modals/penalties-update-stateReason-modal/penalties-update-stateReason-modal.component';
 import { ComplaintService } from '../../../services/complaints.service';
-import { ComplaintDto, PutStateComplaintDto } from '../../../models/complaint';
+import { ComplaintDto } from '../../../models/complaint';
 import { RoutingService } from '../../../../common/services/routing.service';
-import moment from 'moment';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
 import { AuthService } from '../../../../users/users-servicies/auth.service';
+import moment from 'moment';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import * as XLSX from 'xlsx';
+import $ from 'jquery';
+import 'datatables.net-bs5';
 
 
 @Component({
@@ -34,7 +27,7 @@ import { AuthService } from '../../../../users/users-servicies/auth.service';
 })
 export class PenaltiesListComplaintComponent implements OnInit {
   //Variables
-  Complaint: ComplaintDto[] = [];                 //Lista de datos
+  complaints: ComplaintDto[] = [];                 //Lista de datos
   filterComplaint: ComplaintDto[] = [];           //Datos filtrados a mostrar
   filterComplaintsecond: ComplaintDto[] = [];     //Datos filtrados a mostrar 2??
   states: { key: string; value: string }[] = [];  //Lista de estados
@@ -48,6 +41,7 @@ export class PenaltiesListComplaintComponent implements OnInit {
 
   options: { value: string, name: string }[] = []
   @ViewChild(CustomSelectComponent) customSelect!: CustomSelectComponent;
+
 
   //Constructor
   constructor(
@@ -67,25 +61,6 @@ export class PenaltiesListComplaintComponent implements OnInit {
     this.refreshData();
     this.getStates();
     this.eraseFilters();
-  }
-
-  //Setea el valor default de las fechas
-  resetDates() {
-    const today = new Date();
-    this.filterDateEnd = this.formatDateToString(today); // Fecha final con hora 00:00:00
-
-    const previousMonthDate = new Date();
-    previousMonthDate.setMonth(previousMonthDate.getMonth() - 1);
-    this.filterDateStart = this.formatDateToString(previousMonthDate); // Fecha de inicio con hora 00:00:00
-  }
-  get maxDate(): string {
-    return this.formatDateToString(new Date());
-  }
-  //Función para convertir la fecha al formato `YYYY-MM-DD`
-  formatDateToString(date: Date): string {
-    // Crea una fecha ajustada a UTC-3 y establece la hora a 00:00:00 para evitar horas residuales
-    const adjustedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0);
-    return adjustedDate.toLocaleDateString('en-CA'); // Formato `YYYY-MM-DD`
   }
 
 
@@ -118,12 +93,12 @@ export class PenaltiesListComplaintComponent implements OnInit {
           className: 'align-middle',
           render: (data) => {
             let displayText = data;
-            let badgeClass = this.getStatusClass(data); 
-            
+            let badgeClass = this.getStatusClass(data);
+
             if (data === "Nueva") {
-              displayText = "Pendiente"; 
-              badgeClass = "badge bg-warning"; 
-              
+              displayText = "Pendiente";
+              badgeClass = "badge bg-warning";
+
               return `
                 <div class="text-center">
                   <div class="badge ${badgeClass} border rounded-pill text-body-emphasis">
@@ -131,7 +106,7 @@ export class PenaltiesListComplaintComponent implements OnInit {
                   </div>
                 </div>`;
             }
-            
+
             return `
               <div class="text-center">
                 <div class="badge ${badgeClass} border rounded-pill">${displayText}</div>
@@ -210,9 +185,29 @@ export class PenaltiesListComplaintComponent implements OnInit {
   }
 
 
+  //Setea el valor default de las fechas
+  resetDates() {
+    const today = new Date();
+    this.filterDateEnd = this.formatDateToString(today); // Fecha final con hora 00:00:00
+
+    const previousMonthDate = new Date();
+    previousMonthDate.setMonth(previousMonthDate.getMonth() - 1);
+    this.filterDateStart = this.formatDateToString(previousMonthDate); // Fecha de inicio con hora 00:00:00
+  }
+  get maxDate(): string {
+    return this.formatDateToString(new Date());
+  }
+  //Función para convertir la fecha al formato `YYYY-MM-DD`
+  formatDateToString(date: Date): string {
+    // Crea una fecha ajustada a UTC-3 y establece la hora a 00:00:00 para evitar horas residuales
+    const adjustedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0);
+    return adjustedDate.toLocaleDateString('en-CA'); // Formato `YYYY-MM-DD`
+  }
+
+
   //
   filterComplaintData() {
-    let filteredComplaints = [...this.Complaint];  // Copiar los datos de las que no han sido filtradas aún
+    let filteredComplaints = [...this.complaints];  // Copiar los datos de las que no han sido filtradas aún
 
     //Filtra por los estados
     if (this.selectedStates.length > 0) {
@@ -308,15 +303,10 @@ export class PenaltiesListComplaintComponent implements OnInit {
   }
 
 
-
-  //Metodos propios de nuestro micro:
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
   //Consulta los datos del listado con la api
   refreshData() {
     this.complaintService.getAllComplaints().subscribe((data) => {
-      this.Complaint = data;
+      this.complaints = data;
       this.filterComplaint = [...data];
       this.updateDataTable();
       this.filterDate()
