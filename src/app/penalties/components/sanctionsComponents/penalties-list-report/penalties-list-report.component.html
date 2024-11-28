@@ -6,17 +6,17 @@
       <span class="bi-plus-lg"></span>
     </button>
 
-    <div class="row mb-3">
+    <div class="row">
 
       <!-- Barra de busqueda -->
-      <div class="col-md-3">
+      <div class="col-md-3 mb-3">
         <input type="text" placeholder="Buscar" class="form-control" [(ngModel)]="searchTerm"
           (input)="onSearch($event)">
       </div>
 
 
       <!-- Select de estado -->
-      <div class="col-md-2">
+      <div class="col-md-2 mb-3">
         <app-custom-select [options]="options" [selectedOptions]="selectedStates"
           (selectedOptionsChange)="onFilter($event)" [multiple]="true">
         </app-custom-select>
@@ -24,14 +24,14 @@
 
       
       <!-- Filtro de fechas -->
-      <div class="col-md-4 d-flex gap-3">
+      <div class="col-md-4 d-flex gap-3 mb-3">
         <input (change)="filterDate()" [(ngModel)]="filterDateStart" class="form-control" type="date" [max]="filterDateEnd">
         <input (change)="filterDate()" [(ngModel)]="filterDateEnd" class="form-control" type="date" [min]="filterDateStart" [max]="today">
       </div>
 
 
       <!-- Botones de exportar -->
-      <div class="col-md-3 d-flex gap-2 justify-content-end">
+      <div class="col-md-3 d-flex gap-2 justify-content-end mb-3">
         <button class="btn btn-secondary bi-trash"(click)="eraseFilters()"></button>
         <button id="exportExcelBtn" class="btn btn-success bi-file-earmark-excel"(click)="exportToExcel()"></button>
         <button id="exportPdfBtn" class="btn btn-danger bi-file-earmark-pdf"(click)="exportToPDF()"></button>
@@ -66,36 +66,34 @@
       </div>
       <div class="modal-body">
         <p>
-          En este listado podrá buscar y filtrar los informes existentes.
+          En este listado podrá visualizar, buscar y ordenar los informes realizados.
         </p>
         <p>
-          Con la opción "+" podrá generar un nuevo informe.
+          Además, en las acciones, cuenta con la posibilidad de modificar el estado o ver más detalles sobre los informes.
         </p>
-        <p>
-          Además, en las acciones, cuenta con la posibilidad de modificar el estado o ver más detalles sobre el informe.
-        </p> 
         <p>
           <strong>Acciones</strong>
         </p>
-        <p>
-          En la sección de acciones podrá interactuar con el informe; siempre tendrá la posibilidad de obtener más información sobre el mismo.
-        </p>
-        <p>
-          Si el informe está <strong>Pendiente</strong>, usted deberá abrirlo para poder comenzar a operar con él.
-        </p>
-        <p>
-          Si el informe está <strong>Abierto</strong>, podrá editarlo, sancionarlo o darlo por cerrado. En caso de que desee dejarlo para otro momento, puede hacerlo.
-        </p>
-        <p>
-          Si el informe está <strong>Cerrado</strong>, tendrá la posibilidad de volver a abrirlo para aplicar una sanción.
-        </p>
-        <p>
-          Una vez que el informe esté <strong>Finalizado</strong>, significará que la sanción económica relacionada ha sido pagada.
-        </p>
-        <p>
-          Podrá rechazarlo si está <strong>Abierto</strong> o <strong>Pendiente</strong>.
-        </p>
-        
+        <ul>
+          <li><b>Ver más: </b>Se abrirá una ventana para poder ver con detalle la información del informe.</li>
+          <li><b>Editar: </b>Se abrirá una ventana para poder editar el informe seleccionado</li>
+          <li><b>Sancionar: </b>Se redirige hacia el formulario de registro de infracciones (multas y advertencias)</li>
+          <li><b>Rechazar: </b>Cambia el estado del informe a "Rechazado"</li>
+          <li><b>Cerrar: </b>Cambia el estado del informe a "Cerrado"</li>
+        </ul>
+        <p>La tabla también incluye una barra de búsqueda, filtros de fecha desde y hasta y opciones de paginación, facilitando así la navegación y el filtrado de los datos disponibles.</p>
+        <ul>
+          <li><button class="btn btn-secondary bi bi-trash mb-2"></button> Elimina los filtros avanzados aplicados.</li>
+          <li><button class="btn btn-success mt-2 bi-file-earmark-excel mb-2"></button> Exporta el contenido de la tabla
+            a Excel.</li>
+          <li><button class="btn btn-danger bi-file-earmark-pdf mb-2"></button> Exporta el contenido de la tabla a PDF.
+          </li>
+          <li>
+            <button type="button" class="btn btn-primary rounded-pill">
+              <span class="bi-plus-lg"></span>
+            </button> Redirige hacia el formulario de alta de informes.
+          </li>    
+        </ul>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>

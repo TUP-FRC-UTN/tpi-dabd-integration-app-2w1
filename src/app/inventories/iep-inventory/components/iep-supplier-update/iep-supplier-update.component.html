@@ -37,8 +37,14 @@
         <div class="mb-3">
           <label class="form-label">Email</label>
           <input type="email" formControlName="email" class="form-control" [ngClass]="{'is-invalid': isFieldInvalid('email')}"/>
-          <div *ngIf="isFieldInvalid('email')" class="invalid-feedback">
-            Este campo es requerido.
+          <div class="invalid-feedback" *ngIf="proveedorForm.get('email')?.errors">
+            <ng-container *ngIf="proveedorForm.get('email')?.errors?.['required']">
+              Este campo es requerido.
+            </ng-container>
+            <ng-container *ngIf="proveedorForm.get('email')?.errors?.['email'] || 
+            proveedorForm.get('email')?.errors?.['emailDomain']">
+              Introduzca un Email válido.
+            </ng-container>
           </div>
         </div>
       </div>

@@ -9,9 +9,12 @@ export const roleGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
 
   //Rol que puede acceder al componente
-  const requiredRoles = route.data['roles'] as string[];
+  const requiredRoles = route.data['roles'] as string[] | undefined;
   
   //Ver si el usuario tiene alguno de los roles permitidos
+  if (!requiredRoles || requiredRoles.length === 0) {
+    return true;
+  }
   const hasValidRole = requiredRoles.some((role) =>    
     authService.getActualRole() == role
   );

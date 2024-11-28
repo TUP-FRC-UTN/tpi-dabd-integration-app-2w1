@@ -87,17 +87,14 @@
               <table id="visitorsTable" class="table table-hover table-striped">
                 <thead>
                   <tr>
-                    <!-- <th scope="col">Estado</th> -->
                     <th scope="col">Nombre</th>
                     <th scope="col">Tipo Ingresante</th>
                     <th scope="col">Documento</th>
                     <th scope="col">Vehículos</th>
-                    <!-- <th scope="col">Observaciones</th> -->
                     <th scope="col">Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <!-- Aquí iría la lógica para mostrar los visitantes -->
                 </tbody>
               </table>
             </div>
@@ -156,7 +153,7 @@
                   selectedVisitor.userType.description === 'Visitor' ? 'Visitante' : 
                   selectedVisitor.userType.description === 'Owner' ? 'Propietario' : 
                   selectedVisitor.userType.description === 'Tenant' ? 'Inquilino' : 
-                  selectedVisitor.userType.description === 'Supplier' ? 'Proveedor':
+                  selectedVisitor.userType.description === 'Supplied' ? 'Proveedor':
                   selectedVisitor.userType.description === 'Emergency' ? 'Emergencia':
                   selectedVisitor.userType.description === 'Worker' ? 'Obrero' : 
                   selectedVisitor.userType.description === 'Delivery' ? 'Delivery' : 
@@ -191,12 +188,25 @@
 
                   <strong>Tipo:</strong> 
                     {{ 
-                      vehicle.vehicle_Type.description === 'Car' ? 'Coche' : 
+                      vehicle.vehicle_Type.description === 'Car' ? 'Auto' : 
                       vehicle.vehicle_Type.description === 'Motorbike' ? 'Motocicleta' : 
-                      vehicle.vehicle_Type.description === 'Truck' ? 'Camión' : 
+                      vehicle.vehicle_Type.description === 'Truck' ? 'Camión' :
+                      vehicle.vehicle_Type.description === 'Van' ? 'Camioneta' :  
                       vehicle.vehicle_Type.description 
                     }}
                 </div>
+              </div>
+              <div class="form-check">
+                <input 
+                  class="form-check-input" 
+                  type="radio" 
+                  id="no-vehicle" 
+                  value="none" 
+                  [(ngModel)]="selectedVehiclePlate"
+                  (change)="onVehicleChange('none')">
+                <label class="form-check-label" for="no-vehicle">
+                  Sin vehículo
+                </label>
               </div>
               <ng-template #noVehicle>
                 <p class="mb-1">No tiene registro</p>
@@ -206,17 +216,22 @@
               </ng-template>
               <br>
 
+
               <!-- Rango de fechas autorizado -->
               <p class="fw-bold mb-1">Rango de Fechas Autorizado:</p>
               <div *ngIf="selectedVisitor.authRanges.length > 0; else noDays">
                 <ul class="list-unstyled">
                   <li><strong>Desde:</strong> {{ selectedVisitor.authRanges.at(selectedVisitor.authRanges.length-1)?.init_date| date : "dd/MM/yyyy" }}</li>
                   <li><strong>Hasta:</strong> {{ selectedVisitor.authRanges.at(selectedVisitor.authRanges.length-1)?.end_date | date : "dd/MM/yyyy" }}</li>
+                
                 </ul>
               </div>
               <ng-template #noDays>
                 <p class="mb-1">No hay rango de fechas cargado.</p>
               </ng-template>
+            </div>
+            <div>
+
             </div>
           </div>
 
