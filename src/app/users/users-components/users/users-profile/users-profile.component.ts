@@ -30,7 +30,7 @@ export class UsersProfileComponent implements OnInit, OnDestroy {
   selectedIconUrl: string = '';
   isDropdownOpen = false;
   plots: GetPlotDto[] = [];
-  formProfile : FormGroup;
+  formProfile: FormGroup;
   noIcon = 'https://i.ibb.co/bNH6vjf/avatar.png'
   icons = [
     { name: 'Icono 1', url: 'https://i.ibb.co/DpxXd6C/icono1.png' },
@@ -59,7 +59,7 @@ export class UsersProfileComponent implements OnInit, OnDestroy {
   }
 
   //Instancia el formulario
-  constructor(private fb : FormBuilder) {
+  constructor(private fb: FormBuilder) {
     this.formProfile = this.fb.group({
       name: new FormControl({ value: '...', disabled: true }, [
         Validators.required,
@@ -81,7 +81,7 @@ export class UsersProfileComponent implements OnInit, OnDestroy {
         Validators.required,
         Validators.email
       ]),
-  
+
       phoneNumber: new FormControl({ value: '', disabled: true }, [
         Validators.required,
         Validators.minLength(9),
@@ -99,12 +99,12 @@ export class UsersProfileComponent implements OnInit, OnDestroy {
       datebirth: new FormControl({ value: '', disabled: true }, [Validators.required]),
       roles: new FormControl<string[]>({ value: [], disabled: true })
     });
-   }
+  }
 
   //------------------------------------------------------Carga de datos------------------------------------------------------
 
   //Obtener un usuario por id
-  getUserById(){
+  getUserById() {
     const sus = this.usersService.getUserById2(this.authService.getUser().id).subscribe({
       next: (user: GetuserDto) => {
         let roles = user.roles.map(role => " " + role);
@@ -212,39 +212,39 @@ export class UsersProfileComponent implements OnInit, OnDestroy {
 
   //-------------------------------------------------------Funciones-------------------------------------------------------
 
-    //Setea la url del icono seleccionado
-    onIconSelect(event: Event) {
-      const selectElement = event.target as HTMLSelectElement;
-      this.selectedIconUrl = selectElement.value;
-    }
-  
-    //Método para seleccionar un icono
-    selectIcon(url: string) {
-      this.selectedIconUrl = url;
-      this.isDropdownOpen = false;
-    }
-  
-    //Abre o cierra el dropdown para los iconos
-    toggleDropdown() {
-      this.isDropdownOpen = !this.isDropdownOpen;
-    }
-  
-    //Cambiar el botón
-    changeType(newType: string): void {
-      this.type = newType;
-      if (newType == 'edit') {
-        this.formProfile.get('name')?.enable();
-        this.formProfile.get('lastName')?.enable();
-        this.formProfile.get('phoneNumber')?.enable();
-        this.formProfile.get('avatar_url')?.enable();
-      }
-      if (newType == 'info') {
-        this.ngOnInit();
-        this.formProfile.disable();
-      }
-    }
+  //Setea la url del icono seleccionado
+  onIconSelect(event: Event) {
+    const selectElement = event.target as HTMLSelectElement;
+    this.selectedIconUrl = selectElement.value;
+  }
 
-//-------------------------------------------------------Validaciones-------------------------------------------------------
+  //Método para seleccionar un icono
+  selectIcon(url: string) {
+    this.selectedIconUrl = url;
+    this.isDropdownOpen = false;
+  }
+
+  //Abre o cierra el dropdown para los iconos
+  toggleDropdown() {
+    this.isDropdownOpen = !this.isDropdownOpen;
+  }
+
+  //Cambiar el botón
+  changeType(newType: string): void {
+    this.type = newType;
+    if (newType == 'edit') {
+      this.formProfile.get('name')?.enable();
+      this.formProfile.get('lastName')?.enable();
+      this.formProfile.get('phoneNumber')?.enable();
+      this.formProfile.get('avatar_url')?.enable();
+    }
+    if (newType == 'info') {
+      this.ngOnInit();
+      this.formProfile.disable();
+    }
+  }
+
+  //-------------------------------------------------------Validaciones-------------------------------------------------------
 
   //Retorna una clase para poner el input en verde o rojo dependiendo si esta validado
   onValidate(controlName: string) {
@@ -293,5 +293,24 @@ export class UsersProfileComponent implements OnInit, OnDestroy {
     }
 
     return ''; // No hay errores o el control no existe
+  }
+
+  //-----------------------------------------------------Estilos-----------------------------------------------------
+
+  showPlotType(plotType: any): string {
+    let color: string = ''
+
+    switch (plotType) {
+      case "Comercial":
+        color = "text-bg-secondary";
+        break;
+      case "Residencial":
+        color = "text-bg-success";
+        break;
+      case "Baldio":
+        color = "text-bg-danger";
+        break;
+    }
+    return `<div class="d-flex justify-content-center"> <span class='badge rounded-pill ${color}'>${plotType}</span> </div>`;
   }
 }
