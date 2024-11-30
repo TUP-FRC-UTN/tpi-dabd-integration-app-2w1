@@ -547,7 +547,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
             color = "bg-secondary";
             break;
           case "Familiar menor":
-            color = "text-bg-menor";
+            color = "text-bg-light-blue";
             break;
           case "SuperAdmin":
             color = "text-bg-dark";
@@ -559,7 +559,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
             color = "text-bg-pink";
             break;
           case "Contador":
-            color = "text-bg-teal text-dark";
+            color = "text-bg-teal";
             break;
           case "Seguridad":
             color = "text-bg-orange";
