@@ -116,11 +116,10 @@
     <!-- KPI LIMITE 5-->
 
     <div class="col-2 gap-2 d-flex flex-column justify-content-center">
-      <app-custom-kpi [amount]="totalComplaints" title="Total Denuncias" subTitle="Período"
-        tooltip="Total del Período" [customStyles]="{ 'background-color': '#D6F6FF' }" icon="bi bi-flag-fill"
-        formatPipe=""></app-custom-kpi>
-      <app-custom-kpi [amount]="averageComplaintsPerMonth" title="Promedio" subTitle="Período"
-        tooltip="Total del Período" [customStyles]="{ 'background-color': '#FFE699' }" icon="bi bi-calendar-day"
+      <app-custom-kpi [value]="totalComplaints" title="Total Denuncias" subTitle="Período" tooltip="Total del Período"
+        [customStyles]="{ 'background-color': '#D6F6FF' }" icon="bi-flag-fill" formatPipe=""></app-custom-kpi>
+      <app-custom-kpi [value]="averageComplaintsPerMonth" title="Promedio" subTitle="Período"
+        tooltip="Total del Período" [customStyles]="{ 'background-color': '#FFE699' }" icon="bi-calendar-day"
         formatPipe=""></app-custom-kpi>
     </div>
 
@@ -214,15 +213,15 @@
           <hr />
           <div class="row">
             <div class="col-3 gap-2 d-flex flex-column justify-content-center">
-              <app-custom-kpi [amount]="stateWithHighestPercentage.percentage" title="Estado Mayor"
+              <app-custom-kpi [value]="stateWithHighestPercentage.percentage" title="Estado Mayor"
                 [subTitle]="stateWithHighestPercentage.state" tooltip="Total del Período"
                 [customStyles]="{ 'background-color': '#FCAE7C' }" icon="bi bi-percent"
-                formatPipe="percent"></app-custom-kpi>
+                formatPipe="percentage"></app-custom-kpi>
 
-              <app-custom-kpi [amount]="stateWithLowestPercentage.percentage" title="Estado Menor"
+              <app-custom-kpi [value]="stateWithLowestPercentage.percentage" title="Estado Menor"
                 [subTitle]="stateWithLowestPercentage.state" tooltip="Total del Período"
                 [customStyles]="{ 'background-color': '#D6F6FF' }" icon="bi bi-percent"
-                formatPipe="percent"></app-custom-kpi>
+                formatPipe="percentage"></app-custom-kpi>
             </div>
 
             <div class="col-9">
@@ -256,11 +255,11 @@
           <hr />
           <div class="row">
             <div class="col-3 gap-2 d-flex flex-column justify-content-center">
-              <app-custom-kpi [amount]="0" title="Mayor Cantidad" [subTitle]="dayWithMostComplaintsName"
+              <app-custom-kpi [value]="0" title="Mayor Cantidad" [subTitle]="dayWithMostComplaintsName"
                 tooltip="Promedio" [customStyles]="{ 'background-color': '#E2CBF7' }" icon="bi bi-clock"
                 formatPipe="string"></app-custom-kpi>
 
-              <app-custom-kpi [amount]="0" title="Menor Cantidad" [subTitle]="dayWithLeastComplaintsName"
+              <app-custom-kpi [value]="0" title="Menor Cantidad" [subTitle]="dayWithLeastComplaintsName"
                 tooltip="Promedio" [customStyles]="{ 'background-color': '#F9FFB5' }" icon="bi bi-clock"
                 formatPipe="string"></app-custom-kpi>
             </div>
@@ -294,11 +293,11 @@
         <hr />
         <div class="row">
           <div class="col-3 gap-2 d-flex flex-column justify-content-center">
-            <app-custom-kpi [amount]="differenceInDaysResolution" title="Resolución Denuncias"
-              subTitle="Días Promedio" tooltip="Promedio" [customStyles]="{ 'background-color': '#FFE699' }"
-              icon="bi bi-clock" formatPipe=""></app-custom-kpi>
+            <app-custom-kpi [value]="differenceInDaysResolution" title="Resolución Denuncias" subTitle="Días Promedio"
+              tooltip="Promedio" [customStyles]="{ 'background-color': '#FFE699' }" icon="bi bi-clock"
+              formatPipe=""></app-custom-kpi>
 
-            <app-custom-kpi [amount]="weekWithMostComplaints.count" title="Semana con más Denuncias" subTitle="{{
+            <app-custom-kpi [value]="weekWithMostComplaints.count" title="Semana con más Denuncias" subTitle="{{
                 weekWithMostComplaints.month
                   ? weekWithMostComplaints.month.charAt(0).toUpperCase() +
                     weekWithMostComplaints.month.slice(1) +
