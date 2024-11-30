@@ -109,3 +109,30 @@ table.dataTable tbody tr.selected {
   z-index: 8;
   /* Establece el nivel de superposición del botón sobre otros elementos; un valor más alto asegura que esté sobre otros contenidos */
 }
+
+.shepherd-header {
+  background-color: #ffffff!important;
+  border-bottom: darkgray solid 1px!important;
+}
+
+.shepherd-title{
+  font-weight: bold !important;
+
+}
+.shepherd-highlight {
+  border-radius: 12px !important; /* Adjust the radius as needed */
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5) !important;
+  padding: 10px !important; /* Add padding around the highlighted element */
+}
+
+.shepherd-button{
+  background-color: #6c757d !important;
+
+}
+
+.shepherd-button:hover{
+  background-color: #343a40 !important;}
+
+.shepherd-element{
+  border: darkgray solid 1px ; 
+}

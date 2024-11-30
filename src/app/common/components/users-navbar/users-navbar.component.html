@@ -59,8 +59,9 @@
                         @if (expand) {<span class="ms-2">Dashboard</span>}
                     </button>
                 }
-                <button class="nav-link d-flex text-light w-100 px-3 py-2" data-bs-toggle="modal"
-                    data-bs-target="#infoModal" title="Información">
+                <button class="nav-link d-flex text-light w-100 px-3 py-2"  (click)="startTutorial()"
+                    title="Información">
+                    <!-- data-bs-target="#infoModal" data-bs-toggle="modal" AGREGAR EN CASO DE NO LLEGAR CON LOS TUTORIALES -->
                     <i class="bi-info-circle"></i>
                     @if (expand) {<span class="ms-2">Información</span>}
                 </button>
