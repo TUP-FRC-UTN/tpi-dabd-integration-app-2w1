@@ -51,8 +51,8 @@ export class PenaltiesListComplaintComponent implements OnInit {
     private authService: AuthService
   ) {
     (window as any).viewComplaint = (id: number) => this.viewComplaint(id);
-    (window as any).changeState = (state: string, id: number, userId: number) =>
-      this.changeState(state, id, userId);
+    (window as any).changeState = (id: number, state: string) =>
+      this.changeState(id, state);
   }
 
 
@@ -167,6 +167,7 @@ export class PenaltiesListComplaintComponent implements OnInit {
         zeroRecords: "No se encontraron resultados",
         loadingRecords: "Cargando...",
         processing: "Procesando...",
+        emptyTable: "No hay datos disponibles",
       },
     });
   }
@@ -297,9 +298,27 @@ export class PenaltiesListComplaintComponent implements OnInit {
 
 
   //Metodo para actualizar el estado de una denuncia
-  changeState(option: string, idComplaint: number, userId: number) {
+  changeState(idComplaint: number, option: string) {
     const newState = option;
-    this.openModal(idComplaint, userId, newState);
+    this.openUpdateStateModal(idComplaint, newState);
+  }
+
+
+  //Abre el modal para cambiar el estado de la denuncia
+  openUpdateStateModal(idComplaint: number, complaintState: string) {
+    const modal = this._modal.open(PenaltiesModalStateReasonComponent, {
+      size: 'md',
+      keyboard: false,
+    });
+    modal.componentInstance.idComplaint = idComplaint;
+    modal.componentInstance.complaintState = complaintState;
+    modal.result
+      .then((result) => {
+        this.refreshData();
+      })
+      .catch((error) => {
+        console.log("Error con modal: " + error);
+      });
   }
 
 
@@ -331,25 +350,6 @@ export class PenaltiesListComplaintComponent implements OnInit {
         console.error('error: ', error);
       }
     })
-  }
-
-
-  //Abre el modal para cambiar el estado de la denuncia
-  openModal(idComplaint: number, userId: number, complaintState: string) {
-    const modal = this._modal.open(PenaltiesModalStateReasonComponent, {
-      size: 'md',
-      keyboard: false,
-    });
-    modal.componentInstance.idComplaint = idComplaint;
-    modal.componentInstance.complaintState = complaintState;
-    modal.componentInstance.userId = userId;
-    modal.result
-      .then((result) => {
-        this.refreshData();
-      })
-      .catch((error) => {
-        console.log("Error con modal: " + error);
-      });
   }
 
 
