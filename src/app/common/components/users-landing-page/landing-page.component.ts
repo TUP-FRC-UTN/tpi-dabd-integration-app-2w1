@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, inject, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterOutlet } from '@angular/router';
 import { PlotService } from '../../../users/users-servicies/plot.service';
@@ -9,19 +9,20 @@ import { RoutingService } from '../../services/routing.service';
 @Component({
   selector: 'app-landing-page',
   standalone: true,
-  imports: [RouterOutlet, ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './landing-page.component.html',
   styleUrls: ['./landing-page.component.css'],
 })
 export class LandingPageComponent implements OnInit {
   lotes: GetPlotModel[] = [];
+  selectedPlot: GetPlotModel | null = null;
   //Injects
   private routingService = inject(RoutingService);
   private plotService = inject(PlotService);
-  //-----------------------------------------implementar el servicio de notificaciones para enviar un mail-------------------------------
 
   formMessage: FormGroup;
   plotsCard: { number: number, blockNumber: number, totalArea: number, type: string, status: string }[] = [];
+
 
   images: any[] = [
     'https://www.villadelcondor.com/imagenes/villadelcondor1.jpg',
@@ -43,14 +44,24 @@ export class LandingPageComponent implements OnInit {
     'https://www.villadelcondor.com/imagenes/villadelcondor18.jpg'
   ];
 
+
   //Formulario para hacer consultas
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private cdRef: ChangeDetectorRef) {
     this.formMessage = this.fb.group({
       name: new FormControl('', [Validators.required]),
       email: new FormControl('', [Validators.required, Validators.email]),
       message: new FormControl('', [Validators.required])
     })
   }
+
+
+  //Init
+  ngOnInit(): void {
+    this.getPlots();
+  }
+
+
+  //Cargar el mapa
   loadMap(): void {
     const svgElement = document.getElementById('mapa') as HTMLObjectElement;
     const svgDoc = svgElement.contentDocument;
@@ -89,15 +100,13 @@ export class LandingPageComponent implements OnInit {
 
         // Setteo de evento de clic
         pathElement.addEventListener('click', () => {
-          alert(`Hiciste clic en ${lote.id}`);
-          console.log(lote);
+          this.selectedPlot = this.lotes.find(l => l.id === lote.id)!;
+          console.log("Lote seleccionado:", this.selectedPlot);
+          this.cdRef.detectChanges();
         });
 
       }
     });
-  }
-  ngOnInit(): void {
-    this.getPlots();
   }
 
   //Trae los primeros 3 lotes disponibles
@@ -135,12 +144,6 @@ export class LandingPageComponent implements OnInit {
     this.routingService.redirect('/login')
   }
 
-  //Enviar el formulario con la consulta
-  sendMessage() {
-    if (this.formMessage.valid) {
-      //implementar enviar mensaje
-    }
-  }
 
   //Mostrar si el campo es válido o no
   onValidate(controlName: string) {
@@ -165,6 +168,10 @@ export class LandingPageComponent implements OnInit {
     };
 
     return errorMessages[errorKey] || 'Error desconocido';
+  }
+
+  clearPlot() {
+    this.selectedPlot = null;
   }
 
 }
