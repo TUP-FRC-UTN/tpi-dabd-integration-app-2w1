@@ -61,7 +61,7 @@ export class PostNotificationAdminComponent implements AfterViewInit, OnInit {
           enabled: true,
         },
         arrow: false,
-
+        canClickTarget: false,
         modalOverlayOpeningPadding: 10,
         modalOverlayOpeningRadius: 10,
       },

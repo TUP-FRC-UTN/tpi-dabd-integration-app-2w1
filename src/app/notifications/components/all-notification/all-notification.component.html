@@ -2,14 +2,14 @@
   <div class="container p-3 border border-2 rounded shadow-lg" style="background-color: #ffffff; border: 2px solid #000000; border-radius: 8px; padding: 20px; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);">
  
     <div class="row mb-2">
-      <div class="d-flex">
+      <div class="d-flex" id="filtros">
         <div class="col-3">
           <input type="text" id="searchTerm" placeholder="Buscar..." class="form-control" aria-label="Search" 
             style="margin-top: 15px; border: 1px solid #ddd; border-radius: 5px;" />
         </div>
         
         <!-- dropdown -->
-        <div class="col-2 ms-2" style="margin-top: 15px">
+        <div class="col-2 ms-2" style="margin-top: 15px" id="typeDropdown">
           <app-select-multiple
             [options]="notificationTypes"
             [optionsChecked]="selectedNotificationType"
@@ -18,12 +18,12 @@
         </div>
      
         <div [formGroup]="form" class="col-2 ms-2">
-          <input type="date" class="form-control me-2" formControlName="startDate" 
+          <input type="date" class="form-control me-2" formControlName="startDate" id="startDate"
             style="margin-top: 15px; border: 1px solid #ddd; border-radius: 5px;" />
         </div>
 
         <div [formGroup]="form" class="col-2 ms-2">
-          <input type="date" class="form-control me-2" formControlName="endDate" 
+          <input type="date" class="form-control me-2" formControlName="endDate" id="endDate"
             style="margin-top: 15px; border: 1px solid #ddd; border-radius: 5px;" />
         </div>
 
