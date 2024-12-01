@@ -126,6 +126,8 @@ export class NotificationComponent implements OnInit {
         modalOverlayOpeningRadius: 10,
         canClickTarget: false,
       },
+      keyboardNavigation: false,
+
       useModalOverlay: true,
       
     });
@@ -267,6 +269,9 @@ export class NotificationComponent implements OnInit {
   }
 
   startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
     console.log('EMPEZANDO TUTORIAL');
     this.tour.addStep({
       id: 'table-step',
@@ -325,7 +330,7 @@ export class NotificationComponent implements OnInit {
           action: this.tour.back,
         },
         {
-          text: 'Terminar',
+          text: 'Finalizar',
           action: this.tour.complete,
         },
       ],

@@ -201,6 +201,9 @@ export class NotificationHomeComponent implements OnInit{
     }
   
     startTutorial() {
+      if (this.tour) {
+        this.tour.complete();
+      }
       this.tour.addStep({
         id: 'filter-step',
         title: 'Filtros',
