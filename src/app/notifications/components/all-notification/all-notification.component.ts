@@ -153,6 +153,9 @@ export class AllNotificationComponent implements OnInit {
 
 
   startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
     this.tour.addStep({
       id: 'table-step',
       title: 'Tabla de Notificaciones',

@@ -65,6 +65,8 @@ export class PostNotificationAdminComponent implements AfterViewInit, OnInit {
         modalOverlayOpeningPadding: 10,
         modalOverlayOpeningRadius: 10,
       },
+      keyboardNavigation: false,
+
       useModalOverlay: true,
     });
   }
@@ -122,6 +124,9 @@ export class PostNotificationAdminComponent implements AfterViewInit, OnInit {
   }
 
   startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
     console.log('EMPEZANDO TUTORIAL');
     this.tour.addStep({
       id: 'subject-step',
