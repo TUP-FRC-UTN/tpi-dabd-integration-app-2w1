@@ -1,4 +1,4 @@
-<section class="container p-5 border rounded border-3 border-secundary" style="min-height: 70vh;">
+<section class="container p-5 border rounded border-3 border-secundary" style="min-height: 70vh;" id="profile">
     <div class="d-flex justify-content-between align-items-center">
         <h2 class="mb-3">Mi Perfil</h2>
             @if(type == 'edit'){
@@ -179,7 +179,7 @@
         </div>      
         <div class="w-100 text-end">
             @if(type == 'info'){
-                <button type="button" class="btn btn-primary mt-4" (click)="changeType('edit')">Editar</button>
+                <button type="button" class="btn btn-primary mt-4" id="edit" (click)="changeType('edit')">Editar</button>
             }@else {
                 <button type="button" class="btn btn-secondary mt-4 mx-3" (click)="changeType('info')">Cancelar</button>
                 <button type="submit" class="btn btn-primary mt-4" [disabled]="!formProfile.valid" >Guardar</button>

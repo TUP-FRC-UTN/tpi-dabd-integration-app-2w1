@@ -83,6 +83,7 @@ export class PostNotificationAdminComponent implements AfterViewInit, OnInit {
       this.tutorialSubscription.unsubscribe();
     }
   }
+  
   form: FormGroup = new FormGroup({
     subject: new FormControl('', Validators.required),
     description: new FormControl('', Validators.required),
@@ -132,7 +133,6 @@ export class PostNotificationAdminComponent implements AfterViewInit, OnInit {
         on: 'auto',
       },
       buttons: [
-    
         {
           text: 'Siguiente',
           action: this.tour.next,
@@ -210,7 +210,7 @@ export class PostNotificationAdminComponent implements AfterViewInit, OnInit {
     this.tour.addStep({
       id: 'user-selection-step',
       title: 'Selección de Destinatarios',
-      text: 'Haga click en la casilla de cada destinatario que desea incluir en la notificación. Puede seleccionar múltiples usuarios. Al finalizar, pulse "Enviar"',  
+      text: 'Haga click en la casilla de cada destinatario que desea incluir en la notificación. Puede seleccionar múltiples usuarios. Al finalizar, pulse "Enviar"',
       attachTo: {
         element: '#myTable',
         on: 'auto',

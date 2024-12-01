@@ -85,8 +85,8 @@ export class AllNotificationComponent implements OnInit {
   }
   ngOnDestroy(): void {
     this.subscription.unsubscribe()
-    if (this.tour) {
-      this.tour.complete();
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
     }
 
   }
@@ -188,6 +188,7 @@ export class AllNotificationComponent implements OnInit {
       ]
       
     });
+
     this.tour.start();
   }
 
