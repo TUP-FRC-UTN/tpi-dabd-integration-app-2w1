@@ -311,6 +311,6 @@ export class UsersProfileComponent implements OnInit, OnDestroy {
         color = "text-bg-danger";
         break;
     }
-    return `<div class="d-flex justify-content-center"> <span class='badge rounded-pill ${color}'>${plotType}</span> </div>`;
+    return color;
   }
 }
