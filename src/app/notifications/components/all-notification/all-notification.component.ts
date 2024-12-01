@@ -571,6 +571,7 @@ export class AllNotificationComponent implements OnInit {
       today.getMonth() - 1,
       today.getDate()
     );
+    
     console.log(today.toISOString(), "startDate", today.getDate(), today.getMonth(), today.getFullYear());
     const endDate = new Date(
       today.getFullYear(),
@@ -583,6 +584,7 @@ export class AllNotificationComponent implements OnInit {
       endDate: this.formatDate2(endDate),
     });
   }
+
   formatDate2(date: Date): string {
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Mes debe ser 1-12
@@ -610,6 +612,7 @@ export class AllNotificationComponent implements OnInit {
     if (searchInput) {
       searchInput.value = "";
     }
+
     this.selected = "Todas";
     this.initialzeDates();
     this.fillTable();
