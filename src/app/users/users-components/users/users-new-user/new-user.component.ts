@@ -48,14 +48,12 @@ export class NewUserComponent implements OnInit, OnDestroy {
         Validators.minLength(6),
         Validators.maxLength(30)
       ]),
-      email: new FormControl('', [
-        Validators.required,
+      email: new FormControl(null, [
         Validators.email
       ],
         this.validatorService.validateUniqueEmail()
       ),
-      phone_number: new FormControl('', [
-        Validators.required,
+      phone_number: new FormControl(null, [
         Validators.pattern(/^\d+$/),
         Validators.minLength(10),
         Validators.maxLength(20)
@@ -79,7 +77,7 @@ export class NewUserComponent implements OnInit, OnDestroy {
         Validators.maxLength(9)
       ]),
       active: new FormControl(true),
-      datebirth: new FormControl(DateService.formatDate(new Date("2000-01-02")), [Validators.required]),
+      datebirth: new FormControl(DateService.formatDate(new Date("2000-01-02"))),
       roles: new FormControl([], Validators.required),
       plot: new FormControl('', [Validators.required]),
       userUpdateId: new FormControl(this.authService.getUser().id)
@@ -322,14 +320,14 @@ export class NewUserComponent implements OnInit, OnDestroy {
       lastname: this.reactiveForm.get('lastname')?.value || '',
       username: this.reactiveForm.get('username')?.value || '',
       password: this.reactiveForm.get('password')?.value?.toString() || '',
-      email: this.reactiveForm.get('email')?.value || '',
+      email: this.reactiveForm.get('email')?.value || null,
       dni_type_id: Number(this.reactiveForm.get('dniType')?.value) || 0,
       dni: this.reactiveForm.get('dni')?.value?.toString() || "",
       active: true,
       avatar_url: "",
-      datebirth: fechaValue ? new Date(fechaValue).toISOString().split('T')[0] : '',
+      datebirth: fechaValue ? new Date(fechaValue).toISOString().split('T')[0] : null,
       roles: this.reactiveForm.get('roles')?.value || [],
-      phone_number: this.reactiveForm.get('phone_number')?.value?.toString() || '',
+      phone_number: this.reactiveForm.get('phone_number')?.value?.toString() || null,
       userUpdateId: this.reactiveForm.get('userUpdateId')?.value || 0,
       telegram_id: this.reactiveForm.get('telegram_id')?.value || 0
 

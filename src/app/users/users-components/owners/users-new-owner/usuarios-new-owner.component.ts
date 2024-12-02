@@ -85,10 +85,8 @@ export class UsuariosNewOwnerComponent implements OnInit, OnDestroy {
       documentType: new FormControl("", [
         Validators.required]),
       birthdate: new FormControl(this.date, [
-        Validators.required,
         this.dateLessThanTodayValidator()]),
-      email: new FormControl("", [
-        Validators.required,
+      email: new FormControl(null, [
         Validators.email
       ],
         this.validatorService.validateUniqueEmail()
@@ -107,8 +105,7 @@ export class UsuariosNewOwnerComponent implements OnInit, OnDestroy {
         Validators.minLength(6),
         Validators.maxLength(30)]),
       rol: new FormControl(""),
-      phone: new FormControl('', [
-        Validators.required,
+      phone: new FormControl(null, [
         Validators.minLength(10),
         Validators.maxLength(20),
         Validators.pattern(/^\d+$/)]),
@@ -395,14 +392,14 @@ export class UsuariosNewOwnerComponent implements OnInit, OnDestroy {
       lastname: this.formReactivo.get('lastname')?.value || '',
       dni: this.formReactivo.get('dni')?.value || '',
       dni_type_id: Number(this.formReactivo.get('documentType')?.value) || 0, //Tipo de documento
-      dateBirth: this.formReactivo.get('birthdate')?.value || new Date(),
+      dateBirth: this.formReactivo.get('birthdate')?.value || null,
       ownerTypeId: Number(this.formReactivo.get('type')?.value || ""),
       taxStatusId: Number(this.formReactivo.get('state')?.value),
       active: true,
       username: this.formReactivo.get('username')?.value || '',
       password: this.formReactivo.get('password')?.value || '',
-      email: this.formReactivo.get('email')?.value || '',
-      phoneNumber: this.formReactivo.get('phone')?.value || '',
+      email: this.formReactivo.get('email')?.value || null,
+      phoneNumber: this.formReactivo.get('phone')?.value || null,
       avatarUrl: '',
       businessName: this.formReactivo.get('company')?.value || '',
       telegramId: 0,
