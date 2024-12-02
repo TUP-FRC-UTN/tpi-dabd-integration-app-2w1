@@ -272,6 +272,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
     //Agregar suscripción
     const aux = this.suscriptionService.addSuscription(sus);
 
+    //TUTORIAL
     this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
       () => {
         this.startTutorial();
@@ -303,7 +304,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
     this.tour.addStep({
       id: 'edit-step',
       title: 'Filtros',
-      text: 'Desde acá podrá filtrar las notificaciones por fecha y tipo. También puede exportar las notificaciones a Excel o PDF, o borrar los filtros aplicados con el botón de basura.',
+      text: 'Desde acá podrá filtrar los usuarios. También puede exportar la lista a Excel o PDF, o borrar los filtros aplicados con el botón de basura.',
       attachTo: {
         element: '#filtros',
         on: 'auto',

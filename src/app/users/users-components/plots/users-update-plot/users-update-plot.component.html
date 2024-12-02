@@ -1,4 +1,4 @@
-<section class="container p-5 border rounded border-3 border-secundary" style="min-height: 70vh;">
+<section class="container p-5 border rounded border-3 border-secundary" style="min-height: 70vh;" id="editPlot">
     <h3>Editar Lote</h3>
     <form [formGroup]="formReactivo" (ngSubmit)="updatePlot()">
         <div class="row">
@@ -79,7 +79,7 @@
             </div>
 
 
-            <div class="col-lg-6 mb-3">
+            <div class="col-lg-6 mb-3" id="files">
                 <div class="row">
                   <label class="col-2 col-form-label">Subir Archivos</label>
                   <div class="col-10">
@@ -108,7 +108,7 @@
                     <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#cancelarConfirmacion">Cancelar</button>
                 </div>
                 <div class="col-auto">
-                    <button class="btn btn-primary" type="submit" [disabled]="formReactivo.invalid">Guardar</button>
+                    <button class="btn btn-primary" type="submit" [disabled]="formReactivo.invalid" id="register">Guardar</button>
                 </div>
               </div>
         </div>

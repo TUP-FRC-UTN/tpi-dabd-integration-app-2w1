@@ -13,6 +13,9 @@ import { SuscriptionManagerService } from '../../../../common/services/suscripti
 import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
 import { RoutingService } from '../../../../common/services/routing.service';
 import { min } from 'moment';
+import { Subscription } from 'rxjs';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 
 @Component({
   selector: 'app-users-new-plot',
@@ -22,6 +25,9 @@ import { min } from 'moment';
   styleUrl: './users-new-plot.component.css'
 })
 export class UsersNewPlotComponent implements OnInit, OnDestroy {
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
 
   showOwners: boolean = false;
 
@@ -40,7 +46,21 @@ export class UsersNewPlotComponent implements OnInit, OnDestroy {
   files: File[] = [];
   formReactivo: FormGroup;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private tutorialService: TutorialService
+  ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+      },
+      useModalOverlay: true,
+    }); 
+
     this.formReactivo = this.fb.group({
       plotNumber: new FormControl(1, [
         Validators.required, Validators.min(1),
@@ -93,12 +113,93 @@ export class UsersNewPlotComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadAllStates();
     this.loadAllTypes();
+
+      //TUTORIAL
+      this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+        () => {
+          this.startTutorial();
+        }
+      ); 
+  
   }
+ 
 
   ngOnDestroy(): void {
     this.suscriptionService.unsubscribeAll();
+
+    //TUTORIAL
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
   }
 
+
+  startTutorial() {
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Alta de lote',
+      text: 'Acá puede realizar la alta de un nuevo lote. Recuerde agregar todos los campos necesarios, procurando no equivocarse en ninguno.',
+      attachTo: {
+        element: '#addPlot',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        },
+      ],
+    });
+
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Añadir archivos',
+      text: 'Acá puede subir archivos relevantes al lote, como documentos o imágenes relacionadas.',
+      attachTo: {
+        element: '#files',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back,
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        },
+      ],
+    });
+
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Envio de formulario',
+      text: 'Al finalizar, presione este botón para registrar el nuevo lote.',
+      attachTo: {
+        element: '#register',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back,
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete,
+        },
+      ],
+    });
+
+    this.tour.start();
+  }
   //--------------------------------------------------Carga de datos--------------------------------------------------
 
   //Cargar todos los estados de lote
