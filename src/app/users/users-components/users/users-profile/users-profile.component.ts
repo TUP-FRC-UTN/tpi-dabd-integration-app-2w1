@@ -201,11 +201,11 @@ export class UsersProfileComponent implements OnInit, OnDestroy {
         this.formProfile.patchValue({
           name: user.name,
           lastName: user.lastname,
-          email: user.email,
+          email: user.email || 'N/A',
           username: user.username,
-          phoneNumber: String(user.phone_number),
-          dni: user.dni,
-          dniType: user.dni_type,
+          phoneNumber: user.phone_number == null ?  'N/A': String(user.phone_number),
+          dni: user.dni || 'N/A',
+          dniType: user.dni_type || 'N/A',
           avatar_url: user.avatar_url,
           roles: user.roles,
           telegram_id: user.telegram_id
@@ -224,44 +224,15 @@ export class UsersProfileComponent implements OnInit, OnDestroy {
           const formattedDateString = formattedDate.toISOString().split('T')[0];
 
           this.formProfile.patchValue({
-            name: user.name,
-            lastName: user.lastname,
-            email: user.email,
-            username: user.username,
-            phoneNumber: String(user.phone_number),
-            dni: user.dni,
-            dniType: user.dni_type,
-            avatar_url: user.avatar_url,
-            roles: user.roles,
-            telegram_id: user.telegram_id,
+            datebirth: formattedDateString
           });
-
-          if (user.dni_type == 'DNI') {
-            this.dniType = 1;
-          }
-          if (user.dni_type == 'PASAPORTE') {
-            this.dniType = 2;
-          }
-          this.selectedIconUrl = user.avatar_url;
-
-          const formattedDate: Date = DateService.parseDateString(
-            user.datebirth
-          )!;
-          if (formattedDate) {
-            const formattedDateString = formattedDate
-              .toISOString()
-              .split('T')[0];
-
-            this.formProfile.patchValue({
-              datebirth: formattedDateString,
-            });
-          } else {
-            this.formProfile.patchValue({
-              datebirth: '',
-            });
-          }
-        },
-      });
+        } else {
+          this.formProfile.patchValue({
+            datebirth: 'N/A'
+          });
+        }
+      }
+    })
 
     //Agregar suscripción
     this.suscriptionService.addSuscription(sus);
