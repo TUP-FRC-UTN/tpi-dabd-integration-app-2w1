@@ -423,13 +423,13 @@ export class ExpenseGenerationCounterView2Component {
   private processTop5Debtors(): DebtorInfo[] {
     const debtorsMap = new Map<number, DebtorInfo>();
     const debtors: DebtorInfo[] = [];
-    
+   
     const filteredData = this.counterData.filter(transaction => {
       const transactionPeriod = this.convertPeriodToYearMonth(transaction.period);
-      return transactionPeriod >= this.periodFrom && 
+      return transactionPeriod >= this.periodFrom &&
              transactionPeriod <= this.periodTo;
     });
-  
+ 
     filteredData.forEach(transaction => {
       const owner = this.owners.find(o => o.id === transaction.ownerId);
       const currentDebtorInfo = debtorsMap.get(transaction.ownerId) || {
@@ -442,51 +442,54 @@ export class ExpenseGenerationCounterView2Component {
         unpaidBills: 0,
         oldestDebtDate: undefined
       };
-  
+ 
       currentDebtorInfo.totalBills++;
-  
+ 
       if (transaction.status !== 'Pago') {
         const daysOverdue = this.calculateDaysOverdue(transaction.secondExpirationDate);
-        const debtDate = new Date(
-          transaction.secondExpirationDate[0],
-          transaction.secondExpirationDate[1] - 1,
-          transaction.secondExpirationDate[2]
-        );
-  
-        currentDebtorInfo.totalDebt += transaction.firstExpirationAmount;
-        currentDebtorInfo.unpaidBills++;
-  
-        if (!currentDebtorInfo.oldestDebtDate || debtDate < currentDebtorInfo.oldestDebtDate) {
-          currentDebtorInfo.oldestDebtDate = debtDate;
-          currentDebtorInfo.oldestDebtDays = daysOverdue;
+        
+        // Solo procesar si hay al menos 1 día de mora
+        if (daysOverdue > 0) {
+          const debtDate = new Date(
+            transaction.secondExpirationDate[0],
+            transaction.secondExpirationDate[1] - 1,
+            transaction.secondExpirationDate[2]
+          );
+   
+          currentDebtorInfo.totalDebt += transaction.firstExpirationAmount;
+          currentDebtorInfo.unpaidBills++;
+   
+          if (!currentDebtorInfo.oldestDebtDate || debtDate < currentDebtorInfo.oldestDebtDate) {
+            currentDebtorInfo.oldestDebtDate = debtDate;
+            currentDebtorInfo.oldestDebtDays = daysOverdue;
+          }
+   
+          const currentTotalDays = currentDebtorInfo.averageDebtDays * (currentDebtorInfo.unpaidBills - 1);
+          currentDebtorInfo.averageDebtDays =
+            (currentTotalDays + daysOverdue) / currentDebtorInfo.unpaidBills;
         }
-  
-        const currentTotalDays = currentDebtorInfo.averageDebtDays * (currentDebtorInfo.unpaidBills - 1);
-        currentDebtorInfo.averageDebtDays = 
-          (currentTotalDays + daysOverdue) / currentDebtorInfo.unpaidBills;
       }
-  
+ 
       debtorsMap.set(transaction.ownerId, currentDebtorInfo);
       debtors.push(currentDebtorInfo)
     });
-
     this.top5Data = debtors;
     console.log("TOP 5 DATA: " +this.top5Data);
-  
+ 
     return Array.from(debtorsMap.values())
       .filter(debtor => {
-        const meetsDebtRange = 
-          debtor.totalDebt >= this.debtRangeMin && 
+        const meetsDebtRange =
+          debtor.totalDebt >= this.debtRangeMin &&
           debtor.totalDebt <= this.debtRangeMax;
-        
+       
         const hasUnpaidBills = debtor.unpaidBills > 0;
-        
+       
         return meetsDebtRange && hasUnpaidBills;
       })
       .sort((a, b) => {
         const debtDiff = b.totalDebt - a.totalDebt;
         if (debtDiff !== 0) return debtDiff;
-        
+       
         return b.oldestDebtDays - a.oldestDebtDays;
       })
       .slice(0, 5); // Tomar solo los top 5

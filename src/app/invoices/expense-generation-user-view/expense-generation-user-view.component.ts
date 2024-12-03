@@ -12,6 +12,8 @@ import { OwnerService } from '../expense-generation-services/expense-generation-
 import { AuthService } from '../../users/users-servicies/auth.service';
 import { environment } from '../../common/environments/environment';
 import { RoutingService } from '../../common/services/routing.service';
+import { UserService } from '../expense-generation-services/expense-generation-user-service';
+import { GetUserDto } from '../expense-generation-interfaces/expense-generation-user';
 registerLocaleData(localeEsAr, 'es-AR');
 @Component({
   selector: 'app-expense-generation-user-view',
@@ -34,6 +36,7 @@ export class ExpenseGenerationUserViewComponent implements OnInit {
     private expenseService: ExpenseGenerationExpenseService,
     private paymentService: ExpenseGenerationPaymentService,
     private routingService: RoutingService,
+    private userService: UserService,
     private datePipe:DatePipe,
     private ownerService: OwnerService,
     private authService: AuthService,
@@ -72,34 +75,55 @@ export class ExpenseGenerationUserViewComponent implements OnInit {
 
   ngOnInit() {
     this.expenseService.clearSelectedExpenses;
-    // Obtener el ID del usuario logueado
-    const userId = this.authService.getUser().id;
     
-    // Buscar el propietario correspondiente
-    this.ownerService.getOwnerByUserId(userId).subscribe({
-      next: (owner) => {
-        if (owner) {
-          this.ownerId = owner.id; 
-          this.getExpensesByOwner(); 
-          
-          const today = new Date();
-          const localDate = new Date(today.getTime() - today.getTimezoneOffset() * 60000);
-          this.endDate = localDate.toISOString().split('T')[0];
-          this.maxEndDate = localDate.toISOString().split('T')[0];
-          this.startDate = new Date(localDate.getFullYear(), 0, 1).toISOString().split('T')[0];
-          
-          this.selectedExpenses = this.expenseService.getSelectedExpenses();
-          this.calculateTotal();
-          this.updateButtonState();
-        } else {
-          console.error('No se encontró un propietario para el usuario logueado');
+    let userId = this.authService.getUser().id;
+    const userRole = this.authService.getActualRole();
+    
+    const processExpenses = (ownerId: number) => {
+      this.ownerService.getOwnerByUserId(ownerId).subscribe({
+        next: (owner) => {
+          if (owner) {
+            this.ownerId = owner.id;
+            this.getExpensesByOwner();
+           
+            const today = new Date();
+            const localDate = new Date(today.getTime() - today.getTimezoneOffset() * 60000);
+            this.endDate = localDate.toISOString().split('T')[0];
+            this.maxEndDate = localDate.toISOString().split('T')[0];
+            this.startDate = new Date(localDate.getFullYear(), 0, 1).toISOString().split('T')[0];
+           
+            this.selectedExpenses = this.expenseService.getSelectedExpenses();
+            this.calculateTotal();
+            this.updateButtonState();
+          } else {
+            console.error('No se encontró un propietario para el usuario logueado');
+          }
+        },
+        error: (error) => {
+          console.error('Error al obtener el propietario:', error);
         }
-      },
-      error: (error) => {
-        console.error('Error al obtener el propietario:', error);
-      }
-    });
-  }
+      });
+    };
+
+    if(userRole == "Co-Propietario") {
+      this.userService.getOwnerBySecondaryOwner(userId).subscribe({
+        next: (ownerUser) => {
+          if (ownerUser.id) {
+            processExpenses(ownerUser.id);
+          } else {
+            console.error('No se encontró el ID del propietario');
+            processExpenses(userId);
+          }
+        },
+        error: (error) => {
+          console.error('Error al obtener el propietario', error);
+          processExpenses(userId);
+        }
+      });
+    } else {
+      processExpenses(userId);
+    }
+}
 
   goToPaymentForm(){
     this.routingService.redirect("/main/invoices/expense-generation-payment-form")
