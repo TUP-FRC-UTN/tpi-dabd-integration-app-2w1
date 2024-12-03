@@ -170,7 +170,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
               // user.create_date,
               `${user.lastname}, ${user.name}`,  //Nombre completo
               user.dni,                                //Documento
-              this.showRole(user.roles),              //Roles
+              this.showRole(user.roles, user.id),              //Roles
               user.plot_id,                                //Nro. de lote (puedes ajustar esto)                 
               '<button class="btn btn-info">Ver más</button>'  //Ejemplo de acción
             ]),
@@ -527,7 +527,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
   }
 
   //Mostrar roles con badges
-  showRole(roles: string[]): string {
+  showRole(roles: string[], id: number): string {
     let rolesA: string = "";
 
 
@@ -594,7 +594,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
             color = "bg-secondary";
             break;
           case "Familiar menor":
-            color = "text-bg-menor";
+            color = "text-bg-light-blue";
             break;
           case "SuperAdmin":
             color = "text-bg-dark";
@@ -606,7 +606,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
             color = "text-bg-pink";
             break;
           case "Contador":
-            color = "text-bg-teal text-dark";
+            color = "text-bg-teal";
             break;
           case "Seguridad":
             color = "text-bg-orange";
@@ -647,7 +647,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
             color = "bg-secondary";
             break;
           case "Familiar menor":
-            color = "text-bg-menor";
+            color = "text-bg-light-blue";
             break;
           case "SuperAdmin":
             color = "text-bg-dark";
@@ -659,7 +659,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
             color = "text-bg-pink";
             break;
           case "Contador":
-            color = "text-bg-teal text-dark";
+            color = "text-bg-teal";
             break;
           case "Seguridad":
             color = "text-bg-orange";
@@ -681,16 +681,17 @@ export class ListUsersComponent implements OnInit, OnDestroy {
         rolesB += `<span class="badge rounded-pill m-1 ${color}">${role}</span> `;
       });
 
-      rolesA += `<button class="btn btn-outline-dark text-dark badge" data-bs-toggle="collapse"
-           data-bs-target="#extraRoles" aria-expanded="false" aria-controls="extraRoles">
-              +
-            </button>
+      rolesA += `
+          <button class="btn btn-light border border-1 text-dark badge bi-plus" data-bs-toggle="collapse"
+            data-bs-target="#extraRoles${id}" aria-expanded="false" aria-controls="extraRoles">
 
-            <div class="collapse position-absolute" id="extraRoles">
-              <div class="card card-body d-flex" style="z-index: 10;">
-                ${rolesB}
-              </div>
-            </div>`;
+              <div class="collapse position-absolute" id="extraRoles${id}">
+                <div class="card card-body d-flex fs-6" style="z-index: 10;">
+                  ${rolesB}
+                </div>
+              </div> 
+              
+          </button>`;
     }
 
     return rolesA;

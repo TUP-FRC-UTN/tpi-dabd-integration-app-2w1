@@ -74,6 +74,7 @@ export class UsersUpdateUserComponent implements OnInit, OnDestroy {
     // Desactiva campos específicos del formulario
     if (this.authService.getActualRole() != 'SuperAdmin') {
       this.updateForm.get('dni')?.disable();
+      this.updateForm.get('dniType')?.disable();
       this.updateForm.get('email')?.disable();
       this.updateForm.get('datebirth')?.disable();
     }

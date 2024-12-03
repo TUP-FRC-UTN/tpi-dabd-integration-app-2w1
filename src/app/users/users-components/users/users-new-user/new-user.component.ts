@@ -167,13 +167,13 @@ export class NewUserComponent implements OnInit, OnDestroy {
       next: (data: RolModel[]) => {
         this.options = data.map(rol => rol.description);
         if(this.authService.getActualRole() == "Propietario"){
-          let optionsFilter = this.options.filter(rol => !["Familiar mayor", "Familiar menor", "Inquilino"].includes(rol));
+          let optionsFilter = this.options.filter(rol => !["Familiar mayor", "Familiar menor", "Inquilino", "Co-Propietario"].includes(rol));
           this.options = [];          
           optionsFilter.forEach(o => this.options.push({value : o, name: o}))
                     
         }
         else if(this.authService.getActualRole() == "SuperAdmin"){
-            let optionsFilter = this.options.filter(rol => !["Propietario", "Familiar mayor", "Familiar menor", "Inquilino"].includes(rol));
+            let optionsFilter = this.options.filter(rol => !["Propietario", "Familiar mayor", "Familiar menor", "Inquilino", "Co-Propietario"].includes(rol));
           this.options = [];
           optionsFilter.forEach(o => this.options.push({value : o, name: o}))
           
@@ -222,7 +222,7 @@ export class NewUserComponent implements OnInit, OnDestroy {
       next: (data: RolModel[]) => {
         this.options = data.map(rol => rol.description);
         if (this.authService.getActualRole() == "Propietario") {
-          let optionsFilter = this.options.filter(rol => ["Familiar mayor", "Familiar menor", "Inquilino"].includes(rol));
+          let optionsFilter = this.options.filter(rol => ["Familiar mayor", "Familiar menor", "Inquilino",  "Co-Propietario"].includes(rol));
           this.options = [];
           optionsFilter.forEach(o => this.options.push({ value: o, name: o }))        
         }
@@ -233,7 +233,7 @@ export class NewUserComponent implements OnInit, OnDestroy {
 
         }
         else {
-          let optionsFilter = this.options.filter(rol => !this.optionsForOwner.includes(rol) && rol != "Propietario" && rol != "SuperAdmin");
+          let optionsFilter = this.options.filter(rol => !this.optionsForOwner.includes(rol) && rol != "Propietario" && rol != "SuperAdmin" && rol != "Co-Propietario");
           this.options = [];
           optionsFilter.forEach(o => this.options.push({ value: o, name: o }))
         }

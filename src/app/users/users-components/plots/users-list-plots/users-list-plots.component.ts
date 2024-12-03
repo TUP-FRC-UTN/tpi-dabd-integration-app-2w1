@@ -20,6 +20,9 @@ import { CustomSelectComponent } from '../../../../common/components/custom-sele
 import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
 import { RoutingService } from '../../../../common/services/routing.service';
 import { UsersTransferPlotComponent } from "../users-transfer-plot/users-transfer-plot.component";
+import { UserService } from '../../../users-servicies/user.service';
+import { GetuserDto } from '../../../users-models/users/GetUserDto';
+import { UserGet } from '../../../users-models/users/UserGet';
 
 @Component({
   selector: 'app-users-list-plots',
@@ -32,6 +35,7 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
   plots: GetPlotModel[] = [];
   private readonly plotService = inject(PlotService);
   private readonly ownerService = inject(OwnerService);
+  private readonly userService = inject(UserService);
   showDeactivateModal: boolean = false;
   userToDeactivate: number = 0;
 
@@ -59,6 +63,7 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
   async ngOnInit() {
     this.loadAllPlotsStates();
     this.loadAllPlotsTypes();
+
 
     const sus = this.plotService.getAllPlots().subscribe({
       next: async (data: GetPlotModel[]) => {
@@ -279,8 +284,8 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
       //Agregar servicio
       this.suscriptionService.addSuscription(sus);
     });
-
   }
+
 
   //--------------------------------------------------Filtros------------------------------------------------
 
