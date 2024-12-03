@@ -8,6 +8,9 @@ import { RoutingService } from '../../../../common/services/routing.service';
 import { ReportReasonDto } from '../../../models/ReportReasonDTO';
 import { CustomSelectComponent } from "../../../../common/components/custom-select/custom-select.component";
 import { AuthService } from '../../../../users/users-servicies/auth.service';
+import { Subscription } from 'rxjs';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 
 @Component({
   selector: 'app-penalties-post-complaint',
@@ -24,18 +27,37 @@ export class PenaltiesPostComplaintComponent implements OnInit {
   otroSelected: boolean = false;
   options: { name: string, value: any }[] = []
 
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
+
   //Constructor
   constructor(
     private complaintService: ComplaintService,
     private formBuilder: FormBuilder,
     private routingService: RoutingService,
-    private authService: AuthService
+    private authService: AuthService,
+    private tutorialService: TutorialService
   ) {
     this.reactiveForm = this.formBuilder.group({  //Usen las validaciones que necesiten, todo lo de aca esta puesto a modo de ejemplo
       complaintReason: new FormControl([], [Validators.required]),
       anotherReason: new FormControl(''),
       descriptionControl: new FormControl('', [Validators.required, Validators.minLength(10), Validators.maxLength(255)]),
       fileControl: new FormControl(null),
+    });
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+        canClickTarget: false,
+      },
+      keyboardNavigation: false,
+      
+      useModalOverlay: true,
     });
   }
 
@@ -56,6 +78,75 @@ export class PenaltiesPostComplaintComponent implements OnInit {
       // Actualizar el estado de validación de 'anotherReason'
       anotherReasonControl?.updateValueAndValidity();
     });
+
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    );
+  }
+
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+    this.tour.addStep({
+      id: 'reason-step',
+      title: 'Motivo de la denuncia',
+      text: 'En este campo debe seleccionar el motivo de la denuncia. En caso de no encontrar lo que busca, puede seleccionar "Otro" para escribir el motivo personalizado.',
+      attachTo: {
+        element: '#reasonInput',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+
+    this.tour.addStep({
+      id: 'description-step',
+      title: 'Descripción de la denuncia',
+      text: 'En este campo escriba el contenido detallado de la denuncia que quiera enviar.',
+      attachTo: {
+        element: '#descriptionInput',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'fileInput-step',
+      title: 'Agregar pruebas',
+      text: 'Haciendo click en este botón puede agregar pruebas para la denuncia.',
+      attachTo: {
+        element: '#fileInput',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+    });
+    this.tour.start();
   }
 
   updateSelect(data: any) {

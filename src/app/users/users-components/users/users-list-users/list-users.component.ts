@@ -22,15 +22,27 @@ import { CustomSelectComponent } from '../../../../common/components/custom-sele
 import moment from 'moment';
 import { RoutingService } from '../../../../common/services/routing.service';
 import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
+import { TutorialService } from '../../../../common/services/tutorial.service';
+import { Subscription } from 'rxjs';
+import Shepherd from 'shepherd.js';
 
 @Component({
   selector: 'app-list-users',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, ReactiveFormsModule, CustomSelectComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    ReactiveFormsModule,
+    CustomSelectComponent,
+  ],
   templateUrl: './list-users.component.html',
-  styleUrls: ['./list-users.component.css']
+  styleUrls: ['./list-users.component.css'],
 })
 export class ListUsersComponent implements OnInit, OnDestroy {
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
 
   selectedOptions: any;
   optionesFilter: any;
@@ -38,7 +50,24 @@ export class ListUsersComponent implements OnInit, OnDestroy {
   private readonly routingService = inject(RoutingService);
   private readonly suscriptionService = inject(SuscriptionManagerService);
 
-  constructor(private modal: NgbModal, private plotService: PlotService) { }
+  constructor(
+    private modal: NgbModal,
+    private plotService: PlotService,
+    private tutorialService: TutorialService
+  ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+      },
+      useModalOverlay: true,
+    });
+  }
 
   @ViewChild('customSelect') customSelect!: CustomSelectComponent;
 
@@ -50,31 +79,32 @@ export class ListUsersComponent implements OnInit, OnDestroy {
   showDeactivateModal: boolean = false;
   userToDeactivate: number = 0;
   maxDate: string = new Date().toISOString().split('T')[0];
-  minDate: string = new Date(new Date().setDate(new Date().getDate() - 30)).toISOString().split('T')[0];
+  minDate: string = new Date(new Date().setDate(new Date().getDate() - 30))
+    .toISOString()
+    .split('T')[0];
   plots: GetPlotDto[] = [];
   selectRol: FormControl = new FormControl('');
   rolesFilter: any[] = [];
   selectedRole: string = '';
   initialDate: FormControl = new FormControl(this.minDate);
   endDate: FormControl = new FormControl(this.maxDate);
-  placeholder: string = "Seleccione un rol";
+  placeholder: string = 'Seleccione un rol';
   estadoRoles: { [id: string]: boolean } = {};
   userModal: UserGet = new UserGet();
 
   ngOnInit() {
     this.loadRoles();
     this.loadAllPlots();
+
     //Trae todos los usuarios
     const sus = this.apiService.getAllUsers().subscribe({
       next: (data: UserGet[]) => {
         //Cambiar guiones por barras en la fecha de nacimiento
-        this.users = data.map(user => ({
+        this.users = data.map((user) => ({
           ...user,
 
           datebirth: user.datebirth.replace(/-/g, '/'),
           create_date: user.create_date.replace(/-/g, '/'),
-
-
         }));
 
         //Inicializar DataTables después de cargar los datos
@@ -105,39 +135,39 @@ export class ListUsersComponent implements OnInit, OnDestroy {
               // ,
 
               { title: 'Nombre', width: '20%' },
-              {title: 'Documento', className: 'text-end', width: '20%'},
-              { title: 'Rol', className: 'text-center',width: '30%' },
+              { title: 'Documento', className: 'text-end', width: '20%' },
+              { title: 'Rol', className: 'text-center', width: '30%' },
               {
-                title: 'Lotes', className: 'text-start', width: '15%',
+                title: 'Lotes',
+                className: 'text-start',
+                width: '15%',
                 render: (data) => {
-
                   let plotNumber: GetPlotDto[] = [];
 
                   data.forEach((d: any) => {
-                    const plot = this.plots.find((plot: GetPlotDto) => plot.id == d);
+                    const plot = this.plots.find(
+                      (plot: GetPlotDto) => plot.id == d
+                    );
                     if (plot) {
                       plotNumber.push(plot);
                     }
                   });
 
                   if (plotNumber != undefined) {
-
                     if (plotNumber.length > 0) {
-                      var plots: string = "";
+                      var plots: string = '';
                       for (let i = 0; i < plotNumber.length; i++) {
-                        plots = plots + plotNumber[i].plot_number + ", ";
+                        plots = plots + plotNumber[i].plot_number + ', ';
                         // borrar la ultima letra del plots
                       }
                       plots = plots.substring(0, plots.length - 2);
                       return plots;
                     } else {
-                      return "Sin lote";
+                      return 'Sin lote';
                     }
                   }
-                  return "Sin lote";
-
-
-                }
+                  return 'Sin lote';
+                },
               },
               {
                 title: 'Acciones',
@@ -147,8 +177,8 @@ export class ListUsersComponent implements OnInit, OnDestroy {
                 render: (data, type, row, meta) => {
                   const userId = this.users[meta.row].id;
                   return `
-                    <div class="dropdown-center d-flex text-center justify-content-center">
-                      <button class="btn btn-light border border-1" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <div class="dropdown-center d-flex text-center justify-content-center" >
+                      <button class="btn btn-light border border-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="actions">
                         <i class="bi bi-three-dots-vertical"></i>
                       </button>
                       <ul class="dropdown-menu">
@@ -160,30 +190,28 @@ export class ListUsersComponent implements OnInit, OnDestroy {
                       </ul>
                     </div>
                   `;
-                }
-              }
+                },
+              },
             ],
-            dom:
-              '<"mb-3"t>' +
-              '<"d-flex justify-content-between"lp>',
-            data: this.users.map(user => [
+            dom: '<"mb-3"t>' + '<"d-flex justify-content-between"lp>',
+            data: this.users.map((user) => [
               // user.create_date,
-              `${user.lastname}, ${user.name}`,  //Nombre completo
-              user.dni,                                //Documento
-              this.showRole(user.roles),              //Roles
-              user.plot_id,                                //Nro. de lote (puedes ajustar esto)                 
-              '<button class="btn btn-info">Ver más</button>'  //Ejemplo de acción
+              `${user.lastname}, ${user.name}`, //Nombre completo
+              user.dni, //Documento
+              this.showRole(user.roles), //Roles
+              user.plot_id, //Nro. de lote (puedes ajustar esto)
+              '<button class="btn btn-info">Ver más</button>', //Ejemplo de acción
             ]),
             language: {
-              lengthMenu: "_MENU_",
-              zeroRecords: "No se encontraron resultados",
-              info: "Mostrando página _PAGE_ de _PAGES_",
-              infoEmpty: "No hay registros disponibles",
-              infoFiltered: "(filtrado de _MAX_ registros totales)",
-              search: "Buscar:",
-              loadingRecords: "Cargando...",
-              processing: "Procesando...",
-              emptyTable: "No hay datos disponibles en la tabla"
+              lengthMenu: '_MENU_',
+              zeroRecords: 'No se encontraron resultados',
+              info: 'Mostrando página _PAGE_ de _PAGES_',
+              infoEmpty: 'No hay registros disponibles',
+              infoFiltered: '(filtrado de _MAX_ registros totales)',
+              search: 'Buscar:',
+              loadingRecords: 'Cargando...',
+              processing: 'Procesando...',
+              emptyTable: 'No hay datos disponibles en la tabla',
             },
           });
 
@@ -193,7 +221,8 @@ export class ListUsersComponent implements OnInit, OnDestroy {
 
           //Desvincular el comportamiento predeterminado de búsqueda
           $('#myTable_filter input').unbind();
-          $('#myTable_filter input').bind('input', (event) => { //Usar función de flecha aquí
+          $('#myTable_filter input').bind('input', (event) => {
+            //Usar función de flecha aquí
             const searchValue = (event.target as HTMLInputElement).value; //Acceder al valor correctamente
 
             //Comienza a buscar solo si hay 3 o más caracteres
@@ -209,14 +238,13 @@ export class ListUsersComponent implements OnInit, OnDestroy {
           $('#myTable').on('click', '.view-user', (event) => {
             const id = $(event.currentTarget).data('id');
             const userId = this.users[id].id; //Obtén el ID real del usuario
-            this.openModal("info", userId); //Pasa el ID del usuario al abrir el modal
+            this.openModal('info', userId); //Pasa el ID del usuario al abrir el modal
           });
-
 
           $('#myTable').on('click', '.delete-user', (event) => {
             const id = $(event.currentTarget).data('id');
             const userId = this.users[id].id; //Obtén el ID real del usuario
-            this.openModalEliminar(userId); //Pasa el ID del usuario al abrir el modal 
+            this.openModalEliminar(userId); //Pasa el ID del usuario al abrir el modal
           });
 
           //Asignar el evento click a los botones "Editar"
@@ -224,8 +252,6 @@ export class ListUsersComponent implements OnInit, OnDestroy {
             const userId = $(event.currentTarget).data('id');
             this.redirectEdit(userId); //Redirigir al método de edición
           });
-
-
         }, 0); //Asegurar que la tabla se inicializa en el próximo ciclo del evento
       },
       error: (error) => {
@@ -237,19 +263,120 @@ export class ListUsersComponent implements OnInit, OnDestroy {
           showConfirmButton: true,
           confirmButtonText: 'Aceptar',
           allowOutsideClick: false,
-          allowEscapeKey: false
-        })
+          allowEscapeKey: false,
+        });
         this.routingService.redirect('/main', 'Página Principal');
-      }
+      },
     });
 
     //Agregar suscripción
-    this.suscriptionService.addSuscription(sus);
+    const aux = this.suscriptionService.addSuscription(sus);
+
+    //TUTORIAL
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    );
+
+    this.tutorialSubscription.add(aux);
+  }
+
+  startTutorial() {
+    console.log('EMPEZANDO TUTORIAL');
+    this.tour.addStep({
+      id: 'profile-step',
+      title: 'Lista de usuarios',
+      text: 'Acá puede ver una lista de todos los usuarios registrados en la aplicación. También se muestran tanto sus lotes como sus roles en la página.',
+
+      attachTo: {
+        element: '#myTable',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        },
+      ],
+    });
+
+    this.tour.addStep({
+      id: 'edit-step',
+      title: 'Filtros',
+      text: 'Desde acá podrá filtrar los usuarios. También puede exportar la lista a Excel o PDF, o borrar los filtros aplicados con el botón de basura.',
+      attachTo: {
+        element: '#filtros',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back,
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        },
+      ],
+    });
+
+    this.tour.addStep({
+      id: 'profile-step',
+      title: 'Acciones',
+      text: 'Desde acá puede ver las acciones disponibles para cada usuario. Puede editar el perfil, borrar el usuario o ver más información.',
+
+      attachTo: {
+        element: '#actions',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back,
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.next,
+        },
+      ],
+    });
+    
+    this.tour.addStep({
+      id: 'profile-step',
+      title: 'Agregar',
+      text: 'Para agregar un usuario, pulse este botón y será enviado al alta de usuarios.',
+
+      attachTo: {
+        element: '#addUser',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back,
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete,
+        },
+      ],
+    });
+
+    this.tour.start();
   }
 
   //Desuscribirse de todos los observables
   ngOnDestroy(): void {
     this.suscriptionService.unsubscribeAll();
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
   }
 
   //-------------------------------------------------Carga de datos-------------------------------------------
@@ -261,25 +388,23 @@ export class ListUsersComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         console.error('Error al cargar los lotes:', error);
-      }
-    })
+      },
+    });
   }
 
   //Cargar roles
   loadRoles() {
     const sus = this.apiService.getAllRoles().subscribe({
       next: (data: RolModel[]) => {
-
         this.roles = data;
-        this.rolesFilter = data.map(r => ({
+        this.rolesFilter = data.map((r) => ({
           value: r.description,
-          name: r.description
+          name: r.description,
         }));
       },
       error: (error) => {
         console.error('Error al cargar los roles:', error);
-
-      }
+      },
     });
 
     //Agregar suscripción
@@ -291,8 +416,8 @@ export class ListUsersComponent implements OnInit, OnDestroy {
     const sus = this.plotService.getPlotById(plotId).subscribe({
       next: (data: GetPlotModel) => {
         return data.plot_number;
-      }
-    })
+      },
+    });
 
     //Agregar suscripción
     this.suscriptionService.addSuscription(sus);
@@ -303,7 +428,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
   //Abrir modal eliminar usuario
   async openModalEliminar(userId: number) {
     // Obtener el usuario completo usando el UserService
-    this.apiService.getUserById(userId).subscribe(user => {
+    this.apiService.getUserById(userId).subscribe((user) => {
       // Verifica si el usuario tiene el rol "Propietario"
       if (user.roles.includes('Propietario')) {
         Swal.fire({
@@ -316,7 +441,10 @@ export class ListUsersComponent implements OnInit, OnDestroy {
       }
 
       // Abrir el modal si el usuario no es "Propietario"
-      const modalRef = this.modal.open(ModalEliminarUserComponent, { size: 'md', keyboard: false });
+      const modalRef = this.modal.open(ModalEliminarUserComponent, {
+        size: 'md',
+        keyboard: false,
+      });
       modalRef.componentInstance.userModal = { id: userId };
 
       // Escuchar el evento de eliminación para recargar los usuarios
@@ -325,8 +453,6 @@ export class ListUsersComponent implements OnInit, OnDestroy {
       });
     });
   }
-
-
 
   //Método para abrir el modal
   async openModal(type: string, userId: number) {
@@ -337,7 +463,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
       let user: any = this.userModal.plot_id;
       let userPlots: any = [];
       user.forEach((plot: any) => {
-        console.log("AA" + plot);
+        console.log('AA' + plot);
 
         const userPlot = this.plots.find((p: any) => p.id == plot);
         console.log(userPlot);
@@ -348,14 +474,15 @@ export class ListUsersComponent implements OnInit, OnDestroy {
       });
 
       //Cuando se carga se abre el modal
-      const modalRef = this.modal.open(ModalInfoUserComponent, { size: 'lg', keyboard: false });
+      const modalRef = this.modal.open(ModalInfoUserComponent, {
+        size: 'lg',
+        keyboard: false,
+      });
       modalRef.componentInstance.typeModal = type;
       modalRef.componentInstance.userModal = this.userModal;
       modalRef.componentInstance.plotModal = userPlots;
 
-      modalRef.result.then((result) => {
-      });
-
+      modalRef.result.then((result) => {});
     } catch (error) {
       console.error('Error al abrir el modal:', error);
     }
@@ -384,10 +511,9 @@ export class ListUsersComponent implements OnInit, OnDestroy {
             icon: 'error',
             title: 'Error',
             text: 'Hubo un problema al cargar el usuario. Por favor, inténtalo de nuevo.',
-            confirmButtonText: 'Aceptar'
-
+            confirmButtonText: 'Aceptar',
           });
-        }
+        },
       });
 
       //Agregar suscripción
@@ -414,7 +540,9 @@ export class ListUsersComponent implements OnInit, OnDestroy {
     this.endDate.setValue(this.maxDate);
 
     // Limpiar el campo de búsqueda general
-    const searchInput = document.getElementById("myTable_search") as HTMLInputElement;
+    const searchInput = document.getElementById(
+      'myTable_search'
+    ) as HTMLInputElement;
     if (searchInput) {
       searchInput.value = ''; // Limpiar el valor del input
     }
@@ -426,7 +554,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
     const table = $('#myTable').DataTable();
 
     // Reiniciar roles y custom select
-    this.rolesFilter = this.roles.map(r => ({
+    this.rolesFilter = this.roles.map((r) => ({
       value: r.description,
       name: r.description,
     }));
@@ -447,7 +575,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
   fillOptionsSelected(options: any) {
     var optionsFilter = options.map((option: any) => option).join('|');
     const table = $('#myTable').DataTable();
-    table.column(2).search(optionsFilter, true, false).draw(); 
+    table.column(2).search(optionsFilter, true, false).draw();
   }
 
   // //Metodo para filtrar la tabla en base a las 2 fechas
@@ -466,8 +594,6 @@ export class ListUsersComponent implements OnInit, OnDestroy {
   //     // Convertir la fecha de la fila (data[0]) a un objeto Date
   //     const rowDateParts = data[0].split('/'); // Asumiendo que la fecha está en formato DD/MM/YYYY
   //     const rowDate = (new Date(`${rowDateParts[2]}-${rowDateParts[1]}-${rowDateParts[0]}`)).toISOString().split('T')[0]; // Convertir a formato YYYY-MM-DD
-
-
 
   //     // Realizar las comparaciones
   //     if (start && rowDate < start) return false;
@@ -488,7 +614,9 @@ export class ListUsersComponent implements OnInit, OnDestroy {
     const argentinaOffset = 3 * 60;
 
     //Ajustar la fecha a la zona horaria de Argentina, estableciendo la hora en 00:00
-    const localDate = new Date(date.getTime() + (argentinaOffset - date.getTimezoneOffset()) * 60000);
+    const localDate = new Date(
+      date.getTime() + (argentinaOffset - date.getTimezoneOffset()) * 60000
+    );
 
     //Establecer la hora en 00:00 para evitar cambios de fecha no deseados
     localDate.setHours(0, 0, 0, 0);
@@ -496,13 +624,17 @@ export class ListUsersComponent implements OnInit, OnDestroy {
     //Sumar un día
     localDate.setDate(localDate.getDate());
 
-    const options: Intl.DateTimeFormatOptions = { day: '2-digit', month: '2-digit', year: 'numeric' };
+    const options: Intl.DateTimeFormatOptions = {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    };
     return new Intl.DateTimeFormat('es-ES', options).format(localDate);
   }
 
   //Filtrar lote por id
   getPlotById(plotId: number): number {
-    const plot = this.plots.find(plot => plot.id === plotId);
+    const plot = this.plots.find((plot) => plot.id === plotId);
     return plot?.plot_number || 0;
   }
 
@@ -515,7 +647,10 @@ export class ListUsersComponent implements OnInit, OnDestroy {
 
   //Redirige a la edición de un usuario
   redirectEdit(id: number) {
-    this.routingService.redirect(`/main/users/edit/${id}`, 'Actualizar usuario');
+    this.routingService.redirect(
+      `/main/users/edit/${id}`,
+      'Actualizar usuario'
+    );
   }
 
   //--------------------------------------------------Estilos----------------------------------------------------
@@ -523,58 +658,59 @@ export class ListUsersComponent implements OnInit, OnDestroy {
   //Obtener el contenido entre <>
   getContentBetweenArrows(input: string): string[] {
     const matches = [...input.matchAll(/>([^+<,]*)</g)];
-    return matches.map(match => match[1].trim()).filter(content => content !== "");
+    return matches
+      .map((match) => match[1].trim())
+      .filter((content) => content !== '');
   }
 
   //Mostrar roles con badges
   showRole(roles: string[]): string {
-    let rolesA: string = "";
-
+    let rolesA: string = '';
 
     let max: number = 2;
 
     if (roles.length > 1) {
       for (let i = 0; i < max; i++) {
-        let color: string = "";
+        let color: string = '';
         switch (roles[i]) {
-          case "Gerente general":
-            color = "text-bg-salmon";
+          case 'Gerente general':
+            color = 'text-bg-salmon';
             break;
-          case "Propietario":
-            color = "text-bg-primary";
+          case 'Propietario':
+            color = 'text-bg-primary';
             break;
-          case "Familiar mayor":
-            color = "bg-secondary";
+          case 'Familiar mayor':
+            color = 'bg-secondary';
             break;
-          case "Familiar menor":
-            color = "text-bg-light-blue";
+          case 'Familiar menor':
+            color = 'text-bg-light-blue';
             break;
-          case "SuperAdmin":
-            color = "text-bg-dark";
+          case 'SuperAdmin':
+            color = 'text-bg-dark';
             break;
-          case "Inquilino":
-            color = "text-bg-cyan";
+          case 'Inquilino':
+            color = 'text-bg-cyan';
             break;
-          case "Gerente finanzas":
-            color = "text-bg-pink";
+          case 'Gerente finanzas':
+            color = 'text-bg-pink';
             break;
-          case "Contador":
-            color = "text-bg-teal";
+          case 'Contador':
+            color = 'text-bg-teal';
             break;
-          case "Seguridad":
-            color = "text-bg-orange";
+          case 'Seguridad':
+            color = 'text-bg-orange';
             break;
-          case "Gerente inventario":
-            color = "text-bg-blue";
+          case 'Gerente inventario':
+            color = 'text-bg-blue';
             break;
-          case "Gerente empleados":
-            color = "text-bg-red";
+          case 'Gerente empleados':
+            color = 'text-bg-red';
             break;
-          case "Gerente multas":
-            color = "text-bg-indigo";
+          case 'Gerente multas':
+            color = 'text-bg-indigo';
             break;
           default:
-            color = "badge bg-info text-dark";
+            color = 'badge bg-info text-dark';
             break;
         }
 
@@ -582,99 +718,98 @@ export class ListUsersComponent implements OnInit, OnDestroy {
                      <span class="badge rounded-pill ${color}">${roles[i]}</span> `;
       }
     } else {
-      let color: string = "";
+      let color: string = '';
       switch (roles[0]) {
-        case "Gerente general":
-            color = "text-bg-salmon";
-            break;
-          case "Propietario":
-            color = "text-bg-primary";
-            break;
-          case "Familiar mayor":
-            color = "bg-secondary";
-            break;
-          case "Familiar menor":
-            color = "text-bg-menor";
-            break;
-          case "SuperAdmin":
-            color = "text-bg-dark";
-            break;
-          case "Inquilino":
-            color = "text-bg-cyan";
-            break;
-          case "Gerente finanzas":
-            color = "text-bg-pink";
-            break;
-          case "Contador":
-            color = "text-bg-teal text-dark";
-            break;
-          case "Seguridad":
-            color = "text-bg-orange";
-            break;
-          case "Gerente inventario":
-            color = "text-bg-blue";
-            break;
-          case "Gerente empleados":
-            color = "text-bg-red";
-            break;
-          case "Gerente multas":
-            color = "text-bg-indigo";
-            break;
-          default:
-            color = "badge bg-info text-dark";
-            break;
+        case 'Gerente general':
+          color = 'text-bg-salmon';
+          break;
+        case 'Propietario':
+          color = 'text-bg-primary';
+          break;
+        case 'Familiar mayor':
+          color = 'bg-secondary';
+          break;
+        case 'Familiar menor':
+          color = 'text-bg-menor';
+          break;
+        case 'SuperAdmin':
+          color = 'text-bg-dark';
+          break;
+        case 'Inquilino':
+          color = 'text-bg-cyan';
+          break;
+        case 'Gerente finanzas':
+          color = 'text-bg-pink';
+          break;
+        case 'Contador':
+          color = 'text-bg-teal text-dark';
+          break;
+        case 'Seguridad':
+          color = 'text-bg-orange';
+          break;
+        case 'Gerente inventario':
+          color = 'text-bg-blue';
+          break;
+        case 'Gerente empleados':
+          color = 'text-bg-red';
+          break;
+        case 'Gerente multas':
+          color = 'text-bg-indigo';
+          break;
+        default:
+          color = 'badge bg-info text-dark';
+          break;
       }
 
       rolesA += `
                      <span class="badge rounded-pill ${color}">${roles[0]}</span> `;
     }
 
-
     if (roles.length > 2) {
       var rolesExtra = roles.slice(2);
-      var rolesB = "";
+      var rolesB = '';
 
       rolesExtra.forEach((role: string) => {
-        let color: string = "";
+        let color: string = '';
         switch (role) {
-          case "Gerente general":
-            color = "text-bg-salmon";
+          case 'Gerente general':
+            color = 'text-bg-salmon';
             break;
-          case "Propietario":
-            color = "text-bg-primary";
+          case 'Propietario':
+            color = 'text-bg-primary';
             break;
-          case "Familiar mayor":
-            color = "bg-secondary";
+          case 'Familiar mayor':
+            color = 'bg-secondary';
             break;
-          case "Familiar menor":
-            color = "text-bg-menor";
+          case 'Familiar menor':
+            color = 'text-bg-menor';
             break;
-          case "SuperAdmin":
-            color = "text-bg-dark";
+          case 'SuperAdmin':
+            color = 'text-bg-dark';
             break;
-          case "Inquilino":
-            color = "text-bg-cyan";
+          case 'Inquilino':
+            color = 'text-bg-cyan';
             break;
-          case "Gerente finanzas":
-            color = "text-bg-pink";
+          case 'Gerente finanzas':
+            color = 'text-bg-pink';
             break;
-          case "Contador":
-            color = "text-bg-teal text-dark";
+          case 'Contador':
+            color = 'text-bg-teal text-dark';
             break;
-          case "Seguridad":
-            color = "text-bg-orange";
+          case 'Seguridad':
+            color = 'text-bg-orange';
             break;
-          case "Gerente inventario":
-            color = "text-bg-blue";
+          case 'Gerente inventario':
+            color = 'text-bg-blue';
             break;
-          case "Gerente empleados":
-            color = "text-bg-red";
+          case 'Gerente empleados':
+            color = 'text-bg-red';
             break;
-          case "Gerente multas":
-            color = "text-bg-indigo";
+          case 'Gerente multas':
+            color = 'text-bg-indigo';
             break;
           default:
-            color = "badge bg-info text-dark";
+            color = 'badge bg-info text-dark';
             break;
         }
 
@@ -717,10 +852,10 @@ export class ListUsersComponent implements OnInit, OnDestroy {
     const visibleRows = table.rows({ search: 'applied' }).data().toArray();
 
     const rows = visibleRows.map((row: any) => [
-      `${row[0]}`,               // Nombre
-      `${row[1]}`,              // Documento
+      `${row[0]}`, // Nombre
+      `${row[1]}`, // Documento
       `${this.getContentBetweenArrows(row[2])}`, // Rol
-      `${row[3]}` // Lote
+      `${row[3]}`, // Lote
     ]);
 
     autoTable(doc, {
@@ -733,7 +868,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
         0: { cellWidth: 50 },
         1: { cellWidth: 50 },
         2: { cellWidth: 50 },
-        3: { cellWidth: 30 }
+        3: { cellWidth: 30 },
       },
     });
     doc.save(`${date}_listado_usuarios.pdf`);
@@ -755,21 +890,25 @@ export class ListUsersComponent implements OnInit, OnDestroy {
       const nombre = row[0]; // Nombre
       const documento = row[1]; // Documento
       const rol = Array.isArray(row[2])
-        ? row[2].map((r: string) => this.getContentBetweenArrows(r).join(', ')).join(', ')
+        ? row[2]
+            .map((r: string) => this.getContentBetweenArrows(r).join(', '))
+            .join(', ')
         : this.getContentBetweenArrows(row[2]).join(', '); // Aplicamos getContentBetweenArrows si es un array o un string
       const lote = Array.isArray(row[3]) ? row[3].join(', ') : row[4]; // Si lote es un array, lo unimos por comas
 
       // Creamos el objeto para cada fila
       return {
-        'Nombre': nombre,
-        'Documento': documento,
-        'Rol': rol,  // Aplicado getContentBetweenArrows a 'rol'
-        'Lote': lote // Convertido a string
+        Nombre: nombre,
+        Documento: documento,
+        Rol: rol, // Aplicado getContentBetweenArrows a 'rol'
+        Lote: lote, // Convertido a string
       };
     });
 
     // Crear la hoja de trabajo con los datos de los usuarios
-    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(dataRows, { header: ['Nombre', 'Documento', 'Rol', 'Lote'] });
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(dataRows, {
+      header: ['Nombre', 'Documento', 'Rol', 'Lote'],
+    });
 
     // Crear el libro de trabajo
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
@@ -780,4 +919,3 @@ export class ListUsersComponent implements OnInit, OnDestroy {
     XLSX.writeFile(wb, fileName);
   }
 }
-

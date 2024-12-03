@@ -1,6 +1,6 @@
 <div class="mb-5">
     <!-- NavBar -->
-    <nav class="navbar mynav d-flex justify-content-between shadow fixed-top text-bg-dark">
+    <nav class="navbar mynav d-flex justify-content-between shadow fixed-top text-bg-dark" id="navbar">
 
         <!-- Lado izquierdo -->
         <div class="col-4">
@@ -53,7 +53,7 @@
 
     </nav>
     <!-- SideBar -->
-    <aside class="myside text-bg-dark h-100 pt-5 fixed-top animation"
+    <aside class="myside text-bg-dark h-100 pt-5 fixed-top animation" id="sidebar"
         [class]="expand ? 'side-expanded' : 'side-compressed'" style="z-index: 9;">
         <div class="pt-3 fs-5 d-flex flex-column h-100">
             <button class="nav-link d-flex text-light w-100 px-3 py-2"
@@ -80,8 +80,9 @@
                     @if (expand) {<span class="ms-2">Dashboard</span>}
                 </button>
                 }
-                <button class="nav-link d-flex text-light w-100 px-3 py-2" data-bs-toggle="modal"
-                    data-bs-target="#infoModal" title="Información">
+                <button class="nav-link d-flex text-light w-100 px-3 py-2"  (click)="startTutorial()"
+                    title="Información">
+                    <!-- data-bs-target="#infoModal" data-bs-toggle="modal" AGREGAR EN CASO DE NO LLEGAR CON LOS TUTORIALES -->
                     <i class="bi-info-circle"></i>
                     @if (expand) {<span class="ms-2">Información</span>}
                 </button>
