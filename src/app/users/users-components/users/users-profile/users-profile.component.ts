@@ -108,15 +108,16 @@ export class UsersProfileComponent implements OnInit, OnDestroy {
     const sus = this.usersService.getUserById2(this.authService.getUser().id).subscribe({
       next: (user: GetuserDto) => {
         let roles = user.roles.map(role => " " + role);
+        
 
         this.formProfile.patchValue({
           name: user.name,
           lastName: user.lastname,
-          email: user.email,
+          email: user.email || 'N/A',
           username: user.username,
-          phoneNumber: String(user.phone_number),
-          dni: user.dni,
-          dniType: user.dni_type,
+          phoneNumber: user.phone_number == null ?  'N/A': String(user.phone_number),
+          dni: user.dni || 'N/A',
+          dniType: user.dni_type || 'N/A',
           avatar_url: user.avatar_url,
           roles: user.roles,
           telegram_id: user.telegram_id
@@ -139,7 +140,7 @@ export class UsersProfileComponent implements OnInit, OnDestroy {
           });
         } else {
           this.formProfile.patchValue({
-            datebirth: ''
+            datebirth: 'N/A'
           });
         }
       }

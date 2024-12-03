@@ -27,16 +27,16 @@ export class UsersUpdateUserComponent implements OnInit, OnDestroy {
     this.updateForm = this.fb.group({
       name: new FormControl('', [Validators.required]),
       lastname: new FormControl('', [Validators.required]),
-      phoneNumber: new FormControl('', [Validators.required, Validators.pattern(/^\d+$/), Validators.minLength(10), Validators.maxLength(20)]),
+      phoneNumber: new FormControl(null, [Validators.pattern(/^\d+$/), Validators.minLength(10), Validators.maxLength(20)]),
       telegram_id: new FormControl(0),
       dni: new FormControl('', [Validators.required, 
         Validators.pattern(/^\d+$/),
         Validators.minLength(8),
         this.validarCuit.bind(this)]),
       dniType: new FormControl(0, [Validators.required]),
-      email: new FormControl('', [Validators.email]),
+      email: new FormControl(null),
       avatar_url: new FormControl(''),
-      datebirth: new FormControl(''),
+      datebirth: new FormControl(null),
       roles: new FormControl([], [Validators.required])
     })
   }
@@ -119,7 +119,7 @@ export class UsersUpdateUserComponent implements OnInit, OnDestroy {
           this.updateForm.get('name')?.setValue(data.name);
           this.updateForm.get('lastname')?.setValue(data.lastname);
           this.updateForm.get('dni')?.setValue(data.dni);
-          this.updateForm.get('email')?.setValue(data.email);
+          this.updateForm.get('email')?.setValue(data.email || null);
           this.updateForm.get('avatar_url')?.setValue(data.avatar_url);
           console.log(data.dni_type);
 
@@ -140,8 +140,12 @@ export class UsersUpdateUserComponent implements OnInit, OnDestroy {
             this.documentTypeChange();
           });
 
-
-          const formattedDate = DateService.parseDateString(data.datebirth);
+            let formattedDate = null;
+            if (data.datebirth) {
+            formattedDate = DateService.parseDateString(data.datebirth);
+            } else {
+            formattedDate = null;
+            }
 
           this.userRoles = data.roles;
 
@@ -154,6 +158,8 @@ export class UsersUpdateUserComponent implements OnInit, OnDestroy {
             this.updateForm.get('roles')?.setValue(this.userRoles);
             this.rolesComponent.setData(this.userRoles);
           }
+
+          this.updateForm.get('datebirth')?.setValue(formattedDate || null);
           if (formattedDate) {
             // Formatea la fecha a 'yyyy-MM-dd' para un input de tipo date
             const formattedDateString = formattedDate.toISOString().split('T')[0];
@@ -167,7 +173,7 @@ export class UsersUpdateUserComponent implements OnInit, OnDestroy {
             });
           }
 
-          this.updateForm.get('phoneNumber')?.setValue(data.phone_number.toString());
+          this.updateForm.get('phoneNumber')?.setValue(data.phone_number.toString() || null);
           this.updateForm.get('telegram_id')?.setValue(data.telegram_id) || 0;
 
           // Asigna `rolesSelected` después de obtener `data.roles`
@@ -296,17 +302,24 @@ export class UsersUpdateUserComponent implements OnInit, OnDestroy {
     user.name = this.updateForm.get('name')?.value || '';
     user.lastName = this.updateForm.get('lastname')?.value || '';
     user.dni = this.updateForm.get('dni')?.value || '';
-    user.phoneNumber = this.updateForm.get('phoneNumber')?.value?.toString() || '';
-    user.email = this.updateForm.get('email')?.value || '';
+    user.phoneNumber = this.updateForm.get('phoneNumber')?.value?.toString() || null;
+    user.email = this.updateForm.get('email')?.value || null;
     user.avatar_url = this.updateForm.get('avatar_url')?.value || '';
 
     //Formatea la fecha correctamente (año-mes-día)
-    const date: Date = new Date(this.updateForm.get('datebirth')?.value || '');
+    const date: Date = new Date(this.updateForm.get('datebirth')?.value || null);
 
     //Formatear la fecha como YYYY-MM-DD
-    const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+    let formattdDate = null;
+    if(date){
+      formattdDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+    }
+    else{
+      formattdDate = null;
+    }
+    
 
-    user.datebirth = formattedDate;
+    user.datebirth = formattdDate || null;
     user.roles = this.updateForm.get('roles')?.value + this.blockedRoles || [];
     user.userUpdateId = this.authService.getUser().id;
     user.dni_type_id = this.updateForm.get('dniType')?.value;

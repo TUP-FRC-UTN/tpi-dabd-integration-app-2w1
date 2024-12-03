@@ -3,10 +3,10 @@ export class UserPut {
     lastName: string;     
     dni_type_id: number;
     dni: string;   
-    phoneNumber: string;
-    email: string;                  
+    phoneNumber: string | null;
+    email: string | null;                  
     avatar_url: string;   
-    datebirth: string;    
+    datebirth: string | null;    
     roles: string[];      
     userUpdateId: number;
     telegram_id: number;
