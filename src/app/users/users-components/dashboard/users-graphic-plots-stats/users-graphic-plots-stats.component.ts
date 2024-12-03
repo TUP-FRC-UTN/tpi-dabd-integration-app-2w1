@@ -7,10 +7,13 @@ import {
   PlotsStats
 } from '../../../users-models/dashboard/plots-stats';
 import {
+  AbstractControl,
   FormControl,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn,
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
@@ -52,6 +55,7 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
     type: new FormControl(''),
     status: new FormControl(''),
   });
+  isSelectedDisabled = false;
 
   filteredPlotsStats: PlotsStats | null = null;
   filteredPlotsByBlock: PlotsByBlock[] = [];
@@ -61,6 +65,8 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
   plotsTypes: PlotTypeModel[] = [];
   plotsStatus: PlotStateModel[] = [];
 
+  loadingPieChart = false;
+  loadingBarChart = false;
   errorPieChart: string | null = null;
   errorBarChart: string | null = null;
   errorRangeDate: string | null = null;
@@ -99,7 +105,7 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
       titleTextStyle: { color: '#6c757d', fontSize: 14, bold: true },
       textStyle: { color: '#495057', fontSize: 12 },
     },
-    bar: { groupWidth: '70%' },
+    bar: { groupWidth: '80%' },
     tooltip: {
       showColorCode: true,
       trigger: 'both',
@@ -189,6 +195,7 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
             }
             this.filteredOwnerDistribution = data;
             this.processPieChartData();
+            this.loadingPieChart = false;
           },
           error: () => {
             this.errorPieChart = 'Error al cargar la distribución de propietarios';
@@ -228,13 +235,14 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
   }
 
   private loadData() {
-    this.errorBarChart = null;
-    this.errorPieChart = null;
+    this.loadingBarChart = true;
+    this.loadingPieChart = true;
     this.loadStats();
     this.loadBarChart();
     this.loadPieChart();
     this.processFilterOptions();
   }
+
 
    loadStats() {
     this.apiService.getPlotsStats().subscribe({
@@ -255,9 +263,10 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
         this.filteredPlotsByBlock = [...this.plotsByBlock];
         this.processData();
         this.processFilterOptions();
+        this.loadingBarChart = false;
       },
       error: () => {
-        this.errorBarChart = 'Error al cargar los datos por manzana';
+        this.errorBarChart = 'Error al cargar los datos de las manzanas';
       },
     });
   }
@@ -269,6 +278,7 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
         this.ownerDistribution = data;
         this.filteredOwnerDistribution = [...this.ownerDistribution];
         this.processPieChartData();
+        this.loadingPieChart = false
       },
       error: () => {
         this.errorPieChart = 'Error al cargar la distribución de propietarios';
@@ -279,11 +289,16 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
 
   private processData() {
     if(this.filteredPlotsByBlock.length === 0) {
-      this.errorBarChart = 'No hay datos disponibles con esos filtros';
+      this.errorBarChart = 'No se encontraron datos para los filtros seleccionados';
     }
 
+    this.filteredPlotsByBlock.sort((a, b) => a.blockNumber - b.blockNumber);
+    
+    // Tomar solo las 10 primeras manzanas
+    const displayData = this.filteredPlotsByBlock.slice(0, 10);
+
     this.barChartData = [
-      ...this.filteredPlotsByBlock.map((item: PlotsByBlock) => [
+      ...displayData.map((item: PlotsByBlock) => [
         {
           v: item.blockNumber,
           f: `Nro. Manzana: ${item.blockNumber}`,
@@ -306,7 +321,7 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
 
   private processPieChartData() {
     if (!this.filteredOwnerDistribution?.length) {
-      this.errorPieChart = 'No hay datos disponibles con esos filtros';
+      this.errorPieChart = 'No se encontraron datos para los filtros seleccionados';
     }
 
     const sortedOwners = [...this.filteredOwnerDistribution].sort(
@@ -357,18 +372,7 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
     };
   }
 
-  clearFilters() {
-    this.startDate.reset();
-    this.endDate.reset();
-    this.filterForm.reset();
-    this.errorRangeDate = null;
-    this.filteredPlotsByBlock = [...this.plotsByBlock];
-    this.filteredOwnerDistribution = [...this.ownerDistribution];
-    this.filteredPlotsStats = { ...this.plotsStats };
-    this.processData();
-    this.processPieChartData();
-  }
-
+  
   filterByDate() {
     this.errorRangeDate = null;
 
@@ -396,6 +400,9 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
     this.errorBarChart = null;
     this.errorPieChart = null;
 
+    this.loadingBarChart = true;
+    this.loadingPieChart = true;
+    
     this.apiService
       .getPlotsStats(
         startDate,
@@ -407,6 +414,7 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
         next: (stats) => {
           this.filteredPlotsStats = stats;
           this.updateKPIs(stats);
+          this.processFilterOptions();
         },
         error: (error) => {
           console.error('Error al obtener estadísticas:', error);
@@ -417,6 +425,7 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
       next: (plotsByBlock) => {
         this.filteredPlotsByBlock = plotsByBlock;
         this.processData();
+        this.loadingBarChart = false;
       },
       error: (error) => {
         console.error('Error al obtener datos por bloque:', error);
@@ -434,6 +443,7 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
         next: (distribution) => {
           this.filteredOwnerDistribution = distribution;
           this.processPieChartData();
+          this.loadingPieChart = false
         },
         error: (error) => {
           console.error('Error al obtener distribución:', error);
@@ -445,20 +455,6 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
     return date.toISOString().split('T')[0];
   }
 
-  resetPieChart() {
-    this.filterForm.reset();
-    this.startDate.reset();
-    this.endDate.reset();
-    this.loadPieChart();
-    this.loadStats();
-  }
-
-  resetBarChart() {
-    this.startDate.reset();
-    this.endDate.reset();
-    this.loadBarChart();
-  }
-
   resetAll() {
     this.filterForm.reset();
     this.startDate.reset();
@@ -468,5 +464,28 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
 
   changeView(){
     this.routerService.redirect('main/users/dashboard');
+  }
+  
+  maxBlocksValidator(max: number): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const selectedBlocks = control.value;
+      if (selectedBlocks && selectedBlocks.length > max) {
+        this.isSelectedDisabled = true;
+        return { 'customsErrors': { message: `Se alcanzó el máximo de ${max} manzanas seleccionadas` } };
+      }else{
+        this.isSelectedDisabled = false;
+      }
+      return null;
+    };
+  }
+
+  clearFilters() {
+    this.startDate.reset();
+    this.endDate.reset();
+    this.filterForm.reset();
+    this.errorRangeDate = null;
+    this.errorBarChart = null;
+    this.errorPieChart = null;
+    this.loadData();
   }
 }

@@ -69,7 +69,6 @@ export class UsersGraphicHistogramComponent {
   pieChartOptions = {
     title: 'Distribución de Usuarios por Estado',
     titleTextStyle: { fontSize: 14 },
-    //pieHole: 0.4,
     colors: ['#4285F4', '#DB4437'],
     backgroundColor: 'transparent',
     legend: {
@@ -108,7 +107,6 @@ export class UsersGraphicHistogramComponent {
   private processData() {
 
     this.barChartData = [
-      //['Rango de Edad', 'Activos', 'Inactivos'],
       ...this.ageDistribution.ageDistribution.map((item: any) => [
         {
           v: item.ageRange,

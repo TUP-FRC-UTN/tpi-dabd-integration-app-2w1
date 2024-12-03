@@ -266,42 +266,47 @@ export class ExpenseGenerationCounterView2Component {
 
   columnChartOptions = {
     backgroundColor: 'transparent',
-    colors: ['#709775', '#64b6ac'], // Verde para cobrado, Azul claro para facturado
+    colors: ['#709775', '#64b6ac'],
     legend: {
-      display: true,
       position: 'top',
       alignment: 'center',
       textStyle: {
         color: '#6c757d',
-        fontSize: 12
+        fontSize: 15
       },
     },
     chartArea: {
-      width: '85%',
-      height: '70%',
-      top: 60
+      width: '90%',   
+      height: '55%',   
+      top: 30,         
+      left: '12%',    
+      bottom: 80       
     },
     vAxis: {
       title: 'Miles de pesos (ARS)',
       textStyle: {
         color: '#6c757d',
-        fontSize: 12
+        fontSize: 15
       },
-      format: 'decimal', // Cambiar de currency a decimal
+      format: 'decimal',
       viewWindow: {
         min: 0,
       },
-      ticks: {
-        // Personaliza las etiquetas en el eje Y para mostrar "Mil"
-        callback: (value: number) => {
-          return '$' + (value / 1000) + 'Mil'; // Dividir por 1000 y agregar "Mil"
-        }
+      gridlines: {
+        count: 4
       }
     },
     hAxis: {
       title: 'Periodo',
       format: 'MMM yyyy',
-      textStyle: { color: '#6c757d' }
+      textStyle: { 
+        color: '#6c757d',
+        fontSize: 15
+      },
+      slantedText: true,
+      slantedTextAngle: 45,
+      maxTextLines: 1,
+      maxAlternation: 1
     },
     animation: {
       duration: 1000,
@@ -309,14 +314,16 @@ export class ExpenseGenerationCounterView2Component {
       startup: true
     },
     width: '100%',
-    height: '75%',
-    bar: { groupWidth: '70%' },
+    height: '75%',      
+    bar: { 
+      groupWidth: '65%'
+    },
     seriesType: 'bars',
     series: {
       1: { targetAxisIndex: 0, label: 'Facturado' },
       0: { targetAxisIndex: 0, label: 'Cobrado' }
     },
-
+    isStacked: false
   };
 
   ngOnInit() {
@@ -368,6 +375,7 @@ export class ExpenseGenerationCounterView2Component {
           uuid: expense.uuid,
           second_expiration_date: expense.second_expiration_date,
           second_expiration_amount: expense.second_expiration_amount,
+          first_expiration_amount: expense.first_expiration_amount,
           actual_amount: expense.actual_amount,
         } as DebtorExpense));
     });
@@ -561,8 +569,8 @@ export class ExpenseGenerationCounterView2Component {
         return transactionPeriod >= this.periodFrom &&
                transactionPeriod <= this.periodTo &&
                meetsPaymentMethodFilter &&
-               (transaction.status === 'Pago' || transaction.status === 'PAGO') &&  // Modificado para manejar ambos casos
-               transaction.amountPayed != null &&  // Cambio importante
+               (transaction.status === 'Pago' || transaction.status === 'PAGO') &&  
+               transaction.amountPayed != null && 
                transaction.amountPayed > 0;
       })
       .forEach(transaction => {
@@ -628,7 +636,6 @@ export class ExpenseGenerationCounterView2Component {
       }
     });
 
-    // Actualizar KPIs
     this.columnKpis[0].amount = totalProjected;
     this.columnKpis[3].amount = totalIncome;
     this.columnKpis[2].amount = maxIncome;
@@ -785,7 +792,6 @@ export class ExpenseGenerationCounterView2Component {
   
     console.log('Plataforma top:', topPlatformEntry);
   
-    // Actualizar KPIs principales
     this.principalKpis[0].amount = totalIncome;
     this.principalKpis[1].amount = totalDebt;
     this.principalKpis[2].amount = delinquentCount;
@@ -815,11 +821,9 @@ export class ExpenseGenerationCounterView2Component {
       return '';
     }
     try {
-      // Si ya está en formato YYYY-MM, lo devuelve directamente
       if (typeof period === 'string' && /^\d{4}-\d{2}$/.test(period)) {
         return period;
       }
-      // Maneja el nuevo formato "MM/YYYY"
       if (typeof period === 'string' && /^\d{2}\/\d{4}$/.test(period)) {
         const [month, year] = period.split('/');
         return `${year}-${month.padStart(2, '0')}`;

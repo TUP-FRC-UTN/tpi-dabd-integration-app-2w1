@@ -1,214 +1,261 @@
-<section class="container p-5 border rounded border-3 border-secundary" style="min-height: 70vh;">
-    <div class="d-flex justify-content-between align-items-center">
-        <h2 class="mb-3">Mi Perfil</h2>
-            @if(type == 'edit'){
-                <div style="max-width: 500px" class="col-md-6 d-flex justify-content-end align-items-center">
+<div class="card shadow-lg">
+    <div class="card-header bg-dark text-light fs-2 ">
+        <div class="row">
+            <div class="col d-flex align-items-end">
+                <!-- Icono del usuario -->
+                @if(type == 'edit'){
+                    <div style="max-width: 500px" class="d-flex align-items-center">
                         @if(haveIcon(selectedIconUrl)){
-                            <img [src]="selectedIconUrl" alt="Selected Icon" style="max-width: 120px;" class="border rounded-circle p-3 dropdown btn btn btn-outline-secondary dropdown-toggle"  data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        <img [src]="selectedIconUrl" alt="Selected Icon" style="width: 120px;"
+                            class="border rounded-circle p-3 dropdown btn btn btn-outline-secondary dropdown-toggle"
+                            data-bs-toggle="modal" data-bs-target="#exampleModal">
                         }@else {
-                            <img [src]="noIcon" alt="Selected Icon" style="max-width: 120px;" class="border rounded-circle p-3 dropdown btn btn btn-outline-secondary dropdown-toggle"  data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        <img [src]="noIcon" alt="Selected Icon" style="width: 120px;"
+                            class="border rounded-circle p-3 dropdown btn btn btn-outline-secondary dropdown-toggle"
+                            data-bs-toggle="modal" data-bs-target="#exampleModal">
                         }
-                        <div class="modal fade " id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal fade " id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                            aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">
                                     <div class="modal-body" aria-labelledby="dropdownMenuButton">
                                         <div class="row">
                                             <div class="col-4" *ngFor="let icon of icons; let i = index">
-                                                <a class="dropdown-item text-center " (click)="selectIcon(icon.url)" data-bs-dismiss="modal">
-                                                    <img [src]="icon.url" alt="{{icon.name}}" style="max-width: 120px; min-width: 120px;" class="m-2 border rounded-circle p-3 pre-icon" />
+                                                <a class="dropdown-item text-center " (click)="selectIcon(icon.url)"
+                                                    data-bs-dismiss="modal">
+                                                    <img [src]="icon.url" alt="{{icon.name}}"
+                                                        style="width: 120px;"
+                                                        class="m-2 border rounded-circle p-3 pre-icon" />
                                                 </a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>             
-                </div>
-            }@else {
-                <div style="max-width: 500px" class="col-md-6 d-flex justify-content-end align-items-center">
-                    <div class="">
+                    </div>
+                    }@else {
+                    <div style="max-width: 500px" class="d-flex align-items-center">
+                        <div class="">
                             @if(haveIcon(selectedIconUrl)){
-                                <img [src]="selectedIconUrl" alt="Selected Icon" style="max-width: 120px;min-width: 120px;" class="border rounded-circle p-3 bg-secondary">
+                            <img [src]="selectedIconUrl" alt="Selected Icon" style="width: 120px;"
+                                class="border rounded-circle p-3 bg-secondary">
                             }@else {
-                                <img [src]="noIcon" alt="Selected Icon" style="max-width: 120px;" class="border rounded-circle p-3">
-                            
-                            }
-                    </div>
-                </div>
-            }
-    </div>
-
-    <form [formGroup]="formProfile" class=" mt-5" (ngSubmit)="updateUser()">
-        <div class="row mb-3">
-
-            <div class="col-lg-6 mb-3">
-                <div class="row">
-                    <label class="col-2 col-form-label">Nombre</label>
-                    <div class="col-10">
-                        <input type="text" class="form-control" formControlName="name"
-                            [ngClass]="onValidate('name')">
-                        <div class="invalid-feedback">{{showError('name')}}</div>
-                    </div>
-                </div>
-            </div>
-
-
-            <div class="col-lg-6 mb-3">
-                <div class="row">
-                    <label class="col-2 col-form-label">Apellido</label>
-                    <div class="col-10">
-                        <input type="text" class="form-control" formControlName="lastName"
-                            [ngClass]="onValidate('lastName')">
-                        <div class="invalid-feedback">{{showError('lastName')}}</div>
-                    </div>
-                </div>
-            </div>
-
-
-            <div class="col-lg-6 mb-3">
-                <div class="row">
-                    <label class="col-2 col-form-label">Email</label>
-                    <div class="col-10">
-                        <input type="email" class="form-control" formControlName="email">
-                    </div>
-                </div>
-            </div>
-
-
-            <!-- ERA DNI -->
-            <div class="col-lg-6 mb-3">
-                <div class="row">
-                    <label class="col-2 col-form-label">Documento</label>
-                    <div class="col-10">
-                        <input type="text" class="form-control" formControlName="dni"
-                            [ngClass]="onValidate('dni')">
-                        <div class="invalid-feedback">{{showError('dni')}}</div>
-                    </div>
-                </div>
-            </div>
-
+                            <img [src]="noIcon" alt="Selected Icon" style="width: 120px;"
+                                class="border rounded-circle p-3">
     
-            <div class="col-lg-6 mb-3">
-                <div class="row">
-                    <label class="col-2 col-form-label">Tipo de Documento</label>
-                    <div class="col-10">
-                        <input type="text" class="form-control" formControlName="dniType"
-                            [ngClass]="onValidate('dniType')">
-                        <div class="invalid-feedback">{{showError('dniType')}}</div>
+                            }
+                        </div>
                     </div>
-                </div>
-            </div>
-            
-            
-            <div class="col-lg-6 mb-3">
-                <div class="row">
-                    <label class="col-2 col-form-label">Teléfono</label>
-                    <div class="col-10">
-                        <input type="text" class="form-control" formControlName="phoneNumber" [ngClass]="onValidate('phoneNumber')">
+                    }
 
-                        <div class="invalid-feedback">{{showError('phoneNumber')}}</div>
-                    </div>
-                </div>
+                <!-- Nombre del usuario -->
+                <div class="ps-3 fs-1">{{formProfile.get('name')?.value ?? ''}} {{formProfile.get('lastName')?.value ??
+                    ''}}</div>
             </div>
 
-        
-            
-            <div class="col-lg-6 mb-3">
-                <div class="row">
-                    <label class="col-2 col-form-label">Fecha de Nacimiento</label>
-                    <div class="col-10">
-                        <input type="date" class="form-control" formControlName="datebirth" value="01/01/2000">
+            <!-- Botón para editrar -->
+            <div class="col text-end">
+                @if(type == "info"){
+                <button class="btn fs-4 bi-pencil-square rounded-circle btn-outline-light border-0"
+                    (click)="changeType('edit')"></button>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <form [formGroup]="formProfile" (ngSubmit)="updateUser()">
+            <div class="row mb-3">
+
+                @if(type == 'edit'){
+                <div class="col-lg-6 mb-3">
+                    <div class="row">
+                        <label class="col-2 col-form-label">Nombre</label>
+                        <div class="col-10">
+                            <input type="text" class="form-control" formControlName="name"
+                                [ngClass]="onValidate('name')">
+                            <div class="invalid-feedback">{{showError('name')}}</div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            
-            <div class="col-lg-6 mb-3">
-                <div class="row">
-                    <label class="col-2 col-form-label">Roles</label>
-                    <div class="col-10">
-                        <input type="text" class="form-control" formControlName="roles">
+
+                <div class="col-lg-6 mb-3">
+                    <div class="row">
+                        <label class="col-2 col-form-label">Apellido</label>
+                        <div class="col-10">
+                            <input type="text" class="form-control" formControlName="lastName"
+                                [ngClass]="onValidate('lastName')">
+                            <div class="invalid-feedback">{{showError('lastName')}}</div>
+                        </div>
                     </div>
                 </div>
-            </div>
+                }
 
 
-            
-            <div class="col-lg-6 mb-3">
-                <div class="row">
-                    <label class="col-2 col-form-label">Telegram Id</label>
-                    <div class="col-10">
-                        <input type="number" class="form-control" formControlName="telegram_id">
+                <div class="col-lg-6 mb-3">
+                    <div class="row">
+                        <label class="col-2 col-form-label">Email</label>
+                        <div class="col-10">
+                            <input type="email" class="form-control" formControlName="email">
+                        </div>
                     </div>
                 </div>
-            </div>
 
 
-            
-            <div class="col-lg-6 mb-3">
-                <div class="row">
-                    <label class="col-2 col-form-label">Nombre de Usuario</label>
-                    <div class="col-10">
-                        <input type="text" class="form-control" formControlName="username">
+                <!-- ERA DNI -->
+                <div class="col-lg-6 mb-3">
+                    <div class="row">
+                        <label class="col-2 col-form-label">Documento</label>
+                        <div class="col-10">
+                            <input type="text" class="form-control" formControlName="dni" [ngClass]="onValidate('dni')">
+                            <div class="invalid-feedback">{{showError('dni')}}</div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-             <!-- Aca abre el componente de abrir formulario -->
-             @if(type == 'edit') {
+
+                <div class="col-lg-6 mb-3">
+                    <div class="row">
+                        <label class="col-2 col-form-label">Tipo de Documento</label>
+                        <div class="col-10">
+                            <input type="text" class="form-control" formControlName="dniType"
+                                [ngClass]="onValidate('dniType')">
+                            <div class="invalid-feedback">{{showError('dniType')}}</div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-lg-6 mb-3">
+                    <div class="row">
+                        <label class="col-2 col-form-label">Teléfono</label>
+                        <div class="col-10">
+                            <input type="text" class="form-control" formControlName="phoneNumber"
+                                [ngClass]="onValidate('phoneNumber')">
+
+                            <div class="invalid-feedback">{{showError('phoneNumber')}}</div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="col-lg-6 mb-3">
+                    <div class="row">
+                        <label class="col-2 col-form-label">Fecha de Nacimiento</label>
+                        <div class="col-10">
+                            <input type="date" class="form-control" formControlName="datebirth" value="01/01/2000">
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-lg-6 mb-3">
+                    <div class="row">
+                        <label class="col-2 col-form-label">Roles</label>
+                        <div class="col-10">
+                            <input type="text" class="form-control" formControlName="roles">
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="col-lg-6 mb-3">
+                    <div class="row">
+                        <label class="col-2 col-form-label">Telegram Id</label>
+                        <div class="col-10">
+                            <input type="number" class="form-control" formControlName="telegram_id">
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="col-lg-6 mb-3">
+                    <div class="row">
+                        <label class="col-2 col-form-label">Nombre de Usuario</label>
+                        <div class="col-10">
+                            <input type="text" class="form-control" formControlName="username">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Aca abre el componente de abrir formulario -->
+                @if(type == 'edit') {
 
                 <app-users-change-password [email]="formProfile.get('email')?.value ?? ''"></app-users-change-password>
-            }
+                }
 
-            <hr>
-            <div class="col-lg-6 mb-3">
-                <div class="row d-flex flex-column">
-                    <h4>Mis lotes</h4>
-                    <div class="col-10">
-                        @for (p of plots; track $index) {
-                        
-                            <div class="mt-2">
-                                {{'Lote: ' + p.plot_number + " Manzana: " + p.block_number}}
+                @if(type == 'info') {
+                <hr>
+                <h4 class="bi-stack"> Lotes</h4>
+
+                <div class="row">
+                    @for (p of plots; track $index) {
+                    <div class="col col-lg-4 p-2">
+                        <div class="card shadow-sm border-success bg-success-subtle">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h6><strong>Lote: {{p.plot_number}} - Manzana: {{p.block_number}}</strong></h6>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="badge rounded-pill" [ngClass]="showPlotType(p.plot_type)">
+                                            {{p.plot_type}}</div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-auto">
+
+                                        <div><i class="bi-crop fs-6"></i> {{p.total_area_in_m2}} m2</div>
+                                        <div><i class="bi-building fs-6"></i> {{p.built_area_in_m2}} m2</div>
+
+                                    </div>
+                                    <div class="col-auto">
+
+                                    </div>
+                                </div>
                             </div>
-                        }
-                       
+                        </div>
                     </div>
-                    
+                    }
                 </div>
+                }
+
             </div>
-        </div>      
-        <div class="w-100 text-end">
-            @if(type == 'info'){
-                <button type="button" class="btn btn-primary mt-4" (click)="changeType('edit')">Editar</button>
-            }@else {
+
+            <!-- Acciones -->
+            <div class="w-100 text-end">
+                @if(type != 'info'){
                 <button type="button" class="btn btn-secondary mt-4 mx-3" (click)="changeType('info')">Cancelar</button>
-                <button type="submit" class="btn btn-primary mt-4" [disabled]="!formProfile.valid" >Guardar</button>
-            }
-        </div>
+                <button type="submit" class="btn btn-primary mt-4" [disabled]="!formProfile.valid">Guardar</button>
+                }
+            </div>
+        </form>
+    </div>
+</div>
 
-    </form>
-
-
-    <!-- Modal de info -->
+<!-- Modal de info -->
 <div class="modal fade" id="infoModal" role="dialog">
     <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Información de la pantalla</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Información de la pantalla</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Funcionalidades de esta pantalla:
+                <ul>
+                    <li>Ver tus datos personales y de tus lotes</li>
+                    <li>Editar tus datos personales incluyendo tu contraseña</li>
+                    <li>Se puede editar tu icono!</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
         </div>
-        <div class="modal-body">
-          Funcionalidades de esta pantalla:
-          <ul>
-            <li>Ver tus datos personales y de tus lotes</li>
-            <li>Editar tus datos personales incluyendo tu contraseña</li>
-            <li>Se puede editar tu icono!</li>
-          </ul>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-        </div>
-      </div>
     </div>
-  </div>
-</section>
+</div>

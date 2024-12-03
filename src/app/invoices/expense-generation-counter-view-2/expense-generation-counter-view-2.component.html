@@ -36,7 +36,7 @@
     <!-- KPI LIMITE 5-->
     <div class="col-3 gap-2 d-flex flex-column justify-content-center">
       @for (kpi of principalKpis; track $index) {
-      <app-custom-kpi [amount]="kpi.amount" [title]="kpi.title" [subTitle]="kpi.subTitle" [tooltip]="kpi.tooltip"
+      <app-custom-kpi [value]="kpi.amount" [title]="kpi.title" [subTitle]="kpi.subTitle" [tooltip]="kpi.tooltip"
         [customStyles]="kpi.customStyles" [icon]="kpi.icon" [formatPipe]="kpi.formatPipe">
       </app-custom-kpi> }
 
@@ -119,9 +119,9 @@
                   class="btn btn-sm btn-link text-muted bi bi-arrows-angle-expand fs-5 float-end" title="Expandir"
                   (click)="makeBig(3)"></button></h4>
               <hr>
-              <div class="col-12  flex-grow-1 d-flex align-items-center justify-content-center">
+              <div class="col-12  flex-grow-1 d-flex align-items-center justify-content-center ">
                 <google-chart [type]="columnChartType" [data]="columnChartData" [options]="columnChartOptions"
-                  class="w-100">
+                  class="w-100 ">
                 </google-chart>
 
               </div>
@@ -152,7 +152,7 @@
                   <div class="col-8 mb-1 w-100">
                     @for (kpi of pieKpis; track $index) {
                     <div class="mb-2">
-                      <app-custom-kpi [amount]="kpi.amount" [title]="kpi.title" [subTitle]="kpi.subTitle"
+                      <app-custom-kpi [value]="kpi.amount" [title]="kpi.title" [subTitle]="kpi.subTitle"
                         [tooltip]="kpi.tooltip" [customStyles]="kpi.customStyles" [icon]="kpi.icon"
                         [formatPipe]="kpi.formatPipe">
                       </app-custom-kpi>
@@ -199,7 +199,7 @@
                   <div class="col-5 m-1  w-100">
                     @for (kpi of topFiveKpi; track $index) {
                     <div class="mb-2 w-100">
-                      <app-custom-kpi [amount]="kpi.amount" [title]="kpi.title" [subTitle]="kpi.subTitle"
+                      <app-custom-kpi [value]="kpi.amount" [title]="kpi.title" [subTitle]="kpi.subTitle"
                         [tooltip]="kpi.tooltip" [customStyles]="kpi.customStyles" [icon]="kpi.icon"
                         [formatPipe]="kpi.formatPipe">
                       </app-custom-kpi>
@@ -259,7 +259,7 @@
           <div class="col-3 gap-2 d-flex flex-column justify-content-center">
             @for (kpi of columnKpis; track $index) {
             <div class="mb-2 w-100">
-              <app-custom-kpi [amount]="kpi.amount" [title]="kpi.title" [subTitle]="kpi.subTitle"
+              <app-custom-kpi [value]="kpi.amount" [title]="kpi.title" [subTitle]="kpi.subTitle"
                 [tooltip]="kpi.tooltip" [customStyles]="kpi.customStyles" [icon]="kpi.icon"
                 [formatPipe]="kpi.formatPipe">
               </app-custom-kpi>
@@ -466,7 +466,7 @@
             <div class="card bg-secondary-subtle border-0 shadow mb-3">
               <div class="card-body">
                 <p><b>PERIODO:</b> {{item.period}} </p>
-                <p><b>MONTO:</b> {{item.actual_amount | currency:'ARS':'symbol-narrow':'1.0-0'}} </p>
+                <p><b>MONTO:</b> {{item.first_expiration_amount | currency:'ARS':'symbol-narrow':'1.0-0'}} </p>
               </div>
             </div>
           </div>

@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule, registerLocaleData } from '@angular/common';
 import { ExpenseGenerationExpenseService } from '../expense-generation-services/expense-generation-expense.service';
 import { ExpenseGenerationExpenseInterface } from '../expense-generation-interfaces/expense-generation-expense-interface';
@@ -16,6 +16,8 @@ import { BehaviorSubject } from 'rxjs';
 import localeEsAr from '@angular/common/locales/es-AR';
 import { environment } from '../../common/environments/environment';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { CustomSelectComponent } from '../../common/components/custom-select/custom-select.component';
+
 registerLocaleData(localeEsAr, 'es-AR');
 
 declare var window: any;
@@ -23,7 +25,7 @@ declare var window: any;
 @Component({
   selector: 'app-expense-generation-admin-view',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, CustomSelectComponent],
   templateUrl: './expense-generation-admin-view.component.html',
   styleUrls: ['./expense-generation-admin-view.component.css'],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -32,10 +34,13 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
   @ViewChild('dateRangeContent') dateRangeContent!: TemplateRef<any>;
   @ViewChild('observationContent') observationContent!: TemplateRef<any>;
   @ViewChild('multipliersContent') multipliersContent!: TemplateRef<any>;
+  @ViewChild(CustomSelectComponent) customSelect!: CustomSelectComponent;
+
 
   // Formatear los períodos
   loadMultipliersData() {
     this.isLoadingMultipliers = true;
+    this.isDefaultValue = true;
     forkJoin({
       multipliers: this.expenseService.getMultipliers(),
       generationDay: this.expenseService.getGenerationDay(),
@@ -98,6 +103,8 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
       second_expiration_date: expense.second_expiration_date,
       second_expiration_amount: expense.second_expiration_amount,
     };
+    console.log(expense)
+
   }
   private expensesSubject = new BehaviorSubject<any[]>([]);
   expenses$ = this.expensesSubject.asObservable();
@@ -129,6 +136,7 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
 
   todayNow: Date = new Date; 
 
+  isDefaultValue: boolean = true;
   startDate: string = '';
   endDate: string = '';
 
@@ -170,7 +178,10 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
     { value: 11, label: '11 - Noviembre' },
     { value: 12, label: '12 - Diciembre' },
   ];
-  listStatus: string[] = ['Pendiente', 'Pago', 'Exceptuado'];
+  listStatus: any[] = [{value: 'Pendiente', name: 'Pendiente'}, 
+    {value: 'Pago', name: 'Pago'}, 
+    {value: 'Exceptuado', name: 'Exceptuado'}];
+
   typedoc = ['DNI', 'PASAPORTE', 'CUIT/CUIL'];
   filter = {
     from: '',
@@ -183,7 +194,11 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
   };
   multiplier: number = 1;
 
-  status = ['Pendiente', 'Pago', 'Exceptuado'];
+  modalFilter = {
+    from: '',
+    until: ''
+  };
+
   showStatusDropdown = false;
   constructor(private expenseService: ExpenseGenerationExpenseService, private modalService: NgbModal,) {}
 
@@ -217,6 +232,12 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
       this.filter.selectedPeriod.splice(index, 1);
     }
     this.filter$.next({ ...this.filter });
+  }
+
+  updateState(states : any[]){
+    this.selectedFilters = states;
+    this.filter.status = states.join(',');
+    this.searchTickets();
   }
 
   toggleStatus(status: string) {
@@ -254,7 +275,7 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
 
   filteredStatusList(): string[] {
     return this.listStatus.filter((status) =>
-      status.toLowerCase().includes(this.statusFilter.toLowerCase())
+      status.name.toLowerCase().includes(this.statusFilter.toLowerCase())
     );
   }
 
@@ -294,8 +315,16 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
   onFieldChange(fieldName: 'generationDay' | 'latePayment' | 'expiration'): void {
     if (this.isFieldModified(fieldName)) {
       this.fieldModified = fieldName;
+   
+      if (fieldName === 'generationDay') {
+        this.isDefaultValue = false;
+      }
     } else {
       this.fieldModified = null;
+      
+      if (fieldName === 'generationDay') {
+        this.isDefaultValue = true;
+      }
     }
   }
   resetFieldState(): void {
@@ -340,9 +369,14 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
   }
 
   onModalClose() {
-    // Limpiar estados si es necesario
     this.fieldModified = null;
     this.observation = '';
+    
+    this.generationDay = this.originalGenerationDay;
+    this.latePaymentPercentage = this.originalLatePaymentPercentage;
+    this.expirationPercentage = this.originalExpirationPercentage;
+    
+    this.isDefaultValue = true;
   }
 
   hasUnsavedChanges(): boolean {
@@ -355,15 +389,22 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
 
   ngOnInit() {
     const today = new Date();
+    const threeMonthsAgo = new Date(today.getFullYear(), today.getMonth() - 3, today.getDate());
     const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
-    
-    // Actualizamos el filtro con los valores deseados
-    this.filter.until = today.toISOString().split('T')[0];
-    this.filter.from = lastMonth.toISOString().split('T')[0];
+    this.generationDay = 25;
+    this.isDefaultValue = true;
 
+    // Actualizar filtro de tabla con rango de 3 meses
+    this.filter.from = threeMonthsAgo.toISOString().split('T')[0];
+    this.filter.until = today.toISOString().split('T')[0];
 
     // Emitimos los cambios en el filtro
     this.filter$.next({ ...this.filter });
+
+    this.modalFilter.from = lastMonth.toISOString().split('T')[0];
+    this.modalFilter.until = today.toISOString().split('T')[0];
+
+
     this.filter$.subscribe(() => {
       this.searchTickets();
     });
@@ -508,17 +549,19 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
   }
 
   isValidGenerationDay(): boolean {
+    if (this.isDefaultValue) return true;
+     
     if (!this.generationDay) return false;
-    
+  
     const today = new Date();
     const currentDay = today.getDate();
-    
-    return this.generationDay >= 1 && 
-           this.generationDay <= 28 && 
-           this.generationDay > currentDay;
-  }
-
   
+    return (
+      this.generationDay >= 1 &&
+      this.generationDay <= 28 &&
+      this.generationDay > currentDay
+    );
+  }
   
   hasChangesExpense(): boolean {
     if (!this.selectedExpense) return false;
@@ -578,7 +621,7 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
 
     // Método para abrir el modal de observación
     
-    openObservationModal() {
+    openObservationModalExpenses() {
       const observationModalElement = document.getElementById('observationModalExpenses');
       if (observationModalElement) {
         const modalInstance = new window.bootstrap.Modal(observationModalElement, { backdrop: 'static' });
@@ -588,8 +631,26 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
       }
     }
 
+    openObservationModalGeneration() {
+      if (this.observationContent) {
+        this.modalService.open(this.observationContent, { backdrop: 'static' });
+      } else {
+        console.error('No se encontró el template del modal');
+      }
+    }
+
     // Método para abrir el modal principal
     openMultipliersModal() {
+      // Resetear a valores originales
+      this.generationDay = this.originalGenerationDay;
+      this.latePaymentPercentage = this.originalLatePaymentPercentage;
+      this.expirationPercentage = this.originalExpirationPercentage;
+      
+      // Resetear estados de validación
+      this.isDefaultValue = true;
+      this.fieldModified = null;
+      this.activeField = null;
+    
       this.modalService.open(this.multipliersContent, {
         size: 'lg',
         backdrop: 'static'
@@ -597,13 +658,14 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
         (result) => {
           this.onModalClose();
         },
+
         (reason) => {
           this.onModalClose();
         }
       );
+    
       this.loadMultipliersData();
     }
-
     // Método para abrir el modal de rango de fechas
     openDateRangeModal() {
       const modalRef = this.modalService.open(this.dateRangeContent, {
@@ -715,33 +777,7 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
     return hasMultiplierChanges || hasGenerationDayChanges;
   }
 
-  getChangeSummary(): string[] {
-    const changes: string[] = [];
-
-    if (this.latePaymentPercentage !== this.originalLatePayment * 100) {
-      changes.push(
-        `Multiplicador de pagos atrasados: ${(
-          this.originalLatePayment * 100
-        ).toFixed(1)}% → ${this.latePaymentPercentage.toFixed(1)}%`
-      );
-    }
-
-    if (this.expirationPercentage !== this.originalExpiration * 100) {
-      changes.push(
-        `Multiplicador de vencimiento: ${(
-          this.originalExpiration * 100
-        ).toFixed(1)}% → ${this.expirationPercentage.toFixed(1)}%`
-      );
-    }
-
-    if (this.generationDay !== this.originalGenerationDay) {
-      changes.push(
-        `Día de generación: ${this.originalGenerationDay} → ${this.generationDay}`
-      );
-    }
-
-    return changes;
-  }
+  
   selectedFilters: string[] = [];
   onEstadoChange(): void {
     this.selectedFilters = this.selectedFilters.filter(
@@ -753,26 +789,34 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
 
 
 
-  handleSaveClick() {
+  handleSaveClickExpenses() {
+    if (this.hasChangesExpense()) {
+      this.modalService.dismissAll();
+      this.fieldModified = null;
+      this.openObservationModalExpenses();
+    }
+  }
+
+  handleSaveClickGeneration() {
     if (this.hasChanges()) {
       this.modalService.dismissAll();
       this.fieldModified = null;
-      this.openObservationModal();
+      this.openObservationModalGeneration();
     }
   }
 
 
   confirmDateRange() {
-    if (!this.filter.from || !this.filter.until) {
-        Swal.fire({
+    if (!this.modalFilter.from || !this.modalFilter.until) {
+      Swal.fire({
         title: 'Error',
         text: 'Debe seleccionar ambas fechas',
         icon: 'error'
       });
       return;
     }
-
-    this.expenseService.generateAllExpenses(this.filter.from, this.filter.until)
+  
+    this.expenseService.generateAllExpenses(this.modalFilter.from, this.modalFilter.until)
       .subscribe({
         next: () => {
           Swal.fire({
@@ -791,7 +835,6 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
         }
       });
   }
-  
 
   saveChanges() {
     if (!this.observation.trim()) {
@@ -807,7 +850,6 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
     const requests: Observable<any>[] = [];
     const updatedValues: any = {};
 
-    // Preparar las solicitudes solo para los valores que han cambiado
     if (
       this.latePaymentPercentage !== this.originalLatePayment * 100 ||
       this.expirationPercentage !== this.originalExpiration * 100 ||
@@ -862,10 +904,8 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
       },
     });
 
-    // Ejecutar todas las solicitudes en paralelo
     forkJoin(requests).subscribe({
       next: (responses) => {
-        // ... tu lógica existente ...
         this.modalService.dismissAll();
         this.observation = '';
         
@@ -907,7 +947,7 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
     this.observation = '';
     const modal = document.getElementById('multipliersModal');
     if (modal) {
-      (modal as any).modal('hide'); // Cierra el modal
+      (modal as any).modal('hide'); 
     }
   }
 
@@ -936,6 +976,7 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
       }
     });
   }
+
 
   openModal() {
     const modalElement = document.getElementById('multipliersModal');
@@ -1026,23 +1067,36 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
 
   cleanFilters() {
     const today = new Date();
-    const lastMonth = new Date();
-    lastMonth.setMonth(lastMonth.getMonth() - 1);
-
+    const threeMonthsAgo = new Date(today.getFullYear(), today.getMonth() - 3, today.getDate());
+  
     this.filter = {
-      from: lastMonth.toISOString().split('T')[0],
+      from: threeMonthsAgo.toISOString().split('T')[0],
       until: today.toISOString().split('T')[0],
-      status: '',
+      status: '', // Limpiar status completamente
       minimumAmount: null,
       period: null,
       typedoc: '',
       selectedPeriod: [],
     };
+      
+    // Limpiar selectedFilters antes de llamar a setData
+    this.selectedFilters = [];
+    this.filter.status = '';
+  
+    // Usar un setTimeout para asegurar que el cambio de estado se procese
+    setTimeout(() => {
+      if (this.customSelect) {
+        this.customSelect.setData(this.selectedFilters); // Método específico para limpiar selección
+      }
+    });
+  
     this.searchTerm = '';
     this.selectedOwner = null;
     this.error = null;
     this.filteredUsers = [];
+  
     this.loadAllOwnersWithExpenses();
+    this.searchTickets();
   }
 
   getPlotNumbers(owner: Owner): string {
@@ -1055,7 +1109,6 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
 
   searchUsers() {
     if (!this.searchTerm && !this.filter.typedoc) {
-      // Si no hay término de búsqueda ni filtro por tipo de documento, mostrar todos los elementos
       this.applyPagination(this.expenses);
       return;
     }
@@ -1102,6 +1155,10 @@ applyPagination(data: any[]) {
     this.currentPage = 1;
     this.isLoading = true;
     this.error = null;
+
+    if (!this.filter.status) {
+      this.selectedFilters = [];
+    }
 
     if (this.selectedOwner) {
       const ownerData = this.ownersWithExpenses.find(

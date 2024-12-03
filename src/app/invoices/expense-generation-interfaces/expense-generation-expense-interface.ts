@@ -26,6 +26,7 @@ export interface DebtorExpense {
     period: string;
     uuid: string;
     second_expiration_date: string;
+    first_expiration_amount: number;
     second_expiration_amount: number;
     actual_amount: number;
 }

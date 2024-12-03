@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators, AbstractControl } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { PlotService } from '../../../users-servicies/plot.service';
 import { PlotTypeModel } from '../../../users-models/plot/PlotType';
@@ -12,6 +12,7 @@ import { ValidatorsService } from '../../../users-servicies/validators.service';
 import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
 import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
 import { RoutingService } from '../../../../common/services/routing.service';
+import { min } from 'moment';
 
 @Component({
   selector: 'app-users-new-plot',
@@ -68,16 +69,25 @@ export class UsersNewPlotComponent implements OnInit, OnDestroy {
 
     //Validar que la superficie construida no sea mayor a la superficie total, cuando se cambia la superficie construida
     const sus = this.formReactivo.get('totalBuild')?.valueChanges.subscribe(() => {
-      this.formReactivo.get('totalBuild')?.setValidators([Validators.max(this.formReactivo.get('totalArea')?.value)]);
+      this.formReactivo.get('totalBuild')?.setValidators([Validators.max(this.formReactivo.get('totalArea')?.value), Validators.min(0)]);
     });
 
-    //Validar que la superficie construida no sea mayor a la superficie total, cuando se cambia la superficie total
-    const sus1 = this.formReactivo.get('totalArea')?.valueChanges.subscribe(() => {
-      this.formReactivo.get('totalBuild')?.setValidators([Validators.max(this.formReactivo.get('totalArea')?.value)]);
+    const sus2 = this.formReactivo.get('totalArea')?.valueChanges.subscribe(() => {
+      this.formReactivo.get('totalBuild')?.setValidators([Validators.max(this.formReactivo.get('totalArea')?.value), Validators.min(0)]);
     });
 
-    //Agregar suscripciones
-    [sus, sus1].forEach(s => s && this.suscriptionService.addSuscription(s));
+    const sus3 = this.formReactivo.get('type')?.valueChanges.subscribe(() => {
+        if(this.formReactivo.get('type')?.value == 3){
+          this.formReactivo.get('totalBuild')?.setValue(0);
+          this.formReactivo.get('totalBuild')?.disable();
+        }else{
+          this.formReactivo.get('totalBuild')?.enable();
+        }
+    });
+    
+    //Agregar suscripción
+    [sus, sus2, sus3].forEach(s => s && this.suscriptionService.addSuscription(s));
+
   }
 
   ngOnInit(): void {

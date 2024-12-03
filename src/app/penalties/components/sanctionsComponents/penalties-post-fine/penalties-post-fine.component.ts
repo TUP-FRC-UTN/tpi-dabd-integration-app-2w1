@@ -8,6 +8,8 @@ import Swal from 'sweetalert2';
 import { RoutingService } from '../../../../common/services/routing.service';
 import { PlotService } from '../../../../users/users-servicies/plot.service';
 import { ReportService } from '../../../services/report.service';
+import { UserService } from '../../../../users/users-servicies/user.service';
+import { UserGet } from '../../../../users/users-models/users/UserGet';
 @Component({
   selector: 'app-penalties-post-fine',
   standalone: true,
@@ -17,6 +19,7 @@ import { ReportService } from '../../../services/report.service';
 })
 export class PenaltiesPostFineComponent implements OnInit {
   private readonly plotService = inject(PlotService);
+  private readonly userService = inject(UserService);
   //Variables
   report: any
   formattedDate: any;
@@ -48,7 +51,7 @@ export class PenaltiesPostFineComponent implements OnInit {
   private initForm(): void {
     this.reactiveForm = this.fb.group({
       infractionType: ['warning', Validators.required],
-      amount: [null, [Validators.required, Validators.min(1)]]
+      amount: [null, [Validators.required, Validators.min(1), Validators.max(999999)]]
     });
   }
 
@@ -119,6 +122,19 @@ export class PenaltiesPostFineComponent implements OnInit {
 
         this.penaltiesService.postFine(fineData).subscribe(
           res => {
+            let ownersIds: number[] = this.getOwnersIdByPlotId(this.report.plotId)
+            ownersIds.forEach(id => {
+              let notification = {
+                user_id: id,
+                reason: this.report.reportReason.reportReason, // report => ReportReason (Entidad) => reportReason propiedad de la entidad
+                amount: this.reactiveForm.get('amount')?.value,
+                warning: false
+              }
+              this.penaltiesService.notifyNewFineOrWarning(notification).subscribe({
+                next: () => { },
+                error: (e) => { console.log("Error al notificar al propietario: ", e) }
+              });
+            });
             Swal.fire({
               title: '¡Multa enviada!',
               text: 'La multa ha sido enviada correctamente.',
@@ -157,6 +173,18 @@ export class PenaltiesPostFineComponent implements OnInit {
 
         this.penaltiesService.postWarning(warningData).subscribe(
           res => {
+            let ownersIds: number[] = this.getOwnersIdByPlotId(this.report.plotId)
+            ownersIds.forEach(id => {
+              let notification = {
+                user_id: id,
+                reason: this.report.reportReason.reportReason, // report => ReportReason (Entidad) => reportReason propiedad de la entidad
+                warning: true
+              }
+              this.penaltiesService.notifyNewFineOrWarning(notification).subscribe({
+                next: () => { },
+                error: (e) => { console.log("Error al notificar al propietario: ", e) }
+              });
+            });
             Swal.fire({
               title: '¡Advertencia enviada!',
               text: 'La advertencia ha sido enviada correctamente.',
@@ -196,7 +224,7 @@ export class PenaltiesPostFineComponent implements OnInit {
     }
   }
 
-  
+
   //Controla que se tenga que enviar un mensaje de error, lo busca y retorna
   showError(controlName: string): string {
     const control = this.reactiveForm.get(controlName);
@@ -208,7 +236,7 @@ export class PenaltiesPostFineComponent implements OnInit {
     return '';
   }
 
-  
+
   //Devuelve el mensaje de error
   private getErrorMessage(errorKey: string, errorValue: any): string {
     const errorMessages: { [key: string]: (error: any) => string } = {
@@ -227,5 +255,20 @@ export class PenaltiesPostFineComponent implements OnInit {
     };
 
     return errorMessages[errorKey]?.(errorValue) ?? 'Error no identificado en el campo.';
+  }
+
+  getOwnersIdByPlotId(plotId: number): number[] {
+    let ownersIds: number[] = [];
+    let users: UserGet[] = [];
+    this.userService.getUsersByPlotID(plotId).subscribe({
+      next: (data) => { users = data },
+      error: (e) => { console.log("Error al cargar usuarios: ", e) }
+    });
+    users.forEach((user: UserGet) => {
+      if (user.roles.includes('Propietario')) {
+        ownersIds.push(user.id);
+      }
+    });
+    return ownersIds;
   }
 }
