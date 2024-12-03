@@ -23,8 +23,13 @@
 
       <!-- Status Select -->
       <div class="col-4 col-xxl-3">
-        <app-custom-select [options]="listStatus" [placeholder]="'Seleccionar Estado'"
-          (selectedOptionsChange)="updateState($event)" [multiple]="true" />
+        <app-custom-select 
+        [options]="listStatus" 
+        [placeholder]="'Seleccionar Estado'"
+        (selectedOptionsChange)="updateState($event)" 
+        [multiple]="true" 
+        [selectedOptions]="selectedFilters"
+        />
       </div>
 
       <!-- Date Range -->
@@ -214,7 +219,6 @@
     </div>
 
     <div [class.d-none]="isLoadingMultipliers">
-      <!-- Día de generación -->
       <div class="mb-4">
         <div class="row">
           <div class="col-md-4">
@@ -224,11 +228,21 @@
           </div>
           <div class="col-md-8">
             <div class="input-group">
-              <input type="number" id="generationDayInput" [(ngModel)]="generationDay" class="form-control" min="1"
-                max="28" [class.is-invalid]="!isValidGenerationDay()" [disabled]="
-                    !!fieldModified && fieldModified !== 'generationDay'
-                  " (focus)="onFieldFocus('generationDay')" (blur)="onFieldBlur()"
-                (ngModelChange)="onFieldChange('generationDay')" />
+              <input
+                type="number"
+                id="generationDayInput"
+                [(ngModel)]="generationDay"
+                class="form-control"
+                min="1"
+                max="28"
+                [class.is-invalid]="!isValidGenerationDay()"
+                [disabled]="
+                  !!fieldModified && fieldModified !== 'generationDay'
+                "
+                (focus)="onFieldFocus('generationDay')"
+                (blur)="onFieldBlur()"
+                (ngModelChange)="onFieldChange('generationDay')"
+              />
               <span class="input-group-text">del mes</span>
             </div>
             <div class="form-text" [class.text-danger]="!isValidGenerationDay()">
@@ -236,7 +250,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </div>    
 
       <!-- Porcentaje de late payment. -->
       <div class="mb-3">
@@ -294,7 +308,7 @@
     <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">
       Cerrar
     </button>
-    <button type="button" class="btn btn-primary" (click)="handleSaveClick()" [disabled]="
+    <button type="button" class="btn btn-primary" (click)="handleSaveClickGeneration()" [disabled]="
           isLoadingMultipliers || !fieldModified || !isValidGenerationDay()
         ">
       Guardar
@@ -312,13 +326,21 @@
     <div class="row">
       <div class="col">
         <label>Fecha Inicio</label>
-        <input type="date" class="form-control" [(ngModel)]="filter.from" (ngModelChange)="validateDates()"
-          [max]="maxDate" placeholder="Fecha desde" />
+        <input type="date" class="form-control"
+          [(ngModel)]="modalFilter.from" 
+          (ngModelChange)="validateDates()"
+          [max]="maxDate" 
+          placeholder="Fecha desde" />
       </div>
       <div class="col">
         <label>Fecha Fin</label>
-        <input type="date" class="form-control ms-2" [(ngModel)]="filter.until" (ngModelChange)="validateDates()"
-          [min]="filter.from" [max]="maxDate" placeholder="Fecha hasta" />
+        
+        <input type="date" class="form-control ms-2"
+          [(ngModel)]="modalFilter.until" 
+          (ngModelChange)="validateDates()"
+          [min]="modalFilter.from" 
+          [max]="maxDate"
+          placeholder="Fecha hasta" />
       </div>
     </div>
   </div>
@@ -329,7 +351,7 @@
   </div>
 </ng-template>
 
-<!-- Modal de Observación -->
+<!-- Modal de Observación de Multiplicadores -->
 <ng-template #observationContent let-modal>
   <div class="modal-header">
     <h5 class="modal-title">Justificación de los Cambios</h5>
@@ -349,7 +371,7 @@
     <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">
       Cancelar
     </button>
-    <button type="button" class="btn btn-primary" (click)="modal.close('confirm')" [disabled]="!observation.trim()">
+    <button type="button" class="btn btn-primary" (click)="saveChanges()" [disabled]="!observation.trim()">
       Confirmar
     </button>
   </div>
@@ -553,7 +575,7 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
         <button type="button" class="btn btn-primary" data-bs-dismiss="modal" [disabled]="!hasChangesExpense()"
-          (click)="openObservationModal()">
+          (click)="openObservationModalExpenses()">
           Guardar
         </button>
       </div>
@@ -561,6 +583,7 @@
   </div>
 </div>
 <!-- Ver Más Modal -->
+ 
 <div class="modal fade" id="viewMoreModal" tabindex="-1" aria-labelledby="viewMoreModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -578,9 +601,9 @@
               <div class="">
                 <div class="card-body">
                   <p><strong>Nombre:</strong> {{ getOwnerName(selectedExpense.owner_id) }}</p>
-                  <p><strong>Tipo de DNI:</strong> {{ getOwnerDni(selectedExpense.owner_id) }}</p>
-                  <p><strong>Periodo:</strong> {{ selectedExpense.period }}</p>
-                  <p><strong>Fecha de Emisión:</strong> {{ selectedExpense.issueDate | date: 'dd/MM/yyyy' }}</p>
+                  <p><strong>Documento:</strong> {{ getOwnerDni(selectedExpense.owner_id)}}</p>
+                  <p><strong>Periodo facturado:</strong> {{ selectedExpense.period }}</p>
+                  <p><strong>Fecha de emisión:</strong> {{ selectedExpense.issueDate | date: 'dd/MM/yyyy' }}</p>
                 </div>
               </div>
             </div>
@@ -589,14 +612,14 @@
             <div class="col-md-6">
               <div class="">
                 <div class="card-body">
-                  <p><strong>Estado:</strong> {{ selectedExpense.status }}</p>
+                  <p><strong>Estado de la boleta:</strong> {{ selectedExpense.status }}</p>
                   <p>
-                    <strong>Método de Pago:</strong>
-                    {{ selectedExpense.payment_method || "En espera..." }}
+                    <strong>Método de pago:</strong>
+                    {{ selectedExpense.payment_method || "No hay pago registrado." }}
                   </p>
                   <p>
-                    <strong>Plataforma de Pago:</strong>
-                    {{ selectedExpense.payment_platform || "En espera..." }}
+                    <strong>Plataforma de pago:</strong>
+                    {{ selectedExpense.payment_platform || "No hay pago registrado." }}
                   </p>
 
                 </div>
@@ -607,12 +630,12 @@
             <div class="col-md-6">
               <div class="">
                 <div class="card-body">
-                  <p><strong>Primer Vencimiento:</strong> {{ selectedExpense.first_expiration_date | date: 'dd/MM/yyyy'
+                  <p><strong>Fecha de primer vencimiento:</strong> {{ selectedExpense.first_expiration_date | date: 'dd/MM/yyyy'
                     }}</p>
-                  <p><strong>Monto Primer Vencimiento:</strong> ${{ selectedExpense.first_expiration_amount }}</p>
-                  <p><strong>Segundo Vencimiento:</strong> {{ selectedExpense.second_expiration_date | date:
+                      <p><strong>Monto del primer vencimiento:</strong> ${{ selectedExpense.first_expiration_amount | number: '1.2-2' }}</p>
+                      <p><strong>Fecha de segundo vencimiento:</strong> {{ selectedExpense.second_expiration_date | date:
                     'dd/MM/yyyy' }}</p>
-                  <p><strong>Monto Segundo Vencimiento:</strong> ${{ selectedExpense.second_expiration_amount }}</p>
+                  <p><strong>Monto del segundo Vencimiento:</strong> ${{ selectedExpense.second_expiration_amount }}</p>
                 </div>
               </div>
             </div>
@@ -622,15 +645,15 @@
               <div class="">
 
                 <div class="card-body">
-                  <p><strong>Monto Actual:</strong> {{ selectedExpense.actual_amount | currency:'ARS':'symbol':'1.2-2':'es-AR' }}</p>
-                  <p><strong>Monto Pagado:</strong> {{ selectedExpense.amount_payed | currency:'ARS':'symbol':'1.2-2':'es-AR' }}</p>
+                  <p><strong>Monto final a pagar:</strong> ${{ selectedExpense.actual_amount }}</p>
+                  <p><strong>Monto pagado:</strong> ${{ selectedExpense.amount_payed || 0 }}</p>
                 </div>
               </div>
             </div>
 
             <!-- Documentos -->
             <div class="col-12">
-              <h6>Documentos</h6>
+              <h6><strong>Documentos</strong></h6>
               <div class="d-flex gap-2">
                 <button class="btn btn-outline-danger" (click)="openPdf(selectedExpense.uuid)">
                   <i class="bi bi-file-earmark-pdf"></i> Ver Factura

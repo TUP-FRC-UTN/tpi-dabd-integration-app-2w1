@@ -109,17 +109,17 @@
   <div class="row">
     <!-- KPI LIMITE 5-->
     <div class="col-2 gap-2 d-flex flex-column justify-content-center">
-      <app-custom-kpi [amount]="totalFines" title="Total Multas" subTitle="Período" tooltip="Total del Período"
+      <app-custom-kpi [value]="totalFines" title="Total Multas" subTitle="Período" tooltip="Total del Período"
         [customStyles]="{ 'background-color': '#D6F6FF' }" icon="bi bi-flag-fill" formatPipe=""></app-custom-kpi>
-      <app-custom-kpi [amount]="averageFinesPerMonth" title="Promedio" subTitle="Período" tooltip="Total del Período"
+      <app-custom-kpi [value]="averageFinesPerMonth" title="Promedio" subTitle="Período" tooltip="Total del Período"
         [customStyles]="{ 'background-color': '#FFE699' }" icon="bi bi-calendar-day" formatPipe=""></app-custom-kpi>
       <div class="lowestHighest" (click)="openModalPreview(5)">
-        <app-custom-kpi [amount]="highestFine?.amount" title="Multa más alta" subTitle="Período"
+        <app-custom-kpi [value]="highestFine?.amount" title="Multa más alta" subTitle="Período"
           tooltip="Total del Período" [customStyles]="{ 'background-color': '#B3F5BC' }" icon="bi bi-calendar-day"
           formatPipe="currency"></app-custom-kpi>
       </div>
       <div class="lowestHighest" (click)="openModalPreview(6)">
-        <app-custom-kpi [amount]="lowestFine?.amount" title="Multa más baja" subTitle="Período"
+        <app-custom-kpi [value]="lowestFine?.amount" title="Multa más baja" subTitle="Período"
           tooltip="Total del Período" [customStyles]="{ 'background-color': '#FCAE7C' }" icon="bi bi-calendar-day"
           formatPipe="currency"></app-custom-kpi>
       </div>
@@ -211,12 +211,12 @@
           <hr />
           <div class="row">
             <div class="col-3 gap-2 d-flex flex-column justify-content-center">
-              <app-custom-kpi [amount]="stateWithHighestPercentage.percentage" title="Estado Mayor"
+              <app-custom-kpi [value]="stateWithHighestPercentage.percentage" title="Estado Mayor"
                 [subTitle]="stateWithHighestPercentage.state" tooltip="Total del Período"
                 [customStyles]="{ 'background-color': '#D6F6FF' }" icon="bi bi-percent"
                 formatPipe="percent"></app-custom-kpi>
 
-              <app-custom-kpi [amount]="stateWithLowestPercentage.percentage" title="Estado Menor"
+              <app-custom-kpi [value]="stateWithLowestPercentage.percentage" title="Estado Menor"
                 [subTitle]="stateWithLowestPercentage.state" tooltip="Total del Período"
                 [customStyles]="{ 'background-color': '#FFE699' }" icon="bi bi-percent"
                 formatPipe="percent"></app-custom-kpi>
@@ -251,11 +251,11 @@
           <hr />
           <div class="row">
             <div class="col-3 gap-2 d-flex flex-column justify-content-center">
-              <app-custom-kpi [amount]="0" title="Mayor Cantidad" [subTitle]="dayWithMostComplaintsName"
+              <app-custom-kpi [value]="0" title="Mayor Cantidad" [subTitle]="dayWithMostComplaintsName"
                 tooltip="Promedio" [customStyles]="{ 'background-color': '#E2CBF7' }" icon="bi bi-clock"
                 formatPipe="string"></app-custom-kpi>
 
-              <app-custom-kpi [amount]="0" title="Menor Cantidad" [subTitle]="dayWithLeastComplaintsName"
+              <app-custom-kpi [value]="0" title="Menor Cantidad" [subTitle]="dayWithLeastComplaintsName"
                 tooltip="Promedio" [customStyles]="{ 'background-color': '#F9FFB5' }" icon="bi bi-clock"
                 formatPipe="string"></app-custom-kpi>
             </div>
@@ -291,11 +291,11 @@
           <div class="col-3 gap-2 d-flex flex-column justify-content-center">
             <!-- KPI Placeholder -->
 
-            <app-custom-kpi [amount]="paidFinesCount" title="Multas Pagadas" subTitle="Período"
+            <app-custom-kpi [value]="paidFinesCount" title="Multas Pagadas" subTitle="Período"
               tooltip="Total del Período" [customStyles]="{ 'background-color': '#D6F6FF' }" icon="bi bi-check-circle"
               formatPipe=""></app-custom-kpi>
 
-            <app-custom-kpi [amount]="pendingFinesCount" title="Multas Pendientes de Pago" subTitle="Período"
+            <app-custom-kpi [value]="pendingFinesCount" title="Multas Pendientes de Pago" subTitle="Período"
               tooltip="Total del Período" [customStyles]="{ 'background-color': '#FFE699' }"
               icon="bi bi-exclamation-circle" formatPipe=""></app-custom-kpi>
 
@@ -419,13 +419,7 @@
         <button type="button" class="btn btn-secondary" (click)="closeFilterModal()">
           Cerrar
         </button>
-        <!-- <button
-          type="button"
-          class="btn btn-primary"
-          (click)="applyFilters(); closeFilterModal()"
-        >
-          Aplicar
-        </button> -->
+        
       </div>
     </div>
   </div>

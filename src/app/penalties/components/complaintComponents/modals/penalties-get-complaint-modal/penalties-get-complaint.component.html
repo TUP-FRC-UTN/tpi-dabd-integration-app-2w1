@@ -1,57 +1,57 @@
 <div class="modal-content border border-2">
+
+  <!-- Header -->
   <div class="modal-header">
     <h1 class="modal-title fs-5" id="complaintModal">Denuncia</h1>
     <button type="button" class="btn-close" (click)="close()"></button>
   </div>
+
+  <!-- Body -->
   <div class="modal-body">
-
     <h5>Información de la Denuncia</h5>
-      <div class="row mb-3">
-          <div class="col-md-6">
-            @if (complaint?.complaintReason==="Otro"){
-              <p><strong>Motivo</strong> {{ complaint?.complaintReason + " - " + complaint?.anotherReason || 'N/A' }}</p>
+    <div class="row mb-3">
 
-            }
-            @else {
-              <p><strong>Motivo</strong> {{ complaint?.complaintReason || 'N/A' }}</p>
-            }
-              
-              <p><strong>Fecha</strong> {{ complaint?.createdDate ? (complaint.createdDate | date:"dd/MM/yyyy") : 'N/A' }}</p>
-          </div>
+      <!-- Motivo y fecha -->
+      <div class="col-md-6">
+        <p><strong>Motivo</strong> {{ (complaint?.complaintReason==="Otro" ?
+          complaint?.complaintReason + " - " + complaint?.anotherReason : complaint?.complaintReason) || 'N/A' }}</p>
+        <p><strong>Fecha</strong> {{ complaint?.createdDate ? (complaint.createdDate | date:"dd/MM/yyyy") : 'N/A' }}</p>
+      </div>
       
-          <div class="col-md-6">
-              <p><strong>Descripción</strong> {{ complaint?.description || 'N/A' }}</p>
-              <p><strong>Denunciante</strong> {{ complaint?.user || 'N/A' }}</p>
-          </div>
-      </div>
-      <hr>
-
-      <h5>Estado de la Denuncia</h5>
-      <div class="row mb-3">
-          <div class="col-md-6">
-              <p><strong>Estado</strong> {{ complaint?.complaintState || 'N/A' }}</p>
-              <p><strong>Razón</strong> {{ complaint?.stateReason || 'N/A' }}</p>
-          </div>
-      </div>
-
-      <!-- Archivos Adjuntos -->
-      <div class="mt-4">
-        <h5 class="mb-3">Archivos adjuntos</h5>
-        <div class="list-group">
-            <div *ngFor="let file of files" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center">
-                    <i class="bi bi-file-earmark-text me-3 text-primary fs-5"></i>
-                    <span>{{ file.name }}</span>
-                </div>
-                <button (click)="downloadFile(file)" class="btn btn-success btn-sm">
-                    <i class="bi bi-download me-2"></i>
-                    Descargar
-                </button>
-            </div>
-        </div>
+      <!-- Descripción y Denunciante -->
+      <div class="col-md-6">
+        <p><strong>Descripción</strong> {{ complaint?.description || 'N/A' }}</p>
+        <p><strong>Denunciante</strong> {{ complaint?.user || 'N/A' }}</p>
       </div>
     </div>
 
+    <hr>
+
+    <h5>Estado de la Denuncia</h5>
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <p><strong>Estado</strong> {{ complaint?.complaintState || 'N/A' }}</p>
+        <p><strong>Razón</strong> {{ complaint?.stateReason || 'N/A' }}</p>
+      </div>
+    </div>
+
+    <!-- Archivos Adjuntos -->
+    <h5 class="mb-3">Archivos adjuntos</h5>
+    <div class="list-group">
+      @for (file of files; track $index) {
+      <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+          <i class="bi bi-file-earmark-text me-3 text-primary fs-5"></i>
+          <span>{{ file.name }}</span>
+        </div>
+        <button (click)="downloadFile(file)" class="btn btn-success btn-sm bi-download"> Descargar </button>
+      </div>
+      }
+    </div>
+
+  </div>
+
+  <!-- Footer -->
   <div class="modal-footer">
     <button type="button" class="btn btn-secondary" (click)="close()">Cerrar</button>
   </div>
