@@ -21,7 +21,7 @@ export class CustomKpiComponent {
   @Input() formatPipe: string = '';
 
 
-  getValue() {
+  get Value() {
     let formattedValue: any;
     switch (this.formatPipe) {
       case 'currency': {
@@ -30,9 +30,7 @@ export class CustomKpiComponent {
       }
 
       case 'percentage': {
-        formattedValue = (this.value / 100).toLocaleString('en-US', { style: 'percent', minimumFractionDigits: 0, maximumFractionDigits: 2 });
-        formattedValue += '%';
-        alert(formattedValue);
+        formattedValue = (this.value / 100).toLocaleString('es-AR', { style: 'percent', minimumFractionDigits: 0, maximumFractionDigits: 2 });
         break;
       }
 
@@ -41,8 +39,13 @@ export class CustomKpiComponent {
         break;
       }
 
+      case 'number': {
+        formattedValue = this.value.toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+        break;
+      }
+      
       default: {
-        formattedValue = this.value.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+        formattedValue = this.value.toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
         break;
       }
 
