@@ -4,50 +4,50 @@
             <div class="col d-flex align-items-end">
                 <!-- Icono del usuario -->
                 @if(type == 'edit'){
-                <div style="max-width: 500px" class="d-flex align-items-center">
-                    @if(haveIcon(selectedIconUrl)){
-                    <img [src]="selectedIconUrl" alt="Selected Icon" style="max-width: 120px;"
-                        class="border rounded-circle p-3 dropdown btn btn btn-outline-secondary dropdown-toggle"
-                        data-bs-toggle="modal" data-bs-target="#exampleModal">
-                    }@else {
-                    <img [src]="noIcon" alt="Selected Icon" style="max-width: 120px;"
-                        class="border rounded-circle p-3 dropdown btn btn btn-outline-secondary dropdown-toggle"
-                        data-bs-toggle="modal" data-bs-target="#exampleModal">
-                    }
-                    <div class="modal fade " id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
-                        aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content">
-                                <div class="modal-body" aria-labelledby="dropdownMenuButton">
-                                    <div class="row">
-                                        <div class="col-4" *ngFor="let icon of icons; let i = index">
-                                            <a class="dropdown-item text-center " (click)="selectIcon(icon.url)"
-                                                data-bs-dismiss="modal">
-                                                <img [src]="icon.url" alt="{{icon.name}}"
-                                                    style="max-width: 120px; min-width: 120px;"
-                                                    class="m-2 border rounded-circle p-3 pre-icon" />
-                                            </a>
+                    <div style="max-width: 500px" class="d-flex align-items-center">
+                        @if(haveIcon(selectedIconUrl)){
+                        <img [src]="selectedIconUrl" alt="Selected Icon" style="width: 120px;"
+                            class="border rounded-circle p-3 dropdown btn btn btn-outline-secondary dropdown-toggle"
+                            data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        }@else {
+                        <img [src]="noIcon" alt="Selected Icon" style="width: 120px;"
+                            class="border rounded-circle p-3 dropdown btn btn btn-outline-secondary dropdown-toggle"
+                            data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        }
+                        <div class="modal fade " id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                            aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-body" aria-labelledby="dropdownMenuButton">
+                                        <div class="row">
+                                            <div class="col-4" *ngFor="let icon of icons; let i = index">
+                                                <a class="dropdown-item text-center " (click)="selectIcon(icon.url)"
+                                                    data-bs-dismiss="modal">
+                                                    <img [src]="icon.url" alt="{{icon.name}}"
+                                                        style="width: 120px;"
+                                                        class="m-2 border rounded-circle p-3 pre-icon" />
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                }@else {
-                <div style="max-width: 500px" class="d-flex align-items-center">
-                    <div class="">
-                        @if(haveIcon(selectedIconUrl)){
-                        <img [src]="selectedIconUrl" alt="Selected Icon" style="max-width: 120px;min-width: 120px;"
-                            class="border rounded-circle p-3 bg-secondary">
-                        }@else {
-                        <img [src]="noIcon" alt="Selected Icon" style="max-width: 120px;"
-                            class="border rounded-circle p-3">
-
-                        }
+                    }@else {
+                    <div style="max-width: 500px" class="d-flex align-items-center">
+                        <div class="">
+                            @if(haveIcon(selectedIconUrl)){
+                            <img [src]="selectedIconUrl" alt="Selected Icon" style="width: 120px;"
+                                class="border rounded-circle p-3 bg-secondary">
+                            }@else {
+                            <img [src]="noIcon" alt="Selected Icon" style="width: 120px;"
+                                class="border rounded-circle p-3">
+    
+                            }
+                        </div>
                     </div>
-                </div>
-                }
+                    }
 
                 <!-- Nombre del usuario -->
                 <div class="ps-3 fs-1">{{formProfile.get('name')?.value ?? ''}} {{formProfile.get('lastName')?.value ??
@@ -62,7 +62,6 @@
                 }
             </div>
         </div>
-
     </div>
     <div class="card-body">
         <form [formGroup]="formProfile" (ngSubmit)="updateUser()">
