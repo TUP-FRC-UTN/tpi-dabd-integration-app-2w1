@@ -7,6 +7,46 @@
   </div>
   <div class="modal-body">
 
+     <!-- Stepper -->
+<div class="stepper-wrapper mb-4">
+  <div class="stepper">
+    <!-- Step 1 -->
+    <div class="step" [ngClass]="{'active': true}" data-step="1">
+      <div class="step-icon">1</div>
+      <p>Generación Multa</p>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step" [ngClass]="{'active': getActualState()}" data-step="2">
+      <div class="step-icon">2</div>
+      <p>Apelación del Usuario</p>
+    </div>
+
+    <!-- Step 3 -->
+     @if(fine?.fineState == 'Absuelta'){
+      <div class="step" [ngClass]="{'rejected': fine?.fineState == 'Absuelta'}" data-step="3">
+        <div class="step-icon">3</div>
+        <p>Absuelta</p>
+      </div>
+     }
+     @else {
+      <div class="step" [ngClass]="{'active': fine?.fineState == 'Pendiente de pago' || fine?.fineState == 'Pagada'}" data-step="3">
+        <div class="step-icon">3</div>
+        <p>Pendiente de Pago</p>
+      </div>
+     }
+
+     @if(fine?.fineState != 'Absuelta'){
+     <div class="step" [ngClass]="{'completed': fine?.fineState == 'Pagada'}" data-step="4">
+      <div class="step-icon">4</div>
+      <p>Pagada</p>
+    </div>
+    }
+    
+  </div>
+</div>
+<!-- Stepper -->
+
     <h5>Información de la Multa</h5>
     <div class="row mb-3">
         <div class="col-md-6">
