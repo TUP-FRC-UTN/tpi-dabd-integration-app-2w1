@@ -1,0 +1,181 @@
+<div class="modal-content">
+  <div class="modal-header">
+    <h5 class="modal-title" id="expenseModalLabel">Registrar Categoría</h5>
+    <button type="button" class="btn-close" aria-label="Close" (click)="clearInputs()"></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="proveedorForm">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="mb-3">
+          <label class="form-label">Nombre</label>
+          <input
+            type="text"
+            formControlName="name"
+            class="form-control"
+            [ngClass]="{
+              'is-invalid':
+                proveedorForm.get('name')?.invalid &&
+                proveedorForm.get('name')?.touched,
+              'is-valid':
+                proveedorForm.get('name')?.valid &&
+                proveedorForm.get('name')?.touched
+            }"
+          />
+          <div
+            *ngIf="isFieldInvalid('name') && !nameExists"
+            class="invalid-feedback"
+          >
+            Este campo es requerido.
+          </div>
+          <div *ngIf="nameExists" class="invalid-feedback">
+            Este nombre ya está en uso.
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <!-- Columna para el CUIT -->
+        <div class="mb-3">
+          <label class="form-label">CUIT</label>
+          <input
+            type="text"
+            formControlName="cuit"
+            class="form-control"
+            [ngClass]="{
+              'is-invalid':
+                proveedorForm.get('cuit')?.invalid &&
+                proveedorForm.get('cuit')?.touched,
+              'is-valid':
+                proveedorForm.get('cuit')?.valid &&
+                proveedorForm.get('cuit')?.touched
+            }"
+          />
+          <div
+            *ngIf="proveedorForm.get('cuit')?.hasError('required') && proveedorForm.get('cuit')?.touched"
+            class="invalid-feedback"
+          >
+            Este campo es requerido.
+          </div>
+          <div *ngIf="cuitExists" class="invalid-feedback">
+            El CUIT ingresado ya existe en el sistema.
+          </div>
+          <div class="invalid-feedback" *ngIf="proveedorForm.get('cuit')?.hasError('cuilInvalido') && proveedorForm.get('cuit')?.touched">
+            La entrada no es válida. Asegúrate que cumpla con el formato estipulado (XX-XXXXXXXX-X).
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="mb-3">
+          <label class="form-label">Teléfono</label>
+          <input
+            type="text"
+            formControlName="phoneNumber"
+            class="form-control"
+            [ngClass]="{
+              'is-invalid':
+                proveedorForm.get('phoneNumber')?.invalid &&
+                proveedorForm.get('phoneNumber')?.touched,
+              'is-valid':
+                proveedorForm.get('phoneNumber')?.valid &&
+                proveedorForm.get('phoneNumber')?.touched
+            }"
+          />
+          <div *ngIf="isFieldInvalid('phoneNumber')" class="invalid-feedback">
+            La entrada no es válida. Ingrese el número con la característica sin el 0 y sin el 15.
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="mb-3">
+          <label class="form-label">Email</label>
+          <input
+            type="email"
+            formControlName="email"
+            class="form-control"
+            [ngClass]="{
+              'is-invalid':
+                proveedorForm.get('email')?.invalid &&
+                proveedorForm.get('email')?.touched,
+              'is-valid':
+                proveedorForm.get('email')?.valid &&
+                proveedorForm.get('email')?.touched
+            }"
+          />
+          <div class="invalid-feedback" *ngIf="proveedorForm.get('email')?.errors">
+            <ng-container *ngIf="proveedorForm.get('email')?.errors?.['required']">
+              Este campo es requerido.
+            </ng-container>
+            <ng-container *ngIf="proveedorForm.get('email')?.errors?.['email'] || 
+            proveedorForm.get('email')?.errors?.['emailDomain']">
+              Introduzca un Email válido.
+            </ng-container>
+            <ng-container *ngIf="emailExists">
+              Este Email ya está en uso.
+            </ng-container>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="mb-3">
+          <label class="form-label">Tipo Proveedor</label>
+          <select
+            formControlName="supplierType"
+            class="form-select"
+            [ngClass]="{
+              'is-invalid':
+                proveedorForm.get('supplierType')?.invalid &&
+                proveedorForm.get('supplierType')?.touched,
+              'is-valid':
+                proveedorForm.get('supplierType')?.valid &&
+                proveedorForm.get('supplierType')?.touched
+            }"
+          >
+            <option value="" disabled selected>Seleccionar tipo</option>
+            <option value="OTHER">Otro</option>
+            <option value="OUTSOURCED_SERVICE">Servicio externo</option>
+            <option value="INVENTORY_SUPPLIER">Proveedor de Inventario</option>
+          </select>
+          <div *ngIf="isFieldInvalid('supplierType')" class="invalid-feedback">
+            Este campo es requerido.
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="mb-3">
+          <label class="form-label">Dirección</label>
+          <input
+            type="text"
+            formControlName="address"
+            class="form-control"
+            [ngClass]="{
+              'is-invalid':
+                proveedorForm.get('address')?.invalid &&
+                proveedorForm.get('address')?.touched,
+              'is-valid':
+                proveedorForm.get('address')?.valid &&
+                proveedorForm.get('address')?.touched
+            }"
+          />
+          <div *ngIf="isFieldInvalid('address')" class="invalid-feedback">
+            Este campo es requerido.
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-success"  (click)="save()" [disabled]="proveedorForm.invalid">Registrar</button>
+    <button type="button" class="btn btn-secondary"  (click)="clearInputs()">Cancelar</button>
+  </div>
+</div>
