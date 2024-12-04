@@ -24,7 +24,8 @@ export class IepSuppliersFormComponent implements OnInit,OnDestroy {
   tutorialSubscription = new Subscription();
   private tour: Shepherd.Tour;
 
-  constructor(private fb: FormBuilder, private supplierService: SuppliersService, private router: Router, private userService: AuthService, private tutorialService: TutorialService
+  constructor(private fb: FormBuilder, private supplierService: SuppliersService, private router: Router, private userService: AuthService
+    , private tutorialService: TutorialService
   ) {
     this.tour = new Shepherd.Tour({
       defaultStepOptions: {
