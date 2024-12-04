@@ -391,7 +391,7 @@ export class NewReportComponent {
   }
 
   openSelectComplaints(): void {
-    const modalElement = document.getElementById('complaintModal');
+    const modalElement = document.getElementById('complaintModal') as HTMLElement;
     if (modalElement) {
       const modal = new (window as any).bootstrap.Modal(modalElement);
       modal.show();
