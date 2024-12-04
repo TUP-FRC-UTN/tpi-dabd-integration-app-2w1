@@ -77,6 +77,8 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
         modalOverlayOpeningPadding: 10,
         modalOverlayOpeningRadius: 10,
       },
+      keyboardNavigation: false,
+
       useModalOverlay: true,
     }); 
     (window as any).viewReport = (id: number) => this.viewReport(id);
