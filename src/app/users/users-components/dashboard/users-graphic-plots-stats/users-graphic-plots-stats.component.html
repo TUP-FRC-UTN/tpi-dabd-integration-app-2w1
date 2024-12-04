@@ -126,10 +126,12 @@
 
           <div class="col mb-3">
             <label for="blockFilter" class="form-label">Manzana:</label>
-            <app-custom-select [options]="blocksNumber" [multiple]="true" [validations]="maxBlocksValidator(10)"
-              (selectedOptionsChange)="filterForm.get('block')?.setValue($event)" />
-            <div *ngIf="filterForm.get('block')?.errors?.['customsErrors']">
-              {{ filterForm.get('block')?.errors?.['customsErrors']?.message }}
+            <div>
+              <app-custom-select 
+                [options]="blocksNumber" 
+                [multiple]="true" 
+                [validations]="maxBlocksValidator(10)"
+                (selectedOptionsChange)="onSelectedOptionsChange($event)" />
             </div>
           </div>
 

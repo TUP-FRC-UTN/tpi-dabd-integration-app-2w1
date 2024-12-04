@@ -32,6 +32,10 @@ export class UserService {
     return this.http.get<UserGet[]>(this.url + "/users/getall");
   }
 
+  getAllCoOwnerByPlotId(id : number): Observable<UserGet[]> {
+    return this.http.get<UserGet[]>(this.url + "/users/get/secondary/" + id);
+  }
+
   verifyLogin(user: LoginUser): Observable<LoginUser> {
     return this.http.post<LoginUser>(this.url + "/auth/login", user);
   }   

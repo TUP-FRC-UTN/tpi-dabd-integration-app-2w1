@@ -199,6 +199,7 @@ export class UsersProfileComponent implements OnInit, OnDestroy {
     const sus = this.usersService.getUserById2(this.authService.getUser().id).subscribe({
       next: (user: GetuserDto) => {
         let roles = user.roles.map(role => " " + role);
+        
 
         this.formProfile.patchValue({
           name: user.name,

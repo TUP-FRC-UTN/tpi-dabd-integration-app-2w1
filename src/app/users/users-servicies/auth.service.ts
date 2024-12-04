@@ -40,6 +40,7 @@ export class AuthService {
   //Elimina el token
   logOut() {
     localStorage.removeItem('jwtToken');
+    localStorage.removeItem('jwtRole');
   }
 
   //Verifica si el id existe en el localstorage
