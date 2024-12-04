@@ -59,9 +59,9 @@
       </div>
     </div>
 
-    <div class="row">
+    <div class="row" id="filtros">
       <!-- Sección para filtro global -->
-      <div class="col-md-8">
+      <div class="col-md-8" >
         <!-- Campo de búsqueda con tamaño normal -->
         <div class="row">
           <div class="col-4">
@@ -228,7 +228,7 @@
 
     <!-- Sección de Tabla -->
 
-    <div class="row mt-1">
+    <div class="row mt-1" id="tabla">
       <div class="col table-responsive">
         <table 
         class="table table-striped border border-4 rounded table-hover" id="suppliersTable">
@@ -283,7 +283,7 @@
     </div>
   </div>
 
-  <button class="floating-btn btn btn-primary" (click)="goTo('main/inventories/new-provider')">
+  <button class="floating-btn btn btn-primary" id="agregar" (click)="goTo('main/inventories/new-provider')">
     <span class="bi-plus-lg"></span>
   </button>
 </section>
