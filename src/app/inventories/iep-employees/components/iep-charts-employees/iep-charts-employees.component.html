@@ -71,17 +71,17 @@
         <!-- KPI LIMITE 5-->
         <div class="col-2 gap-2 d-flex flex-column justify-content-center">
             <!-- KPI 1 -->
-            <app-custom-kpi [amount]="kpiPresente" title="Asistencias"
+            <app-custom-kpi [value]="kpiPresente" title="Asistencias"
             [customStyles]="{ 'background-color': '#b3f5bc' }" icon="bi-person-check"
             ></app-custom-kpi>
             <!-- KPI 2 -->
-            <app-custom-kpi [amount]="kpiTarde" title="Llegadas tarde"
+            <app-custom-kpi [value]="kpiTarde" title="Llegadas tarde"
             [customStyles]="{ 'background-color': '#f9ffb5' }" icon="bi-clock-history"></app-custom-kpi>
             <!-- KPI 3 -->
-            <app-custom-kpi [amount]="kpiAusente" title="Inasistencias" subTitle="injustificadas"
+            <app-custom-kpi [value]="kpiAusente" title="Inasistencias" subTitle="injustificadas"
             [customStyles]="{ 'background-color': '#fa9189' }" icon="bi-x-circle"></app-custom-kpi>
             <!-- KPI 4 -->
-            <app-custom-kpi [amount]="kpiJustificado" title="Inasistencias" subTitle="justificadas"
+            <app-custom-kpi [value]="kpiJustificado" title="Inasistencias" subTitle="justificadas"
             [customStyles]="{ 'background-color': '#d1bdff' }" icon="bi-file-earmark-check"></app-custom-kpi>
         </div>
         <div class="col-10">

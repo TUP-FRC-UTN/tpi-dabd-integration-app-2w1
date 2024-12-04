@@ -20,6 +20,9 @@ import { CustomSelectComponent } from '../../../../common/components/custom-sele
 import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
 import { RoutingService } from '../../../../common/services/routing.service';
 import { UsersTransferPlotComponent } from "../users-transfer-plot/users-transfer-plot.component";
+import { Subscription } from 'rxjs';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 
 @Component({
   selector: 'app-users-list-plots',
@@ -29,6 +32,11 @@ import { UsersTransferPlotComponent } from "../users-transfer-plot/users-transfe
   styleUrl: './users-list-plots.component.css'
 })
 export class UsersListPlotsComponent implements OnInit, OnDestroy {
+
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
+  
   plots: GetPlotModel[] = [];
   private readonly plotService = inject(PlotService);
   private readonly ownerService = inject(OwnerService);
@@ -50,13 +58,44 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
   private readonly suscriptionService = inject(SuscriptionManagerService);
   private readonly routingService = inject(RoutingService);
 
-  constructor(private modal: NgbModal) { }
+  constructor(private modal: NgbModal, private tutorialService: TutorialService
+  ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+      },
+      useModalOverlay: true,
+    }); 
+ }
 
   ngOnDestroy(): void {
     this.suscriptionService.unsubscribeAll();
+
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
   }
 
   async ngOnInit() {
+      //TUTORIAL
+      this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+        () => {
+          this.startTutorial();
+        }
+      ); 
+
+      
     this.loadAllPlotsStates();
     this.loadAllPlotsTypes();
 
@@ -108,7 +147,7 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
             const plotId = this.plots[meta.row].id;
             return `
               <div class="dropdown-center d-flex align-items-center justify-content-center">
-                <button class="btn btn-light border border-1" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <button class="btn btn-light border border-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="actions">
             <i class="bi bi-three-dots-vertical"></i>
                 </button>
                 <ul class="dropdown-menu">
@@ -184,6 +223,89 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
     //Agregar servicio
     this.suscriptionService.addSuscription(sus);
 
+  }
+  startTutorial() {
+    console.log('EMPEZANDO TUTORIAL');
+    this.tour.addStep({
+      id: 'profile-step',
+      title: 'Lista de lotes',
+      text: 'Acá puede ver una lista de los lotes presentes en el barrio, junto con su ubicación, sus datos de construcción, su estado actual y su propietario.',
+
+      attachTo: {
+        element: '#myTablePlot',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        },
+      ],
+    });
+
+    this.tour.addStep({
+      id: 'edit-step',
+      title: 'Filtros',
+      text: 'Desde acá podrá filtrar los lotes. También puede exportar la lista a Excel o PDF, o borrar los filtros aplicados con el botón de basura.',
+      attachTo: {
+        element: '#filtros',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back,
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        },
+      ],
+    });
+
+    this.tour.addStep({
+      id: 'profile-step',
+      title: 'Acciones',
+      text: 'Desde acá puede ver las acciones disponibles para cada lote. Puede editar el perfil, borrar el usuario o ver más información.',
+
+      attachTo: {
+        element: '#actions',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back,
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        },
+      ],
+    });
+    
+    this.tour.addStep({
+      id: 'profile-step',
+      title: 'Agregar',
+      text: 'Para agregar una propiedad, pulse este botón y será enviado al alta de lotes.',
+
+      attachTo: {
+        element: '#addPlot',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back,
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete,
+        },
+      ],
+    });
+
+    this.tour.start();
   }
   //--------------------------------------------------Carga de datos--------------------------------------------------
 

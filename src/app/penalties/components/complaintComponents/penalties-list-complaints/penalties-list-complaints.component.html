@@ -2,11 +2,11 @@
   <div class="container p-3 border border-2 rounded shadow-lg">
 
     <!-- BOTON DE AGREGAR ITEM AL LISTADO PARA QUIENES LO NECESITEN -->
-    <button type="button" class="floating-btn btn btn-primary" (click)="postRedirect()">
+    <button type="button" class="floating-btn btn btn-primary" (click)="postRedirect()" id="addButton">
       <span class="bi-plus-lg"></span>
     </button>
 
-    <div class="row">
+    <div class="row" id="filtros">
 
       <!-- Barra de busqueda -->
       <div class="col-md-3 mb-3">
@@ -24,6 +24,7 @@
 
 
       <!-- Filtro de fechas -->
+
       <div class="col-md-4 d-flex gap-3 mb-3">
         <input (change)="filterDate()" [(ngModel)]="filterDateStart" class="form-control" type="date"
           [max]="filterDateEnd">

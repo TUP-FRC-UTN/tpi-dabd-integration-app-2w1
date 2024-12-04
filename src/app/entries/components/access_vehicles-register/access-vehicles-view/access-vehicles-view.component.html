@@ -1,17 +1,15 @@
-<div class="card mt-5 mx-3 mx-md-5 shadow-lg p-3 mb-5 bg-body-tertiary rounded pruebaNavbar">
+<div class="card mt-5 mx-3 mx-md-5 shadow-lg p-3 mb-5 bg-body-tertiary rounded pruebaNavbar" id="vehicles">
 
-  <div class="card-body fs-2">
-    <!-- <h5 class="card-title">Ingrese aquí los datos:</h5> -->
-  </div>
+
 
   <form [formGroup]="formVehicle" class="needs-validation" novalidate (ngSubmit)="onSubmit()">
-    <!-- Document Info -->
+    <!-- Document Info -->      
     <div class="card mt-1 mb-3">
-      <div class="card-body pb-2">
-        <div class="row g-3 mb-3">
+      <div class="card-body pb-2" id="document">
+        <div class="row g-3 mb-3" >
           <!--* Campo Documento *-->
-          <div class="col-6">
-            <div class="d-flex align-items-center">
+          <div class="col-6" >
+            <div class="d-flex align-items-center" >
               <label for="document" class="form-label me-1" style="width: 120px;">Documento</label>
               <div class="position-relative flex-grow-1">
                 <input type="text" class="form-control mb-0" id="document" formControlName="document"
@@ -114,12 +112,12 @@
       </div>
     }
     <!-- Vehicle Forms -->
-    <div class="card mt-3 mb-3">
+    <div class="card mt-3 mb-3" id="addVehicle">
       <div class="card-body">
         <div class="row justify-content-between mb-2">
           <h5 class="col">Alta de Vehículos:</h5>
           <div class="col text-end">
-            <button type="button" class="btn btn-primary" (click)="addVehicle()">
+            <button type="button" class="btn btn-primary" id="buttonAddVehicle" (click)="addVehicle()">
               Agregar
             </button>
           </div>
@@ -194,7 +192,7 @@
               </div>
               <!-- Botón Quitar -->
               <div class="col-12 col-md d-flex flex-column align-items-end justify-content-end">
-                <button type="button" class="btn btn-danger btn-sm" (click)="removeVehicle($index)">
+                <button type="button" class="btn btn-danger btn-sm" (click)="removeVehicle($index)" id="quitar">
                   Quitar
                 </button>
               </div>

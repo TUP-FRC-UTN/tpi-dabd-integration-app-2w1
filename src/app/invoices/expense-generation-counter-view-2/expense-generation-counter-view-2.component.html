@@ -1,6 +1,6 @@
 <div class="container">
   <!-- Filtors -->
-  <div class="row  border-0 rounded-4 p-3 shadow mb-4">
+  <div class="row  border-0 rounded-4 p-3 shadow mb-4" id="filtros">
 
     <div class="row">
       <!-- Filtro de fechas -->
@@ -29,14 +29,14 @@
 
 <!-- ================================================================================== -->
 
-<div class="container">
+<div class="container" id="graficos">
   <!-- Inicia en esta vista -->
   @if (status == 0) {
   <div class="row">
     <!-- KPI LIMITE 5-->
-    <div class="col-3 gap-2 d-flex flex-column justify-content-center">
+    <div class="col-3 gap-2 d-flex flex-column justify-content-center" id="kpis">
       @for (kpi of principalKpis; track $index) {
-      <app-custom-kpi [amount]="kpi.amount" [title]="kpi.title" [subTitle]="kpi.subTitle" [tooltip]="kpi.tooltip"
+      <app-custom-kpi [value]="kpi.amount" [title]="kpi.title" [subTitle]="kpi.subTitle" [tooltip]="kpi.tooltip"
         [customStyles]="kpi.customStyles" [icon]="kpi.icon" [formatPipe]="kpi.formatPipe">
       </app-custom-kpi> }
 
@@ -46,7 +46,7 @@
       <!-- Graficos chicos (pie, lines, list)-->
       <div class="row mb-2 ">
         <!-- Grafico 1 -->
-        <div class="col col-md-6">
+        <div class="col col-md-6" id="promedio">
           <div class="card border-0 shadow-lg  rounded-4 h-100">
             <div class="card-body ">
               <h4 class="card-title align-items-center">Promedios por metodo de pago<button type="button"
@@ -68,7 +68,7 @@
           </div>
         </div>
         <!-- Grafico 2 -->
-        <div class="col col-md-6">
+        <div class="col col-md-6" id="deudores">
           <div class="card border-0 shadow-lg rounded-4 h-100">
             <div class="card-body">
               <h4 class="card-title align-items-center">Top 5 deudores<button type="button"
@@ -112,7 +112,7 @@
 
       <div class="row ">
         <!-- Grafico 3 -->
-        <div class="col ">
+        <div class="col" id="facturado">
           <div class="card border-0 shadow-lg  rounded-4 h-100">
             <div class="card-body">
               <h4 class="card-title align-items-center">Comparación de facturado y cobrado <button type="button"
@@ -152,7 +152,7 @@
                   <div class="col-8 mb-1 w-100">
                     @for (kpi of pieKpis; track $index) {
                     <div class="mb-2">
-                      <app-custom-kpi [amount]="kpi.amount" [title]="kpi.title" [subTitle]="kpi.subTitle"
+                      <app-custom-kpi [value]="kpi.amount" [title]="kpi.title" [subTitle]="kpi.subTitle"
                         [tooltip]="kpi.tooltip" [customStyles]="kpi.customStyles" [icon]="kpi.icon"
                         [formatPipe]="kpi.formatPipe">
                       </app-custom-kpi>
@@ -199,7 +199,7 @@
                   <div class="col-5 m-1  w-100">
                     @for (kpi of topFiveKpi; track $index) {
                     <div class="mb-2 w-100">
-                      <app-custom-kpi [amount]="kpi.amount" [title]="kpi.title" [subTitle]="kpi.subTitle"
+                      <app-custom-kpi [value]="kpi.amount" [title]="kpi.title" [subTitle]="kpi.subTitle"
                         [tooltip]="kpi.tooltip" [customStyles]="kpi.customStyles" [icon]="kpi.icon"
                         [formatPipe]="kpi.formatPipe">
                       </app-custom-kpi>
@@ -259,7 +259,7 @@
           <div class="col-3 gap-2 d-flex flex-column justify-content-center">
             @for (kpi of columnKpis; track $index) {
             <div class="mb-2 w-100">
-              <app-custom-kpi [amount]="kpi.amount" [title]="kpi.title" [subTitle]="kpi.subTitle"
+              <app-custom-kpi [value]="kpi.amount" [title]="kpi.title" [subTitle]="kpi.subTitle"
                 [tooltip]="kpi.tooltip" [customStyles]="kpi.customStyles" [icon]="kpi.icon"
                 [formatPipe]="kpi.formatPipe">
               </app-custom-kpi>
