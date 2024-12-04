@@ -31,6 +31,14 @@
           <input (change)="filterDataOnChange()" [(ngModel)]="dateTo" class="form-control" type="date" [max]="maxDateTo"
             [min]="dateFrom">
         </div>
+        <div class="col-1 align-items-cente">
+          @if (isLoading) {
+            <div class="spinner-border text-secondary" role="status">
+              <span class="visually-hidden">Cargando...</span>
+            </div>
+          }
+
+        </div>
       </div>
 
       <!-- Botones de exportar -->
