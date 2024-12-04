@@ -1,5 +1,3 @@
-/* You can add global styles to this file, and also import other style files */
-
 /* Importing Bootstrap SCSS file. */
 @import 'bootstrap/scss/bootstrap';
 @import 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css';
@@ -14,98 +12,160 @@ table.dataTable tbody tr.selected {
 
 }
 
-.text-bg-orange {
-  background-color: $orange;
-}
+
+//------------------------------Colores--------------------------------//
+
+$blue:    #0d6efd;
+$indigo:  #6610f2;
+$purple:  #6f42c1;
+$pink:    #d63384;
+$red:     #dc3545;
+$orange:  #fd7e14;
+$yellow:  #ffc107;
+$green:   #198754;
+$teal:    #20c997;
+$cyan:    #0dcaf0;
+
+$white:    #fff;
+$gray-100: #f8f9fa;
+$gray-200: #e9ecef;
+$gray-300: #dee2e6;
+$gray-400: #ced4da;
+$gray-500: #adb5bd;
+$gray-600: #6c757d;
+$gray-700: #495057;
+$gray-800: #343a40;
+$gray-900: #212529;
+$black:    #000;
+
+$primary:       $blue;
+$secondary:     $gray-600;
+$success:       $green;
+$info:          $cyan;
+$warning:       $yellow;
+$danger:        $red;
+$light:         $gray-100;
+$dark:          $gray-900;
 
 .text-bg-indigo {
-  background-color: #6610f2 !important;
-  /* Color indigo de Bootstrap 5.3 */
-  color: #fff !important;
+  background-color: $indigo;
+  color: $white;
 }
 
 .text-bg-red {
-  background-color: #d1888f !important;
-  /* Bootstrap red */
-  color: #fff !important;
+  background-color: $red;
+  color: $white;
 }
 
 .text-bg-green {
-  background-color: #28a745 !important;
-  /* Bootstrap green */
-  color: #fff !important;
+  background-color: $green;
+  color: $white;
 }
 
 .text-bg-blue {
-  background-color: #74af7d !important;
-  /* Bootstrap blue */
-  color: #ffffff !important;
+  background-color: $blue;
+  color: $white;
 }
 
 .text-bg-salmon {
-  background-color: #dc3545 !important;
-  /* Bootstrap salmon */
-  color: #ffffff !important;
+  background-color: #d46b75;
+  color: $dark;
 }
 
-.text-bg-menor {
-  background-color: #0dcaf0 !important;
-  /* Custom light blue */
-  color: #ffffff !important;
+.text-bg-light-blue {
+  background-color: #0dcaf0;
+  color: $white;
 }
 
 .text-bg-orange {
-  background-color: #fd7e14 !important;
-  /* Bootstrap yellow */
-  color: #ffffff !important;
+  background-color: $orange;
+  color: $white;
 }
 
 .text-bg-purple {
-  background-color: #6f42c1 !important;
-  /* Bootstrap purple */
-  color: #fff !important;
+  background-color: $purple;
+  color: $white;
 }
 
 .text-bg-teal {
-  background-color: #20c997 !important;
-  /* Bootstrap teal */
-  color: #ffffff !important;
+  background-color: $teal;
+  color: $white;
 }
 
 .text-bg-pink {
-  background-color: #e83e8c !important;
-  /* Bootstrap pink */
-  color: #fff !important;
+  background-color: $pink;
+  color: $white;
 }
 
 .text-bg-cyan {
-  background-color: #17a2b8 !important;
-  /* Bootstrap cyan */
-  color: #fff !important;
+  background-color: $cyan;
+  color: $white;
 }
 
 
+//------------------------------Animaciones--------------------------------//
+
+
+.verticalAnimation {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.5s ease-in-out,
+    opacity 0.5s ease-in-out;
+}
+
+//Animacion para expandir verticalmente (Origen)
+.verticalAnimation.expanded {
+  max-height: 500px;
+  opacity: 1;
+}
+
+
+//------------------------------Botónes--------------------------------//
+
 .floating-btn {
+  //Ajuste de posicion
   position: fixed;
-  /* Fija el botón en una posición relativa a la ventana del navegador, manteniéndolo siempre visible en el mismo lugar */
   bottom: 20px;
-  /* Coloca el botón a 20 píxeles desde la parte inferior de la pantalla */
   right: 20px;
-  /* Coloca el botón a 20 píxeles desde la parte derecha de la pantalla */
+  //Tamaño del boton
   width: 50px !important;
-  /* Define el ancho del botón en 50 píxeles; el !important asegura que esta regla tenga prioridad */
   height: 50px !important;
-  /* Define la altura del botón en 50 píxeles, también con !important para darle prioridad */
+  //Estilo del boton
   border-radius: 50% !important;
-  /* Redondea el botón para hacerlo circular; el 50% crea un borde completamente redondeado */
   border: none !important;
-  /* Elimina el borde del botón y usa !important para sobreescribir cualquier otro estilo de borde */
   display: flex;
-  /* Utiliza Flexbox para facilitar el centrado del contenido dentro del botón */
   align-items: center;
-  /* Centra verticalmente el contenido (icono o texto) dentro del botón */
   justify-content: center;
-  /* Centra horizontalmente el contenido dentro del botón */
   z-index: 8;
-  /* Establece el nivel de superposición del botón sobre otros elementos; un valor más alto asegura que esté sobre otros contenidos */
+}
+
+
+//------------------------------Tutoriales--------------------------------//
+
+.shepherd-header {
+  background-color: #ffffff!important;
+  border-bottom: darkgray solid 1px!important;
+}
+
+.shepherd-title{
+  font-weight: bold !important;
+
+}
+.shepherd-highlight {
+  border-radius: 12px !important; /* Adjust the radius as needed */
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5) !important;
+  padding: 10px !important; /* Add padding around the highlighted element */
+}
+
+.shepherd-button{
+  background-color: #6c757d !important;
+
+}
+
+.shepherd-button:hover{
+  background-color: #343a40 !important;}
+
+.shepherd-element{
+  border: darkgray solid 1px ; 
 }

@@ -13,6 +13,9 @@ import { AuthService } from '../../../../users/users-servicies/auth.service';
 import { AccessVisitorsRegisterServiceHttpClientService } from '../../../services/access_visitors/access-visitors-register/access-visitors-register-service-http-client/access-visitors-register-service-http-client.service';
 import { AccessRegisterEmergencyComponent } from "../../access-register-emergency/access-register-emergency.component";
 import { AccessInsurancesService } from '../../../services/access-insurances/access-insurances.service';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
+import { waitForAsync } from '@angular/core/testing';
 
 declare var bootstrap: any;
 @Component({
@@ -23,21 +26,46 @@ declare var bootstrap: any;
   styleUrl: './access-vehicles-view.component.css'
 })
 
-export class AccessVehiclesViewComponent implements OnDestroy,OnInit  {
+export class AccessVehiclesViewComponent implements OnDestroy, OnInit {
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
+
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private insuranceService: AccessInsurancesService
-  ) {}
+    , private tutorialService: TutorialService
+  ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+      },
+      useModalOverlay: true,
+    });
+  }
 
   @ViewChild('confirmModal') confirmModal: any;
   ngOnInit(): void {
+    //TUTORIAL
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    );
+
     this.loadVehicleTypes();
     this.loadInsurances();
     this.formVehicle = this.fb.group({
       document: [
-        '', 
-        [Validators.required, this.ValidateCharacters], 
+        '',
+        [Validators.required, this.ValidateCharacters],
         [this.finUserByDni()] // Agregando la validación asincrónica aquí
       ],
       documentType: ['', Validators.required],
@@ -53,12 +81,24 @@ export class AccessVehiclesViewComponent implements OnDestroy,OnInit  {
   }
   private suscription = new Subscription();
   patentePlate = '^[A-Z]{1,3}\\d{3}[A-Z]{0,3}$';
+
+
   ngOnDestroy(): void {
     this.suscription.unsubscribe();
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+
+    //TUTORIAL
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
   }
-  
+
   private unsubscribe$ = new Subject<void>();
   vehicleTypes: string[] = ['Car', 'Motorbike', 'Truck', 'Van'];
   vehicleType: string[] = [];
@@ -70,39 +110,39 @@ export class AccessVehiclesViewComponent implements OnDestroy,OnInit  {
   };
   insurances: string[] = [];
   vehicleOptions: { value: string, label: string }[] = [];
-  vehiculos:AccessNewVehicleDto[]=[]
+  vehiculos: AccessNewVehicleDto[] = []
   isValidating: boolean = false;
   isUserFound: boolean = false;
   selectedVehicle: any;
-  userAllowed:UserAllowedDto|null=null;
+  userAllowed: UserAllowedDto | null = null;
   private userId = 0;
-  private readonly httpUserAllowedVehicle=inject(Access_userDocumentService)
-  private readonly httpVehicleService=inject(Access_vehicleService)
-  private readonly visitorHttpService: AccessVisitorsRegisterServiceHttpClientService=inject(AccessVisitorsRegisterServiceHttpClientService)
-  
-  formVehicle:FormGroup=new FormGroup({
-    document:new FormControl('',[Validators.required,this.ValidateCharacters,
-      this.finUserByDni,Validators.minLength(8)]),
-    documentType:new FormControl('',[Validators.required]),
-    vehicles:new FormArray([])
+  private readonly httpUserAllowedVehicle = inject(Access_userDocumentService)
+  private readonly httpVehicleService = inject(Access_vehicleService)
+  private readonly visitorHttpService: AccessVisitorsRegisterServiceHttpClientService = inject(AccessVisitorsRegisterServiceHttpClientService)
+
+  formVehicle: FormGroup = new FormGroup({
+    document: new FormControl('', [Validators.required, this.ValidateCharacters,
+    this.finUserByDni, Validators.minLength(8)]),
+    documentType: new FormControl('', [Validators.required]),
+    vehicles: new FormArray([])
   })
-  
-  private CreateVehicle():FormGroup{
+
+  private CreateVehicle(): FormGroup {
     return this.fb.group({
-      plate:new FormControl('',[Validators.required, Validators.pattern(this.patentePlate)]),
-      vehicleType:new FormControl('',[Validators.required]),
-      insurance:new FormControl('',[Validators.required]),
+      plate: new FormControl('', [Validators.required, Validators.pattern(this.patentePlate)]),
+      vehicleType: new FormControl('', [Validators.required]),
+      insurance: new FormControl('', [Validators.required]),
       isExistingVehicle: [false]
     })
   }
-  get VehiclesArray():FormArray{
+  get VehiclesArray(): FormArray {
     return this.formVehicle.get('vehicles') as FormArray
   }
-  removeVehicle(index:number):void{
+  removeVehicle(index: number): void {
     this.VehiclesArray.removeAt(index);
   }
-  addVehicle():void{
-    const vehicleGroup=this.CreateVehicle()
+  addVehicle(): void {
+    const vehicleGroup = this.CreateVehicle()
     this.VehiclesArray.push(vehicleGroup)
   }
   private ValidateCharacters(control: AbstractControl): ValidationErrors | null {
@@ -125,88 +165,88 @@ export class AccessVehiclesViewComponent implements OnDestroy,OnInit  {
   }
 
 
-finUserByDni(): AsyncValidatorFn {
-  return (control: AbstractControl): Observable<ValidationErrors | null> => {
-    const document = control.value;
-    const documentType = this.formVehicle.get('documentType')?.value;
+  finUserByDni(): AsyncValidatorFn {
+    return (control: AbstractControl): Observable<ValidationErrors | null> => {
+      const document = control.value;
+      const documentType = this.formVehicle.get('documentType')?.value;
 
-    if (!document || !documentType) {
-      return of(null);  // Si no hay documento o tipo de documento, no se valida
-    }
+      if (!document || !documentType) {
+        return of(null);  // Si no hay documento o tipo de documento, no se valida
+      }
 
-    return this.httpUserAllowedVehicle.getUserByDniAndDocument(document, documentType).pipe(
-      map((data: UserAllowedDto | null) => {
-        if (data) {
-          // El documento existe
-          this.userAllowed=data
-          this.isUserFound=true;
-          console.log(this.userAllowed)
-          return null;
-        } else {
-          // El documento no existe
-          return { userNotFound: true };
-        }
-      }),
-      catchError((error) => {
-        console.error(error);
-        return of({ apiError: true });  // Si hay un error en la API
-      })
-    );
-  };
-}
-
-
-
-  onSubmit():void{
-    if(this.formVehicle.valid && this.VehiclesArray.length > 0){
-      const formValue=this.formVehicle.value;
-      const bodyData={
-        dni:formValue.document,
-        documentType:formValue.documentType,
-        vehicleDtos:this.getSelectedVehicles()
-      };
-      const sub=this.httpVehicleService.addVehicle(bodyData.vehicleDtos,bodyData.dni,bodyData.documentType)
-      .subscribe({
-        next:(response)=>{
-          if(response.success){
-            Swal.fire({
-              icon:"success",
-              title:"Éxito",
-              text:"Vehiculos añadido con exito"
-            })
-          
-            console.log(bodyData.vehicleDtos)
-            this.userAllowed?.vehicles?.push(...bodyData.vehicleDtos)
-            this.VehiclesArray.clear()
+      return this.httpUserAllowedVehicle.getUserByDniAndDocument(document, documentType).pipe(
+        map((data: UserAllowedDto | null) => {
+          if (data) {
+            // El documento existe
+            this.userAllowed = data
+            this.isUserFound = true;
+            console.log(this.userAllowed)
+            return null;
+          } else {
+            // El documento no existe
+            return { userNotFound: true };
           }
-        },
-       error: (error: HttpErrorResponse) => {
-      // Verificamos si la respuesta contiene un mensaje que se pueda traducir
-        if (error.error && error.error.message) {
-    // Traducimos el mensaje de error usando translateMessage
-       const translatedMessage = translateMessage(error.error.message);
-       Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: `${translatedMessage}`,
-      });
-         console.log('API Response Error:', error.error);
-        
-       } else {
-        // Si no se puede traducir el mensaje, mostramos uno genérico
-        console.error('Error en la solicitud:', error);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: `${error.message || error.statusText}`,
+        }),
+        catchError((error) => {
+          console.error(error);
+          return of({ apiError: true });  // Si hay un error en la API
+        })
+      );
+    };
+  }
+
+
+
+  onSubmit(): void {
+    if (this.formVehicle.valid && this.VehiclesArray.length > 0) {
+      const formValue = this.formVehicle.value;
+      const bodyData = {
+        dni: formValue.document,
+        documentType: formValue.documentType,
+        vehicleDtos: this.getSelectedVehicles()
+      };
+      const sub = this.httpVehicleService.addVehicle(bodyData.vehicleDtos, bodyData.dni, bodyData.documentType)
+        .subscribe({
+          next: (response) => {
+            if (response.success) {
+              Swal.fire({
+                icon: "success",
+                title: "Éxito",
+                text: "Vehiculos añadido con exito"
+              })
+
+              console.log(bodyData.vehicleDtos)
+              this.userAllowed?.vehicles?.push(...bodyData.vehicleDtos)
+              this.VehiclesArray.clear()
+            }
+          },
+          error: (error: HttpErrorResponse) => {
+            // Verificamos si la respuesta contiene un mensaje que se pueda traducir
+            if (error.error && error.error.message) {
+              // Traducimos el mensaje de error usando translateMessage
+              const translatedMessage = translateMessage(error.error.message);
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: `${translatedMessage}`,
+              });
+              console.log('API Response Error:', error.error);
+
+            } else {
+              // Si no se puede traducir el mensaje, mostramos uno genérico
+              console.error('Error en la solicitud:', error);
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: `${error.message || error.statusText}`,
+              });
+
+            }
+          }
         });
-         
-        }
-        }
-      });
       this.suscription.add(sub);
     }
-    else{
+    else {
       Swal.fire({
         icon: 'error',
         title: 'Error',
@@ -249,39 +289,43 @@ finUserByDni(): AsyncValidatorFn {
     const modal = new bootstrap.Modal(modalElement); // Inicializar modal con Bootstrap
     modal.show(); // Mostrar el modal
   }
-  logicDownVehicle():void{
+  logicDownVehicle(): void {
     console.log(this.selectedVehicle.plate)
-    const sub=this.httpVehicleService.logicDown(this.selectedVehicle.plate,this.userId).subscribe({
-      next:(response)=>{
-        if(response.success){
+    const sub = this.httpVehicleService.logicDown(this.selectedVehicle.plate, this.userId).subscribe({
+      next: (response) => {
+        if (response.success) {
           Swal.fire({
-            icon:"success",
-            title:"Éxito",
-            text:"Vehiculos dado de baja con exito"
+            icon: "success",
+            title: "Éxito",
+            text: "Vehiculos dado de baja con exito"
           })
-         let index= this.userAllowed?.vehicles?.findIndex(vehicle=> vehicle.plate===this.selectedVehicle.plate)
-         if(index!==-1 && index!==undefined)
-         this.userAllowed?.vehicles?.splice(index,1)
-        
+          let index = this.userAllowed?.vehicles?.findIndex(vehicle => vehicle.plate === this.selectedVehicle.plate)
+          if (index !== -1 && index !== undefined)
+            this.userAllowed?.vehicles?.splice(index, 1)
+
         }
-        else{
-          if(response.message==='The vehicle not exist'){
-          alert('El vehiculo no existe')}
+        else {
+          if (response.message === 'The vehicle not exist') {
+            alert('El vehiculo no existe')
+          }
         }
-    },
-    error:(error)=>{
-      console.log(error)
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Hubo un error al dar de baja',
-      });
-    }});
+      },
+      error: (error) => {
+        console.log(error)
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Hubo un error al dar de baja',
+        });
+      }
+    });
     this.suscription.add(sub)
   }
+
   get documentControl() {
     return this.formVehicle.get('document');
   }
+
   updateValidation() {
     if (this.isValidating) return; // Evitar que se ejecute si ya se está validando
     const document = this.formVehicle.get('document')?.value;
@@ -292,6 +336,128 @@ finUserByDni(): AsyncValidatorFn {
       this.formVehicle.get('document')?.updateValueAndValidity();
     }
   }
- 
-  
+
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Registro de Vehículos',
+      text: 'Acá puede ver los vehículos registrados de cada persona cargada. También puede agregar nuevos vehículos.',
+      attachTo: {
+        element: '#vehicles',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Búsqueda de uusario',
+      text: 'Desde acá podrá obtener un listado de todos los vehículos registrados de una persona buscando por su documento.',
+      attachTo: {
+        element: '#document',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Añadir vehículo',
+      text: 'Desde esta sección puede agregar un vehículo nuevo, indicando su patente, el tipo de vehículo y su seguro.',
+      attachTo: {
+        element: '#addVehicle',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: () => {
+            // Codigo para seleccionar el radio button "Solamente a"
+            const addVehicle = document.getElementById(
+              'buttonAddVehicle'
+            ) as HTMLInputElement;
+            addVehicle.click();
+            this.tour.next();
+          },
+        }
+      ]
+    });
+
+    this.tour.addStep({
+      id: 'user-selection-step',
+      title: 'Eliminar vehículo',
+      text: 'Al hacer click en este botón, se eliminará el vehículo seleccionado.',
+      attachTo: {
+        element: '#quitar',
+        on: 'auto',
+      },
+
+      beforeShowPromise: () => {
+        return new Promise((resolve) => {
+          const checkElementExists = () => {
+            const removeButton = document.getElementById('quitar');
+            if (removeButton) {
+              resolve(true);
+            } else {
+              // Reintentar cada 500 milisegundos
+              setTimeout(checkElementExists, 5);
+            }
+          };
+
+          checkElementExists();
+        });
+      },
+
+      buttons: [
+        {
+          text: 'Anterior',
+          action: () => {
+            // Codigo para seleccionar el radio button "Solamente a"
+            const remove = document.getElementById(
+              'quitar'
+            ) as HTMLInputElement;
+            remove.click();
+
+            this.tour.back();
+          },
+        },
+        {
+          text: 'Finalizar',
+          action: () => {
+            // Codigo para seleccionar el radio button "Solamente a"
+            const remove = document.getElementById(
+              'quitar'
+            ) as HTMLInputElement;
+            remove.click();
+            waitForAsync(() => { })
+            this.tour.complete();
+          },
+        },
+      ],
+    });
+
+    this.tour.start();
+  }
 }

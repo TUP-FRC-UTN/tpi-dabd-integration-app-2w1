@@ -19,6 +19,9 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
 import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
 import { RoutingService } from '../../../../common/services/routing.service';
+import { Subscription } from 'rxjs';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 
 @Component({
   selector: 'app-usuarios-new-owner',
@@ -30,6 +33,10 @@ import { RoutingService } from '../../../../common/services/routing.service';
 
 
 export class UsuariosNewOwnerComponent implements OnInit, OnDestroy {
+
+//TUTORIAL
+tutorialSubscription = new Subscription();
+private tour: Shepherd.Tour;
 
   private readonly ownerService = inject(OwnerService);
   private readonly apiService = inject(UserService);
@@ -64,7 +71,23 @@ export class UsuariosNewOwnerComponent implements OnInit, OnDestroy {
   documentType: string = '';
 
   //Inicializa el formulario
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private tutorialService: TutorialService
+  ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+      },
+      keyboardNavigation: false,
+
+      useModalOverlay: true,
+    });
+   
     this.formReactivo = this.fb.group({
       name: new FormControl("", [
         Validators.required,
@@ -85,10 +108,8 @@ export class UsuariosNewOwnerComponent implements OnInit, OnDestroy {
       documentType: new FormControl("", [
         Validators.required]),
       birthdate: new FormControl(this.date, [
-        Validators.required,
         this.dateLessThanTodayValidator()]),
-      email: new FormControl("", [
-        Validators.required,
+      email: new FormControl(null, [
         Validators.email
       ],
         this.validatorService.validateUniqueEmail()
@@ -107,8 +128,7 @@ export class UsuariosNewOwnerComponent implements OnInit, OnDestroy {
         Validators.minLength(6),
         Validators.maxLength(30)]),
       rol: new FormControl(""),
-      phone: new FormControl('', [
-        Validators.required,
+      phone: new FormControl(null, [
         Validators.minLength(10),
         Validators.maxLength(20),
         Validators.pattern(/^\d+$/)]),
@@ -120,6 +140,13 @@ export class UsuariosNewOwnerComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+  //TUTORIAL
+  this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+    () => {
+      this.startTutorial();
+    }
+  );
+
     this.loadRoles();
     this.loadOwnerTypes();
     this.loadPlotStates();
@@ -135,9 +162,119 @@ export class UsuariosNewOwnerComponent implements OnInit, OnDestroy {
     this.formReactivo.get('type')?.setValue("");
     // this.formReactivo.get('state')?.setValue(""); 
   }
+  startTutorial() {
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Alta de propietario',
+      text: 'Acá puede realizar la alta de un propietario. Recuerde agregar todos los campos necesarios, procurando no equivocarse en ninguno.',
+      attachTo: {
+        element: '#newOwner',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        },
+      ],
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Tipo de propietario',
+      text: 'Desde acá puede seleccionar si el propietario es una persona física o jurídica.',
+      attachTo: {
+        element: '#ownerType',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back,
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        },
+      ],
+    });
+
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Selección de lotes',
+      text: 'Acá puede seleccionar los lotes que le corresponden al nuevo propietario.', 
+      attachTo: {
+        element: '#lotes',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back,
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        },
+      ],
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Añadir archivos',
+      text: 'Acá puede subir los archivos necesarios para la certificación del propietario.',
+      attachTo: {
+        element: '#files',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back,
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        },
+      ],
+    });
+
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Envio de formulario',
+      text: 'Al finalizar, presione este botón para registrar al nuevo propietario.',
+      attachTo: {
+        element: '#register',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back,
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete,
+        },
+      ],
+    });
+
+    this.tour.start();
+
+  }
 
   ngOnDestroy(): void {
     this.suscriptionService.unsubscribeAll();
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
   }
 
   //--------------------------------------------------Carga de datos--------------------------------------------------
@@ -395,14 +532,14 @@ export class UsuariosNewOwnerComponent implements OnInit, OnDestroy {
       lastname: this.formReactivo.get('lastname')?.value || '',
       dni: this.formReactivo.get('dni')?.value || '',
       dni_type_id: Number(this.formReactivo.get('documentType')?.value) || 0, //Tipo de documento
-      dateBirth: this.formReactivo.get('birthdate')?.value || new Date(),
+      dateBirth: this.formReactivo.get('birthdate')?.value || null,
       ownerTypeId: Number(this.formReactivo.get('type')?.value || ""),
       taxStatusId: Number(this.formReactivo.get('state')?.value),
       active: true,
       username: this.formReactivo.get('username')?.value || '',
       password: this.formReactivo.get('password')?.value || '',
-      email: this.formReactivo.get('email')?.value || '',
-      phoneNumber: this.formReactivo.get('phone')?.value || '',
+      email: this.formReactivo.get('email')?.value || null,
+      phoneNumber: this.formReactivo.get('phone')?.value || null,
       avatarUrl: '',
       businessName: this.formReactivo.get('company')?.value || '',
       telegramId: 0,

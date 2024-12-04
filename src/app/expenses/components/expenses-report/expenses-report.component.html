@@ -6,7 +6,7 @@
   <div class="row ">
     <!-- Filtro de fechas -->
     <div class="col d-flex gap-3">
-      <div class="col">
+      <div id="filters" class="col">
 
         @if (cardView==3) {
           <app-expenses-year-ngSelect
@@ -57,7 +57,7 @@
   @if (cardView == 0) {
   <div class="row">
     <!-- KPI LIMITE 5-->
-    <div class="col-2 gap-2 d-flex flex-column justify-content-center">
+    <div id="kpis" class="col-2 gap-2 d-flex flex-column justify-content-center">
       <!-- KPI 1 -->
       <app-expenses-kpi [amount]="amountCommon+amountExtraordinary
                                       +amountIndividual+amountNoteCredit" title="Total" subTitle="Periodo"

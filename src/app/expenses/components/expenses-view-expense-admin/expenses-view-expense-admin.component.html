@@ -1,9 +1,11 @@
-<button class="floating-btn btn btn-primary" (click)="redirect('main/expenses/register-expense')"><span class="bi-plus-lg"></span></button>
+<button class="floating-btn btn btn-primary" id="addButton" (click)="redirect('main/expenses/register-expense')"><span
+    class="bi-plus-lg"></span>
+</button>
 <section class="py-5">
   <div class="container p-3 border border-2 rounded shadow-lg">
 
-   
-     <!-- <div class="row mb-3 text-end">
+
+    <!-- <div class="row mb-3 text-end">
       <div class="col">
         <button class="btn btn-primary" (click)="redirect('/registerExpense')">
           <span class="bi-plus-lg"></span>
@@ -12,7 +14,7 @@
     </div>  -->
 
     <!-- Fila de botones de filtro -->
-    <div class="row mb-3">
+    <div class="row mb-3" id="filters">
 
       <!-- Barra de busqueda -->
       <div class="col-3">
@@ -23,30 +25,29 @@
       <!-- Filtro de fechas -->
       <div class="col d-flex gap-3">
         <div class="col">
-          <input (change)="filterDataOnChange()" [(ngModel)]="dateFrom" class="form-control" type="date"[max]="dateTo">
+          <input (change)="filterDataOnChange()" [(ngModel)]="dateFrom" class="form-control" type="date" [max]="dateTo">
         </div>
         <div class="col">
-          <input (change)="filterDataOnChange()" [(ngModel)]="dateTo" class="form-control" type="date"[max]="maxDateTo"
-          [min]="dateFrom">
+          <input (change)="filterDataOnChange()" [(ngModel)]="dateTo" class="form-control" type="date" [max]="maxDateTo"
+            [min]="dateFrom">
         </div>
       </div>
-
-      <!-- BOTON DE FILTRO PARA QUIENES LO NECESITEN -->
-      <!-- <div class="col-auto">
-        <button class="btn btn-primary bi-funnel-fill">Filtros</button>
-      </div> -->
 
       <!-- Botones de exportar -->
       <div class="col-auto d-flex gap-1 text-end">
-        <button class="btn btn-primary filterbutton" data-bs-toggle="modal" title="Filtros Avanzados" data-bs-target="#filtrosAvanzados">
+        <button class="btn btn-primary filterbutton" data-bs-toggle="modal" title="Filtros Avanzados"
+          data-bs-target="#filtrosAvanzados">
           <i class="bi bi-funnel-fill"></i>
         </button>
-        <button type="button" class="btn btn-secondary bi bi-trash filterbutton" title="Limpiar Filtros" (click)="clearFiltered()"></button>
-        <button (click)="exportToExcel()" id="exportExcelBtn" class="btn btn-success bi-file-earmark-excel filterbutton" title="Exportar Excel"></button>
-        <button  (click)="exportToPDF()" id="exportPdfBtn" class="btn btn-danger bi-file-earmark-pdf filterbutton" title="Exportar PDF"></button>
+        <button type="button" class="btn btn-secondary bi bi-trash filterbutton" title="Limpiar Filtros"
+          (click)="clearFiltered()"></button>
+        <button (click)="exportToExcel()" id="exportExcelBtn" class="btn btn-success bi-file-earmark-excel filterbutton"
+          title="Exportar Excel"></button>
+        <button (click)="exportToPDF()" id="exportPdfBtn" class="btn btn-danger bi-file-earmark-pdf filterbutton"
+          title="Exportar PDF"></button>
       </div>
     </div>
-    <table id="myTable" class="table table-striped border border-3 rounded">
+    <table id="expensesTable" class="table table-striped border border-3 rounded">
       <thead>
       </thead>
       <tbody></tbody>
@@ -56,14 +57,9 @@
 </section>
 
 
-<app-expenses-filters 
- [(selectedCategories)]="selectedCategories"
- [(selectedProviders)]="selectedProviders"
- [(selectedTypes)]="selectedType"
- (selectedCategoriesChange)="loadBillsFiltered()" 
- (selectedProvidersChange)="loadBillsFiltered()"
- (selectedTypesChange)="loadBillsFiltered()"
- ></app-expenses-filters>
+<app-expenses-filters [(selectedCategories)]="selectedCategories" [(selectedProviders)]="selectedProviders"
+  [(selectedTypes)]="selectedType" (selectedCategoriesChange)="loadBillsFiltered()"
+  (selectedProvidersChange)="loadBillsFiltered()" (selectedTypesChange)="loadBillsFiltered()"></app-expenses-filters>
 
 
 <!-- Modal de info -->
@@ -71,7 +67,8 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Listado de expensas</h5>        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <h5 class="modal-title" id="exampleModalLabel">Listado de expensas</h5> <button type="button" class="btn-close"
+          data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
         <p>
@@ -81,26 +78,32 @@
           Además, en las acciones, cuenta con la posibilidad de editar, ver más información o modificar las expensas.
         </p>
         <p>
-          La tabla también incluye una barra de búsqueda, filtros de fecha desde y hasta, y opciones de paginación, lo que facilita la navegación y el filtrado de los datos disponibles.
+          La tabla también incluye una barra de búsqueda, filtros de fecha desde y hasta, y opciones de paginación, lo
+          que facilita la navegación y el filtrado de los datos disponibles.
         </p>
         <ul>
           <li>
-            <strong>Tabla de Expensas</strong>: Muestra la información de las expensas, con columnas para la categoría, proveedor, tipo de gasto, monto, fecha y opciones de acciones.
+            <strong>Tabla de Expensas</strong>: Muestra la información de las expensas, con columnas para la categoría,
+            proveedor, tipo de gasto, monto, fecha y opciones de acciones.
           </li>
           <li>
             <strong>Botones</strong>:
             <ul>
-              <li><button class="btn btn-success mt-2 bi-file-earmark-excel mb-2"></button> Exporta el contenido de la tabla a Excel.</li>
-              <li><button class="btn btn-danger bi-file-earmark-pdf mb-2"></button> Exporta el contenido de la tabla a PDF.</li>
-              <li><button  class="btn btn-primary bi bi-funnel-fill mb-2"></button> Permite aplicar filtros avanzados.</li>
-              <li><button class="btn btn-secondary bi bi-trash mb-2"></button> Elimina los filtros avanzados aplicados.</li>
-              <li><button class="rounded-circle mb-2 btn btn-primary"> 
-                <span class="bi-plus-lg"></span>
-              </button> Redirige a una pantalla para registrar nueva expensa.</li>
+              <li><button class="btn btn-success mt-2 bi-file-earmark-excel mb-2"></button> Exporta el contenido de la
+                tabla a Excel.</li>
+              <li><button class="btn btn-danger bi-file-earmark-pdf mb-2"></button> Exporta el contenido de la tabla a
+                PDF.</li>
+              <li><button class="btn btn-primary bi bi-funnel-fill mb-2"></button> Permite aplicar filtros avanzados.
+              </li>
+              <li><button class="btn btn-secondary bi bi-trash mb-2"></button> Elimina los filtros avanzados aplicados.
+              </li>
+              <li><button class="rounded-circle mb-2 btn btn-primary">
+                  <span class="bi-plus-lg"></span>
+                </button> Redirige a una pantalla para registrar nueva expensa.</li>
             </ul>
           </li>
         </ul>
-       
+
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -108,119 +111,75 @@
     </div>
   </div>
 </div>
-   <!-- Modal Confirm Delete -->
-   <div 
-   #modalConfirmDelete 
-   class="modal" 
-   id="modalConfirmationDeleteExpense" 
-   tabindex="-1" 
-   role="dialog"
- >
-   <div class="modal-dialog" role="document">
-     <div class="modal-content">
-       <div class="modal-header">
-         <h5 class="modal-title">Confirmación</h5>
-       </div>
-       
-       <div class="modal-body">
-         <p class="mb-4">¿Está seguro de eliminar el gasto?</p>
-         
-         <div class="row align-items-center">
-           <label for="justification" class="col-3 form-label mb-0">Justificación</label>
-           <div class="col-9">
-             <textarea 
-               id="justification"
-               class="form-control"
-               rows="3"
-             ></textarea>
-           </div>
-         </div>
-       </div>
- 
-       <div class="modal-footer">
-         <button
-           type="button"
-           class="btn btn-danger"
-           (click)="confirmDeleteExpense()"
-         >
-           Eliminar
-         </button>
-         <button
-           type="button"
-           class="btn btn-secondary"
-           (click)="closeModal(modalConfirmDelete)"
-         >
-           Cancelar
-         </button>
-       </div>
-     </div>
-   </div>
- </div>
-  <!--Modal show operation successfuly-->
-  
- 
- <!-- Modal Note Credit -->
- <div
-   #modalNoteCredit
-   class="modal"
-   id="showModalNoteCredit"
-   tabindex="-1"
-   role="dialog"
- >
-   <div class="modal-dialog" role="document">
-     <div class="modal-content">
-       <div class="modal-header">
-         <h5 class="modal-title">Nota de crédito</h5>
-       </div>
-       <div class="modal-body">
-         El gasto ya está cobrado. ¿Desea realizar una nota de crédito?
-       </div>
-       <div class="modal-footer">
-         <button
-           type="button"
-           class="btn btn-danger"
-           (click)="deleteWithNoteCredit()"
-         >
-           Eliminar
-         </button>
-         <button
-         type="button"
-         class="btn btn-secondary"
-         (click)="closeModal(modalNoteCredit)"
-       >
-         Cancelar
-       </button>
-       </div>
-     </div>
-   </div>
- </div>
-   <!-- Modal Error Delete -->
-   <div
-   #modalError
-   class="modal"
-   id="modalError"
-   tabindex="-1"
-   role="dialog"
- >
-   <div class="modal-dialog" role="document">
-     <div class="modal-content">
-       <div class="modal-header">
-         <h5 class="modal-title">Error</h5>
-       </div>
-       <div class="modal-body">
-         Se produjo un error al eliminar el gasto
-       </div>
-       <div class="modal-footer">
-         <button
-           type="button"
-           class="btn btn-primary"
-           (click)="closeModal(modalError)"
-         >
-           Aceptar
-         </button>
-       </div>
-     </div>
-   </div>
-   </div>
+<!-- Modal Confirm Delete -->
+<div #modalConfirmDelete class="modal" id="modalConfirmationDeleteExpense" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirmación</h5>
+      </div>
+
+      <div class="modal-body">
+        <p class="mb-4">¿Está seguro de eliminar el gasto?</p>
+
+        <div class="row align-items-center">
+          <label for="justification" class="col-3 form-label mb-0">Justificación</label>
+          <div class="col-9">
+            <textarea id="justification" class="form-control" rows="3"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" (click)="confirmDeleteExpense()">
+          Eliminar
+        </button>
+        <button type="button" class="btn btn-secondary" (click)="closeModal(modalConfirmDelete)">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!--Modal show operation successfuly-->
 
 
+<!-- Modal Note Credit -->
+<div #modalNoteCredit class="modal" id="showModalNoteCredit" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Nota de crédito</h5>
+      </div>
+      <div class="modal-body">
+        El gasto ya está cobrado. ¿Desea realizar una nota de crédito?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" (click)="deleteWithNoteCredit()">
+          Eliminar
+        </button>
+        <button type="button" class="btn btn-secondary" (click)="closeModal(modalNoteCredit)">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal Error Delete -->
+<div #modalError class="modal" id="modalError" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Error</h5>
+      </div>
+      <div class="modal-body">
+        Se produjo un error al eliminar el gasto
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="closeModal(modalError)">
+          Aceptar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

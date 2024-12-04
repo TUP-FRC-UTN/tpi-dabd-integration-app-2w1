@@ -16,6 +16,9 @@ import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import $ from 'jquery';
 import 'datatables.net-bs5';
+import { Subscription } from 'rxjs';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 
 
 @Component({
@@ -42,17 +45,50 @@ export class PenaltiesListComplaintComponent implements OnInit {
   options: { value: string, name: string }[] = []
   @ViewChild(CustomSelectComponent) customSelect!: CustomSelectComponent;
 
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
+
+  
+  //Destroy
+  ngOnDestroy(): void {
+    //TUTORIAL
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
+
+  }
 
   //Constructor
   constructor(
     private _modal: NgbModal,
     private complaintService: ComplaintService,
     private routingService: RoutingService,
-    private authService: AuthService
+    private authService: AuthService,
+    private tutorialService: TutorialService
   ) {
     (window as any).viewComplaint = (id: number) => this.viewComplaint(id);
-    (window as any).changeState = (state: string, id: number, userId: number) =>
-      this.changeState(state, id, userId);
+    (window as any).changeState = (id: number, state: string) =>
+      this.changeState(id, state);
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+        canClickTarget: false,
+      },
+      keyboardNavigation: false,
+      
+      useModalOverlay: true,
+    });
   }
 
 
@@ -61,8 +97,77 @@ export class PenaltiesListComplaintComponent implements OnInit {
     this.refreshData();
     this.getStates();
     this.eraseFilters();
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    );
   }
 
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Listado de Denuncias',
+      text: 'Acá puede ver una lista completa de las denuncias que se han realizado. Desde el botón de acciones puede ver más información de la denuncia, así como rechazarla o resolverla.', 
+      attachTo: {
+        element: '#complaintsTable',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+
+    this.tour.addStep({
+      id: 'filter-step',
+      title: 'Filtros',
+      text: 'Desde acá podrá filtrar las denuncias por nombre, fecha y tipo. También puede exportarlas a Excel o PDF, o borrar los filtros aplicados con el botón de basura.',
+      attachTo: {
+        element: '#filtros',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'float-button-step',
+      title: 'Agregar denuncia',
+      text: 'Haciendo click en este botón puede acceder a la página de alta de denuncias. Acá puede crear una nueva denuncia con sus datos correspondientes.',
+      attachTo: {
+        element: '#addButton',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+      
+    });
+
+    this.tour.start();
+  }
 
   //Crea la tabla con sus configuraciones 
   updateDataTable() {
@@ -141,11 +246,11 @@ export class PenaltiesListComplaintComponent implements OnInit {
                   <div class="dropdown">
                     <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
                     <ul class="dropdown-menu">
-                      <li><a class="dropdown-item" onclick="viewComplaint(${data.id})">Ver más</a></li>
+                      <li><a class="btn dropdown-item" onclick="viewComplaint(${data.id})">Ver más</a></li>
                       ${(data.complaintState === "Pendiente" || data.complaintState === "Nueva") ? `
                       <li><hr class="dropdown-divider"></li>
-                      <li><a class="dropdown-item" onclick="changeState('REJECTED', ${data.id}, ${this.authService.getUser().id})">Rechazar</a></li>
-                      <li><a class="dropdown-item" onclick="changeState('SOLVED', ${data.id}, ${this.authService.getUser().id})">Resuelta</a></li>` : ``}
+                      <li><a class="btn dropdown-item" onclick="changeState('REJECTED', ${data.id}, ${this.authService.getUser().id})">Rechazar</a></li>
+                      <li><a class="btn dropdown-item" onclick="changeState('SOLVED', ${data.id}, ${this.authService.getUser().id})">Resuelta</a></li>` : ``}
                     </ul>
                   </div>
                 </div>
@@ -167,6 +272,7 @@ export class PenaltiesListComplaintComponent implements OnInit {
         zeroRecords: "No se encontraron resultados",
         loadingRecords: "Cargando...",
         processing: "Procesando...",
+        emptyTable: "No hay datos disponibles",
       },
     });
   }
@@ -297,9 +403,27 @@ export class PenaltiesListComplaintComponent implements OnInit {
 
 
   //Metodo para actualizar el estado de una denuncia
-  changeState(option: string, idComplaint: number, userId: number) {
+  changeState(idComplaint: number, option: string) {
     const newState = option;
-    this.openModal(idComplaint, userId, newState);
+    this.openUpdateStateModal(idComplaint, newState);
+  }
+
+
+  //Abre el modal para cambiar el estado de la denuncia
+  openUpdateStateModal(idComplaint: number, complaintState: string) {
+    const modal = this._modal.open(PenaltiesModalStateReasonComponent, {
+      size: 'md',
+      keyboard: false,
+    });
+    modal.componentInstance.idComplaint = idComplaint;
+    modal.componentInstance.complaintState = complaintState;
+    modal.result
+      .then((result) => {
+        this.refreshData();
+      })
+      .catch((error) => {
+        console.log("Error con modal: " + error);
+      });
   }
 
 
@@ -331,25 +455,6 @@ export class PenaltiesListComplaintComponent implements OnInit {
         console.error('error: ', error);
       }
     })
-  }
-
-
-  //Abre el modal para cambiar el estado de la denuncia
-  openModal(idComplaint: number, userId: number, complaintState: string) {
-    const modal = this._modal.open(PenaltiesModalStateReasonComponent, {
-      size: 'md',
-      keyboard: false,
-    });
-    modal.componentInstance.idComplaint = idComplaint;
-    modal.componentInstance.complaintState = complaintState;
-    modal.componentInstance.userId = userId;
-    modal.result
-      .then((result) => {
-        this.refreshData();
-      })
-      .catch((error) => {
-        console.log("Error con modal: " + error);
-      });
   }
 
 

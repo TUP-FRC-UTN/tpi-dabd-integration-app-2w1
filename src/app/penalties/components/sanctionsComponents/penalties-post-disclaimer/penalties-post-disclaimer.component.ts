@@ -1,11 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, Input, OnInit } from '@angular/core';
+import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { SanctionService } from '../../../services/sanctions.service';
 import Swal from 'sweetalert2';
 import { RoutingService } from '../../../../common/services/routing.service';
 import { PlotService } from '../../../../users/users-servicies/plot.service';
+import { Subscription } from 'rxjs';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 
 @Component({
   selector: 'app-penalties-post-disclaimer',
@@ -14,19 +17,39 @@ import { PlotService } from '../../../../users/users-servicies/plot.service';
   templateUrl: './penalties-post-disclaimer.component.html',
   styleUrl: './penalties-post-disclaimer.component.scss'
 })
-export class PenaltiesPostDisclaimerComponent implements OnInit {
+export class PenaltiesPostDisclaimerComponent implements OnInit, OnDestroy {
   private readonly plotService = inject(PlotService);
   userId: number;
   fineIdFromList: number;
   fine: any;
   reactiveForm: FormGroup;
 
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
+
   constructor(private penaltiesService: SanctionService,
     private router: Router,
     private route: ActivatedRoute,
     formBuilder: FormBuilder,
-    private routingService: RoutingService
+    private routingService: RoutingService,
+    private tutorialService: TutorialService
   ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+      },
+      keyboardNavigation: false,
+
+      useModalOverlay: true,
+    });
+
     this.userId = 1;
     this.fineIdFromList = 0; //Esto deberia venir del listado
     this.reactiveForm = formBuilder.group({
@@ -39,6 +62,88 @@ export class PenaltiesPostDisclaimerComponent implements OnInit {
       this.fineIdFromList = + params.get('fineId')!;
       this.getFine(this.fineIdFromList);
     });
+
+    //TUTORIAL
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    );
+  }
+
+  ngOnDestroy(): void {
+    //TUTORIAL
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
+  }
+
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Alta de Descargo',
+      text: 'Acá puede realizar el alta de un descargo. Complete el campo con el motivo de su descargo para que sea posteriormente revisado por la administracion.',
+      attachTo: {
+        element: '#page',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Datos de la Multa',
+      text: 'Aqui puede revisar los datos relacionados a la multa sobre la que esta queriendo apelar.',
+      attachTo: {
+        element: '#sanctionData',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+    
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Boton de registro',
+      text: 'Con este boton esta confirmando el alta del descargo, poseriormente se enviara a administracion para que sea revisado y se actualizara en un maximo de 7 dias el resultado.',
+      attachTo: {
+        element: '#sendButton',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+    });
+
+    this.tour.start();
   }
 
   getFine(fineId: number) {

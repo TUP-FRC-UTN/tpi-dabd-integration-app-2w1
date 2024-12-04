@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, inject, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterOutlet } from '@angular/router';
 import { PlotService } from '../../../users/users-servicies/plot.service';
@@ -9,19 +9,21 @@ import { RoutingService } from '../../services/routing.service';
 @Component({
   selector: 'app-landing-page',
   standalone: true,
-  imports: [RouterOutlet, ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './landing-page.component.html',
   styleUrls: ['./landing-page.component.css'],
 })
 export class LandingPageComponent implements OnInit {
   lotes: GetPlotModel[] = [];
+  selectedPlot: GetPlotModel | null = null;
+  selectedPath: HTMLElement | null = null;
   //Injects
   private routingService = inject(RoutingService);
   private plotService = inject(PlotService);
-  //-----------------------------------------implementar el servicio de notificaciones para enviar un mail-------------------------------
 
   formMessage: FormGroup;
   plotsCard: { number: number, blockNumber: number, totalArea: number, type: string, status: string }[] = [];
+
 
   images: any[] = [
     'https://www.villadelcondor.com/imagenes/villadelcondor1.jpg',
@@ -43,14 +45,24 @@ export class LandingPageComponent implements OnInit {
     'https://www.villadelcondor.com/imagenes/villadelcondor18.jpg'
   ];
 
+
   //Formulario para hacer consultas
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private cdRef: ChangeDetectorRef) {
     this.formMessage = this.fb.group({
       name: new FormControl('', [Validators.required]),
       email: new FormControl('', [Validators.required, Validators.email]),
       message: new FormControl('', [Validators.required])
     })
   }
+
+
+  //Init
+  ngOnInit(): void {
+    this.getPlots();
+  }
+
+
+  //Cargar el mapa
   loadMap(): void {
     const svgElement = document.getElementById('mapa') as HTMLObjectElement;
     const svgDoc = svgElement.contentDocument;
@@ -89,15 +101,14 @@ export class LandingPageComponent implements OnInit {
 
         // Setteo de evento de clic
         pathElement.addEventListener('click', () => {
-          alert(`Hiciste clic en ${lote.id}`);
-          console.log(lote);
+          this.selectedPlot = this.lotes.find(l => l.id === lote.id)!;
+          this.selectedPath = pathElement.cloneNode(true) as HTMLElement;
+          console.log(this.selectedPlot);
+          this.cdRef.detectChanges();
         });
 
       }
     });
-  }
-  ngOnInit(): void {
-    this.getPlots();
   }
 
   //Trae los primeros 3 lotes disponibles
@@ -135,12 +146,6 @@ export class LandingPageComponent implements OnInit {
     this.routingService.redirect('/login')
   }
 
-  //Enviar el formulario con la consulta
-  sendMessage() {
-    if (this.formMessage.valid) {
-      //implementar enviar mensaje
-    }
-  }
 
   //Mostrar si el campo es válido o no
   onValidate(controlName: string) {
@@ -165,6 +170,69 @@ export class LandingPageComponent implements OnInit {
     };
 
     return errorMessages[errorKey] || 'Error desconocido';
+  }
+
+  clearPlot() {
+    this.selectedPlot = null;
+  }
+
+  extractPathCoordinates(path: string): { minX: number, minY: number, maxX: number, maxY: number } {
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    let currentX = 0, currentY = 0;
+
+    //Separa los comandos del path
+    const pathCommands = path.match(/[a-zA-Z][^a-zA-Z]*/g);
+
+    pathCommands?.forEach(command => {
+      //Obtiene las coordenadas
+      const coords = command.slice(1).split(/[\s,]+/).map(Number);
+      let i = 0;
+
+      while (i < coords.length) {
+        const x = coords[i];
+        const y = coords[i + 1];
+
+        //Movimientos absolutos
+        if (command.startsWith('M') || command.startsWith('L') || command.startsWith('T')) {
+          currentX = x;
+          currentY = y;
+        }
+
+        //Movimientos relativos
+        else if (command.startsWith('m') || command.startsWith('l') || command.startsWith('t')) {
+          currentX += x;
+          currentY += y;
+        }
+
+        //
+        else if (command.startsWith('C') || command.startsWith('c') || command.startsWith('S') || command.startsWith('s') || command.startsWith('Q') || command.startsWith('q') || command.startsWith('T')) {
+          currentX = x;
+          currentY = y;
+        }
+
+        //Actualiza las coordenadas mínimas y máximas
+        minX = Math.min(minX, currentX);
+        minY = Math.min(minY, currentY);
+        maxX = Math.max(maxX, currentX);
+        maxY = Math.max(maxY, currentY);
+
+        //Avanza de dos en dos porque itera sobre x,y
+        i += 2;
+      }
+    });
+
+    return { minX, minY, maxX, maxY };
+  }
+
+  updatePathToOrigin(path: string): string {
+    const { minX, minY } = this.extractPathCoordinates(path);
+
+    // Calculamos el traslape necesario para llevar el path a (0, 0)
+    const translateX = -minX;
+    const translateY = -minY;
+
+    // Devuelve el transform para mover el path a (0, 0)
+    return `translate(${translateX}, ${translateY})`;
   }
 
 }

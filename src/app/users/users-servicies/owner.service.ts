@@ -63,15 +63,21 @@ export class OwnerService {
     formData.append('lastname', owner.lastname);
     formData.append('dni', owner.dni);
     formData.append('dni_type', owner.dni_type_id.toString());
-    formData.append('dateBirth', new Date(owner.dateBirth).toISOString().split('T')[0]);
+    if(owner.dateBirth){
+      formData.append('dateBirth', new Date(owner.dateBirth).toISOString().split('T')[0]);
+    }
     formData.append('ownerTypeId', owner.ownerTypeId.toString());
     formData.append('taxStatusId', owner.taxStatusId.toString());
     formData.append('businessName', owner.businessName? owner.businessName : '');
     formData.append('active', owner.active.toString());
     formData.append('username', owner.username);
     formData.append('password', owner.password);
-    formData.append('email', owner.email);
-    formData.append('phoneNumber', owner.phoneNumber);
+    if(owner.email){
+      formData.append('email', owner.email);
+    }
+    if(owner.phoneNumber){
+      formData.append('phoneNumber', owner.phoneNumber);
+    }
     formData.append('avatarUrl', owner.avatarUrl);
 
     owner.roles.forEach((role, index) => {

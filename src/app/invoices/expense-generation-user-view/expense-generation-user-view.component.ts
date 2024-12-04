@@ -1,7 +1,7 @@
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import { ExpenseGenerationExpenseService } from '../expense-generation-services/expense-generation-expense.service';
 import { ExpenseGenerationExpenseInterface } from '../expense-generation-interfaces/expense-generation-expense-interface';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import {CommonModule, DatePipe, registerLocaleData} from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ExpenseGenerationCardComponent } from '../expense-generation-card/expense-generation-card.component';
@@ -12,6 +12,10 @@ import { OwnerService } from '../expense-generation-services/expense-generation-
 import { AuthService } from '../../users/users-servicies/auth.service';
 import { environment } from '../../common/environments/environment';
 import { RoutingService } from '../../common/services/routing.service';
+import { UserService } from '../expense-generation-services/expense-generation-user-service';
+import { GetUserDto } from '../expense-generation-interfaces/expense-generation-user';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../common/services/tutorial.service';
 registerLocaleData(localeEsAr, 'es-AR');
 @Component({
   selector: 'app-expense-generation-user-view',
@@ -28,16 +32,35 @@ registerLocaleData(localeEsAr, 'es-AR');
 })
 export class ExpenseGenerationUserViewComponent implements OnInit {
 
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
+  
    Math = Math;
 
   constructor(
     private expenseService: ExpenseGenerationExpenseService,
     private paymentService: ExpenseGenerationPaymentService,
     private routingService: RoutingService,
+    private userService: UserService,
     private datePipe:DatePipe,
     private ownerService: OwnerService,
     private authService: AuthService,
-  ) {}
+    private tutorialService: TutorialService
+  ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+      },
+      useModalOverlay: true,
+    }); 
+}
 
 
   // Arreglos
@@ -72,34 +95,139 @@ export class ExpenseGenerationUserViewComponent implements OnInit {
 
   ngOnInit() {
     this.expenseService.clearSelectedExpenses;
-    // Obtener el ID del usuario logueado
-    const userId = this.authService.getUser().id;
     
-    // Buscar el propietario correspondiente
-    this.ownerService.getOwnerByUserId(userId).subscribe({
-      next: (owner) => {
-        if (owner) {
-          this.ownerId = owner.id; 
-          this.getExpensesByOwner(); 
-          
-          const today = new Date();
-          const localDate = new Date(today.getTime() - today.getTimezoneOffset() * 60000);
-          this.endDate = localDate.toISOString().split('T')[0];
-          this.maxEndDate = localDate.toISOString().split('T')[0];
-          this.startDate = new Date(localDate.getFullYear(), 0, 1).toISOString().split('T')[0];
-          
-          this.selectedExpenses = this.expenseService.getSelectedExpenses();
-          this.calculateTotal();
-          this.updateButtonState();
-        } else {
-          console.error('No se encontró un propietario para el usuario logueado');
+    let userId = this.authService.getUser().id;
+    const userRole = this.authService.getActualRole();
+      //TUTORIAL
+      this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+        () => {
+          this.startTutorial();
         }
-      },
-      error: (error) => {
-        console.error('Error al obtener el propietario:', error);
-      }
-    });
+      ); 
+    const processExpenses = (ownerId: number) => {
+      this.ownerService.getOwnerByUserId(ownerId).subscribe({
+        next: (owner) => {
+          if (owner) {
+            this.ownerId = owner.id;
+            this.getExpensesByOwner();
+           
+            const today = new Date();
+            const localDate = new Date(today.getTime() - today.getTimezoneOffset() * 60000);
+            this.endDate = localDate.toISOString().split('T')[0];
+            this.maxEndDate = localDate.toISOString().split('T')[0];
+            this.startDate = new Date(localDate.getFullYear(), 0, 1).toISOString().split('T')[0];
+           
+            this.selectedExpenses = this.expenseService.getSelectedExpenses();
+            this.calculateTotal();
+            this.updateButtonState();
+          } else {
+            console.error('No se encontró un propietario para el usuario logueado');
+          }
+        },
+        error: (error) => {
+          console.error('Error al obtener el propietario:', error);
+        }
+      });
+    };
+
+    if(userRole == "Co-Propietario") {
+      this.userService.getOwnerBySecondaryOwner(userId).subscribe({
+        next: (ownerUser) => {
+          if (ownerUser.id) {
+            processExpenses(ownerUser.id);
+          } else {
+            console.error('No se encontró el ID del propietario');
+            processExpenses(userId);
+          }
+        },
+        error: (error) => {
+          console.error('Error al obtener el propietario', error);
+          processExpenses(userId);
+        }
+      });
+    } else {
+      processExpenses(userId);
+    }
+}
+  ngOnDestroy() {
+    //TUTORIAL
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    
+    // Cancelar suscripción del tutorial
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
+
+  
   }
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+    this.tour.addStep({
+      id: 'apagar',
+      title: 'Documentos a pagar.',
+      text: 'Desde acá podrá seleccionar las boletas pendientes que desea pagar.',      attachTo: {
+        element: '#apagar',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+      
+    });
+    
+    this.tour.addStep({
+      id: 'tabla',
+      title: 'Tabla de documentos historicos',
+      text: 'Acá puede ver todas las boletas que se emitieron a su nombre, tanto las pendientes, pagadas o exceptuadas.',
+      attachTo: {
+        element: '#tabla',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'filtros',
+      title: 'Filtros',
+      text: 'Desde acá podrá filtrar sus boletas emitidas por fecha e importe mínimo y máximo.',
+      attachTo: {
+        element: '#filtros',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+    });
+    this.tour.start();
+}
+
+
 
   goToPaymentForm(){
     this.routingService.redirect("/main/invoices/expense-generation-payment-form")
@@ -140,7 +268,6 @@ export class ExpenseGenerationUserViewComponent implements OnInit {
 
   async openPdf(uuid: string) {
     try {
-      // Eliminar el prefijo 'uuid:' si existe
       const cleanUuid = uuid.replace('uuid:', '');
       
       const response = await fetch(

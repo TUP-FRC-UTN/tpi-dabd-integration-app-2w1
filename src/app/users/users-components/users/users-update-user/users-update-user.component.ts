@@ -13,6 +13,9 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
 import { RoutingService } from '../../../../common/services/routing.service';
 import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
+import { Subscription } from 'rxjs';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 
 @Component({
   selector: 'app-users-update-user',
@@ -23,7 +26,11 @@ import { SuscriptionManagerService } from '../../../../common/services/suscripti
 })
 export class UsersUpdateUserComponent implements OnInit, OnDestroy {
 
-  constructor(private route: ActivatedRoute, private fb: FormBuilder) {
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
+  
+  constructor(private route: ActivatedRoute, private fb: FormBuilder, private tutorialService: TutorialService) {
     this.updateForm = this.fb.group({
       name: new FormControl('', [Validators.required]),
       lastname: new FormControl('', [Validators.required]),
@@ -39,6 +46,20 @@ export class UsersUpdateUserComponent implements OnInit, OnDestroy {
       datebirth: new FormControl(''),
       roles: new FormControl([], [Validators.required])
     })
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+      },
+      keyboardNavigation: false,
+
+      useModalOverlay: true,
+    });
   }
   @ViewChild('rolesSelect') rolesComponent!: CustomSelectComponent; //FixMe: Usar el customSelect en este componente
   @ViewChild('dniComponent') dniComponent!: CustomSelectComponent; //FixMe: Usar el customSelect en este componente
@@ -77,11 +98,64 @@ export class UsersUpdateUserComponent implements OnInit, OnDestroy {
       this.updateForm.get('email')?.disable();
       this.updateForm.get('datebirth')?.disable();
     }
+
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    );
+  }
+  startTutorial() {
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Actualización de usuario',
+      text: 'Acá puede actualizar los datos de un usuario. Tenga en cuenta que algunos campos no pueden modificarse sin permisos especiales.',
+      attachTo: {
+        element: '#updateUser',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        },
+      ],
+    });
+
+
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Guardar cambios',
+      text: 'Al finalizar, presione este botón para guardar sus cambios.',
+      attachTo: {
+        element: '#register',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back,
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete,
+        },
+      ],
+    });
+
+    this.tour.start();
   }
 
   //Desuscribirse de los observables
   ngOnDestroy(): void {
     this.suscriptionService.unsubscribeAll();
+    if (this.tour) {
+      this.tour.complete();
+    }
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
   }
 
   //---------------------------------------------------Carga de datos---------------------------------------------------

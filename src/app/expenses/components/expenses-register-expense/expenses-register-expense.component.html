@@ -1,5 +1,5 @@
 <section class="py-5">
-  <div class="container p-3 border border-2 rounded shadow-lg">
+  <div id="addExpense" class="container p-3 border border-2 rounded shadow-lg">
     <div class="container mt-4">
       <div class="card border-0">
         <div class="card border-0">
@@ -132,7 +132,7 @@
                   </div>
                 </div>
               </div>
-              <div class="col">
+              <div id="uploadFile" class="col">
                 <div class="d-flex justify-content-start align-items-center mb-2">
                   <div class="col-3">
                     <label for="receipt" class="form-label">Comprobante</label>
@@ -404,7 +404,7 @@
                   </button>
                 }
                 @else {
-                  <button
+                  <button id="register"
                     class="btn btn-success px-5 d-flex align-items-center justify-content-center"
                     type="submit"
                     [disabled]="!form.valid || (expense.typeExpense == 'INDIVIDUAL' && !validateTotalProportion()) || isLoading">

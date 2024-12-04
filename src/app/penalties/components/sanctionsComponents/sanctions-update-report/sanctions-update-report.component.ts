@@ -9,6 +9,9 @@ import { RoutingService } from '../../../../common/services/routing.service';
 import Swal from 'sweetalert2';
 import { PlotService } from '../../../../users/users-servicies/plot.service';
 import { HttpClient } from '@angular/common/http';
+import { Subscription } from 'rxjs';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 
 @Component({
   selector: 'app-report-modify',
@@ -34,11 +37,30 @@ export class ReportModifyComponent implements OnInit {
   modalInstance: any;
   formType = 'modify';
 
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
+
   constructor(private complaintService: ComplaintService,
      private reportService: SanctionService,
        route: ActivatedRoute,
-       private routingService: RoutingService
+       private routingService: RoutingService, 
+       private tutorialService: TutorialService
       ) {
+        this.tour = new Shepherd.Tour({
+          defaultStepOptions: {
+            cancelIcon: {
+              enabled: true,
+            },
+            arrow: false,
+            canClickTarget: false,
+            modalOverlayOpeningPadding: 10,
+            modalOverlayOpeningRadius: 10,
+          },
+          keyboardNavigation: false,
+
+          useModalOverlay: true,
+        }); 
     this.route = route;
   }
 
@@ -61,6 +83,115 @@ export class ReportModifyComponent implements OnInit {
         console.log(params);
       }
     });
+
+    //TUTORIAL
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    ); 
+  }
+
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    };
+    while (this.tour.steps.length > 0) {
+      this.tour.removeStep(this.tour.steps[this.tour.steps.length - 1].id);
+    }
+    this.tour.addStep({
+      id: 'general-step',
+      title: 'Editar Informe',
+      text: 'En este formulario puede editar la información del informe.',
+      attachTo: {
+        element: '#formDenuncia',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+
+
+    this.tour.addStep({
+      id: 'description-step',
+      title: 'Descripción',
+      text: 'Acá puede editar la descripción del informe.',
+      attachTo: {
+        element: '#reportDescription',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'complaint-step',
+      title: 'Adjuntar Denuncias',
+      text: 'Este botón abrirá una ventana donde podrá visualizar y seleccionar denuncias...',
+      attachTo: {
+        element: '#complaintModal',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back,
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        },
+      ],
+    });
+
+    
+    this.tour.addStep({
+      id: 'final-step',
+      title: 'Guardar',
+      text: 'Finalmente, haga click en el botón azul para guardar los cambios realizados.',
+      attachTo: {
+        element: '#saveButton',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+      
+    });
+
+    this.tour.start();
+  }
+
+  ngOnDestroy(): void {
+    //TUTORIAL
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
   }
 
   loadSelectedComplaints(reportId: number): void {

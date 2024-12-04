@@ -1,5 +1,5 @@
-<section class="container p-5 border rounded border-3 border-secundary" style="min-height: 70vh">
-  <form [formGroup]="formReactivo" (ngSubmit)="createOwner()">
+<section class="container p-5 border rounded border-3 border-secundary" style="min-height: 70vh" id="newOwner">
+  <form [formGroup]="formReactivo" (ngSubmit)="createOwner()" >
     <div class="row">
       <div class="col-lg-6 mb-3">
         <div class="row">
@@ -91,7 +91,7 @@
       </div>
 
 
-      <div class="col-lg-6 mb-3">
+      <div class="col-lg-6 mb-3" id="ownerType">
         <div class="row">
           <label class="col-2 col-form-label">Tipo de Propietario</label>
           <div class="col-10">
@@ -179,7 +179,7 @@
       </div> -->
 
 
-      <div class="col-lg-6 mb-3">
+      <div class="col-lg-6 mb-3" id="lotes">
         <div class="row">
           <label class="col-2 col-form-label">Lotes</label>
           <div class="col-10">
@@ -197,7 +197,7 @@
       </div>
 
 
-      <div class="col-lg-6 mb-3">
+      <div class="col-lg-6 mb-3" id="files">
         <div class="row">
           <label class="col-2 col-form-label">Subir Archivos</label>
           <div class="col-10">
@@ -229,7 +229,7 @@
           </button>
         </div>
         <div class="col-auto">
-          <button type="submit" class="btn btn-success" [disabled]="formReactivo.invalid">
+          <button type="submit" class="btn btn-success" [disabled]="formReactivo.invalid" id="register">
             Registrar
           </button>
         </div>
