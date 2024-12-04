@@ -16,5 +16,5 @@ export const environment = {
     sanctions: 'http://localhost:9042',
     stripeService: 'http://localhost:9024',
     usersAndAddresses: 'http://localhost:9060',  
-  },
+  }
 };

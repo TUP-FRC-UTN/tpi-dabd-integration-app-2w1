@@ -164,6 +164,7 @@ export class PenaltiesPostDisclaimerComponent implements OnInit, OnDestroy {
       fineId: this.fineIdFromList,
       disclaimer: this.reactiveForm.value.disclaimerControl
     };
+    console.log(disclaimerData)
 
     // Confirmación antes de enviar el formulario
 
