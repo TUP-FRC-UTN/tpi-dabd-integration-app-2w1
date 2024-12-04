@@ -20,13 +20,16 @@ import { CustomSelectComponent } from '../../../../common/components/custom-sele
 import moment from 'moment';
 import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
 import { RoutingService } from '../../../../common/services/routing.service';
+import { Subscription } from 'rxjs';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 
 @Component({
   selector: 'app-users-list-owners',
   standalone: true,
   imports: [ReactiveFormsModule, CustomSelectComponent],
   templateUrl: './users-list-owners.component.html',
-  styleUrl: './users-list-owners.component.css'
+  styleUrl: './users-list-owners.component.css',
 })
 export class UsersListOwnersComponent implements OnDestroy {
   owners: Owner[] = [];
@@ -41,8 +44,12 @@ export class UsersListOwnersComponent implements OnDestroy {
   showDeactivateModal: boolean = false;
   userToDeactivate: number = 0;
   types: any[] = [];
-  maxDate = new Date(new Date().setHours(new Date().getHours() - 3)).toISOString().split('T')[0];
-  minDate: string = new Date(new Date().setDate(new Date().getDate() - 30)).toISOString().split('T')[0];
+  maxDate = new Date(new Date().setHours(new Date().getHours() - 3))
+    .toISOString()
+    .split('T')[0];
+  minDate: string = new Date(new Date().setDate(new Date().getDate() - 30))
+    .toISOString()
+    .split('T')[0];
   selectType: FormControl = new FormControl([]);
   initialDate: FormControl = new FormControl(this.minDate);
   endDate: FormControl = new FormControl(this.maxDate);
@@ -50,13 +57,39 @@ export class UsersListOwnersComponent implements OnDestroy {
   plots: GetPlotDto[] = [];
   ownersWithPlots: any[] = [];
 
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
+
   //Desuscribirse
   ngOnDestroy(): void {
     this.suscriptionService.unsubscribeAll();
+    
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
   }
 
-  constructor(private modal: NgbModal) {
+  constructor(private modal: NgbModal, private tutorialService: TutorialService) {
     const fecha = new Date();
+
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+      },
+      useModalOverlay: true,
+    });
   }
 
   async ngOnInit() {
@@ -96,7 +129,6 @@ export class UsersListOwnersComponent implements OnDestroy {
           ])
         );
 
-
         // Inicializar DataTables después de cargar los datos
         setTimeout(() => {
           const table = $('#myTableOwners').DataTable({
@@ -109,7 +141,11 @@ export class UsersListOwnersComponent implements OnDestroy {
             pageLength: 5,
             columns: [
               { title: 'Nombre', width: '15%', className: 'text-start' },
-              { title: 'Tipo Documento', width: '10%', className: 'text-start' },
+              {
+                title: 'Tipo Documento',
+                width: '10%',
+                className: 'text-start',
+              },
               { title: 'Documento', width: '15%', className: 'text-end' },
               { title: 'Tipo', width: '15%', className: 'text-center' },
               { title: 'Lotes', width: '10%', className: 'text-start' },
@@ -122,7 +158,7 @@ export class UsersListOwnersComponent implements OnDestroy {
                   const ownerId = this.owners[meta.row].id;
                   return `
                     <div class="dropdown-center d-flex align-items-center justify-content-center text-center">
-                      <button class="btn btn-light border border-1" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      <button class="btn btn-light border border-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="actions">
                         <i class="bi bi-three-dots-vertical"></i>
                       </button>
                       <ul class="dropdown-menu">
@@ -187,7 +223,7 @@ export class UsersListOwnersComponent implements OnDestroy {
           $('#myTableOwners').on('click', '.delete-owner', (event) => {
             const id = $(event.currentTarget).data('id');
             const userId = this.owners[id].id; //Obtén el ID real del usuario
-            this.openModalEliminar(userId); //Pasa el ID del usuario al abrir el modal 
+            this.openModalEliminar(userId); //Pasa el ID del usuario al abrir el modal
           });
         }, 0); // Asegurar que la tabla se inicializa en el próximo ciclo del evento
       },
@@ -195,6 +231,97 @@ export class UsersListOwnersComponent implements OnDestroy {
         console.error('Error al cargar los lotes:', error);
       },
     });
+
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    );
+
+  }
+
+  startTutorial() {
+    console.log('EMPEZANDO TUTORIAL');
+    this.tour.addStep({
+      id: 'profile-step',
+      title: 'Lista de propietarios',
+      text: 'Acá puede ver una lista de todos los propietarios del barrio. Se diferenfia entre persona fisica y persona jurídica. También se muestra la lista de lotes qu tiene el propietario.',
+
+      attachTo: {
+        element: '#myTableOwners',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        },
+      ],
+    });
+
+    this.tour.addStep({
+      id: 'edit-step',
+      title: 'Filtros',
+      text: 'Desde acá podrá filtrar los propietarios. También puede exportar la lista a Excel o PDF, o borrar los filtros aplicados con el botón de basura.',
+      attachTo: {
+        element: '#filtros',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back,
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        },
+      ],
+    });
+
+    this.tour.addStep({
+      id: 'profile-step',
+      title: 'Acciones',
+      text: 'Desde acá puede ver las acciones disponibles para cada usuario. Puede editar el perfil, borrar el usuario o ver más información.',
+
+      attachTo: {
+        element: '#actions',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back,
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        },
+      ],
+    });
+    
+    this.tour.addStep({
+      id: 'profile-step',
+      title: 'Agregar',
+      text: 'Para agregar un nuevo propietario, pulse este botón y será enviado al alta de propietarios.',
+
+      attachTo: {
+        element: '#addOwner',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back,
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete,
+        },
+      ],
+    });
+
+    this.tour.start();
   }
 
   showOwerType(ownerType: string) {
@@ -212,42 +339,42 @@ export class UsersListOwnersComponent implements OnDestroy {
   }
 
   async loadPlots(ownerId: number): Promise<string> {
+    this.plots = (await this.plotService.getAllPlots().toPromise()) || [];
 
-    this.plots = await this.plotService.getAllPlots().toPromise() || [];
-
-    let plots = this.ownersWithPlots.find(owner => owner.owner.id == ownerId);
+    let plots = this.ownersWithPlots.find((owner) => owner.owner.id == ownerId);
 
     let response = '';
 
     for (let i = 0; i < plots.plot.length; i++) {
-      response += this.plots.find(plot => plot.id == plots.plot[i])?.plot_number + ", " || '';
+      response +=
+        this.plots.find((plot) => plot.id == plots.plot[i])?.plot_number +
+          ', ' || '';
     }
 
     response = response.substring(0, response.length - 2);
     return response;
   }
 
-
   async abrirModal(ownerId: number) {
-
     // Espera a que se cargue el usuario seleccionado
     try {
-
       await this.selectOwner(ownerId);
 
       // Una vez cargado, abre el modal
-      const modalRef = this.modal.open(UsersModalInfoOwnerComponent, { size: 'lg', keyboard: false });
+      const modalRef = this.modal.open(UsersModalInfoOwnerComponent, {
+        size: 'lg',
+        keyboard: false,
+      });
       modalRef.componentInstance.ownerModel = this.ownerModel;
 
       modalRef.result.then((result) => {
         $('#myTableOwners').DataTable().ajax.reload();
       });
-
     } catch (error) {
       console.error('Error al abrir el modal:', error);
     }
   }
-  
+
   //Redirigir a la vista de agregar propietario
   addOwner() {
     this.routingService.redirect('main/owners/add', 'Registrar Propietario');
@@ -255,19 +382,24 @@ export class UsersListOwnersComponent implements OnDestroy {
 
   //Redirigir a la vista de editar propietario
   redirectEdit(id: number) {
-    this.routingService.redirect(`/main/owners/edit/${id}`, 'Actualizar Propietario')
+    this.routingService.redirect(
+      `/main/owners/edit/${id}`,
+      'Actualizar Propietario'
+    );
   }
 
   //Carga los tipos de propietarios
   loadTypes() {
     const sus3 = this.apiService.getAllTypes().subscribe({
       next: (data: OwnerTypeModel[]) => {
-
-        this.types = data.map(type => ({ value: type.description, name: type.description }));
+        this.types = data.map((type) => ({
+          value: type.description,
+          name: type.description,
+        }));
       },
       error: (error) => {
         console.error('Error al cargar los tipos:', error);
-      }
+      },
     });
 
     //Agrego suscripcion
@@ -275,7 +407,10 @@ export class UsersListOwnersComponent implements OnDestroy {
   }
 
   async openModalEliminar(userId: number) {
-    const modalRef = this.modal.open(ModalEliminarOwnerComponent, { size: 'md', keyboard: false });
+    const modalRef = this.modal.open(ModalEliminarOwnerComponent, {
+      size: 'md',
+      keyboard: false,
+    });
     modalRef.componentInstance.userModal = { id: userId };
 
     // Escuchar el evento de eliminación para recargar los usuarios
@@ -297,34 +432,34 @@ export class UsersListOwnersComponent implements OnDestroy {
     // Reiniciar el valor del control de tipo y fechas
     this.selectType.setValue('');
     this.initialDate.setValue(this.minDate); // Restablecer fecha inicial
-    this.endDate.setValue(this.maxDate);    // Restablecer fecha final
-  
+    this.endDate.setValue(this.maxDate); // Restablecer fecha final
+
     // Limpiar el campo de búsqueda general
-    const searchInput = document.querySelector('#myTable_filter_Owners input') as HTMLInputElement;
+    const searchInput = document.querySelector(
+      '#myTable_filter_Owners input'
+    ) as HTMLInputElement;
     if (searchInput) {
       searchInput.value = ''; // Limpiar el valor del input de búsqueda general
     }
-  
+
     // Obtener la instancia de DataTable
     const table = $('#myTableOwners').DataTable();
-  
+
     // Limpiar búsqueda general y filtros de columnas
-    table.search('').draw();          // Limpiar búsqueda general
+    table.search('').draw(); // Limpiar búsqueda general
     table.column(3).search('').draw(); // Limpiar filtro de tipo
     table.column(0).search('').draw(); // Limpiar filtro de fecha
 
     if (this.customSelect) {
       this.customSelect.setData([]); // Reiniciar datos del custom select
     }
-  
+
     // Eliminar la función de filtro personalizada de fechas
     $.fn.dataTable.ext.search.splice(0, $.fn.dataTable.ext.search.length);
-  
+
     // Redibujar la tabla sin filtros
     table.draw();
   }
-
-  
 
   updateFilterType(options: any[]) {
     // Asignamos directamente los roles emitidos
@@ -332,7 +467,6 @@ export class UsersListOwnersComponent implements OnDestroy {
     const table = $('#myTableOwners').DataTable();
 
     console.log(optionsFilter);
-    
 
     // Filtrar por el contenido de la columna de tipo de lote, teniendo en cuenta que puede tener unicamente 1 valor, pero se tiene que filtrar x varios
     table.column(3).search(optionsFilter, true, false).draw(); // Usar expresión regular para permitir múltiples filtros
@@ -340,36 +474,45 @@ export class UsersListOwnersComponent implements OnDestroy {
 
   getContentBetweenArrows(input: string): string[] {
     const matches = [...input.matchAll(/>(.*?)</g)];
-    return matches.map(match => match[1]).filter(content => content !== "");
+    return matches.map((match) => match[1]).filter((content) => content !== '');
   }
 
   //Metodo para filtrar la tabla en base a las 2 fechas
   filterByDate() {
     const table = $('#myTableOwners').DataTable();
-  
+
     // Convertir las fechas seleccionadas a objetos Date para comparar
-    const start = this.initialDate.value ? (new Date(this.initialDate.value)).toISOString().split('T')[0] : null;
-    const end = this.endDate.value ? (new Date(this.endDate.value)).toISOString().split('T')[0] : null;
-  
+    const start = this.initialDate.value
+      ? new Date(this.initialDate.value).toISOString().split('T')[0]
+      : null;
+    const end = this.endDate.value
+      ? new Date(this.endDate.value).toISOString().split('T')[0]
+      : null;
+
     // Limpiar cualquier filtro previo relacionado con fechas
     $.fn.dataTable.ext.search.splice(0, $.fn.dataTable.ext.search.length);
-  
+
     // Agregar una nueva función de filtro
-    $.fn.dataTable.ext.search.push((settings: any, data: any, dataIndex: any) => {
-      // Convertir la fecha de la fila (data[0]) a un objeto Date
-      const rowDateParts = data[0].split('/'); // Asumiendo que la fecha está en formato DD/MM/YYYY
-      const rowDate = (new Date(`${rowDateParts[2]}-${rowDateParts[1]}-${rowDateParts[0]}`)).toISOString().split('T')[0]; // Convertir a formato YYYY-MM-DD
-  
-      // Realizar las comparaciones
-      if (start && rowDate < start) return false;
-      if (end && rowDate > end) return false;
-      return true;
-    });
-  
+    $.fn.dataTable.ext.search.push(
+      (settings: any, data: any, dataIndex: any) => {
+        // Convertir la fecha de la fila (data[0]) a un objeto Date
+        const rowDateParts = data[0].split('/'); // Asumiendo que la fecha está en formato DD/MM/YYYY
+        const rowDate = new Date(
+          `${rowDateParts[2]}-${rowDateParts[1]}-${rowDateParts[0]}`
+        )
+          .toISOString()
+          .split('T')[0]; // Convertir a formato YYYY-MM-DD
+
+        // Realizar las comparaciones
+        if (start && rowDate < start) return false;
+        if (end && rowDate > end) return false;
+        return true;
+      }
+    );
+
     // Redibujar la tabla con el filtro aplicado
     table.draw();
   }
-  
 
   // Busca el user y se lo pasa al modal
   ownerModel: Owner = new Owner();
@@ -377,7 +520,6 @@ export class UsersListOwnersComponent implements OnDestroy {
     return new Promise((resolve, reject) => {
       this.apiService.getById(id).subscribe({
         next: (data: Owner) => {
-
           this.ownerModel = data;
           Swal.close(); // Cerrar SweetAlert
           resolve(data); // Resuelve la promesa cuando los datos se cargan
@@ -392,19 +534,21 @@ export class UsersListOwnersComponent implements OnDestroy {
             text: 'Hubo un problema al cargar el propietario. Por favor, inténtalo de nuevo.',
             confirmButtonText: 'Aceptar',
             allowOutsideClick: false,
-            allowEscapeKey: false
+            allowEscapeKey: false,
           });
-        }
+        },
       });
     });
   }
 
   private formatDate(date: Date): string {
     // Obtener la zona horaria de Argentina (UTC-3)
-    const argentinaOffset = 3 * 60;  // Argentina está a UTC-3, por lo que el offset es 3 horas * 60 minutos
+    const argentinaOffset = 3 * 60; // Argentina está a UTC-3, por lo que el offset es 3 horas * 60 minutos
 
     // Ajustar la fecha a la zona horaria de Argentina, estableciendo la hora en 00:00
-    const localDate = new Date(date.getTime() + (argentinaOffset - date.getTimezoneOffset()) * 60000);
+    const localDate = new Date(
+      date.getTime() + (argentinaOffset - date.getTimezoneOffset()) * 60000
+    );
 
     // Establecer la hora en 00:00 para evitar cambios de fecha no deseados
     localDate.setHours(0, 0, 0, 0);
@@ -412,7 +556,11 @@ export class UsersListOwnersComponent implements OnDestroy {
     // Sumar un día
     localDate.setDate(localDate.getDate());
 
-    const options: Intl.DateTimeFormatOptions = { day: '2-digit', month: '2-digit', year: 'numeric' };
+    const options: Intl.DateTimeFormatOptions = {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    };
     return new Intl.DateTimeFormat('es-ES', options).format(localDate);
   }
 
@@ -429,7 +577,7 @@ export class UsersListOwnersComponent implements OnDestroy {
     doc.text(`Fecha: ${today}`, 15, 30);
 
     // Definir columnas para el PDF
-    const columns = ['Nombre','Tipo Documento', 'Documento', 'Tipo', 'Lotes'];
+    const columns = ['Nombre', 'Tipo Documento', 'Documento', 'Tipo', 'Lotes'];
 
     // Filtrar datos visibles en la tabla
     const table = $('#myTableOwners').DataTable();
@@ -439,7 +587,6 @@ export class UsersListOwnersComponent implements OnDestroy {
 
     // Mapear los datos visibles a un formato adecuado para jsPDF
     const rows = visibleRows.map((row: any) => [
-  
       `${row[0]}`,
       `${row[1]}`,
       `${this.getContentBetweenArrows(row[2])}`,
@@ -459,7 +606,7 @@ export class UsersListOwnersComponent implements OnDestroy {
         1: { cellWidth: 40 },
         2: { cellWidth: 30 },
         3: { cellWidth: 40 },
-        4: { cellWidth: 30 }
+        4: { cellWidth: 30 },
       },
     });
 
@@ -474,37 +621,43 @@ export class UsersListOwnersComponent implements OnDestroy {
     const visibleRows = table.rows({ search: 'applied' }).data().toArray(); // Usar 'search: applied'
 
     // Filtrar a los propietarios por aquellos que aparezcan en la tabla visibleRows
-    let owners = this.owners.filter(owner => visibleRows.some(row => row[1].includes(owner.name) && row[1].includes(owner.lastname)));
+    let owners = this.owners.filter((owner) =>
+      visibleRows.some(
+        (row) => row[1].includes(owner.name) && row[1].includes(owner.lastname)
+      )
+    );
 
     // Obtener las fechas 'Desde' y 'Hasta' solo para el nombre del archivo
-    const today = this.formatDate(new Date);
+    const today = this.formatDate(new Date());
 
-    const dataRows = await Promise.all(this.owners.map(async (owner) => {
-      // Obtener los lotes de manera asíncrona
-      const lotes = await this.loadPlots(owner.id);
+    const dataRows = await Promise.all(
+      this.owners.map(async (owner) => {
+        // Obtener los lotes de manera asíncrona
+        const lotes = await this.loadPlots(owner.id);
 
-      // Retornar la fila con la información del propietario
-      return {
-        Nombre: `${owner.lastname}, ${owner.name}`,
-        TipoDocumento: owner.dni_type,
-        Documento: owner.dni,
-        Tipo: owner.ownerType,
-        Lote: lotes  // El string con los lotes
-      };
-    }));
+        // Retornar la fila con la información del propietario
+        return {
+          Nombre: `${owner.lastname}, ${owner.name}`,
+          TipoDocumento: owner.dni_type,
+          Documento: owner.dni,
+          Tipo: owner.ownerType,
+          Lote: lotes, // El string con los lotes
+        };
+      })
+    );
 
     // Crear la hoja de trabajo con los datos de los propietarios
-    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(dataRows, { header: ['Nombre', 'TipoDocumento', 'Documento', 'Tipo', 'Lote'] });
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(dataRows, {
+      header: ['Nombre', 'TipoDocumento', 'Documento', 'Tipo', 'Lote'],
+    });
 
     // Crear el libro de trabajo
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Propietarios');
-
 
     const fileName = `${today}_listado_propietarios.xlsx`;
 
     // Guardar el archivo Excel
     XLSX.writeFile(wb, fileName);
   }
-
 }

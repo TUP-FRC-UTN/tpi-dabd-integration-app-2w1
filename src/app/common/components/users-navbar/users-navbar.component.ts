@@ -4,6 +4,7 @@ import { UsersSideButtonComponent } from '../users-side-button/users-side-button
 import { NavbarNotificationComponent } from "../../../notifications/components/navbar-notification/navbar-notification.component";
 import { RoutingService } from '../../services/routing.service';
 import { AuthService } from '../../../users/users-servicies/auth.service';
+import { TutorialService } from '../../services/tutorial.service';
 
 @Component({
   selector: 'app-users-navbar',
@@ -15,6 +16,7 @@ import { AuthService } from '../../../users/users-servicies/auth.service';
 export class UsersNavbarComponent implements OnInit {
   private readonly routingService: RoutingService = inject(RoutingService);
   private readonly authService = inject(AuthService);
+  private readonly tutorialService = inject(TutorialService);
 
   pageTitle: string = ''
   username: string = this.authService.getUser().name!;
@@ -41,6 +43,12 @@ export class UsersNavbarComponent implements OnInit {
     this.pageTitle = this.routingService.getTitle();
     this.userRoles = this.authService.getUser().roles!;
     this.actualRole = this.authService.getActualRole()!;
+  }
+
+  //Arranca el tutorial segun la pantalla
+  startTutorial() {
+    console.log("tutorial");
+    this.tutorialService.triggerTutorial();
   }
 
   //Expandir y contraer el sidebar

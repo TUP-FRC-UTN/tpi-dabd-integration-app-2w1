@@ -16,8 +16,9 @@ import { Inventory } from "../models/inventory";
 import { General } from "../models/general";
 import { NotificationRegisterService } from "../service/notification-register.service";
 import { SelectMultipleComponent } from "../select-multiple/select-multiple.component";
-
-declare var bootstrap : any;
+import Shepherd from "shepherd.js";
+import { Subscription } from "rxjs";
+import { TutorialService } from "../../common/services/tutorial.service";
 
 @Component({
   selector: 'app-notification-home',
@@ -71,6 +72,8 @@ export class NotificationHomeComponent implements OnInit{
     notificationsViernes: number = 0;
     notificationsSabado: number = 0;
     notificationsDomingo: number = 0;
+    private tour: Shepherd.Tour;
+    tutorialSubscription = new Subscription();
   
     allNotifications: AllNotifications = {
       fines: [],
@@ -91,7 +94,8 @@ export class NotificationHomeComponent implements OnInit{
   
     constructor(
       private chartDataService: NotificationRegisterService,
-      private fb: FormBuilder
+      private fb: FormBuilder,
+      private tutorialService: TutorialService
     ) {
       this.filterForm = this.fb.group({
         startDate: [''],
@@ -102,6 +106,20 @@ export class NotificationHomeComponent implements OnInit{
       this.form = new FormGroup({
         startDate: new FormControl(new Date()),
         endDate: new FormControl(new Date()),
+      });
+
+      this.tour = new Shepherd.Tour({
+        defaultStepOptions: {
+          cancelIcon: {
+            enabled: true,
+          },
+          arrow: false,
+  
+          modalOverlayOpeningPadding: 10,
+          modalOverlayOpeningRadius: 10,
+        },
+        keyboardNavigation: false,
+        useModalOverlay: true,
       });
     }
   
@@ -168,7 +186,125 @@ export class NotificationHomeComponent implements OnInit{
   
       this.filterListByDate();
       
+      this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+        () => {
+          this.startTutorial();
+        }
+      );
     }
+
+    ngOnDestroy(): void {
+      this.tutorialSubscription.unsubscribe();
+      if (this.tour) {
+        this.tour.complete();
+      }
+    }
+  
+    startTutorial() {
+      if (this.tour) {
+        this.tour.complete();
+      }
+      this.tour.addStep({
+        id: 'filter-step',
+        title: 'Filtros',
+        text: 'Desde acá podrá filtrar los gráficos por fecha. También puede agregar filtros avanzados clickeando en el boton azul de filtros, o borrar los filtros aplicados con el botón de basura.',      attachTo: {
+          element: '#filtros',
+          on: 'auto'
+        },
+        buttons: [
+          {
+            text: 'Siguiente',
+            action: this.tour.next,
+          }
+        ]
+        
+      });
+      
+      this.tour.addStep({
+        id: 'charts-step',
+        title: 'Gráficos',
+        text: 'Acá puede ver gráficos y KPIs con información resumida sobre el total de notificaciones enviadas, según los filtros aplicados.',
+        attachTo: {
+          element: '#charts',
+          on: 'top-start'
+        },
+        buttons: [
+          {
+            text: 'Anterior',
+            action: this.tour.back
+          },
+          {
+            text: 'Siguiente',
+            action: this.tour.next,
+          }
+        ]
+        
+      });
+  
+      this.tour.addStep({
+        id: 'perDayChart-step',
+        title: 'Notificaciones por Día',
+        text: 'Este gráfico muestra el número de notificaciones enviadas por día de la semana.',
+        attachTo: {
+          element: '#chartPerDay',
+          on: 'auto'
+        },
+        buttons: [
+          {
+            text: 'Anterior',
+            action: this.tour.back
+          },
+          {
+            text: 'Siguiente',
+            action: this.tour.next,
+          }
+        ]
+        
+      });
+  
+      this.tour.addStep({
+        id: 'perTypeChart-step',
+        title: 'Notificaciones por tipo',
+        text: 'Este gráfico muestra el número de notificaciones enviadas por tipo.',
+        attachTo: {
+          element: '#chartPerType',
+          on: 'auto'
+        },
+        buttons: [
+          {
+            text: 'Anterior',
+            action: this.tour.back
+          },
+          {
+            text: 'Siguiente',
+            action: this.tour.next,
+          }
+        ]
+        
+      });
+  
+      this.tour.addStep({
+        id: 'kpis-step',
+        title: 'KPIs',
+        text: 'Estos KPIs muestran la cantidad total y el estado de las notificaciones enviadas, mostrando las generales por separado.',
+        attachTo: {
+          element: '#kpis',
+          on: 'auto'
+        },
+        buttons: [
+          {
+            text: 'Anterior',
+            action: this.tour.back
+          },
+          {
+            text: 'Finalizar',
+            action: this.tour.complete
+          }
+        ]
+      });
+      this.tour.start();
+  }
+
   
     loadKpiData(): void {
       this.chartDataService.getData().subscribe((data: AllNotifications) => {

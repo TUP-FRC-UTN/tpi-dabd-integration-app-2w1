@@ -1,4 +1,4 @@
-<div class="stepper-wrapper">
+<div class="stepper-wrapper" id="addPermanent">
     <!-- Stepper Header -->
     <div class="stepper-header">
       <div class="step" [class.active]="currentStep === 0">
@@ -29,7 +29,7 @@
                   [disabled]="!(visitorForm.get('document')?.valid && 
                               visitorForm.get('firstName')?.valid && 
                               visitorForm.get('lastName')?.valid && 
-                              visitorForm.get('email')?.valid)">
+                              visitorForm.get('email')?.valid)" id="addVisitorToList">
             Agregar
           </button>
         </div>
@@ -61,7 +61,7 @@
         <!-- Botón Registrar movido al último step -->
         <div class="col-12 mt-3">
           <div class="d-flex justify-content-end">
-            <button class="btn btn-success" 
+            <button class="btn btn-success" id="submitAll"
                     type="button"
                     *ngIf="isRegisterButtonVisible || isLoading"
                     (click)="sendVisitorRecord()" 
@@ -82,7 +82,7 @@
       <div class="stepper-buttons-only-right">
         <button class="btn btn-primary text-right" 
                 *ngIf="currentStep < 2"
-                (click)="currentStep = currentStep + 1">
+                (click)="currentStep = currentStep + 1" id="nextStep">
           Paso Siguiente
         </button>
       </div>
@@ -95,7 +95,7 @@
         </button>
         <button class="btn btn-primary text-right" 
                 *ngIf="currentStep < 2"
-                (click)="currentStep = currentStep + 1">
+                (click)="currentStep = currentStep + 1" id="finalStep">
           Paso Siguiente
         </button>
       </div>

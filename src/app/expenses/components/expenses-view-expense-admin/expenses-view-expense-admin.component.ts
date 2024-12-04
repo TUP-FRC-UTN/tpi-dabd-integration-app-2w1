@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Bill } from '../../models/bill';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -13,7 +13,7 @@ import { DistributionList } from '../../models/distributionList';
 import { Instalmentlist } from '../../models/installmentList';
 import { BillService } from '../../services/billServices/bill.service';
 import { ExpenseViewService } from '../../services/expenseView/expenseView.service';
-import { debounceTime, distinctUntilChanged, filter, finalize, mergeMap, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, filter, finalize, mergeMap, of, Subject, Subscription, switchMap, takeUntil, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import jsPDF from 'jspdf';
 import Swal from 'sweetalert2';
@@ -26,18 +26,19 @@ import { Provider } from '../../models/provider';
 import { ExpensesFiltersComponent } from "../expenses-filters/expenses-filters.component";
 import { ExpenseType } from '../../models/expenseType';
 import { RoutingService } from '../../../common/services/routing.service';
+import { TutorialService } from '../../../common/services/tutorial.service';
+import Shepherd from 'shepherd.js';
 
 
 @Component({
   selector: 'app-view-gastos-admin',
   standalone: true,
   imports: [CommonModule, FormsModule, ExpenseViewComponent, ExpenseCategoriesNgSelectComponent, ExpenseProvidersNgSelectComponent, ExpensesFiltersComponent],
-  providers: [BillService,ExpenseViewService],
+  providers: [BillService, ExpenseViewService],
   templateUrl: './expenses-view-expense-admin.component.html',
   styleUrl: './expenses-view-expense-admin.component.scss'
 })
-export class ViewGastosAdminComponent implements OnInit {
-
+export class ViewGastosAdminComponent implements OnInit, OnDestroy {
   dateFrom: string = '';
   dateTo: string = '';
   maxDateTo: string = '';
@@ -47,6 +48,7 @@ export class ViewGastosAdminComponent implements OnInit {
   isLoading = false;
   table: any;
   searchTerm: string = '';
+  tour: Shepherd.Tour;
   private dateChangeSubject = new Subject<{ from: string, to: string }>();
   private unsubscribe$ = new Subject<void>();
   @ViewChild('modalNoteCredit') modalNoteCredit!: ElementRef;
@@ -60,26 +62,127 @@ export class ViewGastosAdminComponent implements OnInit {
   providers: string[] = [];
   expenseTypes: string[] = [];
   selectedExpense: ExpenseView | null = null;
-  
-  
+  tutorialSubscription = new Subscription();
   selectedCategories: Category[] = [];
-  selectedProviders: Provider[] =[];
-  selectedType: ExpenseType[]=[];
+  selectedProviders: Provider[] = [];
+  selectedType: ExpenseType[] = [];
   constructor(
     private cdRef: ChangeDetectorRef,
     private billService: BillService,
     private expenseViewService: ExpenseViewService,
     private router: Router,
     private modalNG: NgbModal,
-    private routerS: RoutingService
-  ) { }
+    private routerS: RoutingService,
+    private tutorialService: TutorialService
+  ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+      },
+      useModalOverlay: true,
+    })
+  }
+
 
   ngOnInit(): void {
     this.loadDates();
     this.setupDateChangeObservable();
     this.configDataTable();
     this.filterDataOnInit();
+
+    //TUTORIAL
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    );
   }
+
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+
+    //TUTORIAL
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
+  }
+
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Listado de Gastos',
+      text: 'Acá puede ver una lista completa de los gastos que se han realizado. Tambien se puede clickear para ver mas detalles, editar o eliminar.',
+      attachTo: {
+        element: '#expensesTable',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+
+    this.tour.addStep({
+      id: 'filter-step',
+      title: 'Filtros',
+      text: 'Desde acá podrá filtrar los gastos por nombre y fecha o desplegar los filtros avanzados para ordenar por tipo, categoria y proveedor. También puede exportar el listado a Excel o PDF, o borrar los filtros aplicados con el botón de basura.',
+      attachTo: {
+        element: '#filters',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+
+    });
+
+    this.tour.addStep({
+      id: 'float-button-step',
+      title: 'Agregar Gasto',
+      text: 'Haciendo click en este botón puede acceder a la página de alta de gastos. Acá puede crear un nuevo gasto con sus datos correspondientes.',
+      attachTo: {
+        element: '#addButton',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+    });
+
+    this.tour.start();
+  }
+
   onSearch(event: any) {
     const searchValue = event.target.value;
 
@@ -111,10 +214,7 @@ export class ViewGastosAdminComponent implements OnInit {
   redirect(path: string) {
     this.router.navigate([path]);
   }
-  ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
-  }
+
 
   private setupDateChangeObservable() {
     // Set loading true immediately when method is called
@@ -163,7 +263,7 @@ export class ViewGastosAdminComponent implements OnInit {
 
     doc.text(`Fechas: Desde ${moment(this.dateFrom).format('DD/MM/YYYY')} hasta ${moment(this.dateTo).format('DD/MM/YYYY')}`, 15, 20);
 
-    const table = $('#myTable').DataTable();
+    const table = $('#expensesTable').DataTable();
     const filteredData = table.rows({ search: 'applied' }).data().toArray();
 
     const pdfData = filteredData.map(bill => {
@@ -206,9 +306,9 @@ export class ViewGastosAdminComponent implements OnInit {
 
   // Exportar a Excel
   exportToExcel(): void {
-    const table = $('#myTable').DataTable();
+    const table = $('#expensesTable').DataTable();
     const filteredData = table.rows({ search: 'applied' }).data().toArray();
-  
+
     const excelData = filteredData.map(bill => {
       const category = bill.category || 'Sin categoría';
       const provider = bill.provider || 'Sin proveedor';
@@ -220,11 +320,11 @@ export class ViewGastosAdminComponent implements OnInit {
         'Monto': `$${bill.amount}`
       };
     });
-  
+
     const worksheet = XLSX.utils.json_to_sheet(excelData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Listado de Gastos');
-  
+
     const dateFromFormatted = moment(this.dateFrom).format('YYYY-MM-DD');
     const dateToFormatted = moment(this.dateTo).format('YYYY-MM-DD');
     const fileName = `${dateFromFormatted}_${dateToFormatted}_listado_gastos.xlsx`;
@@ -277,33 +377,33 @@ export class ViewGastosAdminComponent implements OnInit {
   }
 
   loadBillsFiltered() {
-    const dataTable = $('#myTable').DataTable();
+    const dataTable = $('#expensesTable').DataTable();
     let billsFiltered = this.filteredbyType(this.bills.slice());
     billsFiltered = this.filteredByCategiries(billsFiltered);
     billsFiltered = this.filteredByProviders(billsFiltered);
     dataTable.clear().rows.add(billsFiltered).draw();
   }
-  filteredByCategiries(bills :Bill[]):Bill[]{
+  filteredByCategiries(bills: Bill[]): Bill[] {
 
     console.log(this.selectedCategories)
-    if (this.selectedCategories && this.selectedCategories.length>0){
+    if (this.selectedCategories && this.selectedCategories.length > 0) {
       const selectedCategoryIds = this.selectedCategories.map(category => category.id); // Extraer los ids de las categorías seleccionadas
-    return bills.filter(bill => selectedCategoryIds.includes(bill.categoryId)); // Filtrar solo los que tienen un id que coincida
+      return bills.filter(bill => selectedCategoryIds.includes(bill.categoryId)); // Filtrar solo los que tienen un id que coincida
     }
     return bills;
   }
-  filteredByProviders(bills :Bill[]):Bill[]{
+  filteredByProviders(bills: Bill[]): Bill[] {
 
-    if (this.selectedProviders && this.selectedProviders.length>0){
+    if (this.selectedProviders && this.selectedProviders.length > 0) {
       const selectedProviderIds = this.selectedProviders.map(provider => provider.id as number); // Extraer los ids de las categorías seleccionadas
-    return bills.filter(bill => selectedProviderIds.includes(bill.providerId)); // Filtrar solo los que tienen un id que coincida
+      return bills.filter(bill => selectedProviderIds.includes(bill.providerId)); // Filtrar solo los que tienen un id que coincida
     }
     return bills;
   }
-  filteredbyType(bills :Bill[]):Bill[]{
-    if (this.selectedType && this.selectedType.length>0){
+  filteredbyType(bills: Bill[]): Bill[] {
+    if (this.selectedType && this.selectedType.length > 0) {
       const selectedTypeIds = this.selectedType.map(type => type.id);
-    return bills.filter(bill => selectedTypeIds.includes(bill.expenseType)); // Filtrar solo los que tienen un id que coincida
+      return bills.filter(bill => selectedTypeIds.includes(bill.expenseType)); // Filtrar solo los que tienen un id que coincida
     }
     return bills;
   }
@@ -343,11 +443,11 @@ export class ViewGastosAdminComponent implements OnInit {
   configDataTable() {
     $.fn.dataTable.ext.type.order['date-moment-pre'] = (d: string) => moment(d, 'DD/MM/YYYY').unix();
 
-    if ($.fn.DataTable.isDataTable('#myTable')) {
-      $('#myTable').DataTable().clear().destroy();
+    if ($.fn.DataTable.isDataTable('#expensesTable')) {
+      $('#expensesTable').DataTable().clear().destroy();
     }
 
-    this.table = $('#myTable').DataTable({
+    this.table = $('#expensesTable').DataTable({
       // Atributos de la tabla
       paging: true,
       searching: true,
@@ -412,9 +512,9 @@ export class ViewGastosAdminComponent implements OnInit {
                     <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
                     <ul class="dropdown-menu">
                       <li><a class="dropdown-item btn-view" style="cursor: pointer">Ver más</a></li>
-                       <li><hr class="dropdown-divider"></li>
+                      <li><hr class="dropdown-divider"></li>
                       <li><a class="dropdown-item btn-edit" style="cursor: pointer">Editar</a></li>
-                       <li><a class="dropdown-item btn-delete" style="cursor: pointer">Eliminar</a></li>
+                      <li><a class="dropdown-item btn-delete" style="cursor: pointer">Eliminar</a></li>
                     </ul>
                   </div>
                 </div>
@@ -441,7 +541,7 @@ export class ViewGastosAdminComponent implements OnInit {
         info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
         infoEmpty: "Mostrando 0 registros",
         infoFiltered: "(filtrado de _MAX_ registros totales)",
-        
+
         zeroRecords: 'No se encontraron resultados',
         emptyTable: 'No hay datos disponibles',
         loadingRecords: "Cargando...",
@@ -450,16 +550,16 @@ export class ViewGastosAdminComponent implements OnInit {
     });
 
     // Event handlers
-    $('#myTable tbody').on('click', '.btn-view', (event) => {
+    $('#expensesTable tbody').on('click', '.btn-view', (event) => {
       const row = this.table.row($(event.currentTarget).parents('tr'));
       const rowData = row.data();
       if (rowData) {
         this.viewBillDetails(rowData.id);
       }
-      
+
     });
 
-    $('#myTable tbody').on('click', '.btn-edit', (event) => {
+    $('#expensesTable tbody').on('click', '.btn-edit', (event) => {
       const row = this.table.row($(event.currentTarget).parents('tr'));
       const rowData = row.data();
       if (rowData) {
@@ -467,24 +567,24 @@ export class ViewGastosAdminComponent implements OnInit {
       }
     });
 
-    $('#myTable tbody').on('click', '.btn-delete', (event) => {
+    $('#expensesTable tbody').on('click', '.btn-delete', (event) => {
       const row = $(event.currentTarget).closest('tr');
       const rowData = this.table.row(row).data();
       this.failedBillId = rowData.id;
       this.openModal(this.modalConfirmDelete);
     });
   }
-  clearFiltered(){
+  clearFiltered() {
 
-  this.selectedCategories=[];
-  this.selectedProviders=[];
-  this.selectedType=[];
-  this.loadDates()
-  this.filterDataOnChange()
+    this.selectedCategories = [];
+    this.selectedProviders = [];
+    this.selectedType = [];
+    this.loadDates()
+    this.filterDataOnChange()
   }
   editBill(id: any) {
     console.log(id); // Esto mostrará el id en la consola
-    this.routerS.redirect('/main/expenses/register-expense/'+id,"Editar Gasto"); // Navega a /viewExpenseAdmin/ida
+    this.routerS.redirect('/main/expenses/register-expense/' + id, "Editar Gasto"); // Navega a /viewExpenseAdmin/ida
   }
   viewBillDetails(id: any) {
     console.log("ID de la expensa:", id);
@@ -494,13 +594,13 @@ export class ViewGastosAdminComponent implements OnInit {
         this.cdRef.detectChanges();
         console.log("Detalles de la expensa:", expense);
         // Aquí puedes activar el modal más adelante si deseas
-        const modal = this.modalNG.open(ExpenseViewComponent,{ size: 'lg' ,  keyboard: false });
+        const modal = this.modalNG.open(ExpenseViewComponent, { size: 'lg', keyboard: false });
         modal.componentInstance.expense = expense;
         modal.result.then((result) => {
-          
-         }).catch((error) => {
-           console.log('Modal dismissed with error:', error);
-         });
+
+        }).catch((error) => {
+          console.log('Modal dismissed with error:', error);
+        });
       },
       error: (err) => {
         console.error("Error al obtener los detalles de la expensa:", err);

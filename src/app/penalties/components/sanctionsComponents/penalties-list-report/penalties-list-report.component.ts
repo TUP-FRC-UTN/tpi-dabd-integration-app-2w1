@@ -223,6 +223,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
         zeroRecords: "No se encontraron resultados",
         loadingRecords: "Cargando...",
         processing: "Procesando...",
+        emptyTable: "No hay datos disponibles",
       }
     });
 

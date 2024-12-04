@@ -1,10 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { SanctionService } from '../../../services/sanctions.service';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import Swal from 'sweetalert2';
 import { RoutingService } from '../../../../common/services/routing.service';
+import { Subscription } from 'rxjs';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 @Component({
   selector: 'app-penalties-update-fine',
   standalone: true,
@@ -12,25 +15,43 @@ import { RoutingService } from '../../../../common/services/routing.service';
   templateUrl: './penalties-update-fine.component.html',
   styleUrl: './penalties-update-fine.component.scss'
 })
-export class PenaltiesUpdateFineComponent implements OnInit {
+export class PenaltiesUpdateFineComponent implements OnInit, OnDestroy {
   //Variables
   userId: number;
   fineIdFromList: number;
   fine: any;
   reactiveForm: FormGroup;
 
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
+
 
   //Constructor
   constructor(private penaltiesService: SanctionService,
     private route: ActivatedRoute,
     formBuilder: FormBuilder,
-    private routingService: RoutingService
+    private routingService: RoutingService,
+    private tutorialService: TutorialService
   ) {
     this.userId = 1;
     this.fineIdFromList = 0; //Esto deberia venir del listado
     this.reactiveForm = formBuilder.group({
       amountControl: new FormControl('', [Validators.required, Validators.min(1), Validators.max(999999)])
     })
+
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+      },
+      useModalOverlay: true,
+    });
   }
 
 
@@ -40,6 +61,25 @@ export class PenaltiesUpdateFineComponent implements OnInit {
       this.fineIdFromList = + params.get('fineId')!;
       this.getFine(this.fineIdFromList);
     });
+
+    //TUTORIAL
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    );
+  }
+
+  ngOnDestroy(): void {
+    //TUTORIAL
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
   }
 
 
@@ -115,7 +155,7 @@ export class PenaltiesUpdateFineComponent implements OnInit {
     return '';
   }
 
-  
+
   //Devuelve el mensaje de error
   private getErrorMessage(errorKey: string, errorValue: any): string {
     const errorMessages: { [key: string]: (error: any) => string } = {
@@ -134,5 +174,68 @@ export class PenaltiesUpdateFineComponent implements OnInit {
     };
 
     return errorMessages[errorKey]?.(errorValue) ?? 'Error no identificado en el campo.';
+  }
+
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Actualizacion de multa',
+      text: 'Acá puede actualizar una multa ya creada para modificar el monto a cobrar antes de la siguiente generacion de cobro de expensas.',
+      attachTo: {
+        element: '#page',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Importe',
+      text: 'Aqui puede actualizar el monto que se cobrara al infractor con el siguiente cobro de expensas.',
+      attachTo: {
+        element: '#amount',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Boton de Guardar',
+      text: 'Con este boton esta confirmando la actualizacion. Se guardaran los cambios y actualizaran instantaneamente.',
+      attachTo: {
+        element: '#saveButton',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+    });
+
+    this.tour.start();
   }
 }

@@ -5,6 +5,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PutStateComplaintDto } from '../../../../models/complaint';
 import { UserService } from '../../../../../users/users-servicies/user.service';
+import { AuthService } from '../../../../../users/users-servicies/auth.service';
 
 @Component({
   selector: 'app-penalties-modal-consult-complaint',
@@ -19,12 +20,14 @@ export class PenaltiesModalConsultComplaintComponent implements OnInit {
   files: File[] = [];
   complaint: any;
   loggedUserId: number = 1;
-  private readonly userService = inject(UserService);
+
 
   //Constructor
   constructor(
-    public activeModal: NgbActiveModal,
-    public complaintService: ComplaintService,
+    private activeModal: NgbActiveModal,
+    private complaintService: ComplaintService,
+    private authService: AuthService,
+    private userService: UserService
   ) { }
 
 
@@ -35,21 +38,21 @@ export class PenaltiesModalConsultComplaintComponent implements OnInit {
   }
 
 
-  //Button to close the modal
+  //Cierra el modal
   close() {
     this.activeModal.close()
   }
 
 
-  // This method fetches the complaint 
-  // details using the provided ID
-  // and loads it in its variable.
-  
-  
+  //-----------------------------------CARGA DE DATOS--------------------------------------//
+
+  //Busca los datos de la denuncia
   getComplaint() {
     this.complaintService.getById(this.denunciaId).subscribe(
       (response) => {
         this.complaint = response
+
+        //Si la denuncia esta en estado "Nueva" se cambia a "Pendiente"
         if (this.complaint.complaintState == "Nueva") {
           const updatedComplaint: PutStateComplaintDto = {
             id: this.complaint.id,
@@ -58,116 +61,83 @@ export class PenaltiesModalConsultComplaintComponent implements OnInit {
             stateReason: "Ya vista"
           }
           this.complaintService.putStateComplaint(this.complaint.id, updatedComplaint).subscribe()
+
+
         }
+
+        //Se obtiene el nombre del usuario que realizo la denuncia
         this.userService.getUserById(this.complaint.userId).subscribe(
           (response) => {
             this.complaint.user = response.name + ' ' + response.lastname
           });
       },
       (error) => {
-        console.error('Error:', error);
+        console.error('Error al obtener la denuncia: ', error);
       });
   }
 
 
-  // Event to update the file list 
-  // to the currently selected ones.
-  onFileChange(event: any) {
-    this.files = Array.from(FileList = event.target.files); //Convert FileList to Array
-  }
-
-
-  //Deprecated, to comment.
-  /*addMockFile() {
-    const mockImage = new File(["Contenido de la imagen"], "MockImage.png", {
-      type: "image/jpeg",
-      lastModified: Date.now()
-    });
-    this.files.push(mockImage); //Agrega la imagen simulada a la lista
-  }*/
-
-  
-  // This method calls the service to 
-  // get the files of the complaint.
+  //Busca los archivos adjuntados de la denuncia
   loadComplaintFiles() {
     this.complaintService.getFilesById(this.denunciaId).subscribe(
       (response: any) => {
-        console.log('Respuesta de la API:', response);
-        console.log('Tipo de respuesta:', typeof response);
-        
-        if (response && typeof response === 'object') {
-          this.files = this.base64ToFile(response);
-        } else {
-          console.error('La respuesta está mal:', response);
-        }
+        this.files = this.base64ToFile(response);
       },
       (error) => {
-        console.error('Error:', error);
+        console.error('Error al obtener las imagenes: ', error);
       }
     );
-}
+  }
 
-// This method converts a Record/Map of 
-// base64 strings and the filename no File objects.
 
-// Param 'response' The response object 
-// containing the base64 strings and filenames.
+  //-----------------------------------MANEJO DE FILES--------------------------------------//
 
-// Returns an array of File objects.
-base64ToFile(response: Record<string, string>): File[] {
-  const files: File[] = [];
+  // Returns an array of File objects.
+  base64ToFile(response: Record<string, string>): File[] {
+    const files: File[] = [];
 
-  for (const base64String in response) {
-    if (response.hasOwnProperty(base64String)) {
-      const fileName = response[base64String].trim(); 
-      const trimmedBase64String = base64String.trim(); 
-      console.log(`Base64 Key: ${base64String}, File Name: ${fileName}`);
-      
-      if (trimmedBase64String.startsWith("data:")) {
-        
-        const [mimeTypePart, base64Data] = trimmedBase64String.split(',');
-        const mimeType = mimeTypePart.split(':')[1].split(';')[0]; 
-        
-        if (base64Data) {
-          try {
-            const byteCharacters = atob(base64Data);
-            const byteNumbers = new Uint8Array(byteCharacters.length);
-            for (let i = 0; i < byteCharacters.length; i++) {
-              byteNumbers[i] = byteCharacters.charCodeAt(i);
+    for (const base64String in response) {
+      if (response.hasOwnProperty(base64String)) {
+        const fileName = response[base64String].trim();
+        const trimmedBase64String = base64String.trim();
+        if (trimmedBase64String.startsWith("data:")) {
+
+          const [mimeTypePart, base64Data] = trimmedBase64String.split(',');
+          const mimeType = mimeTypePart.split(':')[1].split(';')[0];
+
+          if (base64Data) {
+            try {
+              const byteCharacters = atob(base64Data);
+              const byteNumbers = new Uint8Array(byteCharacters.length);
+              for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+              }
+
+              const blob = new Blob([byteNumbers], { type: mimeType });
+              const file = new File([blob], fileName, { type: mimeType });
+              files.push(file);
+            } catch (error) {
+              console.error(`Error decoding base64 for ${base64String}:`, error);
             }
-
-            const blob = new Blob([byteNumbers], { type: mimeType });
-            const file = new File([blob], fileName, { type: mimeType });
-            files.push(file);
-          } catch (error) {
-            console.error(`Error decoding base64 for ${base64String}:`, error);
+          } else {
+            console.error(`Base64 data is empty for ${base64String}`);
           }
         } else {
-          console.error(`Base64 data is empty for ${base64String}`);
+          console.warn(`Base64 string does not start with expected prefix for ${base64String}: ${trimmedBase64String}`);
         }
-      } else {
-        console.warn(`Base64 string does not start with expected prefix for ${base64String}: ${trimmedBase64String}`);
       }
     }
+    return files;
   }
-  return files; 
-}
 
 
-
-// This method tracks the files by their id.
+  //Retorna el id del archivo para identificarlo
   trackByFile(index: number, file: any): number {
     return file.id;
   }
 
 
-
-// This method creates a URL 
-// for the file and downloads it.
-
-// Param 'file' The file to be downloaded.
-
-// Returns a download prompt for the file.
+  //Descarga la imagen
   downloadFile(file: File) {
     const url = URL.createObjectURL(file);
     const a = document.createElement('a');
@@ -178,6 +148,5 @@ base64ToFile(response: Record<string, string>): File[] {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   }
-
 
 }

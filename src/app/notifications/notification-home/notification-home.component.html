@@ -1,6 +1,6 @@
   <!-- Fila superior: Filtros -->
   <div class="container">
-    <div class="row col-12  border-0 rounded-2 p-2 shadow mb-4" style="flex: 0 0 ; justify-content: center; align-items: center;" [formGroup]="filterForm">
+    <div class="row col-12  border-0 rounded-2 p-2 shadow mb-4" style="flex: 0 0 ; justify-content: center; align-items: center;" [formGroup]="filterForm" id="filtros">
       <div class="col-3">
         <input id="startDate" type="date" class="form-control form-control-sm rounded" formControlName="startDate" style="font-size:.9em;">
       </div>
@@ -53,8 +53,8 @@
       </div>
     </div> 
     
-    <div class="row align-middle">
-    <div class="col-2 mt-3">
+    <div class="row align-middle" id="charts">
+    <div class="col-2 mt-3" id="kpis">
       <div class="card shadow-sm flex-grow-1 card border-0 shadow-lg rounded-4 mb-3 hover-scale" >
         <div class="card-body p-2 d-flex flex-column rounded-4" style="background-color: #e7f1ff">
           <i class="bi bi-envelope-check-fill d-flex justify-content-end" style="margin-top: .5em;"></i>
@@ -88,7 +88,7 @@
     </div>
   <div class="col-10 d-flex">
       <!-- CHARTS -->
-    <div class="card shadow rounded-4 hover-scale col-8 mt-3" style="box-sizing: border-box; height: 41.85em;">
+    <div class="card shadow rounded-4 hover-scale col-8 mt-3" style="box-sizing: border-box; height: 41.85em;" id="chartPerDay">
       <div class="">
         <div class="">
           <div class="card-body">
@@ -106,7 +106,7 @@
     </div>
     </div>  
   
-    <div class="col-4 d-flex flex-column mt-3" style="margin-left:1%;" >
+    <div class="col-4 d-flex flex-column mt-3" style="margin-left:1%;" id="chartPerType">
       <div class="card shadow rounded-4 hover-scale" style="height:41.80em">
         <div class="card-body">
           <h6 class="card-title text-center" style="font-size: 1.2em; margin-bottom: 5px;">Notificaciones Enviadas por Tipo</h6>

@@ -72,14 +72,14 @@
         <!-- KPI LIMITE 5-->
         <div class="col-2 gap-2 d-flex flex-column justify-content-center">
             <!-- KPI 1 -->
-            <app-custom-kpi [amount]="kpiTotalMovimientosAumento" title="Cant. productos" subTitle="Aumentos"
+            <app-custom-kpi [value]="kpiTotalMovimientosAumento" title="Cant. productos" subTitle="Aumentos"
             [customStyles]="{ 'background-color': '#b3f5bc' }" icon="bi-arrow-up-circle"
             ></app-custom-kpi>
             <!-- KPI 2 -->
-            <app-custom-kpi [amount]="kpiTotalMovimietnosDisminucion" title="Cant. productos" subTitle="Disminuciones"
+            <app-custom-kpi [value]="kpiTotalMovimietnosDisminucion" title="Cant. productos" subTitle="Disminuciones"
             [customStyles]="{ 'background-color': '#fa9189' }" icon="bi-arrow-down-circle"></app-custom-kpi>
             <!-- KPI 3 -->
-            <app-custom-kpi [amount]="kpiTotalMovimientos" title="Movimientos" subTitle="Totales"
+            <app-custom-kpi [value]="kpiTotalMovimientos" title="Movimientos" subTitle="Totales"
             [customStyles]="{ 'background-color': '#d6f6ff' }"></app-custom-kpi>
             <!-- KPI 3 -->
             <div class="card hover-scale p-2 shadow border-0">

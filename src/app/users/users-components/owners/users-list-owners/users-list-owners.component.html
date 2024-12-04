@@ -1,5 +1,5 @@
 <section class="container pt-5">
-  <div class="d-flex justify-content-between align-items-center mb-2">
+  <div class="d-flex justify-content-between align-items-center mb-2" id="filtros">
     <div class="d-flex align-items-center">
       <div id="myTable_filter_Owners" class="dataTables_filter me-3" style="text-align: left;">
         <input class="form-control" placeholder="Buscar" style="width: 300px;" aria-controls="myTable">
@@ -30,7 +30,7 @@
         <i class="bi bi-file-earmark-pdf"></i>
       </button>
     </div>
-    <button class="floating-btn btn btn-primary" (click)="addOwner()">
+    <button class="floating-btn btn btn-primary" (click)="addOwner()" id="addOwner">
       <span class="bi-plus-lg"></span>
     </button>
   </div>

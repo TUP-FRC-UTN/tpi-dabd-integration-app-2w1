@@ -5,6 +5,7 @@ import { MetricsComponent } from "./components/metrics/metrics.component";
 import { authGuard } from "../users/guards/auth.guard";
 import { roleGuard } from "../users/guards/role.guard";
 import { AccessGlobalReportComponent } from "./components/entries_reports/entries-global-report/access-global-report.component";
+import { AccessRegisterVisitorsComponent } from "./components/access_visitors/access_visitors_register/access-register-visitors/access-register-visitors.component";
 
 export const ENTRY_ROUTES: Routes = [
     {
@@ -17,7 +18,7 @@ export const ENTRY_ROUTES: Routes = [
                 data: { roles: ['SuperAdmin', 'Seguridad'] }
             },
             {
-                path: 'visitor', component: AccessContainerVisitorsRegistrationComponent,
+                path: 'visitor', component: AccessRegisterVisitorsComponent,
                 data: { roles: ['SuperAdmin', 'Propietario', 'Inquilino', 'Familiar mayor'] }
             },
             {

@@ -1,6 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators, FormBuilder, AbstractControl, ValidationErrors } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+  FormBuilder,
+  AbstractControl,
+  ValidationErrors,
+} from '@angular/forms';
 import { RolModel } from '../../../users-models/users/Rol';
 import { UserService } from '../../../users-servicies/user.service';
 import { UserPost } from '../../../users-models/users/UserPost';
@@ -14,76 +23,103 @@ import { ValidatorsService } from '../../../users-servicies/validators.service';
 import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
 import { RoutingService } from '../../../../common/services/routing.service';
 import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
+import { TutorialService } from '../../../../common/services/tutorial.service';
+import Shepherd from 'shepherd.js';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-new-user',
   standalone: true,
-  imports: [FormsModule, CommonModule, ReactiveFormsModule, RouterModule, CustomSelectComponent],
+  imports: [
+    FormsModule,
+    CommonModule,
+    ReactiveFormsModule,
+    RouterModule,
+    CustomSelectComponent,
+  ],
   templateUrl: './new-user.component.html',
-  styleUrl: './new-user.component.css'
+  styleUrl: './new-user.component.css',
 })
 export class NewUserComponent implements OnInit, OnDestroy {
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private tutorialService: TutorialService
+  ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+      },
+      useModalOverlay: true,
+    });
+
     this.reactiveForm = this.fb.group({
       name: new FormControl('', [
         Validators.required,
         Validators.minLength(1),
-        Validators.maxLength(50)
+        Validators.maxLength(50),
       ]),
       lastname: new FormControl('', [
         Validators.required,
         Validators.minLength(1),
-        Validators.maxLength(50)
+        Validators.maxLength(50),
       ]),
-      username: new FormControl('', [
-        Validators.required,
-        Validators.minLength(1),
-        Validators.maxLength(30)
-      ],
+      username: new FormControl(
+        '',
+        [
+          Validators.required,
+          Validators.minLength(1),
+          Validators.maxLength(30),
+        ],
         this.validatorService.validateUniqueUsername()
       ),
       password: new FormControl('', [
         Validators.required,
         Validators.minLength(6),
-        Validators.maxLength(30)
+        Validators.maxLength(30),
       ]),
-      email: new FormControl('', [
-        Validators.required,
+      email: new FormControl(null, [
         Validators.email
       ],
         this.validatorService.validateUniqueEmail()
       ),
-      phone_number: new FormControl('', [
-        Validators.required,
+      phone_number: new FormControl(null, [
         Validators.pattern(/^\d+$/),
         Validators.minLength(10),
-        Validators.maxLength(20)
+        Validators.maxLength(20),
       ]),
-      dniType: new FormControl(0, [
-        Validators.required
-
-      ]),
-      dni: new FormControl('', [
-        Validators.required,
-        Validators.pattern(/^\d+$/),
-        Validators.minLength(8),
-        this.validarCuit.bind(this)
-      ],
+      dniType: new FormControl(0, [Validators.required]),
+      dni: new FormControl(
+        '',
+        [
+          Validators.required,
+          Validators.pattern(/^\d+$/),
+          Validators.minLength(8),
+          this.validarCuit.bind(this),
+        ],
         this.validatorService.validateUniqueDni()
       ),
       telegram_id: new FormControl(0, [
         Validators.required,
         Validators.min(0),
         Validators.minLength(1),
-        Validators.maxLength(9)
+        Validators.maxLength(9),
       ]),
       active: new FormControl(true),
-      datebirth: new FormControl(DateService.formatDate(new Date("2000-01-02")), [Validators.required]),
+      datebirth: new FormControl(DateService.formatDate(new Date("2000-01-02"))),
       roles: new FormControl([], Validators.required),
       plot: new FormControl('', [Validators.required]),
-      userUpdateId: new FormControl(this.authService.getUser().id)
-    })
+      userUpdateId: new FormControl(this.authService.getUser().id),
+    });
   }
 
   private readonly userService = inject(UserService);
@@ -92,52 +128,124 @@ export class NewUserComponent implements OnInit, OnDestroy {
   private readonly validatorService = inject(ValidatorsService);
   private readonly routingService = inject(RoutingService);
   private readonly suscriptionService = inject(SuscriptionManagerService);
-  @ViewChild(CustomSelectComponent) customSelectComponent!: CustomSelectComponent;
+  @ViewChild(CustomSelectComponent)
+  customSelectComponent!: CustomSelectComponent;
 
   documentType: string = '';
   reactiveForm: FormGroup;
   rolesSelected: string[] = [];
   roles: RolModel[] = [];
   rolesHtmlString: string = '';
-  rolesString: string = "Roles añadidos:";
+  rolesString: string = 'Roles añadidos:';
   rolesInput: string[] = [];
-  select: string = "";
+  select: string = '';
   checkOption: boolean = false;
   lotes: GetPlotDto[] = [];
   date: string = new Date(2000, 0, 1).toISOString().split('T')[0];
   initialDate: FormControl = new FormControl(this.date);
   subTitleLabel: string = 'Seleccione los roles del usuario';
-  optionsForOwner: string[] = ["Familiar mayor", "Familiar menor"];
+  optionsForOwner: string[] = ['Familiar mayor', 'Familiar menor'];
   options: any[] = [];
   selectedOptions: string[] = [];
   passwordVisible: boolean = false;
   actualRole = this.authService.getActualRole();
 
   ngOnInit() {
-
     this.loadRoles();
     this.loadPlotsAvailables();
 
-    if (this.authService.getActualRole() == "Propietario") {
+    if (this.authService.getActualRole() == 'Propietario') {
       this.reactiveForm.controls['plot'].disable();
     }
 
     this.loadFilteredRoles();
 
-    if (this.authService.getActualRole() == "Gerente general") {
-      this.reactiveForm.get("plot")?.disable();
-      this.reactiveForm.get("plot")?.setValue("Sin lote");
+    if (this.authService.getActualRole() == 'Gerente general') {
+      this.reactiveForm.get('plot')?.disable();
+      this.reactiveForm.get('plot')?.setValue('Sin lote');
     }
 
     this.reactiveForm.get('dniType')?.valueChanges.subscribe(() => {
       this.documentTypeChange();
     });
-      
+
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    );
+  }
+
+  startTutorial() {
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Alta de usuario',
+      text: 'Acá puede realizar la alta de un usuario. Recuerde agregar todos los campos necesarios, procurando no equivocarse en ninguno.',
+      attachTo: {
+        element: '#newUser',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        },
+      ],
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Selección de roles',
+      text: 'Acá puede seleccionar los roles que desea asignar al usuario. Tenga cuidado con los roles que agrega, ya que estos pueden otorgar permisos no deseados.',
+      attachTo: {
+        element: '#roles',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back,
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        },
+      ],
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Envio de formulario',
+      text: 'Al finalizar, presione este botón para registrar al usuario al consorcio.',
+      attachTo: {
+        element: '#register',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back,
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete,
+        },
+      ],
+    });
+
+    this.tour.start();
   }
 
   //Desuscribirse de los observables
   ngOnDestroy(): void {
     this.suscriptionService.unsubscribeAll();
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
   }
 
   //------------------------------------------------------Carga de datos------------------------------------------------
@@ -146,9 +254,13 @@ export class NewUserComponent implements OnInit, OnDestroy {
   loadPlotsAvailables() {
     const sus = this.plotService.getAllPlotsAvailables().subscribe({
       next: (data: GetPlotDto[]) => {
-        if (this.authService.getActualRole() == "Propietario") {
-          this.lotes = data.filter(lote => this.authService.getUser().plotId.includes(lote.id));
-          this.reactiveForm.get('plot')?.setValue(this.authService.getUser().plotId.toString());
+        if (this.authService.getActualRole() == 'Propietario') {
+          this.lotes = data.filter((lote) =>
+            this.authService.getUser().plotId.includes(lote.id)
+          );
+          this.reactiveForm
+            .get('plot')
+            ?.setValue(this.authService.getUser().plotId.toString());
           this.reactiveForm.get('plot')?.disable();
         } else {
           this.lotes = data;
@@ -157,48 +269,73 @@ export class NewUserComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('Error al cargar los lotes:', err);
-      }
+      },
     });
 
-    if(this.authService.getActualRole() == "Propietario"){
+    if (this.authService.getActualRole() == 'Propietario') {
       this.reactiveForm.controls['plot'].disable();
     }
 
-
     this.userService.getAllRoles().subscribe({
       next: (data: RolModel[]) => {
-        this.options = data.map(rol => rol.description);
-        if(this.authService.getActualRole() == "Propietario"){
-          let optionsFilter = this.options.filter(rol => !["Familiar mayor", "Familiar menor", "Inquilino"].includes(rol));
-          this.options = [];          
-          optionsFilter.forEach(o => this.options.push({value : o, name: o}))
-                    
-        }
-        else if(this.authService.getActualRole() == "SuperAdmin"){
-            let optionsFilter = this.options.filter(rol => !["Propietario", "Familiar mayor", "Familiar menor", "Inquilino"].includes(rol));
+        this.options = data.map((rol) => rol.description);
+        if (this.authService.getActualRole() == 'Propietario') {
+          let optionsFilter = this.options.filter(
+            (rol) =>
+              !['Familiar mayor', 'Familiar menor', 'Inquilino'].includes(rol)
+          );
           this.options = [];
-          optionsFilter.forEach(o => this.options.push({value : o, name: o}))
-          
-        }
-        else if(this.authService.getActualRole() == "Gerente general"){
-          let optionsFilter = this.options.filter(rol => !["SuperAdmin","Propietario", "Familiar mayor", "Familiar menor", "Inquilino"].includes(rol));
+          optionsFilter.forEach((o) =>
+            this.options.push({ value: o, name: o })
+          );
+        } else if (this.authService.getActualRole() == 'SuperAdmin') {
+          let optionsFilter = this.options.filter(
+            (rol) =>
+              ![
+                'Propietario',
+                'Familiar mayor',
+                'Familiar menor',
+                'Inquilino',
+              ].includes(rol)
+          );
           this.options = [];
-          optionsFilter.forEach(o => this.options.push({value : o, name: o}))           
+          optionsFilter.forEach((o) =>
+            this.options.push({ value: o, name: o })
+          );
+        } else if (this.authService.getActualRole() == 'Gerente general') {
+          let optionsFilter = this.options.filter(
+            (rol) =>
+              ![
+                'SuperAdmin',
+                'Propietario',
+                'Familiar mayor',
+                'Familiar menor',
+                'Inquilino',
+              ].includes(rol)
+          );
+          this.options = [];
+          optionsFilter.forEach((o) =>
+            this.options.push({ value: o, name: o })
+          );
+        } else {
+          let optionsFilter = this.options.filter(
+            (rol) =>
+              !['Familiar mayor', 'Familiar menor', 'Inquilino'].includes(rol)
+          );
+          this.options = [];
+          optionsFilter.forEach((o) =>
+            this.options.push({ value: o, name: o })
+          );
         }
-          else{
-            let optionsFilter = this.options.filter(rol => !["Familiar mayor", "Familiar menor", "Inquilino"].includes(rol));
-            this.options = [];
-            optionsFilter.forEach(o => this.options.push({value : o, name: o}))
-          }
-        },
+      },
       error: (error) => {
         console.error('Error al cargar los roles:', error);
-      }
+      },
     });
 
-    if(this.authService.getActualRole() == "Gerente general"){
-      this.reactiveForm.get("plot")?.disable();
-      this.reactiveForm.get("plot")?.setValue("Sin lote");
+    if (this.authService.getActualRole() == 'Gerente general') {
+      this.reactiveForm.get('plot')?.disable();
+      this.reactiveForm.get('plot')?.setValue('Sin lote');
     }
     //Agregar suscripción
     this.suscriptionService.addSuscription(sus);
@@ -208,13 +345,11 @@ export class NewUserComponent implements OnInit, OnDestroy {
   loadRoles() {
     this.userService.getAllRoles().subscribe({
       next: (data: RolModel[]) => {
-
         this.roles = data;
       },
       error: (error) => {
         console.error('Error al cargar los roles:', error);
-
-      }
+      },
     });
   }
 
@@ -222,27 +357,44 @@ export class NewUserComponent implements OnInit, OnDestroy {
   loadFilteredRoles() {
     const sus = this.userService.getAllRoles().subscribe({
       next: (data: RolModel[]) => {
-        this.options = data.map(rol => rol.description);
-        if (this.authService.getActualRole() == "Propietario") {
-          let optionsFilter = this.options.filter(rol => ["Familiar mayor", "Familiar menor", "Inquilino"].includes(rol));
+        this.options = data.map((rol) => rol.description);
+        if (this.authService.getActualRole() == 'Propietario') {
+          let optionsFilter = this.options.filter((rol) =>
+            ['Familiar mayor', 'Familiar menor', 'Inquilino'].includes(rol)
+          );
           this.options = [];
-          optionsFilter.forEach(o => this.options.push({ value: o, name: o }))        
-        }
-        else if (this.authService.getActualRole() == "SuperAdmin") {
-          let optionsFilter = this.options.filter(rol => this.options.includes(rol) && rol != "Propietario" && rol != "Familiar mayor" && rol != "Familiar menor" && rol != "Inquilino");
+          optionsFilter.forEach((o) =>
+            this.options.push({ value: o, name: o })
+          );
+        } else if (this.authService.getActualRole() == 'SuperAdmin') {
+          let optionsFilter = this.options.filter(
+            (rol) =>
+              this.options.includes(rol) &&
+              rol != 'Propietario' &&
+              rol != 'Familiar mayor' &&
+              rol != 'Familiar menor' &&
+              rol != 'Inquilino'
+          );
           this.options = [];
-          optionsFilter.forEach(o => this.options.push({ value: o, name: o }))
-
-        }
-        else {
-          let optionsFilter = this.options.filter(rol => !this.optionsForOwner.includes(rol) && rol != "Propietario" && rol != "SuperAdmin");
+          optionsFilter.forEach((o) =>
+            this.options.push({ value: o, name: o })
+          );
+        } else {
+          let optionsFilter = this.options.filter(
+            (rol) =>
+              !this.optionsForOwner.includes(rol) &&
+              rol != 'Propietario' &&
+              rol != 'SuperAdmin'
+          );
           this.options = [];
-          optionsFilter.forEach(o => this.options.push({ value: o, name: o }))
+          optionsFilter.forEach((o) =>
+            this.options.push({ value: o, name: o })
+          );
         }
       },
       error: (error) => {
         console.error('Error al cargar los roles:', error);
-      }
+      },
     });
 
     //Agregar suscripción+
@@ -255,7 +407,7 @@ export class NewUserComponent implements OnInit, OnDestroy {
     const cuit = control.value;
 
     console.log(this.documentType);
-    
+
     if (Number(this.documentType) !== 3) {
       return null;
     }
@@ -280,7 +432,9 @@ export class NewUserComponent implements OnInit, OnDestroy {
       aux = 9;
     }
 
-    return aux === parseInt(cuit[10], 10) ? null : { invalidCuit: 'El CUIT es inválido' };
+    return aux === parseInt(cuit[10], 10)
+      ? null
+      : { invalidCuit: 'El CUIT es inválido' };
   }
 
   documentTypeChange() {
@@ -290,20 +444,19 @@ export class NewUserComponent implements OnInit, OnDestroy {
 
     dniControl?.setErrors(null);
 
-    if (this.documentType == '3') {     
-      const validationResult = this.validarCuit(dniControl!);      
+    if (this.documentType == '3') {
+      const validationResult = this.validarCuit(dniControl!);
       if (validationResult) {
         dniControl?.setErrors(validationResult);
       }
     }
   }
 
-
   //------------------------------------------------------Redireccionar------------------------------------------------------
 
-  //Redirige a la ruta especificada 
+  //Redirige a la ruta especificada
   redirect() {
-    if (this.authService.getActualRole() == "Propietario") {
+    if (this.authService.getActualRole() == 'Propietario') {
       this.routingService.redirect('/main/users/family', 'Mi Familia');
     } else {
       this.routingService.redirect('/main/users/list', 'Listado de Usuarios');
@@ -314,7 +467,6 @@ export class NewUserComponent implements OnInit, OnDestroy {
 
   //Crear el usuario
   createUser() {
-
     const fechaValue = this.reactiveForm.get('datebirth')?.value;
 
     const userData: UserPost = {
@@ -322,28 +474,26 @@ export class NewUserComponent implements OnInit, OnDestroy {
       lastname: this.reactiveForm.get('lastname')?.value || '',
       username: this.reactiveForm.get('username')?.value || '',
       password: this.reactiveForm.get('password')?.value?.toString() || '',
-      email: this.reactiveForm.get('email')?.value || '',
+      email: this.reactiveForm.get('email')?.value || null,
       dni_type_id: Number(this.reactiveForm.get('dniType')?.value) || 0,
-      dni: this.reactiveForm.get('dni')?.value?.toString() || "",
+      dni: this.reactiveForm.get('dni')?.value?.toString() || '',
       active: true,
       avatar_url: "",
-      datebirth: fechaValue ? new Date(fechaValue).toISOString().split('T')[0] : '',
+      datebirth: fechaValue ? new Date(fechaValue).toISOString().split('T')[0] : null,
       roles: this.reactiveForm.get('roles')?.value || [],
-      phone_number: this.reactiveForm.get('phone_number')?.value?.toString() || '',
+      phone_number: this.reactiveForm.get('phone_number')?.value?.toString() || null,
       userUpdateId: this.reactiveForm.get('userUpdateId')?.value || 0,
-      telegram_id: this.reactiveForm.get('telegram_id')?.value || 0
-
+      telegram_id: this.reactiveForm.get('telegram_id')?.value || 0,
     };
 
     //Si el usuario es de tipo owner se setea el plotId
-    if (this.authService.getActualRole() == "Propietario") {
+    if (this.authService.getActualRole() == 'Propietario') {
       userData.plot_id = this.authService.getUser().plotId[0];
     } else {
       userData.plot_id = 0;
     }
 
     console.log(userData);
-    
 
     const sus = this.userService.postUser(userData).subscribe({
       next: (response) => {
@@ -358,11 +508,10 @@ export class NewUserComponent implements OnInit, OnDestroy {
         });
         this.redirect();
         this.reactiveForm.reset();
-
       },
       error: (error) => {
         console.log(error);
-        
+
         //Mostramos que hubo un error
         Swal.fire({
           title: 'Error',
@@ -370,7 +519,7 @@ export class NewUserComponent implements OnInit, OnDestroy {
           icon: 'error',
           confirmButtonText: 'Aceptar',
         });
-      }
+      },
     });
 
     //Agregar suscripción
@@ -393,8 +542,7 @@ export class NewUserComponent implements OnInit, OnDestroy {
   verifyOptions() {
     if (this.selectedOptions.length === 0) {
       this.checkOption = false;
-    }
-    else {
+    } else {
       this.checkOption = true;
     }
   }
@@ -406,8 +554,8 @@ export class NewUserComponent implements OnInit, OnDestroy {
     const control = this.reactiveForm.get(controlName);
     return {
       'is-invalid': control?.invalid && (control?.dirty || control?.touched),
-      'is-valid': control?.valid
-    }
+      'is-valid': control?.valid,
+    };
   }
 
   //Muestra el mensaje de error personalizado

@@ -1,4 +1,4 @@
-<section class="container p-5 border rounded border-3 border-secundary">
+<section class="container p-5 border rounded border-3 border-secundary" id="addPlot">
     <form [formGroup]="formReactivo" (ngSubmit)="createPlot()">
         <div class="row">
 
@@ -79,7 +79,7 @@
             </div>
 
             <!-- Campo para subir archivos -->
-            <div class="col-lg-6 mb-3">
+            <div class="col-lg-6 mb-3" id="files">
                 <div class="row">
                   <label class="col-2 col-form-label">Subir Archivos</label>
                   <div class="col-10">
@@ -110,7 +110,7 @@
                 </div>
                 <!-- Botón para hacer el submit -->
                 <div class="col-auto">
-                    <button class="btn btn-success" type="submit" [disabled]="formReactivo.invalid">Registrar</button>
+                    <button class="btn btn-success" type="submit" [disabled]="formReactivo.invalid" id="register">Registrar</button>
                 </div>
               </div>
         </div>
