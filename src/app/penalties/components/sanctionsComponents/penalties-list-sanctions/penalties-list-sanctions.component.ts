@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, inject, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { SanctionService } from '../../../services/sanctions.service';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -22,6 +22,9 @@ import autoTable from 'jspdf-autotable';
 import { CustomSelectComponent } from "../../../../common/components/custom-select/custom-select.component";
 import { AuthService } from '../../../../users/users-servicies/auth.service';
 import { PlotService } from '../../../../users/users-servicies/plot.service';
+import { Subscription } from 'rxjs';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 
 
 @Component({
@@ -31,7 +34,7 @@ import { PlotService } from '../../../../users/users-servicies/plot.service';
   templateUrl: './penalties-list-sanctions.component.html',
   styleUrl: './penalties-list-sanctions.component.scss'
 })
-export class PenaltiesSanctionsListComponent implements OnInit {
+export class PenaltiesSanctionsListComponent implements OnInit, OnDestroy {
   //Variables
   sanctionsfilter: any[] = [];                    //
   sanctions: SanctionsDTO[] = [];                 //
@@ -47,16 +50,28 @@ export class PenaltiesSanctionsListComponent implements OnInit {
   today: string = '';
   plots: any[] = [];
 
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
+
   options: { name: string, value: any }[] = []
   @ViewChild(CustomSelectComponent) customSelect!: CustomSelectComponent;
 
 
   //Init
   ngOnInit(): void {
+
+    //TUTORIAL
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    );
+
     //Metodo para recargar la datatable desde dentro de un modal en el modal
     this.sanctionService.refreshTable$.subscribe(() => {
       this.refreshData();
-      
+
     });
 
     this.getStates();
@@ -84,6 +99,66 @@ export class PenaltiesSanctionsListComponent implements OnInit {
     this.resetDates()
     this.today = new Date().toISOString().split('T')[0];
     this.eraseFilters();
+  }
+
+
+  //Destroy
+  ngOnDestroy(): void {
+    //TUTORIAL
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
+  }
+
+
+  //Inicia el tutorial
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Listado de Gastos',
+      text: 'Acá puede ver una lista completa de las sanciones que se han realizado sobre los lotes, Tanto las multas como las advertencias. Tambien se puede clickear para ver mas detalles, editar o realizar un descargo. Si desea aceptar o rechazar un descargo puede hacerlo desde el "Ver mas"',
+      attachTo: {
+        element: '#sanctionsTable',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+
+    this.tour.addStep({
+      id: 'filter-step',
+      title: 'Filtros',
+      text: 'Desde acá podrá filtrar los gastos por nombre y fecha. También puede exportar el listado a Excel o PDF, o borrar los filtros aplicados con el botón de basura.',
+      attachTo: {
+        element: '#filters',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+
+    });
+
+    this.tour.start();
   }
 
 
@@ -124,9 +199,23 @@ export class PenaltiesSanctionsListComponent implements OnInit {
     private sanctionService: SanctionService,
     private routingService: RoutingService,
     private authService: AuthService,
-    private plotService: PlotService
+    private plotService: PlotService,
+    private tutorialService: TutorialService
   ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+      },
+      useModalOverlay: true,
+    });
     (window as any).viewFine = (id: number) => this.viewFine(id);
+
   }
 
 
@@ -208,8 +297,8 @@ export class PenaltiesSanctionsListComponent implements OnInit {
                             ${this.getPermisionsToEdit() && (data.fineState === "Apelada" || data.fineState === "Pendiente") ? `
                               <li><hr class="dropdown-divider"></li>
                               <li><a class="dropdown-item" data-action="updateFine" data-id="${data.id}"'>Editar</a></li>` : ``}
-                            ${data.fineState == "Pendiente" && (this.getPermisionsToEdit() || this.getPermissionsToDischarge())  ? 
-                            `<li><hr class="dropdown-divider"></li>
+                            ${data.fineState == "Pendiente" && (this.getPermisionsToEdit() || this.getPermissionsToDischarge()) ?
+                `<li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" data-action="newDisclaimer" data-id="${data.id}">Descargo</a></li>` : ``}
                           </ul>
                         </div>
@@ -235,18 +324,18 @@ export class PenaltiesSanctionsListComponent implements OnInit {
     });
   }
 
-  permisionToEdit : boolean = false
-  getPermisionsToEdit(){
-    if(this.authService.getActualRole() === 'SuperAdmin' ||  
-    this.authService.getActualRole() === 'Gerente multas'){
+  permisionToEdit: boolean = false
+  getPermisionsToEdit() {
+    if (this.authService.getActualRole() === 'SuperAdmin' ||
+      this.authService.getActualRole() === 'Gerente multas') {
       this.permisionToEdit = true
     }
     return this.permisionToEdit;
   }
   permisionToDischarge: boolean = false
-  getPermissionsToDischarge(){
-    if(this.authService.getActualRole() === 'Propietario' ||
-      this.authService.getActualRole() === 'Inquilino'){
+  getPermissionsToDischarge() {
+    if (this.authService.getActualRole() === 'Propietario' ||
+      this.authService.getActualRole() === 'Inquilino') {
       this.permisionToDischarge = true
     }
     return this.permisionToDischarge;
@@ -386,9 +475,9 @@ export class PenaltiesSanctionsListComponent implements OnInit {
   //Actualiza todos los datos de la tabla consultando con la api
   refreshData() {
     let plotIds = this.authService.getUser().plotId;
-    
-    if (this.authService.getActualRole() === 'SuperAdmin' || 
-    this.authService.getActualRole() === 'Gerente multas') {
+
+    if (this.authService.getActualRole() === 'SuperAdmin' ||
+      this.authService.getActualRole() === 'Gerente multas') {
       this.sanctionService.getAllSactions().subscribe((data) => {
         this.sanctions = [...data];
         this.sanctionsfilter = [...this.sanctions];
@@ -421,7 +510,7 @@ export class PenaltiesSanctionsListComponent implements OnInit {
 
   getPlotData(plotId: number) {
     let plot = this.plots.find((plot) => plot.id === plotId);
-    return plot ? `Nro: ${plot?.plot_number} - Manzana: ${plot?.block_number}`: "N/A";
+    return plot ? `Nro: ${plot?.plot_number} - Manzana: ${plot?.block_number}` : "N/A";
   }
 
 

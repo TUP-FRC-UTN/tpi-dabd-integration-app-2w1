@@ -19,6 +19,7 @@ import {
   finalize,
   mergeMap,
   Subject,
+  Subscription,
   switchMap,
   take,
   takeUntil,
@@ -31,6 +32,8 @@ import { ExpenseType } from '../../models/expenseType';
 import { ProviderService } from '../../services/providerServices/provider.service';
 import localeEsAr from '@angular/common/locales/es-AR';
 import { ExpensesYearNgSelectComponent } from "../expenses-year-ngSelect/expenses-year-ngSelect.component";
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../common/services/tutorial.service';
 registerLocaleData(localeEsAr, 'es-AR');
 @Component({
   standalone: true,
@@ -86,12 +89,27 @@ export class ReportExpenseComponent implements OnInit, OnDestroy {
   yearsFromList:number[]=[];
   yearsToList:number[]=[];
 
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
 
   constructor(
     private expenseReportService: ExpenseReportService,
     private providerService: ProviderService,
-    private cdRef: ChangeDetectorRef
+    private cdRef: ChangeDetectorRef,
+    private tutorialService: TutorialService
   ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+      },
+      useModalOverlay: true,
+    });
   }
 
   chartExpensesPeriod = {
@@ -223,7 +241,76 @@ export class ReportExpenseComponent implements OnInit, OnDestroy {
     this.initialKpis();
     this.initialLastBillRecord();
     this.initialcomparateYearMonth();
+
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    );
   }
+
+  ngOnDestroy() {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
+  }
+
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Filtros',
+      text: 'Desde acá podrá filtrar los gastos por estado y realizar una búsqueda en todo el listado. También puede exportar los gastos a Excel o PDF, o borrar los filtros aplicados con el botón de basura.', attachTo: {
+        element: '#filters',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Añadir',
+      text: 'Haciendo click en este botón puede acceder a la página de alta de gastos. Acá puede crear un nuevo gasto con sus datos correspondientes.', attachTo: {
+        element: '#addExpense',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+
+    });
+
+    this.tour.start();
+  }
+
   loadProviders() {
     this.providerService.getProviders().subscribe({
       next: (data: Provider[]) => {
@@ -234,10 +321,7 @@ export class ReportExpenseComponent implements OnInit, OnDestroy {
       },
     });
   }
-  ngOnDestroy() {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
-  }
+  
   loadDates() {
     const today = moment();
     this.dateTo = today.format('YYYY-MM-DD');
