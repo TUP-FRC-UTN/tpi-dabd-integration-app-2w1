@@ -92,6 +92,9 @@ export class UsersHomeComponent implements OnInit, OnDestroy {
   }
 
   startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
 
     this.tour.addStep({
       id: 'table-step',

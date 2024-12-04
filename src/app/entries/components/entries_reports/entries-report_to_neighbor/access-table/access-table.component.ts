@@ -1086,9 +1086,9 @@ export class AccessTableComponent implements OnInit, AfterViewInit, OnDestroy {
     });
 
     this.tour.addStep({
-      id: "type-setp",
+      id: "type-step",
       title: 'Botones de acción',
-      text: 'Con estos botones puede filtrar los accesos por tipo de forma más accesible.',
+      text: 'Con estos botones puede filtrar los accesos por tipo de forma más accesible. También puede ver la lista de personas autorizadas o escanear los QR de acceso. De ser necesario, también puede exportar la lista a Excel o PDF.',
 
       attachTo: {
         element: '#tipos',
@@ -1106,6 +1106,27 @@ export class AccessTableComponent implements OnInit, AfterViewInit, OnDestroy {
       ],
     });
     
+    this.tour.addStep({
+      id: "type-step",
+      title: 'Emergencias',
+      text: 'En caso de emergencias, puede permitir acceso de forma más rápida a través de esta pantalla.',
+
+      attachTo: {
+        element: '#emergency',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back,
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete,
+        },
+      ],
+    });
+
     this.tour.start();
   }
 }

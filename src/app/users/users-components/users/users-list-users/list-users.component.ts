@@ -336,7 +336,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
           action: this.tour.back,
         },
         {
-          text: 'Finalizar',
+          text: 'Siguiente',
           action: this.tour.next,
         },
       ],

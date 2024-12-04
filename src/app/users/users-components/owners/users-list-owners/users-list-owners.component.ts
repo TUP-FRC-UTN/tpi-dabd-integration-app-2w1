@@ -294,7 +294,7 @@ export class UsersListOwnersComponent implements OnDestroy {
           action: this.tour.back,
         },
         {
-          text: 'Finalizar',
+          text: 'Siguiente',
           action: this.tour.next,
         },
       ],
