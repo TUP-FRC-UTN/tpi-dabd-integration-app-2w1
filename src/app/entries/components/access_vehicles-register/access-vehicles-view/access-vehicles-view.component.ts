@@ -425,7 +425,7 @@ export class AccessVehiclesViewComponent implements OnDestroy, OnInit {
               setTimeout(checkElementExists, 5);
             }
           };
-          
+
           checkElementExists();
         });
       },
@@ -439,7 +439,7 @@ export class AccessVehiclesViewComponent implements OnDestroy, OnInit {
               'quitar'
             ) as HTMLInputElement;
             remove.click();
-            
+
             this.tour.back();
           },
         },

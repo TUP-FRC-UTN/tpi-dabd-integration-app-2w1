@@ -271,7 +271,7 @@ export class ReportExpenseComponent implements OnInit, OnDestroy {
     this.tour.addStep({
       id: 'subject-step',
       title: 'Filtros',
-      text: 'Desde acá podrá filtrar los gastos por estado y realizar una búsqueda en todo el listado. También puede exportar los gastos a Excel o PDF, o borrar los filtros aplicados con el botón de basura.', attachTo: {
+      text: 'Desde acá podrá filtrar por una fecha inicial y una fecha final. También puede clickear el botón de embudo para acceder a los filtros avanzados y pulsando el botón de basurero podrá deshacer los filtros aplicados.', attachTo: {
         element: '#filters',
         on: 'auto'
       },
@@ -291,8 +291,8 @@ export class ReportExpenseComponent implements OnInit, OnDestroy {
     this.tour.addStep({
       id: 'subject-step',
       title: 'Añadir',
-      text: 'Haciendo click en este botón puede acceder a la página de alta de gastos. Acá puede crear un nuevo gasto con sus datos correspondientes.', attachTo: {
-        element: '#addExpense',
+      text: 'Aquí puede visualizar los KPI de los gastos, con información resumida.', attachTo: {
+        element: '#kpis',
         on: 'auto'
       },
       buttons: [

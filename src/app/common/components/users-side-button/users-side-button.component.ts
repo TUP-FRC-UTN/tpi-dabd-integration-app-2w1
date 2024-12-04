@@ -24,6 +24,8 @@ export class UsersSideButtonComponent {
   @Output() sendInfo = new EventEmitter<any>();
 
   send(path: string, title: string) {
-   this.sendInfo.emit({path: path, title: title});
+    this.sendInfo.emit({ path: path, title: title });
   }
+  
+  
 }

@@ -122,7 +122,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
 
   getPlotData(plotId: number) {
     let plot = this.plots.find((plot) => plot.id === plotId);
-    return plot ? `Nro: ${plot?.plot_number} - Manzana: ${plot?.block_number}`: "N/A";
+    return plot ? `Nro: ${plot?.plot_number} - Manzana: ${plot?.block_number}` : "N/A";
   }
 
 
@@ -194,16 +194,16 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
                 <div class="dropdown">
                   <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
                   <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" onclick="viewReport(${data.id})">Ver más</a></li>
-                    ${(data.reportState === 'Abierto' || data.reportState === 'Pendiente') ?
-              `<li><hr class="dropdown-divider"></li> <li><a class="dropdown-item" onclick="editReport(${data.id})">Editar</a></li>` : ''}
-                      ${(data.reportState === 'Abierto' || data.reportState === 'Pendiente') ?
-              `<li><a class="dropdown-item" data-action="newSaction" data-id="${data.id}"">Sancionar</a></li>` : ''}
-                        ${data.reportState === 'Abierto' || data.reportState === 'Pendiente' ?
-              `<li><a class="dropdown-item" data-action="changeState" data-id="${data.id}" data-state="REJECTED"">Rechazar</a></li>` : ''}
-                          ${data.reportState === 'Abierto' ?
-              `<li><a class="dropdown-item" data-action="changeState" data-id="${data.id}" data-state="CLOSED"">Cerrar</a></li>` : ''}
-                 </ul>
+                    <li><a class="btn dropdown-item" onclick="viewReport(${data.id})">Ver más</a></li>
+                    ${(data.reportState === 'Abierto' || data.reportState === 'Pendiente') ? 
+                      `
+                      <li><hr class="dropdown-divider"></li>
+                      <li><a class="btn dropdown-item" onclick="editReport(${data.id})">Editar</a></li>
+                      <li><a class="btn dropdown-item" data-action="newSaction" data-id="${data.id}"">Sancionar</a></li>
+                      <li><a class="btn dropdown-item" data-action="changeState" data-id="${data.id}" data-state="REJECTED"">Rechazar</a></li>
+                      ` : ''}
+                    ${data.reportState === 'Abierto' ? `<li><a class="btn dropdown-item" data-action="changeState" data-id="${data.id}" data-state="CLOSED"">Cerrar</a></li>` : ''}
+                </ul>
                 </div>
               </div>
             </div>`
@@ -308,7 +308,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
         this.updateDataTable();
         this.filterDate();
       }, error => {
-        alert(error);
+        console.error('Error al cargar los informes', error);
       }
     );
   }
@@ -319,7 +319,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
     this.routingService.redirect(`main/sanctions/post-fine/${id}`, "Registrar Multa")
   }
 
-  
+
   //Redirige a el alta de un informe
   postRedirect() {
     this.routingService.redirect("main/sanctions/post-report", "Registrar Informe")
