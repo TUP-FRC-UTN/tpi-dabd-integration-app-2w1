@@ -27,26 +27,25 @@
 
         <div class="col-4  d-flex justify-content-end align-items-center">
 
-            <app-navbar-notification ></app-navbar-notification>
+            <app-navbar-notification></app-navbar-notification>
 
             <div class="dropdown">
-                <button type="button" class="btn btn-dark fs-5" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+                <button type="button" class="btn btn-dark fs-5" data-bs-toggle="dropdown" aria-expanded="false"
+                    data-bs-auto-close="outside">
 
                     {{username + ' ' + userLastname}}
                     <i class="bi-person-circle fs-5"></i>
                 </button>
                 <ul class="dropdown-menu">
-                    <li><a class="btn dropdown-item"
-                            (click)="changePath({path: 'main/users/profile', title: 'Mi perfil'})">
-                            <i class="bi bi-person"></i> Perfil</a></li>
+                    <li><a class="btn dropdown-item bi-person"
+                            (click)="changePath({path: 'main/users/profile', title: 'Mi perfil'})"> Perfil </a></li>
                     <!-- <li><a class="dropdown-item" href="#"><i class="bi bi-gear"></i> Configuración</a></li> -->
                     <li>
                         <hr class="dropdown-divider">
                     </li>
 
-                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#confirmExit"
-                            title="Salir">
-                            <i class="bi-box-arrow-left"></i> Cerrar sesión</a></li>
+                    <li><a class="btn dropdown-item bi-box-arrow-left" href="#" data-bs-toggle="modal"
+                            data-bs-target="#confirmExit" title="Salir"> Cerrar sesión </a></li>
                 </ul>
             </div>
         </div>
@@ -61,7 +60,7 @@
                 <i class="bi-house-fill"></i>
                 @if (expand) {<span class="ms-2">Home</span>}
             </button>
-            <ul class="nav flex-column overflow-auto custom-scroll">
+            <ul class="nav flex-column overflow-auto custom-scroll" id="sideButtons">
                 <li class="nav-item mb-2">
                     @for (button of sideButtons; track $index) {
                     <app-users-side-button [expanded]="expand" [info]="button" [userRole]="actualRole"
@@ -80,7 +79,7 @@
                     @if (expand) {<span class="ms-2">Dashboard</span>}
                 </button>
                 }
-                <button class="nav-link d-flex text-light w-100 px-3 py-2"  (click)="startTutorial()"
+                <button class="nav-link d-flex text-light w-100 px-3 py-2" (click)="startTutorial()"
                     title="Información">
                     <!-- data-bs-target="#infoModal" data-bs-toggle="modal" AGREGAR EN CASO DE NO LLEGAR CON LOS TUTORIALES -->
                     <i class="bi-info-circle"></i>

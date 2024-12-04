@@ -18,11 +18,9 @@ export class UsersNavbarComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly tutorialService = inject(TutorialService);
 
-  pageTitle: string = ''
+  pageTitle: string = this.routingService.getTitle();
   username: string = this.authService.getUser().name!;
   userLastname: string = this.authService.getUser().lastname!;
-  // username: string = "Jhon";     //Hardcodeado para no levantar el micro para login
-  // userLastname: string = "Doe";  //Hardcodeado para no levantar el micro para login
 
   //Expande el side
   expand: boolean = false;
@@ -32,8 +30,6 @@ export class UsersNavbarComponent implements OnInit {
 
   //Roles del usuario
   userRoles: string[] = [];
-
-  // userRoles: string[] = ["SuperAdmin", "Gerente general"]; //Hardcodeado para no levantar el micro para login
 
   //Rol seleccionado
   actualRole: string = '';
@@ -45,16 +41,19 @@ export class UsersNavbarComponent implements OnInit {
     this.actualRole = this.authService.getActualRole()!;
   }
 
+
   //Arranca el tutorial segun la pantalla
   startTutorial() {
     console.log("tutorial");
     this.tutorialService.triggerTutorial();
   }
 
+
   //Expandir y contraer el sidebar
   changeState() {
     this.expand = !this.expand;
   }
+
 
   //Obtiene el título y la url del hijo y llama al servicio para redirigir y setear el titulo
   changePath(info: any) {
@@ -64,27 +63,42 @@ export class UsersNavbarComponent implements OnInit {
     });
   }
 
+
   //Redirigir a los dashboards
   redirectDashboard() {
     this.routingService.redirect(this.routingService.getDashboardRoute(), 'Dashboard');
   }
 
+
   //Seleccionar un rol
   selectRole(role: string) {
+    this.collapseSideButtons();
     this.authService.saveActualRole(role);
     this.actualRole = role;
     this.routingService.redirect('/main/home', 'Página principal');
+
   }
 
+
   //Cerrar sesión
-  logOut(){
+  logOut() {
     this.authService.logOut();
     this.routingService.redirect('/login');
   }
 
+
   //Comprobar si el rol actual puede acceder a los dashboards
-  showDashboard(){
+  showDashboard() {
     const rolesPermited = ['SuperAdmin', 'Gerente general', 'Gerente multas', 'Gerente finanzas', 'Gerente inventario', 'Gerente empleados'];
-    return rolesPermited.includes(this.actualRole);
+    return rolesPermited.includes(this.actualRole) && this.routingService.getCurrentRoute() !== '/main/home';
+  }
+
+
+  //Contrae todos los dropdowns de la sidebar
+  collapseSideButtons() {
+    document.querySelectorAll('#sideButtons .collapse').forEach((collapseElement) => {
+      const collapseInstance = new (window as any)['bootstrap'].Collapse(collapseElement as HTMLElement, { toggle: false });
+      collapseInstance.hide();
+    });
   }
 }

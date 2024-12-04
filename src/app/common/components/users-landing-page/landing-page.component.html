@@ -10,7 +10,7 @@
 
         <div class="d-flex align-items-center">
             <button type="button" class="btn btn-light" (click)="redirect('/login')">Iniciar Sesión
-                <i class="bi bi-person-circle"></i>
+                <i class="bi-person-circle"></i>
             </button>
         </div>
     </div>
@@ -99,10 +99,10 @@
                                     <button type="button" class="btn-close" (click)="clearPlot()"></button>
                                 </div>
                                 <div class="card-body">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="200">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="200"
+                                        height="200">
                                         <path [attr.d]="selectedPath?.getAttribute('d')"
-                                            [attr.fill]="selectedPath?.getAttribute('fill')"
-                                            [attr.stroke]="'#343A40'"
+                                            [attr.fill]="selectedPath?.getAttribute('fill')" [attr.stroke]="'#343A40'"
                                             [attr.transform]="selectedPath ? updatePathToOrigin(selectedPath.getAttribute('d')!) : ''" />
                                     </svg>
                                     <span>{{'Estado: ' + selectedPlot?.plot_state}}</span>
@@ -116,7 +116,7 @@
                     <!-- Alerta de lotes no encontrados -->
                     @if(plotsCard.length === 0) {
                     <div class="row">
-                        <div class="alert alert-warning text-center" role="alert">
+                        <div class="alert alert-warning text-center mb-0" role="alert">
                             No se han encontrado lotes disponibles.
                         </div>
                     </div>
