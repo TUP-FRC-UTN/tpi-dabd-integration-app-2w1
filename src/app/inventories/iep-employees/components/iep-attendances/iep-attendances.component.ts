@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { EmpListadoAsistencias } from '../../Models/emp-listado-asistencias';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EmpListadoEmpleadosService } from '../../services/emp-listado-empleados.service';
@@ -15,6 +15,9 @@ import $ from 'jquery';
 import 'datatables.net'; // Importación de DataTables
 import 'datatables.net-dt'; // Estilos para DataTables
 import 'datatables.net-bs5';
+import { Subscription } from 'rxjs';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 
 @Component({
   selector: 'app-iep-attendances',
@@ -23,13 +26,14 @@ import 'datatables.net-bs5';
   templateUrl: './iep-attendances.component.html',
   styleUrl: './iep-attendances.component.css'
 })
-export class IepAttendancesComponent implements OnInit{
+export class IepAttendancesComponent implements OnInit, OnDestroy{
   
   Asistencias: EmpListadoAsistencias[] = [];
   filteredAsistencias: EmpListadoAsistencias[] = [];
   private table: any;
   router = inject(Router);
-  
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
 
   empleadoId: number = 0;
   empleadoName: string = "";
@@ -53,9 +57,34 @@ export class IepAttendancesComponent implements OnInit{
     private route: ActivatedRoute,
     private pillowTimeLateArrivalService: PillowTimeLateArrivalService,
     private mockid: AuthService 
+    , private tutorialService: TutorialService
   ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+      },
+      keyboardNavigation: false,
+      useModalOverlay: true,
+    }); 
+
     const hoy = new Date();
     this.fechaMaxima = hoy.toISOString().split('T')[0];
+  }
+  ngOnDestroy(): void {
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
   }
   
   ngOnInit(): void {
@@ -68,6 +97,92 @@ export class IepAttendancesComponent implements OnInit{
     this.loadAsistencias();
     this.initializeDates();
     this.setInitialDates();
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    ); 
+  }
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Tabla de Asistencias',
+      text: 'Acá puede ver todas las asistencias del empleado, ordenados por fecha.',
+      attachTo: {
+        element: '#empleadosTable',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Filtros',
+      text: 'Desde acá podrá filtrar los empleados por fecha y estado. También puede exportar a Excel o PDF, o borrar los filtros aplicados con el botón de basura.',      attachTo: {
+        element: '#filtros',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+      
+    });
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Acciones',
+      text: 'Mediante este boton podra acceder a la justificacion de una llegada tarde o falta de un empleado.',      attachTo: {
+        element: '#actions',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+      
+    });
+    //TODO OPCIONES
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Volver atras',
+      text: 'Tocando este boton volvera a la pantalla del listado de empleados.',      attachTo: {
+        element: '#arrow',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+      
+    });
+
+    this.tour.start();
   }
 
 
@@ -218,7 +333,7 @@ export class IepAttendancesComponent implements OnInit{
                 <div class="text-center">
                   <div class="btn-group">
                     <div class="dropdown">
-                      <button type="button" class="btn border border-2 bi-three-dots-vertical btn-cambiar-estado" data-bs-toggle="dropdown"></button>
+                      <button type="button" class="btn border border-2 bi-three-dots-vertical btn-cambiar-estado" id="actions" data-bs-toggle="dropdown"></button>
                         <ul class="dropdown-menu">
                           <li><button class="dropdown-item btn-cambiar-estado" data-id="${row.id}" data-nuevoestado="JUSTIFICADO"
                           data-bs-toggle="modal" data-bs-target="#modalPutJustificacion">Justificar</button></li>
