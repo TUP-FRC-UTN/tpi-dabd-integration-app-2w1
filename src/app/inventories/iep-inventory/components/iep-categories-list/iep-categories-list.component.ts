@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import { PutCategoryDTO } from '../../models/putCategoryDTO';
@@ -13,6 +13,9 @@ import { ProductService } from '../../services/product.service';
 import * as XLSX from 'xlsx';
 import { NgSelectModule } from '@ng-select/ng-select';
 import $ from 'jquery';
+import { Subscription } from 'rxjs';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 
 declare var bootstrap: any; // Añadir esta declaración al principio
 @Component({
@@ -22,7 +25,11 @@ declare var bootstrap: any; // Añadir esta declaración al principio
   imports: [CommonModule, ReactiveFormsModule, RouterModule, FormsModule, NgSelectModule],
   standalone: true
 })
-export class IepCategoriesListComponent implements OnInit {
+export class IepCategoriesListComponent implements OnInit, OnDestroy {
+    //TUTORIAL
+    tutorialSubscription = new Subscription();
+    private tour: Shepherd.Tour;
+
   selectedStatuses: string[] = [];
   statusOptions = [
     { id: 'active', name: 'Activo' },
@@ -47,8 +54,23 @@ export class IepCategoriesListComponent implements OnInit {
   constructor(
     categoryService: CategoriaService,
     usersMockService: UsersMockIdService,
-    productService: ProductService
+    productService: ProductService,
+     private tutorialService: TutorialService
   ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+      },
+      keyboardNavigation: false,
+      useModalOverlay: true,
+    }); 
+
     this.usersMockService = usersMockService;
     this.categoryService = categoryService;
     this.productService = productService;
@@ -99,6 +121,69 @@ export class IepCategoriesListComponent implements OnInit {
 
   ngOnInit() {
     this.loadCategories();
+    //TUTORIAL
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    ); 
+  }
+
+  ngOnDestroy(): void {
+    //TUTORIAL
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    } 
+
+  }
+
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Tabla de Categorias',
+      text: 'Acá puede ver todas las categorias de los productos de inventario. Puede hacer click en el botón de acciones para editar una categoria.',
+      attachTo: {
+        element: '#categoryTable',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Filtros',
+      text: 'Desde acá puede filtrar las las categorias por nombre y por su estado (Activo o inactivo). También puede exportar las categorias a Excel o PDF, o borrar los filtros aplicados con el botón de basura.'
+      ,attachTo: {
+        element: '#filtros',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+      
+    });
+
+    this.tour.start();
   }
 
   private refreshDataTable(): void {
