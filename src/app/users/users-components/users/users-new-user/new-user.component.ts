@@ -59,6 +59,8 @@ export class NewUserComponent implements OnInit, OnDestroy {
         modalOverlayOpeningPadding: 10,
         modalOverlayOpeningRadius: 10,
       },
+      keyboardNavigation: false,
+
       useModalOverlay: true,
     });
 
