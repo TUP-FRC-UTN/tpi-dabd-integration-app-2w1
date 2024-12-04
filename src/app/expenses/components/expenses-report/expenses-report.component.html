@@ -64,8 +64,8 @@
         tooltip="Total del Periodo" [customStyles]="{ 'background-color': '#fcc7ccde' }" icon="bi bi-cash"
         formatPipe="currency" (click)="changeView(1)"></app-expenses-kpi>
       <!-- KPI 2 -->
-      <app-expenses-kpi [amount]="totalLastBillRecord" title="Total" subTitle="Ultimo Facturado"
-        tooltip="Total Ultimo Periodo Facturado" formatPipe="currency"
+      <app-expenses-kpi [amount]="totalLastBillRecord" title="Total" subTitle="Último Facturado"
+        tooltip="Total Último Periodo Facturado" formatPipe="currency"
         [customStyles]="{ 'background-color': '#d8ffedde' }" icon="bi bi-cash" (click)="changeView(2)"></app-expenses-kpi>
       <!-- KPI 3 -->
       @if (percentageVariation>=0) {
@@ -110,7 +110,7 @@
         <div class="col ">
           <div class="card border-0 shadow-lg  rounded-4 h-100">
             <div class="card-body">
-              <h4 class="card-title align-items-center">Ultimo Período Facturado<button type="button"
+              <h4 class="card-title align-items-center">Último Período Facturado<button type="button"
                   class="btn btn-sm btn-link text-muted bi bi-arrows-angle-expand fs-5 float-end" title="Expandir"
                   (click)="changeView(2)"></button></h4>
 
@@ -250,7 +250,7 @@
     <div class="col-12">
       <div class="card h-100 border-0 shadow-lg  rounded-4">
         <div class="card-body d-flex flex-column">
-          <h4 class="card-title align-items-center">Ultimo Período Facturado
+          <h4 class="card-title align-items-center">Último Período Facturado
             <button type="button" class="btn btn-sm btn-link text-muted bi bi-arrow-left fs-5 float-end" title="Volver"
               (click)="changeView(0)"></button>
           </h4>
