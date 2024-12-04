@@ -15,6 +15,8 @@ import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
 import { NgSelectModule } from '@ng-select/ng-select';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 
 
 // Interfaz para los filtros
@@ -34,8 +36,11 @@ interface EmployeeFilters {
   styleUrls: ['./iep-list-employees.component.css'],
 })
 export class IepListEmployeesComponent implements OnInit, OnDestroy {
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
 
-  stateOptions =[
+  stateOptions = [
     { id: 'Activo', label: 'Activo' },
     { id: 'Inactivo', label: 'Inactivo' },
     { id: 'Licencia', label: 'Licencia' }
@@ -73,18 +78,18 @@ export class IepListEmployeesComponent implements OnInit, OnDestroy {
       );
 
       // Filtro por posición
-    const positionMatch = this.selectedPositions.length === 0 ||
-    this.selectedPositions.includes(empleado.position);
+      const positionMatch = this.selectedPositions.length === 0 ||
+        this.selectedPositions.includes(empleado.position);
 
-  // Filtrar por estado
-  const stateMatch = this.selectedState.length === 0 ||
-    this.selectedState.includes(empleado.active ? empleado.license ? 'Licencia' : 'Activo' : 'Inactivo');
+      // Filtrar por estado
+      const stateMatch = this.selectedState.length === 0 ||
+        this.selectedState.includes(empleado.active ? empleado.license ? 'Licencia' : 'Activo' : 'Inactivo');
 
-  // Aplicar todos los filtros en conjunto
-  return nameMatch && documentMatch && salaryMatch && searchMatch && positionMatch && stateMatch;
-});
+      // Aplicar todos los filtros en conjunto
+      return nameMatch && documentMatch && salaryMatch && searchMatch && positionMatch && stateMatch;
+    });
 
-this.table.rows.add(filteredData).draw();
+    this.table.rows.add(filteredData).draw();
   }
 
   private filters: EmployeeFilters = {
@@ -220,9 +225,30 @@ this.table.rows.add(filteredData).draw();
   constructor(
     private empleadoService: EmpListadoEmpleadosService,
     private sanitizer: DomSanitizer
-  ) {}
+    , private tutorialService: TutorialService
+  ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+      },
+      keyboardNavigation: false,
+      useModalOverlay: true,
+    });
+  }
 
   ngOnInit(): void {
+    //TUTORIAL
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    );
     this.loadEmpleados();
     this.initializeDates();
     //this.bindEditButtons();
@@ -255,7 +281,7 @@ this.table.rows.add(filteredData).draw();
       doc.setFontSize(16);
       doc.text('Lista de Empleados', 10, 10);
       (doc as any).autoTable({
-        head: [['Estado','Apellido y Nombre', 'Documento', 'Posición', 'Salario']],
+        head: [['Estado', 'Apellido y Nombre', 'Documento', 'Posición', 'Salario']],
         body: dataToExport,
         startY: 30,
         theme: 'grid',
@@ -271,7 +297,7 @@ this.table.rows.add(filteredData).draw();
     const encabezado = [
       ['Listado de Empleados'],
       [], // Fila en blanco
-      ['Estado', 'Nombre', 'Documento', 'Posición', 'Salario'] 
+      ['Estado', 'Nombre', 'Documento', 'Posición', 'Salario']
     ];
 
     // Extrae los datos de los empleados en formato de arreglo de arreglos
@@ -301,7 +327,7 @@ this.table.rows.add(filteredData).draw();
 
     // Descarga el archivo Excel
     XLSX.writeFile(workbook, `${this.getFormattedDate()}_Lista_Empleados.xlsx`);
-}
+  }
 
 
   onSearchFilterChange(event: Event): void {
@@ -399,6 +425,17 @@ this.table.rows.add(filteredData).draw();
     if (this.table) {
       this.table.destroy();
     }
+
+    //TUTORIAL
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
+
   }
 
   initializeDates(): void {
@@ -429,13 +466,13 @@ this.table.rows.add(filteredData).draw();
           active: emp.active,
           license: emp.license
         })));
-        
-        const estadosMapeados = empleados.map((emp) => 
+
+        const estadosMapeados = empleados.map((emp) =>
           emp.active ? (emp.license ? 'Licencia' : 'Activo') : 'Inactivo'
         );
-        
+
         console.log('Mapeo de estados:', estadosMapeados);
-        
+
         this.uniqueStates = [...new Set(estadosMapeados)].sort();
 
         //cargar estados unicos, en caso de que sea activo, validar si esta en licencia
@@ -525,11 +562,11 @@ this.table.rows.add(filteredData).draw();
           className: 'align-middle text-center',
           render: (data: any, type: any, row: any) => {
             console.log('Row:', row);
-            if (row.active === false) {  
+            if (row.active === false) {
               return '<span class="badge border rounded-pill" style="background-color: #dc3545; color: white;">Inactivo</span>';
             }
             if (row.active === true && row.license === true) {
-              
+
               return '<span class="badge border rounded-pill" style="background-color: #ffc107; color: black;">Licencia</span>';
             }
             return '<span class="badge border rounded-pill" style="background-color: #198754; color: white;">Activo</span>';
@@ -589,33 +626,29 @@ this.table.rows.add(filteredData).draw();
 
             return `
                 <div class="dropdown d-flex justify-content-center">
-                <a class="btn btn-light" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"
+                <a id="actions" class="btn btn-light" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"
                   style="width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; line-height: 1; padding: 0;">
                   &#8942;
                 </a>
                 <ul class="dropdown-menu">
-                  <li><a class="dropdown-item consultar-btn" data-empleado-id="${
-                    data.id
-                  }" href="#">Ver más</a></li>
-                  <li><button class="dropdown-item consultar-asistencias" data-empleado-id="${
-                    data.id
-                  }">Ver asistencias</button></li>
-                  <li><button class="dropdown-item consultar-desempeño" data-empleado-id="${
-                    data.id
-                  }">Ver desempeño</button></li>
+                  <li><a class="dropdown-item consultar-btn" data-empleado-id="${data.id
+              }" href="#">Ver más</a></li>
+                  <li><button class="dropdown-item consultar-asistencias" data-empleado-id="${data.id
+              }">Ver asistencias</button></li>
+                  <li><button class="dropdown-item consultar-desempeño" data-empleado-id="${data.id
+              }">Ver desempeño</button></li>
 
                   <li><a class="dropdown-item modificar-btn" data-empleado-id="${data.id}" href="#">Actualizar</a></li>
 
-                  ${
-                    puedeEliminar
-                      ? `
+                  ${puedeEliminar
+                ? `
                     <li class="dropdown-divider"></li>
                     <li><button class="dropdown-item eliminar-btn" data-empleado-id="${data.id}"
                     data-bs-toggle="modal" data-bs-target="#deleteModal">Eliminar</button></li>
 
                   `
-                      : ''
-                  }
+                : ''
+              }
                 </ul>
               </div>`;
           },
@@ -642,7 +675,7 @@ this.table.rows.add(filteredData).draw();
       this.router.navigate([`main/employees/performance/${empleadoId}`]); // Redirige al componente de desempeño con el ID del empleado
     });
 
-    
+
 
     $('#empleadosTable').on('click', '.modificar-btn', (event: any) => {
       event.preventDefault();
@@ -651,21 +684,21 @@ this.table.rows.add(filteredData).draw();
     });
 
 
-  
 
-  // Manejador de clics para los botones de eliminar
-  $('#empleadosTable').on('click', '.eliminar-btn', (event: any) => {
-    event.preventDefault();
-    // Obtener el ID del empleado al que se hace clic
-    this.empleadoIdToDelete = $(event.currentTarget).data('empleado-id');
-  });
+
+    // Manejador de clics para los botones de eliminar
+    $('#empleadosTable').on('click', '.eliminar-btn', (event: any) => {
+      event.preventDefault();
+      // Obtener el ID del empleado al que se hace clic
+      this.empleadoIdToDelete = $(event.currentTarget).data('empleado-id');
+    });
 
     // Event handler para el botón de eliminar
-/*     $('#empleadosTable').on('click', '.eliminar-btn', (event: any) => {
-      event.preventDefault();
-      this.empleadoIdToDelete = $(event.currentTarget).data('empleado-id');
-      this.confirmDelete(); // Llama a confirmDelete al hacer clic
-    }); */
+    /*     $('#empleadosTable').on('click', '.eliminar-btn', (event: any) => {
+          event.preventDefault();
+          this.empleadoIdToDelete = $(event.currentTarget).data('empleado-id');
+          this.confirmDelete(); // Llama a confirmDelete al hacer clic
+        }); */
 
     // Aplicar filtros iniciales si existen
     if (this.searchFilter || this.positionFilter) {
@@ -705,7 +738,7 @@ this.table.rows.add(filteredData).draw();
                 title: 'Error',
                 text: 'Ocurrió un error al eliminar el empleado.',
                 icon: 'error',
-                confirmButtonText: 'Aceptar' , // Solo un botón de "Aceptar" en caso de error
+                confirmButtonText: 'Aceptar', // Solo un botón de "Aceptar" en caso de error
                 confirmButtonColor: '#3085d6'
               }
             );
@@ -721,7 +754,7 @@ this.table.rows.add(filteredData).draw();
       );
     }
   }
-  
+
 
   editarEmpleado(id: any): void {
     //this.router.navigate(['employee/update/', id]);
@@ -743,10 +776,10 @@ this.table.rows.add(filteredData).draw();
     const empByIdSubscription = this.empleadoService
       .getEmployeeById(id)
       .pipe(
-        switchMap(empleado => 
+        switchMap(empleado =>
           this.empleadoService.getContactById(Number(empleado.documentValue)).pipe(
-            map(contacts => ({ 
-              empleado, 
+            map(contacts => ({
+              empleado,
               email: contacts[0]?.value,
               phone: contacts[1]?.value
             }))
@@ -754,7 +787,7 @@ this.table.rows.add(filteredData).draw();
         )
       )
       .subscribe({
-        next: ({empleado, email, phone}) => {
+        next: ({ empleado, email, phone }) => {
           const fechaContrato = new Date(
             empleado.contractStartTime[0],
             empleado.contractStartTime[1] - 1,
@@ -773,12 +806,10 @@ this.table.rows.add(filteredData).draw();
             <div class="row mb-3">
               <div class="col-md-6">
                 <h6><strong>Información Personal</strong></h6>
-                <p><strong>Nombre completo:</strong> ${empleado.surname}, ${
-            empleado.name
-          }</p>
-                <p><strong>Documento:</strong> ${empleado.documentType} ${
-            empleado.documentValue
-          }</p>
+                <p><strong>Nombre completo:</strong> ${empleado.surname}, ${empleado.name
+            }</p>
+                <p><strong>Documento:</strong> ${empleado.documentType} ${empleado.documentValue
+            }</p>
                 <p><strong>CUIL:</strong> ${empleado.cuil}</p>
                  <p><strong>Email:</strong> ${email || 'No disponible'}</p>
                 <p><strong>Teléfono:</strong> ${phone || 'No disponible'}</p>
@@ -812,15 +843,12 @@ this.table.rows.add(filteredData).draw();
             <div class="row">
               <div class="col-12">
                 <h6><strong>Información adicional</strong></h6>
-                <!-- <p><strong>Obra Social:</strong> ${
-                  empleado.healthInsurance ? 'Sí' : 'No'
-                }</p> -->
-                <p><strong>Estado:</strong> ${
-                  empleado.active ? 'Activo' : 'Inactivo'
-                }</p>
-                <p><strong>Licencia:</strong> ${
-                  empleado.license ? 'Sí' : 'No'
-                }</p>
+                <!-- <p><strong>Obra Social:</strong> ${empleado.healthInsurance ? 'Sí' : 'No'
+            }</p> -->
+                <p><strong>Estado:</strong> ${empleado.active ? 'Activo' : 'Inactivo'
+            }</p>
+                <p><strong>Licencia:</strong> ${empleado.license ? 'Sí' : 'No'
+            }</p>
               </div>
             </div>
           </div>
@@ -870,4 +898,109 @@ this.table.rows.add(filteredData).draw();
   navigateToWakeUpCallForm(): void {
     this.router.navigate(['/wake-up-call']);
   }
+
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Listado de empleados',
+      text: 'Acá puede ver la lista de empleados, señalando su posición y su salario.',
+      attachTo: {
+        element: '#empleadosTable',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Filtros',
+      text: 'Desde acá podrá filtrar los productos por fecha y estado, o filtrar de forma más específica con el botón de filtros. También puede exportar la lista a Excel o PDF en caso de desearlo, o borrar los filtros aplicados con el botón de basura.',      attachTo: {
+        element: '#filtros',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Acciones',
+      text: 'Con este botón podrá acceder a las acciones disponibles para el empleado seleccionado. Estos incluyen: ver más, ver asistencias, ver desempeño, actualizar y eliminar.',      attachTo: {
+        element: '#actions',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Configuración',
+      text: 'Si desea cambiar la configuración de ingreso de los empleados, puede hacerlo desde esta pantalla.',      attachTo: {
+        element: '#configuration',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Añadir Empleados',
+      text: 'Para añadir un nuevo empleado, pulse este botón y será redirigido a la pestaña de altas.',      attachTo: { 
+        element: '#register',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+      
+    });
+
+    this.tour.start();
+  }
+
+  
 }
