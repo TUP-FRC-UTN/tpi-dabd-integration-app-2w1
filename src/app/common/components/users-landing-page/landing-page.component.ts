@@ -16,6 +16,7 @@ import { RoutingService } from '../../services/routing.service';
 export class LandingPageComponent implements OnInit {
   lotes: GetPlotModel[] = [];
   selectedPlot: GetPlotModel | null = null;
+  selectedPath: HTMLElement | null = null;
   //Injects
   private routingService = inject(RoutingService);
   private plotService = inject(PlotService);
@@ -101,7 +102,8 @@ export class LandingPageComponent implements OnInit {
         // Setteo de evento de clic
         pathElement.addEventListener('click', () => {
           this.selectedPlot = this.lotes.find(l => l.id === lote.id)!;
-          console.log("Lote seleccionado:", this.selectedPlot);
+          this.selectedPath = pathElement.cloneNode(true) as HTMLElement;
+          console.log(this.selectedPlot);
           this.cdRef.detectChanges();
         });
 
@@ -172,6 +174,65 @@ export class LandingPageComponent implements OnInit {
 
   clearPlot() {
     this.selectedPlot = null;
+  }
+
+  extractPathCoordinates(path: string): { minX: number, minY: number, maxX: number, maxY: number } {
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    let currentX = 0, currentY = 0;
+
+    //Separa los comandos del path
+    const pathCommands = path.match(/[a-zA-Z][^a-zA-Z]*/g);
+
+    pathCommands?.forEach(command => {
+      //Obtiene las coordenadas
+      const coords = command.slice(1).split(/[\s,]+/).map(Number);
+      let i = 0;
+
+      while (i < coords.length) {
+        const x = coords[i];
+        const y = coords[i + 1];
+
+        //Movimientos absolutos
+        if (command.startsWith('M') || command.startsWith('L') || command.startsWith('T')) {
+          currentX = x;
+          currentY = y;
+        }
+
+        //Movimientos relativos
+        else if (command.startsWith('m') || command.startsWith('l') || command.startsWith('t')) {
+          currentX += x;
+          currentY += y;
+        }
+
+        //
+        else if (command.startsWith('C') || command.startsWith('c') || command.startsWith('S') || command.startsWith('s') || command.startsWith('Q') || command.startsWith('q') || command.startsWith('T')) {
+          currentX = x;
+          currentY = y;
+        }
+
+        //Actualiza las coordenadas mínimas y máximas
+        minX = Math.min(minX, currentX);
+        minY = Math.min(minY, currentY);
+        maxX = Math.max(maxX, currentX);
+        maxY = Math.max(maxY, currentY);
+
+        //Avanza de dos en dos porque itera sobre x,y
+        i += 2;
+      }
+    });
+
+    return { minX, minY, maxX, maxY };
+  }
+
+  updatePathToOrigin(path: string): string {
+    const { minX, minY } = this.extractPathCoordinates(path);
+
+    // Calculamos el traslape necesario para llevar el path a (0, 0)
+    const translateX = -minX;
+    const translateY = -minY;
+
+    // Devuelve el transform para mover el path a (0, 0)
+    return `translate(${translateX}, ${translateY})`;
   }
 
 }

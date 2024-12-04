@@ -2,7 +2,7 @@
   <!-- Main Container -->
   <div class="container p-3 border border-2 rounded shadow-lg">
     <!-- Filter Row -->
-    <div class="row mb-2">
+    <div class="row mb-2" id="filtros">
       <!-- Search Type and Input -->
       <div class="col-4 col-xxl-3">
         <input type="text" class="form-control" [(ngModel)]="searchTerm" (ngModelChange)="searchUsers()"
@@ -50,7 +50,7 @@
           <button class="btn btn-primary bi-funnel-fill" data-bs-toggle="modal" title="Filtros Avanzados"
             data-bs-target="#filtrosAvanzados"></button>
           <button class="btn btn-secondary bi-trash" title="Limpiar Filtros" (click)="cleanFilters()"></button>
-          <button class="btn btn-warning text-light" (click)="openMultipliersModal()">
+          <button class="btn btn-warning text-light"id="facturacion"(click)="openMultipliersModal()">
             Facturación
           </button>
           <button class="btn btn-success bi-file-earmark-excel" title="Exportar a Excel"
@@ -61,7 +61,7 @@
     </div>
 
     <!-- Results Table -->
-    <div class="table-responsive">
+    <div class="table-responsive" id="">
       <table class="table table-striped border border-3 table-hover ">
         <thead class="table-light   ">
           <tr>
@@ -107,7 +107,7 @@
                   aria-expanded="false">
                   <i class="bi bi-three-dots-vertical"></i>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton" id="dropdownVerMas">
                   <li>
                     <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#viewMoreModal"
                       (click)="seeDetails(expense)">

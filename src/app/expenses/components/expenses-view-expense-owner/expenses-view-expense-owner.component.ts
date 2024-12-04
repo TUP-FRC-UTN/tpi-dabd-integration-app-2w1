@@ -14,7 +14,7 @@ import { ExpenseViewService } from '../../services/expenseView/expenseView.servi
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, tap, finalize, takeUntil } from 'rxjs/operators';
 import { ExpenseView } from '../../models/expenseView';
 import { ExpenseViewComponent } from '../expenses-view/expenses-view.component';
@@ -23,6 +23,8 @@ import { Category } from '../../models/category';
 import { Provider } from '../../models/provider';
 import { Bill } from '../../models/bill';
 import { ExpenseType } from '../../models/expenseType';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../common/services/tutorial.service';
 
 // declare let bootstrap: any;
 @Component({
@@ -49,15 +51,34 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
   private unsubscribe$ = new Subject<void>();
   isLoading = false;
   selectedCategories: Category[] = [];
-  selectedProviders: Provider[] =[];
-  selectedType: ExpenseType[]=[];
+  selectedProviders: Provider[] = [];
+  selectedType: ExpenseType[] = [];
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
 
   constructor(
     private billService: BillViewOwnerService,
     private cdRef: ChangeDetectorRef,
     private expenseViewService: ExpenseViewService,
-    private modalNG:NgbModal
-  ) { }
+    private modalNG: NgbModal,
+    private tutorialService: TutorialService
+  ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+      },
+      keyboardNavigation: false,
+
+      useModalOverlay: true,
+    })
+  }
+
   onSearch(event: any) {
     const searchValue = event.target.value;
 
@@ -72,36 +93,117 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
     this.setupDateChangeObservable();
     this.configDataTable();
     this.filterDataOnChange();
+
+    //TUTORIAL
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    );
   }
 
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+
+    //TUTORIAL
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
   }
+
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Tabla de gastos',
+      text: 'Acá puede ver todos sus gastos con su correspondiente fecha, tipo, categoría, proveedor y monto. También tiene un botón ver más para poder acceder a información más detallada.',
+      attachTo: {
+        element: '#myTable',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Filtros',
+      text: 'Desde acá podrá filtrar los gastos seleccionando una fecha de inicio y otra de fin, y realizar una búsqueda en todo el listado. También puede exportar los gastos a Excel o PDF, o borrar los filtros aplicados con el botón de basura.', attachTo: {
+        element: '#simpleFilters',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Filtros',
+      text: 'Desde acá podrá filtrar clickear el embudo para acceder a filtros avanzados, también puede exportar los gastos a Excel o PDF, o borrar los filtros aplicados con el botón de basura.', attachTo: {
+        element: '#filters',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+
+    });
+
+    this.tour.start();
+  }
+
   // loadBillsFilter() {
   //   const dataTable = $('#myTable').DataTable();
   //   let billsFiltered = this.fileredByCategiries(this.bills.slice());
   //   billsFiltered = this.fileredByProviders(billsFiltered);
   //   dataTable.clear().rows.add(billsFiltered).draw();
   // }
-  filteredByCategiries(bills :BillViewOwner[]):BillViewOwner[]{
-    if (this.selectedCategories && this.selectedCategories.length>0){
-      const selectedCategoryIds = this.selectedCategories.map(category => category.id); 
-    return bills.filter(bill => selectedCategoryIds.includes(bill.categoryId)); // Filtrar solo los que tienen un id que coincida
+  filteredByCategiries(bills: BillViewOwner[]): BillViewOwner[] {
+    if (this.selectedCategories && this.selectedCategories.length > 0) {
+      const selectedCategoryIds = this.selectedCategories.map(category => category.id);
+      return bills.filter(bill => selectedCategoryIds.includes(bill.categoryId)); // Filtrar solo los que tienen un id que coincida
     }
     return bills;
   }
-  filteredByProviders(bills :BillViewOwner[]):BillViewOwner[]{
-    if (this.selectedProviders && this.selectedProviders.length>0){
+  filteredByProviders(bills: BillViewOwner[]): BillViewOwner[] {
+    if (this.selectedProviders && this.selectedProviders.length > 0) {
       const selectedProviderIds = this.selectedProviders.map(provider => provider.id); // Extraer los ids de los proveedores seleccionadas
-    return bills.filter(bill => selectedProviderIds.includes(bill.providerId)); // Filtrar solo los que tienen un id que coincida
+      return bills.filter(bill => selectedProviderIds.includes(bill.providerId)); // Filtrar solo los que tienen un id que coincida
     }
     return bills;
   }
-  filteredByType(bills :BillViewOwner[]):BillViewOwner[]{
-    if (this.selectedType && this.selectedType.length>0){
+  filteredByType(bills: BillViewOwner[]): BillViewOwner[] {
+    if (this.selectedType && this.selectedType.length > 0) {
       const selectedTypeIds = this.selectedType.map(type => type.id); // Extraer los ids de los tipo seleccionadas
-    return bills.filter(bill => selectedTypeIds.includes(bill.expenseType)); // Filtrar solo los que tienen un id que coincida
+      return bills.filter(bill => selectedTypeIds.includes(bill.expenseType)); // Filtrar solo los que tienen un id que coincida
     }
     return bills;
   }
@@ -116,7 +218,7 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
         prev.from === curr.from && prev.to === curr.to
       ),
       switchMap(({ from, to }) => {
-        return this.billService.getBillsWithProviders( from, to);
+        return this.billService.getBillsWithProviders(from, to);
       }),
       takeUntil(this.unsubscribe$)
     ).subscribe({
@@ -139,14 +241,14 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
     billsFiltered = this.filteredByProviders(billsFiltered);
     dataTable.clear().rows.add(billsFiltered).draw();
   }
-  clearFiltered(){
+  clearFiltered() {
 
-    this.selectedCategories=[];
-    this.selectedProviders=[];
-    this.selectedType=[];
+    this.selectedCategories = [];
+    this.selectedProviders = [];
+    this.selectedType = [];
     this.loadBillsFiltered();
     this.loadDates();
-    }
+  }
   // Cargar fechas por defecto (último mes hasta hoy)
   loadDates() {
     const today = new Date();
@@ -345,9 +447,9 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
       if (rowData) {
         this.viewBillDetails(rowData.expenseId);
       }
-      
+
     });
-    
+
   }
   viewBillDetails(id: any) {
     console.log("ID de la expensa:", id);
@@ -357,13 +459,13 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
         this.cdRef.detectChanges();
         console.log("Detalles de la expensa:", expense);
         // Aquí puedes activar el modal más adelante si deseas
-        const modal = this.modalNG.open(ExpenseViewComponent,{ size: 'lg' ,  keyboard: false });
+        const modal = this.modalNG.open(ExpenseViewComponent, { size: 'lg', keyboard: false });
         modal.componentInstance.expense = expense;
         modal.result.then((result) => {
-          
-         }).catch((error) => {
-           console.log('Modal dismissed with error:', error);
-         });
+
+        }).catch((error) => {
+          console.log('Modal dismissed with error:', error);
+        });
       },
       error: (err) => {
         console.error("Error al obtener los detalles de la expensa:", err);
