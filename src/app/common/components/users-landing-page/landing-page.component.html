@@ -109,43 +109,41 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                        <hr>
 
-                    <hr>
-
-                    <!-- Alerta de lotes no encontrados -->
-                    @if(plotsCard.length === 0) {
-                    <div class="row">
+                        <!-- Alerta de lotes no encontrados -->
+                        @if(plotsCard.length === 0) {
                         <div class="alert alert-warning text-center mb-0" role="alert">
                             No se han encontrado lotes disponibles.
                         </div>
-                    </div>
-                    }
+                        }
 
-                    <!-- Listado de lotes disponibles -->
-                    <div class="row overflow-auto" style="max-height: 100%;">
-                        @for (plot of plotsCard; track $index) {
-                        <div class="col-12 col-lg-6 mb-3">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5>Lote {{plot.number}}</h5>
-                                </div>
-                                <div class="card-body">
-                                    <blockquote class="blockquote mb-0">
-                                        <ul class="list-unstyled">
-                                            Área total: {{plot.totalArea}}m²
-                                            Dirección: Manzana {{plot.blockNumber}}, lote {{plot.number}}
-                                            <li><i class="bi bi-check-circle-fill text-success"></i> Tipo: {{plot.type}}
-                                            </li>
-                                            <li><i class="bi bi-check-circle-fill text-success"></i> Estado:
-                                                {{plot.status}}
-                                            </li>
-                                        </ul>
-                                    </blockquote>
+                        <!-- Listado de lotes disponibles -->
+                        <div class="row overflow-auto" style="max-height: 100%;">
+                            @for (plot of plotsCard; track $index) {
+                            <div class="col-12 col-lg-6 mb-3">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>Lote {{plot.number}}</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <blockquote class="blockquote mb-0">
+                                            <ul class="list-unstyled">
+                                                Área total: {{plot.totalArea}}m²
+                                                Dirección: Manzana {{plot.blockNumber}}, lote {{plot.number}}
+                                                <li><i class="bi bi-check-circle-fill text-success"></i> Tipo:
+                                                    {{plot.type}}
+                                                </li>
+                                                <li><i class="bi bi-check-circle-fill text-success"></i> Estado:
+                                                    {{plot.status}}
+                                                </li>
+                                            </ul>
+                                        </blockquote>
+                                    </div>
                                 </div>
                             </div>
+                            }
                         </div>
-                        }
                     </div>
 
                     <hr>

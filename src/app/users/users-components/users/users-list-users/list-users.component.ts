@@ -198,11 +198,11 @@ export class ListUsersComponent implements OnInit, OnDestroy {
             dom: '<"mb-3"t>' + '<"d-flex justify-content-between"lp>',
             data: this.users.map((user) => [
               // user.create_date,
-              `${user.lastname}, ${user.name}`, //Nombre completo
-              user.dni, //Documento
-              this.showRole(user.roles), //Roles
-              user.plot_id, //Nro. de lote (puedes ajustar esto)
-              '<button class="btn btn-info">Ver más</button>', //Ejemplo de acción
+              `${user.lastname}, ${user.name}`,  //Nombre completo
+              user.dni,                                //Documento
+              this.showRole(user.roles, user.id),              //Roles
+              user.plot_id,                                //Nro. de lote (puedes ajustar esto)                 
+              '<button class="btn btn-info">Ver más</button>'  //Ejemplo de acción
             ]),
             language: {
               lengthMenu: '_MENU_',
@@ -666,8 +666,8 @@ export class ListUsersComponent implements OnInit, OnDestroy {
   }
 
   //Mostrar roles con badges
-  showRole(roles: string[]): string {
-    let rolesA: string = '';
+  showRole(roles: string[], id: number): string {
+    let rolesA: string = "";
 
     let max: number = 2;
 
@@ -722,45 +722,45 @@ export class ListUsersComponent implements OnInit, OnDestroy {
     } else {
       let color: string = '';
       switch (roles[0]) {
-        case 'Gerente general':
-          color = 'text-bg-salmon';
-          break;
-        case 'Propietario':
-          color = 'text-bg-primary';
-          break;
-        case 'Familiar mayor':
-          color = 'bg-secondary';
-          break;
-        case 'Familiar menor':
-          color = 'text-bg-menor';
-          break;
-        case 'SuperAdmin':
-          color = 'text-bg-dark';
-          break;
-        case 'Inquilino':
-          color = 'text-bg-cyan';
-          break;
-        case 'Gerente finanzas':
-          color = 'text-bg-pink';
-          break;
-        case 'Contador':
-          color = 'text-bg-teal text-dark';
-          break;
-        case 'Seguridad':
-          color = 'text-bg-orange';
-          break;
-        case 'Gerente inventario':
-          color = 'text-bg-blue';
-          break;
-        case 'Gerente empleados':
-          color = 'text-bg-red';
-          break;
-        case 'Gerente multas':
-          color = 'text-bg-indigo';
-          break;
-        default:
-          color = 'badge bg-info text-dark';
-          break;
+        case "Gerente general":
+            color = "text-bg-salmon";
+            break;
+          case "Propietario":
+            color = "text-bg-primary";
+            break;
+          case "Familiar mayor":
+            color = "bg-secondary";
+            break;
+          case "Familiar menor":
+            color = "text-bg-light-blue";
+            break;
+          case "SuperAdmin":
+            color = "text-bg-dark";
+            break;
+          case "Inquilino":
+            color = "text-bg-cyan";
+            break;
+          case "Gerente finanzas":
+            color = "text-bg-pink";
+            break;
+          case "Contador":
+            color = "text-bg-teal";
+            break;
+          case "Seguridad":
+            color = "text-bg-orange";
+            break;
+          case "Gerente inventario":
+            color = "text-bg-blue";
+            break;
+          case "Gerente empleados":
+            color = "text-bg-red";
+            break;
+          case "Gerente multas":
+            color = "text-bg-indigo";
+            break;
+          default:
+            color = "badge bg-info text-dark";
+            break;
       }
 
       rolesA += `
@@ -783,8 +783,8 @@ export class ListUsersComponent implements OnInit, OnDestroy {
           case 'Familiar mayor':
             color = 'bg-secondary';
             break;
-          case 'Familiar menor':
-            color = 'text-bg-menor';
+          case "Familiar menor":
+            color = "text-bg-light-blue";
             break;
           case 'SuperAdmin':
             color = 'text-bg-dark';
@@ -795,8 +795,8 @@ export class ListUsersComponent implements OnInit, OnDestroy {
           case 'Gerente finanzas':
             color = 'text-bg-pink';
             break;
-          case 'Contador':
-            color = 'text-bg-teal text-dark';
+          case "Contador":
+            color = "text-bg-teal";
             break;
           case 'Seguridad':
             color = 'text-bg-orange';
@@ -818,16 +818,17 @@ export class ListUsersComponent implements OnInit, OnDestroy {
         rolesB += `<span class="badge rounded-pill m-1 ${color}">${role}</span> `;
       });
 
-      rolesA += `<button class="btn btn-outline-dark text-dark badge" data-bs-toggle="collapse"
-           data-bs-target="#extraRoles" aria-expanded="false" aria-controls="extraRoles">
-              +
-            </button>
+      rolesA += `
+          <button class="btn btn-light border border-1 text-dark badge bi-plus" data-bs-toggle="collapse"
+            data-bs-target="#extraRoles${id}" aria-expanded="false" aria-controls="extraRoles">
 
-            <div class="collapse position-absolute" id="extraRoles">
-              <div class="card card-body d-flex" style="z-index: 10;">
-                ${rolesB}
-              </div>
-            </div>`;
+              <div class="collapse position-absolute" id="extraRoles${id}">
+                <div class="card card-body d-flex fs-6" style="z-index: 10;">
+                  ${rolesB}
+                </div>
+              </div> 
+              
+          </button>`;
     }
 
     return rolesA;

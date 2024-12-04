@@ -45,6 +45,21 @@
         </div>
         <hr>
 
+        <h5>Información de sus Co-Propietarios</h5>
+        @for (user of CoOwners; track $index) {
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <p class="m-0"><strong>Nombre:</strong> {{ (user.name && user.lastname) ? user.name + ', ' + user.lastname : 'N/A' }}</p> <!-- Muestra el nombre del propietario -->
+                </div>
+                <div class="col-md-6">
+                    <p class="m-0"><strong>DNI:</strong> {{ user.dni || 'N/A' }}</p> <!-- Muestra el DNI del propietario -->
+                </div>
+            </div>
+        }@if(users.length == 0)    {
+            <p>No existen Co-Propietarios para este lote</p>
+        } 
+       <hr>
+
         <h5>Información de sus Usuarios</h5>
         @for (user of users; track $index) {
             <div class="row mb-3">
