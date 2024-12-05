@@ -93,14 +93,15 @@
                     <div class="row">
                         <div class="col-12 verticalAnimation" [ngClass]="{'expanded': selectedPlot}">
                             <!-- Lote seleccionado -->
-                            <div class="card">
+                            <div class="card mb-3">
                                 <div class="card-header d-flex justify-content-between">
                                     <h5>
                                         {{'Lote: ' + selectedPlot?.id + ( selectedPlot?.plot_state == 'Disponible' ?
                                         ' - Manzana: ' + selectedPlot?.block_number : '' )}}
                                     </h5>
                                     @if (selectedPlot?.plot_state == 'Disponible') {
-                                    <button type="button" class="btn btn-light border border-2" (click)="openRequestModal(selectedPlot!.id)">
+                                    <button type="button" class="btn btn-light border border-2"
+                                        (click)="formMessage.get('plot_id')?.setValue(selectedPlot?.id)">
                                         Consultar
                                     </button>
                                     }
@@ -133,9 +134,64 @@
                                     }
                                 </div>
                             </div>
+
+
+                        </div>
+
+                    </div>
+                    
+                    <div class="card verticalAnimation" [ngClass]="{'expanded': formMessage.get('plot_id')?.value}">
+                        <div class="card-header d-flex justify-content-between">
+                            <h5>Realice una consulta sobre el lote {{selectedPlot?.plot_number}}</h5>
+                            <button class="btn btn-light bi-x-lg border border-2" (click)="formMessage.reset()"></button>
+                        </div>
+                        <div class="card-body">
+                            <form class="px-3" [formGroup]="formMessage" (submit)="postRequest()">
+                                <div class="row mb-3">
+                                    <label class="col-form-label col-3">Nombre</label>
+                                    <div class="col-9">
+                                        <input type="text" class="form-control col-auto" formControlName="name" [ngClass]="onValidate('name')">
+                                        @if(formMessage.get('name')?.invalid && (formMessage.get('name')?.dirty || formMessage.get('name')?.touched)){
+                                            <div class="text-danger">{{showError('name')}}</div>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label class="col-form-label col-3">Email</label>
+                                    <div class="col-9">
+                                        <input type="email" class="form-control col-auto" formControlName="email" [ngClass]="onValidate('email')">
+                                        @if(formMessage.get('email')?.invalid && (formMessage.get('email')?.dirty || formMessage.get('email')?.touched)){
+                                            <div class="text-danger">{{showError('email')}}</div>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label class="col-form-label col-3">Teléfono</label>
+                                    <div class="col-9">
+                                        <input type="tel" class="form-control col-auto" formControlName="phone" [ngClass]="onValidate('phone')">
+                                        @if(formMessage.get('phone')?.invalid && (formMessage.get('phone')?.dirty || formMessage.get('phone')?.touched)){
+                                            <div class="text-danger">{{showError('phone')}}</div>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label class="col-3 col-form-label">Observaciones</label>
+                                    <div class="col-9">
+                                        <textarea class="form-control col-auto" formControlName="observations" cols="2" style="resize: none;"></textarea>
+                                    </div>
+                                </div>
+                                @if(formMessage.invalid && (formMessage.get('email')?.dirty || formMessage.get('email')?.touched || formMessage.get('phone')?.dirty || formMessage.get('phone')?.touched)){
+                                    <div class="text-danger text-center mt-3">
+                                        Debe ingresar al menos un email o un teléfono de contacto.
+                                    </div>
+                                }
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-light border border-2" [disabled]="formMessage.invalid">Enviar</button>
+                                </div>
+                            </form>
+                           
                         </div>
                     </div>
-
 
                     <!-- Alerta de lotes no encontrados -->
                     @if(plotsCard.length === 0) {

@@ -1,10 +1,12 @@
 import { AfterViewInit, ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterOutlet } from '@angular/router';
 import { PlotService } from '../../../users/users-servicies/plot.service';
 import { GetPlotModel } from '../../../users/users-models/plot/GetPlot';
 import { CommonModule } from '@angular/common';
 import { RoutingService } from '../../services/routing.service';
+import { PostBuyRequestDto } from '../../../users/users-models/plot/PostBuyRequestDto';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-landing-page',
@@ -18,6 +20,7 @@ export class LandingPageComponent implements OnInit {
   selectedPlot: GetPlotModel | null = null;
   selectedPath: HTMLElement | null = null;
   selectedPng: string | null = null;
+  
   //Injects
   private routingService = inject(RoutingService);
   private plotService = inject(PlotService);
@@ -51,15 +54,20 @@ export class LandingPageComponent implements OnInit {
   constructor(private fb: FormBuilder, private cdRef: ChangeDetectorRef) {
     this.formMessage = this.fb.group({
       name: new FormControl('', [Validators.required]),
-      email: new FormControl('', [Validators.required, Validators.email]),
-      message: new FormControl('', [Validators.required])
+      email: new FormControl('', [Validators.email]),
+      phone: new FormControl('', [Validators.minLength(10),
+        Validators.maxLength(20),  Validators.pattern(/^\d+$/)]),
+      observations: new FormControl(''),
+      plot_id: new FormControl(this.selectedPlot?.id)
     })
+    
   }
 
 
   //Init
   ngOnInit(): void {
     this.getPlots();
+    this.formMessage.setValidators(this.emailOrPhoneValidator);
   }
 
 
@@ -103,6 +111,7 @@ export class LandingPageComponent implements OnInit {
 
           this.selectedPath = pathElement.cloneNode(true) as HTMLElement;
           this.selectedPng = this.convertPathToPngV2();
+          this.formMessage.reset();
           this.cdRef.detectChanges();
         });
 
@@ -140,6 +149,16 @@ export class LandingPageComponent implements OnInit {
     })
   }
 
+  emailOrPhoneValidator(control: AbstractControl): { [key: string]: boolean } | null {
+    const email = control.get('email')?.value;
+    const phone = control.get('phone')?.value;
+
+    if (!email && !phone) {
+      return { emailOrPhoneRequired: true };
+    }
+    return null;
+  }
+
   //Método para redireccionar
   redirect(path: string) {
     this.routingService.redirect('/login')
@@ -151,7 +170,7 @@ export class LandingPageComponent implements OnInit {
     const control = this.formMessage.get(controlName);
     return {
       'is-invalid': control?.invalid && (control?.dirty || control?.touched),
-      'is-valid': control?.valid
+      'is-valid': control?.valid  && (control?.dirty || control?.touched)
     }
   }
 
@@ -166,10 +185,15 @@ export class LandingPageComponent implements OnInit {
     const errorMessages: { [key: string]: string } = {
       required: 'Este campo no puede estar vacío.',
       email: 'Formato de correo electrónico inválido.',
+      pattern: 'Solo se permiten números.',
+      minlength: `El campo debe tener al menos 10 caracteres.`,
+      maxlength: `El campo debe tener como máximo 20 caracteres.`,
+      emailOrPhoneRequired: 'Debe ingresar al menos un correo electrónico o un número de teléfono.'
     };
 
     return errorMessages[errorKey] || 'Error desconocido';
   }
+  
 
   clearPlot() {
     this.selectedPlot = null;
@@ -276,10 +300,33 @@ export class LandingPageComponent implements OnInit {
     return canvas.toDataURL('image/png');
   }
 
+  //----------------------------------Acciones----------------------------------
 
-
-  openRequestModal(plotId: number) {
-
+  //Envía el formulario
+  postRequest(){
+    if(this.formMessage.valid){
+      const formData = this.formMessage.value as PostBuyRequestDto;
+      this.plotService.postBuyRequest(formData).subscribe({
+        next: () => {
+          console.log('Solicitud enviada');
+          this.formMessage.reset();
+          Swal.fire({
+            icon: 'success',
+            title: '¡Éxito!',
+            text: 'La solicitud ha sido enviada correctamente.',
+            confirmButtonText: 'Aceptar'
+          });
+        },
+        error: (err) => {
+          console.error('Error al enviar la solicitud', err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Algo salió mal',
+            text: 'Intentelo de nuevo más tarde.',
+            confirmButtonText: 'Aceptar'
+          });
+        }
+      });
+    }
   }
-
 }
