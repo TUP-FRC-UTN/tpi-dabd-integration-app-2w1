@@ -1,12 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { SuppliersService } from '../../services/suppliers.service';
 import { Router, RouterModule } from '@angular/router';
 import { iepBackButtonComponent } from '../../../common-components/iep-back-button/iep-back-button.component';
 import { CommonModule } from '@angular/common';
 import Swal from 'sweetalert2';
-import { catchError, debounceTime, distinctUntilChanged, max, of, switchMap } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, max, of, Subscription, switchMap } from 'rxjs';
 import { AuthService } from '../../../../users/users-servicies/auth.service';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 
 
 @Component({
@@ -16,10 +18,44 @@ import { AuthService } from '../../../../users/users-servicies/auth.service';
   templateUrl: './iep-suppliers-form.component.html',
   styleUrl: './iep-suppliers-form.component.css'
 })
-export class IepSuppliersFormComponent {
+export class IepSuppliersFormComponent implements OnInit,OnDestroy {
   proveedorForm!: FormGroup;
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
 
-  constructor(private fb: FormBuilder, private supplierService: SuppliersService, private router: Router, private userService: AuthService) { }
+  constructor(private fb: FormBuilder, private supplierService: SuppliersService, private router: Router, private userService: AuthService, private tutorialService: TutorialService
+  ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+      },
+      keyboardNavigation: false,
+      useModalOverlay: true,
+    })}
+    
+    
+    
+    
+    ngOnDestroy(): void {
+   //TUTORIAL
+ this.tutorialSubscription.unsubscribe();
+ if (this.tour) {
+   this.tour.complete();
+ }
+
+ if (this.tutorialSubscription) {
+   this.tutorialSubscription.unsubscribe();
+ } 
+;
+  }
+;
 
   ngOnInit(): void {
     this.proveedorForm = this.fb.group({
@@ -37,6 +73,80 @@ export class IepSuppliersFormComponent {
     this.checkCuit();
     this.checkEmail();
     this.chechName();
+
+     //TUTORIAL
+     this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    ); 
+  }
+
+
+
+
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Formulario para alta de proveedor',
+      text: 'Acá puede guardar en el sistema un proveedor con los datos que indique',
+      attachTo: {
+        element: '#pantalla',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Tipo de proveedor',
+      text: 'Desde acá podrá seleccionar el tipo de proveedor.', 
+        attachTo: {
+        element: '#combo',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+      
+    });
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Registrar',
+      text: 'Para finalizar podrá registrar un proveedor en el sistema.', 
+        attachTo: {
+        element: '#registrar',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+      
+    });
+
+    this.tour.start();
   }
 
 

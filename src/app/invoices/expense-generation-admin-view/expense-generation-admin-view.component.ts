@@ -513,7 +513,7 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
       id: 'dropdownVerMas',
       title: 'Acciones',
       text: 'Desde acá puede ver las acciones disponibles para cada boleta. Puede editar boletas pendientes o ver más información.',      attachTo: {
-        element: '#dropdownVerMas',
+        element: '#dropdownMenuButton',
         on: 'auto'
       },
       buttons: [

@@ -1,10 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, NgModule, OnInit } from '@angular/core';
+import { Component, NgModule, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, NgModel, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { EmpPostConfiguration } from '../../Models/emp-post-configuration';
 import { PillowTimeLateArrivalService } from '../../services/pillow-time-late-arrival.service';
 import Swal from 'sweetalert2';
+import { Subscription } from 'rxjs';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 @Component({
   selector: 'app-iep-pillow-later-arrival-config',
   standalone: true,
@@ -12,31 +15,151 @@ import Swal from 'sweetalert2';
   templateUrl: './iep-pillow-later-arrival-config.component.html',
   styleUrl: './iep-pillow-later-arrival-config.component.css'
 })
-export class IepPillowLaterArrivalConfigComponent implements OnInit{
+export class IepPillowLaterArrivalConfigComponent implements OnInit, OnDestroy {
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
 
-  configForm: FormGroup= new FormGroup({});
-  configTimeJustify : FormGroup = new FormGroup({});
-  savedMinutesValue : number|null=null
+  configForm: FormGroup = new FormGroup({});
+  configTimeJustify: FormGroup = new FormGroup({});
+  savedMinutesValue: number | null = null
   savedDaysValue: number | null = null;
-  successMessage: string='';
+  successMessage: string = '';
 
   constructor(
     private fb: FormBuilder,
     private pillowTimeLateArrivalService: PillowTimeLateArrivalService
-  )
-  {
+    , private tutorialService: TutorialService
+  ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+      },
+      keyboardNavigation: false,
+      useModalOverlay: true,
+    });
     this.initForm();
+  }
+  ngOnDestroy(): void {
+    //TUTORIAL
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
   }
 
   ngOnInit(): void {
+    //TUTORIAL
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    );
 
     this.loadSavedConfig();
-    
+
   }
 
-   goBack(){
+
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Configuración de empleados',
+      text: 'Esta es la pantalla de configuración. Desde acá puede editar la política de asistencias de los empleados..',
+      attachTo: {
+        element: '#configuration',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Llegadas tarde',
+      text: 'Acá puede elegir cuánto tiempo de tolerancia tienen los empleados para registrar su llegada antes que ésta se compute como llegada tardía.',      attachTo: {
+        element: '#lateArrival',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Justificación por falta',
+      text: 'Acá puede elegir cuántos días tiene el empleado para justificar una falta .',      
+      attachTo: {
+        element: '#justification',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Guardar',
+      text: 'Al finalizar, presione este botón para guardar los cambios.',
+      attachTo: {
+        element: '#register',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+      
+    });
+
+
+    this.tour.start();
+  }
+
+  goBack() {
     window.history.back();
-   }
+  }
 
 
   private initForm(): void {
@@ -48,11 +171,11 @@ export class IepPillowLaterArrivalConfigComponent implements OnInit{
       ]],
       days: ['', [
         Validators.required,
-         Validators.min(0), 
-         Validators.max(30),
-         ]]
+        Validators.min(0),
+        Validators.max(30),
+      ]]
 
-     
+
     });
 
 
@@ -63,37 +186,37 @@ export class IepPillowLaterArrivalConfigComponent implements OnInit{
 
   private loadSavedConfig(): void {
 
-    this.pillowTimeLateArrivalService.actualConfig().subscribe({ 
+    this.pillowTimeLateArrivalService.actualConfig().subscribe({
 
 
-      next: (x:EmpPostConfiguration) => {
- console.log("ENtrooo")
+      next: (x: EmpPostConfiguration) => {
+        console.log("ENtrooo")
         this.savedMinutesValue = x.pillowLastArrival
         this.savedDaysValue = x.pillowJustify
         console.log(this.savedDaysValue)
         this.configForm.get('minutes')?.setValue(this.savedMinutesValue);
-        console.log(  this.configForm.get('minutes')?.value)
+        console.log(this.configForm.get('minutes')?.value)
         this.configForm.get('days')?.setValue(this.savedDaysValue?.toString());
         console.log(this.configForm.get('days')?.value)
       },
       error: error => {
-        
+
         Swal.fire({
           title: 'Error',
           text: "Error en el servidor intente nuevamente mas tarde",
           icon: 'error',
           confirmButtonText: 'Aceptar',
           confirmButtonColor: '#3085d6'
-        
+
         }).then(() => {
-            window.history.back()
+          window.history.back()
         });
 
-    }
+      }
 
 
-  })
-    
+    })
+
     // Aquí podrías obtener la configuración desde un servicio
     // const savedConfig = localStorage.getItem('minutesBuffer');
     // if (savedConfig) {
@@ -105,7 +228,7 @@ export class IepPillowLaterArrivalConfigComponent implements OnInit{
 
   onSubmit(): void {
     if (this.configForm.valid) {
-      let empPostConfiguration: EmpPostConfiguration ={
+      let empPostConfiguration: EmpPostConfiguration = {
         pillowLastArrival: this.configForm.get('minutes')?.value,
         userId: 1,
         pillowJustify: this.configForm.get('days')?.value
@@ -122,13 +245,13 @@ export class IepPillowLaterArrivalConfigComponent implements OnInit{
             showCancelButton: false,
             confirmButtonColor: '#3085d6'
           }).then(() => {
-            this.savedDaysValue= this.configForm.get('days')?.value;
-            this.savedMinutesValue=this.configForm.get('minutes')?.value
+            this.savedDaysValue = this.configForm.get('days')?.value;
+            this.savedMinutesValue = this.configForm.get('minutes')?.value
 
           });
         },
         error: error => {
-          
+
           Swal.fire({
             title: 'Error',
             text: "Error en el servidor intente nuevamente mas tarde",
@@ -139,8 +262,10 @@ export class IepPillowLaterArrivalConfigComponent implements OnInit{
 
           this.savedMinutesValue = this.configForm.get('minutes')?.value;
           this.savedDaysValue = this.configForm.get('days')?.value;
-      }})
-    }}
+        }
+      })
+    }
+  }
 
 
 

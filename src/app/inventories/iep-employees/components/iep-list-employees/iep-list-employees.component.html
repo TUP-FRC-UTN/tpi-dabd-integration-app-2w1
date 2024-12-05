@@ -1,5 +1,5 @@
 <section class="py-5">
-  <div class="container p-3 border border-2 rounded shadow-lg">
+  <div class="container p-3 border border-2 rounded shadow-lg" id="mainEmployees">
     <!-- Modal de Información -->
     <div
     class="modal fade"
@@ -92,6 +92,7 @@
       class="row filtros"
       *ngIf="ventana === 'Informacion'"
       style="align-items: center"
+      id="filtros"
     >
       <!-- Campo de búsqueda y selector de cargos -->
       <div class="col-md-3">
@@ -290,6 +291,7 @@
   style=" position: fixed; top: calc(100% - 120px);  right: 20px; z-index: 9999;"
   class="floating-btn btn btn-secondary"
   routerLink="/main/employees/pillow-late-arrival"
+  id="configuration"
 >
   <span class="bi-gear position-absolute" 
   style="font-size: 1.5rem; top: 6px; left: 6px;">
@@ -305,6 +307,7 @@
   style="position: fixed; top: calc(100% - 60px); right: 20px; z-index: 9999;"
   class="floating-btn btn btn-primary"
   (click)="goTo('register-employee')"
+  id="register"
 >
   <span class="bi-plus-lg"></span>
 </button>
