@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { ChartType, GoogleChartsModule } from 'angular-google-charts';
 import { EmpListadoEmpleadosService } from '../../services/emp-listado-empleados.service';
 import { EmpListadoAsistencias } from '../../Models/emp-listado-asistencias';
@@ -9,6 +9,9 @@ import { ListadoDesempeñoService } from '../../services/listado-desempeño.serv
 import { WakeUpCallDetail } from '../../Models/listado-desempeño';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { CustomKpiComponent } from "../../../../common/components/custom-kpi/custom-kpi.component";
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-iep-charts-employees',
@@ -17,8 +20,31 @@ import { CustomKpiComponent } from "../../../../common/components/custom-kpi/cus
   templateUrl: './iep-charts-employees.component.html',
   styleUrl: './iep-charts-employees.component.css'
 })
-export class IepChartsEmployeesComponent implements OnInit{
-// Boolean para verificar que se carguen los datos en los graficos por primera vez
+export class IepChartsEmployeesComponent implements OnInit, OnDestroy{
+
+  constructor(private tutorialService: TutorialService) 
+  {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+        scrollTo: {
+          behavior: 'smooth',
+          block: 'center'
+        }
+      },
+      keyboardNavigation: false,
+      useModalOverlay: true,
+    }); 
+  }  
+
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
 
 // Servicios para hacer GET de los datos
 empleadosService = inject(EmpListadoEmpleadosService);
@@ -72,6 +98,12 @@ ngOnInit(): void {
   this.loadData();
   this.initializeDates();
   this.setInitialDates();
+
+  this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+    () => {
+      this.startTutorial();
+    }
+  ); 
 }
 
 initializeDates(): void {
@@ -364,4 +396,146 @@ formatDateyyyyMMdd(dateString: string): string {
 
    return meses[numero - 1];
  }
+
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+    const preventScroll = (e: Event) => {
+      e.preventDefault();
+    };
+
+    const restoreScroll = () => {
+      document.body.style.overflow = 'auto';
+      window.removeEventListener('wheel', preventScroll);
+      window.removeEventListener('touchmove', preventScroll);
+    };
+
+    // Al empezar, lo desactiva
+    this.tour.on('start', () => {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('wheel', preventScroll, { passive: false });
+      window.addEventListener('touchmove', preventScroll, { passive: false });
+    });
+
+    // Al completar lo reactiva, al igual que al cancelar
+    this.tour.on('complete', restoreScroll);
+    this.tour.on('cancel', restoreScroll);
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Filtros',
+      text: 'Desde acá podrá filtrar por una fecha inicial y una fecha final. También puede clickear el botón de filtro para acceder a los filtros avanzados, y el botón de basurero para deshacer los filtros aplicados.',
+      attachTo: {
+        element: '#d1',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Graficos',
+      text: 'Acá puede ver gráficos y KPIs con información resumida sobre los datos de los empleados según los filtros aplicados.',      
+      attachTo: {
+        element: '#d2',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Porcentaje de asistencias',
+      text: 'Este gráfico muestra el porcentaje de asistencias, inasistencias, llegadas tarde y faltas justificadas de los empleados.',      
+      attachTo: {
+        element: '#d3',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Llamados de atención',
+      text: 'Este grafico muestra la cantidad total de llamados de atención realizados por periodo.',      
+      attachTo: {
+        element: '#d4',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'KPIs',
+      text: 'Los KPIs muestran la cantidad total de cada tipo de asistencias de los empleados',      
+      attachTo: {
+        element: '#d5',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+      
+    });
+
+    this.tour.start();
+  }
+
+  ngOnDestroy(): void {
+    this.dataAsistencias = [];
+    this.dataLlamados = [];
+    this.dataCargos = [];
+
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }  
+  }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { SanctionService } from '../../../services/sanctions.service';
 import { ReportDTO } from '../../../models/reportDTO';
 import { CommonModule } from '@angular/common';
@@ -21,6 +21,9 @@ import { CustomSelectComponent } from '../../../../common/components/custom-sele
 import { PenaltiesUpdateStateReasonModalComponent } from '../modals/penalties-update-state-reason-modal/penalties-update-state-reason-modal.component';
 import { PenaltiesUpdateStateReasonReportModalComponent } from '../modals/penalties-update-state-reason-report-modal/penalties-update-state-reason-report-modal.component';
 import { PlotService } from '../../../../users/users-servicies/plot.service';
+import { Subscription } from 'rxjs';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 
 
 
@@ -49,15 +52,39 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
   options: { value: string, name: string }[] = []
   @ViewChild(CustomSelectComponent) customSelect!: CustomSelectComponent;
 
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
+
+
+
   //Constructor
   constructor(
     private reportServices: SanctionService,
     private _modal: NgbModal,
     private router: Router,
     private routingService: RoutingService,
-    private plotService: PlotService
-
+    private plotService: PlotService, 
+    private tutorialService: TutorialService
   ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+        scrollTo: {
+          behavior: 'smooth',
+          block: 'center'
+        }
+      },
+      keyboardNavigation: false,
+
+      useModalOverlay: true,
+    }); 
     (window as any).viewReport = (id: number) => this.viewReport(id);
     (window as any).editReport = (id: number) => this.editReport(id);
 
@@ -66,13 +93,12 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
 
   //Init
   ngOnInit(): void {
+    this.loadPlots();
+    this.getTypes();
     this.reportServices.refreshTable$.subscribe(() => {
       this.refreshData();
     });
     this.refreshData();
-    this.loadPlots();
-
-    this.getTypes();
 
     const that = this; // para referenciar metodos afuera de la datatable
 
@@ -93,6 +119,112 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
     })
     this.resetDates()
     this.today = new Date().toISOString().split('T')[0];
+
+    //TUTORIAL
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    ); 
+  }
+
+  ngOnDestroy(): void {
+    //TUTORIAL
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
+  }
+
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    // CÓDIGO PARA PREVENIR SCROLLEO DURANTE TUTORIAL
+    const preventScroll = (e: Event) => {
+      e.preventDefault();
+    };
+
+    const restoreScroll = () => {
+      document.body.style.overflow = 'auto';
+      window.removeEventListener('wheel', preventScroll);
+      window.removeEventListener('touchmove', preventScroll);
+    };
+
+    // Al empezar, lo desactiva
+    this.tour.on('start', () => {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('wheel', preventScroll, { passive: false });
+      window.addEventListener('touchmove', preventScroll, { passive: false });
+    });
+
+    // Al completar lo reactiva, al igual que al cancelar
+    this.tour.on('complete', restoreScroll);
+    this.tour.on('cancel', restoreScroll);
+    
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Listado de Informes',
+      text: 'Acá puede ver una lista completa de los informes que se han realizado. Además, en las acciones, cuenta con la posibilidad de modificar el estado o ver más detalles sobre los informes.',
+      attachTo: {
+        element: '#reportsTable',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+
+    this.tour.addStep({
+      id: 'filter-step',
+      title: 'Filtros',
+      text: 'Desde acá podrá filtrar los informes por nombre, estado y fecha. También puede exportar el listado a Excel o PDF, o borrar los filtros aplicados con el botón de basura.',
+      attachTo: {
+        element: '#filters',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+
+    });
+
+    this.tour.addStep({
+      id: 'float-button-step',
+      title: 'Agregar Informe',
+      text: 'Haciendo click en este botón puede acceder a la página de alta de informes. Acá puede crear un nuevo informe con sus datos correspondientes.',
+      attachTo: {
+        element: '#addButton',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+    });
+
+    this.tour.start();
   }
 
   resetDates() {
@@ -110,11 +242,17 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
       next: (data) => {
         this.plots = data;
         console.log('Lotes cargados:', data);
+        this.refreshData(); // Call refreshData after plots are loaded
       },
       error: (error) => {
         console.error('error: ', error);
       }
     })
+  }
+
+  getPlotData(plotId: number) {
+    let plot = this.plots.find((plot) => plot.id === plotId);
+    return plot ? `Nro: ${plot?.plot_number} - Manzana: ${plot?.block_number}` : "N/A";
   }
 
 
@@ -126,10 +264,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
   }
 
 
-  getPlotData(plotId: number) {
-    let plot = this.plots.find((plot) => plot.id === plotId);
-    return `Nro: ${plot?.plot_number} - Manzana: ${plot?.block_number}`;
-  }
+
 
   // Configures the DataTable display properties and loads data.
   updateDataTable() {
@@ -170,8 +305,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
           data: 'plotId',
           className: 'align-middle',
           render: (data) => {
-            console.log("datos" + data)
-            return `<div class="text-end">${data}</div>`
+            return `<div>${this.getPlotData(data)}</div>`
           }
         },
         {
@@ -190,18 +324,16 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
                 <div class="dropdown">
                   <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
                   <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" onclick="viewReport(${data.id})">Ver más</a></li>
-                                              ${data.reportState === 'Cerrado' || data.reportState === 'Pendiente' ?
-              `<li><a class="dropdown-item" data-action="changeState" data-id="${data.id}" data-state="OPEN"">Abrir</a></li>` : ''}
-                    ${data.reportState === 'Abierto' ?
-              `<li><hr class="dropdown-divider"></li> <li><a class="dropdown-item" onclick="editReport(${data.id})">Editar</a></li>` : ''}
-                      ${data.reportState === 'Abierto' ?
-              `<li><a class="dropdown-item" data-action="newSaction" data-id="${data.id}"">Sancionar</a></li>` : ''}
-                        ${data.reportState === 'Abierto' || data.reportState === 'Pendiente' ?
-              `<li><a class="dropdown-item" data-action="changeState" data-id="${data.id}" data-state="REJECTED"">Rechazar</a></li>` : ''}
-                          ${data.reportState === 'Abierto' ?
-              `<li><a class="dropdown-item" data-action="changeState" data-id="${data.id}" data-state="CLOSED"">Cerrar</a></li>` : ''}
-                 </ul>
+                    <li><a class="btn dropdown-item" onclick="viewReport(${data.id})">Ver más</a></li>
+                    ${(data.reportState === 'Abierto' || data.reportState === 'Pendiente') ? 
+                      `
+                      <li><hr class="dropdown-divider"></li>
+                      <li><a class="btn dropdown-item" onclick="editReport(${data.id})">Editar</a></li>
+                      <li><a class="btn dropdown-item" data-action="newSaction" data-id="${data.id}"">Sancionar</a></li>
+                      <li><a class="btn dropdown-item" data-action="changeState" data-id="${data.id}" data-state="REJECTED"">Rechazar</a></li>
+                      ` : ''}
+                    ${data.reportState === 'Abierto' ? `<li><a class="btn dropdown-item" data-action="changeState" data-id="${data.id}" data-state="CLOSED"">Cerrar</a></li>` : ''}
+                </ul>
                 </div>
               </div>
             </div>`
@@ -221,6 +353,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
         zeroRecords: "No se encontraron resultados",
         loadingRecords: "Cargando...",
         processing: "Procesando...",
+        emptyTable: "No hay datos disponibles",
       }
     });
 
@@ -302,12 +435,12 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
       response => {
         this.report = response;
         this.reportfilter = this.report;
-        this.updateDataTable()
-        this.filterDate()
+        this.updateDataTable();
+        this.filterDate();
       }, error => {
-        alert(error)
+        console.error('Error al cargar los informes', error);
       }
-    )
+    );
   }
 
 
@@ -316,7 +449,7 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
     this.routingService.redirect(`main/sanctions/post-fine/${id}`, "Registrar Multa")
   }
 
-  
+
   //Redirige a el alta de un informe
   postRedirect() {
     this.routingService.redirect("main/sanctions/post-report", "Registrar Informe")

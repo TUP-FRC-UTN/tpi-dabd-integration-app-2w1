@@ -4,20 +4,23 @@ import { ChartType, GoogleChartsModule } from 'angular-google-charts';
 import {
   OwnersPlotsDistribution,
   PlotsByBlock,
-  PlotsStats
+  PlotsStats,
 } from '../../../users-models/dashboard/plots-stats';
 import {
+  AbstractControl,
   FormControl,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn,
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
 import { PlotTypeModel } from '../../../users-models/plot/PlotType';
 import { PlotStateModel } from '../../../users-models/plot/PlotState';
 import { PlotService } from '../../../users-servicies/plot.service';
-import { UsersKpiComponent } from "../users-kpi/users-kpi.component";
+import { UsersKpiComponent } from '../users-kpi/users-kpi.component';
 import { Router } from '@angular/router';
 import { RoutingService } from '../../../../common/services/routing.service';
 
@@ -30,8 +33,8 @@ import { RoutingService } from '../../../../common/services/routing.service';
     FormsModule,
     CommonModule,
     CustomSelectComponent,
-    UsersKpiComponent
-],
+    UsersKpiComponent,
+  ],
   templateUrl: './users-graphic-plots-stats.component.html',
   styleUrls: ['./users-graphic-plots-stats.component.css'],
 })
@@ -52,6 +55,7 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
     type: new FormControl(''),
     status: new FormControl(''),
   });
+  isSelecteDisabled = false;
 
   filteredPlotsStats: PlotsStats | null = null;
   filteredPlotsByBlock: PlotsByBlock[] = [];
@@ -61,19 +65,21 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
   plotsTypes: PlotTypeModel[] = [];
   plotsStatus: PlotStateModel[] = [];
 
+  isSelectDisabled = false;
+
+  loadingPieChart = false;
+  loadingBarChart = false;
   errorPieChart: string | null = null;
   errorBarChart: string | null = null;
   errorRangeDate: string | null = null;
-  
-  
 
   columnChart = ChartType.ColumnChart;
   barChartData: any[] = [];
 
   barChartOptions = {
     title: 'Distribución de Lotes por Manzana',
-    titleTextStyle: { fontSize: 14},
-    isStacked: true,  
+    titleTextStyle: { fontSize: 14 },
+    isStacked: true,
     legend: { position: 'top', alignment: 'center' },
     series: {
       0: { labelInLegend: 'Disponibles', color: '#4CAF50' },
@@ -91,6 +97,9 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
       title: 'Manzanas',
       titleTextStyle: { color: '#6c757d', fontSize: 14, bold: true },
       textStyle: { color: '#495057', fontSize: 12 },
+      slantedText: true,
+      slantedTextAngle: 45, // Rotar etiquetas para mejor legibilidad
+      showTextEvery: 1,
     },
     vAxis: {
       title: 'Cantidad de Lotes',
@@ -99,7 +108,7 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
       titleTextStyle: { color: '#6c757d', fontSize: 14, bold: true },
       textStyle: { color: '#495057', fontSize: 12 },
     },
-    bar: { groupWidth: '70%' },
+    bar: { groupWidth: '80%' },
     tooltip: {
       showColorCode: true,
       trigger: 'both',
@@ -132,7 +141,6 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
   };
 
   ngOnInit() {
-
     this.loadData();
     this.setFilterListeners();
 
@@ -189,9 +197,11 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
             }
             this.filteredOwnerDistribution = data;
             this.processPieChartData();
+            this.loadingPieChart = false;
           },
           error: () => {
-            this.errorPieChart = 'Error al cargar la distribución de propietarios';
+            this.errorPieChart =
+              'Error al cargar la distribución de propietarios';
           },
         });
 
@@ -228,15 +238,15 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
   }
 
   private loadData() {
-    this.errorBarChart = null;
-    this.errorPieChart = null;
+    this.loadingBarChart = true;
+    this.loadingPieChart = true;
     this.loadStats();
     this.loadBarChart();
     this.loadPieChart();
     this.processFilterOptions();
   }
 
-   loadStats() {
+  loadStats() {
     this.apiService.getPlotsStats().subscribe({
       next: (data: PlotsStats) => {
         this.plotsStats = data;
@@ -248,45 +258,51 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
     });
   }
 
- loadBarChart() {
+  loadBarChart() {
     this.apiService.getPlotsByBlock().subscribe({
       next: (data: PlotsByBlock[]) => {
         this.plotsByBlock = data;
         this.filteredPlotsByBlock = [...this.plotsByBlock];
         this.processData();
         this.processFilterOptions();
+        this.loadingBarChart = false;
       },
       error: () => {
-        this.errorBarChart = 'Error al cargar los datos por manzana';
+        this.errorBarChart = 'Error al cargar los datos de las manzanas';
       },
     });
   }
-  
-  loadPieChart() {
 
+  loadPieChart() {
     this.apiService.getOwnersPlotsDistribution().subscribe({
       next: (data: OwnersPlotsDistribution[]) => {
         this.ownerDistribution = data;
         this.filteredOwnerDistribution = [...this.ownerDistribution];
         this.processPieChartData();
+        this.loadingPieChart = false;
       },
       error: () => {
         this.errorPieChart = 'Error al cargar la distribución de propietarios';
       },
     });
-
   }
 
   private processData() {
-    if(this.filteredPlotsByBlock.length === 0) {
-      this.errorBarChart = 'No hay datos disponibles con esos filtros';
+    if (this.filteredPlotsByBlock.length === 0) {
+      this.errorBarChart =
+        'No se encontraron datos para los filtros seleccionados';
     }
 
+    this.filteredPlotsByBlock.sort((a, b) => a.blockNumber - b.blockNumber);
+
+    // Tomar solo las 10 primeras manzanas
+    const displayData = this.filteredPlotsByBlock.slice(0, 10);
+
     this.barChartData = [
-      ...this.filteredPlotsByBlock.map((item: PlotsByBlock) => [
+      ...displayData.map((item: PlotsByBlock) => [
         {
-          v: item.blockNumber,
-          f: `Nro. Manzana: ${item.blockNumber}`,
+          v: item.blockNumber.toString(),
+          f: `Mzna: ${item.blockNumber}`,
         },
         {
           v: item.available,
@@ -306,7 +322,8 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
 
   private processPieChartData() {
     if (!this.filteredOwnerDistribution?.length) {
-      this.errorPieChart = 'No hay datos disponibles con esos filtros';
+      this.errorPieChart =
+        'No se encontraron datos para los filtros seleccionados';
     }
 
     const sortedOwners = [...this.filteredOwnerDistribution].sort(
@@ -324,16 +341,22 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
     );
 
     this.pieChartData = [
-      ...topOwners.map(owner => [
+      ...topOwners.map((owner) => [
         {
           v: owner.ownerName,
-          f: `${owner.ownerName} (${((owner.plotCount / totalPlots) * 100).toFixed(1)}%)`
+          f: `${owner.ownerName} (${(
+            (owner.plotCount / totalPlots) *
+            100
+          ).toFixed(1)}%)`,
         },
         {
           v: owner.plotCount,
-          f: `Lotes: ${owner.plotCount}\nPorcentaje: ${((owner.plotCount / totalPlots) * 100).toFixed(1)}%`
-        }
-      ])
+          f: `Lotes: ${owner.plotCount}\nPorcentaje: ${(
+            (owner.plotCount / totalPlots) *
+            100
+          ).toFixed(1)}%`,
+        },
+      ]),
     ];
 
     if (othersCount > 0) {
@@ -341,32 +364,29 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
       this.pieChartData.push([
         {
           v: 'Otros',
-          f: `Otros (${othersPercentage.toFixed(1)}%)`
+          f: `Otros (${othersPercentage.toFixed(1)}%)`,
         },
         {
           v: othersCount,
-          f: `Lotes: ${othersCount}\nPorcentaje: ${othersPercentage.toFixed(1)}%\nPropietarios: ${sortedOwners.length - 8}`
-        }
+          f: `Lotes: ${othersCount}\nPorcentaje: ${othersPercentage.toFixed(
+            1
+          )}%\nPropietarios: ${sortedOwners.length - 8}`,
+        },
       ]);
-
     }
 
     this.pieChartOptions = {
       ...this.pieChartOptions,
-      colors: ['#FF9900', '#4285F4', '#34A853', '#EA4335', '#9334E6', '#FBBC05', '#808080'],
+      colors: [
+        '#FF9900',
+        '#4285F4',
+        '#34A853',
+        '#EA4335',
+        '#9334E6',
+        '#FBBC05',
+        '#808080',
+      ],
     };
-  }
-
-  clearFilters() {
-    this.startDate.reset();
-    this.endDate.reset();
-    this.filterForm.reset();
-    this.errorRangeDate = null;
-    this.filteredPlotsByBlock = [...this.plotsByBlock];
-    this.filteredOwnerDistribution = [...this.ownerDistribution];
-    this.filteredPlotsStats = { ...this.plotsStats };
-    this.processData();
-    this.processPieChartData();
   }
 
   filterByDate() {
@@ -380,7 +400,8 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
       const end = new Date(endDateValue);
 
       if (start > end) {
-        this.errorRangeDate = 'La fecha de inicio no puede ser mayor a la fecha de fin';
+        this.errorRangeDate =
+          'La fecha de inicio no puede ser mayor a la fecha de fin';
         return;
       }
 
@@ -396,6 +417,9 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
     this.errorBarChart = null;
     this.errorPieChart = null;
 
+    this.loadingBarChart = true;
+    this.loadingPieChart = true;
+
     this.apiService
       .getPlotsStats(
         startDate,
@@ -407,6 +431,7 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
         next: (stats) => {
           this.filteredPlotsStats = stats;
           this.updateKPIs(stats);
+          this.processFilterOptions();
         },
         error: (error) => {
           console.error('Error al obtener estadísticas:', error);
@@ -417,6 +442,7 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
       next: (plotsByBlock) => {
         this.filteredPlotsByBlock = plotsByBlock;
         this.processData();
+        this.loadingBarChart = false;
       },
       error: (error) => {
         console.error('Error al obtener datos por bloque:', error);
@@ -434,6 +460,7 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
         next: (distribution) => {
           this.filteredOwnerDistribution = distribution;
           this.processPieChartData();
+          this.loadingPieChart = false;
         },
         error: (error) => {
           console.error('Error al obtener distribución:', error);
@@ -445,20 +472,6 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
     return date.toISOString().split('T')[0];
   }
 
-  resetPieChart() {
-    this.filterForm.reset();
-    this.startDate.reset();
-    this.endDate.reset();
-    this.loadPieChart();
-    this.loadStats();
-  }
-
-  resetBarChart() {
-    this.startDate.reset();
-    this.endDate.reset();
-    this.loadBarChart();
-  }
-
   resetAll() {
     this.filterForm.reset();
     this.startDate.reset();
@@ -466,7 +479,56 @@ export class UsersGraphicPlotsStatsComponent implements OnInit {
     this.loadData();
   }
 
-  changeView(){
+  changeView() {
     this.routerService.redirect('main/users/dashboard');
+  }
+
+  maxBlocksValidator(max: number): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const selectedBlocks = control.value;
+      if (selectedBlocks && selectedBlocks.length >= max) {
+        return {
+          customsErrors: {
+            message: `Se alcanzó el máximo de ${max} manzanas seleccionadas`,
+          },
+        };
+      }
+      return null;
+    };
+  }
+  
+
+  onSelectedOptionsChange(event: any[]) {
+    const blockControl = this.filterForm.get('block');
+    
+    if (event.length > 10) {
+      event = event.slice(0, 10);
+    }
+    
+    blockControl?.setValue(event);
+
+    this.isSelectDisabled = event.length >= 10;
+    
+    if (event.length === 10) {
+      blockControl?.setErrors({
+        'customsErrors': {
+          message: 'Se alcanzó el máximo de 10 manzanas seleccionadas'
+        }
+      });
+    }
+  }
+
+  clearFilters() {
+    this.startDate.reset();
+    this.endDate.reset();
+    this.filterForm.reset();
+    const blockControl = this.filterForm.get('block');
+    blockControl?.setValue([]);
+    blockControl?.setErrors(null); 
+    this.isSelectDisabled = false;
+    this.errorRangeDate = null;
+    this.errorBarChart = null;
+    this.errorPieChart = null;
+    this.loadData();
   }
 }

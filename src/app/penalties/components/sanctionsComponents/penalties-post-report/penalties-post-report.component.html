@@ -1,9 +1,9 @@
 <div class="container p-3">
-    <div class="post-complaint-section p-4 border shadow-lg p-3 mb-5 bg-white rounded">
+    <div class="post-complaint-section p-4 border shadow-lg p-3 mb-5 bg-white rounded" id="addReportForm">
         <form [formGroup]="reactiveForm" (ngSubmit)="onSubmit()">
             <div class="row">
                 <!-- Ejemplo select -->
-                <div class="col-lg-6 mb-3">
+                <div class="col-lg-6 mb-3" id="reportReason">
                     <div class="row">
                         <label class="col-2 col-form-label">Motivo</label>
                         <div class="col-10">
@@ -17,7 +17,7 @@
                 </div>
 
                 <!-- Textarea descripcion -->
-                <div class="col-lg-12 mb-3">
+                <div class="col-lg-12 mb-3" id="reportDescription">
                     <div class="row">
                         <label class="col-2 col-lg-1 col-form-label">Descripción</label>
                         <div class="col-10 col-lg-11">
@@ -29,33 +29,35 @@
                 </div>
 
                 <!-- Select Infractor -->
-                <div class="col-lg-6 mb-3">
+                <div class="col-lg-6 mb-3" id="reportLote">
                     <div class="row">
-                        <label class="col-2 col-form-label">Parcela</label>
+                        <label class="col-2 col-form-label">Lote</label>
                         <div class="col-10">
                             <app-custom-select [options]="optionsplot"
-                                [selectedOptions]="reactiveForm.get('plotId')?.value"
+                                [multiple]="true"
+                                [selectedOptions]="reactiveForm.get('plotIds')?.value"
                                 (selectedOptionsChange)="updateSelectplot($event)"
-                                [validations]="reactiveForm.get('plotId')?.validator">
+                                [validations]="reactiveForm.get('plotIds')?.validator">
                             </app-custom-select>
                         </div>
                     </div>
                 </div>
 
                 <!-- Modal adjuntar -->
-                <div class="col">
-                    <button type="button" class="btn btn-warning" (click)="openSelectComplaints()">
-                        <i class="bi bi-paperclip"></i>
-                        Adjuntar Denuncias
-                        <span class=" ms-1 badge text-bg-danger">{{ selectedComplaintsCount }}</span>
-                    </button>
-                </div>
-
+                 @if(!shouldHideButton()){
+                    <div class="col">
+                        <button type="button" class="btn btn-warning" (click)="openSelectComplaints()" id="complaintModalButton">
+                            <i class="bi bi-paperclip"></i>
+                            Adjuntar Denuncias
+                            <span class=" ms-1 badge text-bg-danger">{{ selectedComplaintsCount }}</span>
+                        </button>
+                    </div>
+                 }
             </div>
 
             <div class="submit-box d-flex justify-content-end">
                 <button type="button" class="btn btn-secondary me-3" (click)="cancel()">Cancelar</button>
-                <button type="submit" class="btn btn-success" [disabled]="reactiveForm.invalid">Registrar</button>
+                <button type="submit" class="btn btn-success" [disabled]="reactiveForm.invalid"  id="submitButton">Registrar</button>
             </div>
         </form>
     </div>
@@ -76,16 +78,16 @@
         </div>
         <div class="modal-body">
           <!-- body con tus inputs -->
-          <p>
-            En este apartado podrá realizar un informe y relacionarlo con las denuncias que desee.
-        </p>
         <p>
-            Contará con un espacio para indicar a qué parcela desea relacionarlo.
-        </p>
-        <p>
-            Además, un botón "Adjuntar Denuncias" que le mostrará el listado de las denuncias habilitadas para ser anexadas.
-        </p> 
-          </div>
+            Aquí se puede realizar el alta de un informe con sus datos correspondientes. En el mismo se puede tener ninguna, una o varias denuncias anexadas al momento de crearlo. El informe incluye la siguiente información:
+          </p>
+          <ul>
+            <li><b>Motivo: </b>El motivo por el cuál se creará el informe, que debe corresponder con el de las denuncias anexadas.</li>
+            <li><b>Descripción: </b>Aquí podrá describir el por qué realiza el alta del informe con ese motivo.</li>
+            <li><b>Lote: </b>Aquí puede elegir hacia qué Bloque y Lote irá dirigido el informe.</li>
+            <li><b>Adjuntar Denuncias: </b>Este botón abrirá una ventana donde podra visualizar y seleccionar denuncias que estén en estado "Pendiente" para anexar al informe. En caso de confirmar la modificación del informe, las denuncias seleccionadas pasarán al estado "Anexada".</li>
+          </ul>
+        </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
         </div>

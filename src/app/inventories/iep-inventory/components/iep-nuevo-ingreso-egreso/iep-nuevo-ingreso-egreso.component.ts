@@ -8,10 +8,12 @@ import { ProductXDetailDto } from '../../models/product-xdetail-dto';
 import { SuppliersService } from '../../services/suppliers.service';
 import { Supplier } from '../../models/suppliers';
 import { movementDto } from '../../models/movementDto';
-import { Observable, map, catchError, of } from 'rxjs';
+import { Observable, map, catchError, of, Subscription } from 'rxjs';
 import { IncreaseDecrementService } from '../../services/increase-decrement.service';
 import Swal from 'sweetalert2';
 import { UsersMockIdService } from '../../../common-services/users-mock-id.service';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 
 @Component({
   selector: 'app-iep-nuevo-ingreso-egreso',
@@ -33,11 +35,45 @@ export class IepNuevoIngresoEgresoComponent implements OnInit {
       private serviceP : ProductService ,
       private serviceS :  SuppliersService,
       private serviceMovment : IncreaseDecrementService,
-      private serviceUsers : UsersMockIdService
-    ) {}
+      private serviceUsers : UsersMockIdService, 
+      private tutorialService: TutorialService
+    ) {
+      this.tour = new Shepherd.Tour({
+        defaultStepOptions: {
+          cancelIcon: {
+            enabled: true,
+          },
+          arrow: false,
+          canClickTarget: false,
+          modalOverlayOpeningPadding: 10,
+          modalOverlayOpeningRadius: 10,
+          scrollTo: {
+            behavior: 'smooth',
+            block: 'center'
+          }
+        },
+        keyboardNavigation: false,
+        useModalOverlay: true,
+      }); }
   productos: ProductXDetailDto [] = [];
   suppliers : Supplier[]=[];
   
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
+
+    ngOnDestroy(): void {
+    //TUTORIAL
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    } 
+    }
+
   ngOnInit(): void {
     this.formulario = new FormGroup({
       selectedArticule: new FormControl('',Validators.required),  
@@ -45,6 +81,7 @@ export class IepNuevoIngresoEgresoComponent implements OnInit {
       amount : new FormControl('',[Validators.required,Validators.min(1)]),
       // priceUnit : new FormControl('',[Validators.required,Validators.min(1)]),
       justify : new FormControl('',Validators.required)
+      
     });
 
     this.formularioEgreso = new FormGroup({
@@ -60,10 +97,170 @@ export class IepNuevoIngresoEgresoComponent implements OnInit {
     })
     this.loadSuppliers();
     this.loadProductos();
-    this.idUser= this.serviceUsers.getMockId()
+    this.idUser= this.serviceUsers.getMockId();
+
+    //TUTORIAL
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    ); 
   }
 
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    // CÓDIGO PARA PREVENIR SCROLLEO DURANTE TUTORIAL
+    const preventScroll = (e: Event) => {
+      e.preventDefault();
+    };
+
+    const restoreScroll = () => {
+      document.body.style.overflow = 'auto';
+      window.removeEventListener('wheel', preventScroll);
+      window.removeEventListener('touchmove', preventScroll);
+    };
+
+    // Al empezar, lo desactiva
+    this.tour.on('start', () => {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('wheel', preventScroll, { passive: false });
+      window.addEventListener('touchmove', preventScroll, { passive: false });
+    });
+
+    // Al completar lo reactiva, al igual que al cancelar
+    this.tour.on('complete', restoreScroll);
+    this.tour.on('cancel', restoreScroll);
+    
+    while (this.tour.steps.length > 0) {
+      this.tour.removeStep(this.tour.steps[this.tour.steps.length - 1].id);
+    }
   
+    this.tour.addStep({
+      id: 'movement-type-step',
+      title: 'Tipo de Movimiento',
+      text: 'Seleccione el tipo de movimiento: Ingreso o Egreso. Cada tipo tiene un formulario similar para registrar movimientos de inventario.',
+      attachTo: {
+        element: '.btn-group[role="group"]',
+        on: 'bottom'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+  
+    this.tour.addStep({
+      id: 'article-step',
+      title: 'Selección de Artículo',
+      text: 'Elija el artículo para el cual desea registrar el movimiento.',
+      attachTo: {
+        element: '#productos',
+        on: 'bottom'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+
+    if(this.selectedType==="I"){
+      this.tour.addStep({
+        id: 'create-article-step',
+        title: 'Crear Artículo',
+        text: 'En caso de no encontrar el artículo que desea registrar, puede crear uno nuevo haciendo click acá.',
+        attachTo: {
+          element: '#addProductButton',
+          on: 'auto'
+        },
+        buttons: [
+          {
+            text: 'Anterior',
+            action: this.tour.back
+          },
+          {
+            text: 'Siguiente',
+            action: this.tour.next,
+          }
+        ]
+      });
+    
+
+      this.tour.addStep({
+        id: 'provider-step',
+        title: 'Selección de Proveedor',
+        text: 'Elija el proveedor para el cual desea registrar el movimiento.',
+        attachTo: {
+          element: '#provider',
+          on: 'auto'
+        },
+        buttons: [
+          {
+            text: 'Anterior',
+            action: this.tour.back
+          },
+          {
+            text: 'Siguiente',
+            action: this.tour.next,
+          }
+        ]
+      });
+
+      this.tour.addStep({
+        id: 'create-article-step',
+        title: 'Crear Artículo',
+        text: 'En caso de no encontrar el proveedor que desea registrar, puede crear uno nuevo haciendo click acá.',
+        attachTo: {
+          element: '#addProviderButton',
+          on: 'auto'
+        },
+        buttons: [
+          {
+            text: 'Anterior',
+            action: this.tour.back
+          },
+          {
+            text: 'Siguiente',
+            action: this.tour.next,
+          }
+        ]
+      });
+    }
+  
+    this.tour.addStep({
+      id: 'submit-step',
+      title: 'Cargar Movimiento',
+      text: 'Cuando haya completado todos los campos, haga clic en "Registrar" para guardar el movimiento. El botón estará deshabilitado hasta que complete todos los campos requeridos.',
+      attachTo: {
+        element: 'button[type="submit"]',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+    });
+  
+    this.tour.start();
+  }
+
+
   goTo(path: string) {
     console.log('Intentando navegar a:', path);
     this.router.navigate([path]).then(

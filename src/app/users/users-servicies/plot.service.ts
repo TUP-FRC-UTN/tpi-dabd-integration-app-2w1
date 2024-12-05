@@ -7,6 +7,8 @@ import { PlotModel } from '../users-models/plot/Plot';
 import { GetPlotModel } from '../users-models/plot/GetPlot';
 import { PutPlot } from '../users-models/plot/PutPlot';
 import { environment } from '../../common/environments/environment';
+import { GetBuyRequestDto } from '../users-models/plot/GetBuyRequestDto';
+import { PostBuyRequestDto } from '../users-models/plot/PostBuyRequestDto';
 
 @Injectable({
   providedIn: 'root'
@@ -99,5 +101,19 @@ export class PlotService {
         
       }
     });
+  }
+
+  //-----------------------------------Buy Requests-----------------------------------
+
+  getAllBuyRequests(): Observable<GetBuyRequestDto[]>{ 
+    return this.http.get<GetBuyRequestDto[]>(`${this.url}/requests`);
+  }
+
+  postBuyRequest(buyRequest: PostBuyRequestDto): Observable<PostBuyRequestDto>{
+    return this.http.post<PostBuyRequestDto>(`${this.url}/requests`, buyRequest);
+  }
+
+  changeStateBuyRequest(buyRequestId: number): Observable<void> {
+    return this.http.put<void>(`${this.url}/requests/${buyRequestId}`, {});
   }
 }

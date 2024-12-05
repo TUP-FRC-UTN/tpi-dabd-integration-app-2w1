@@ -4,6 +4,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ComplaintService } from '../../../../services/complaints.service';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
+import { AuthService } from '../../../../../users/users-servicies/auth.service';
 @Component({
   selector: 'app-penalties-modal-state-reason',
   standalone: true,
@@ -12,57 +13,56 @@ import Swal from 'sweetalert2';
   styleUrl: './penalties-update-stateReason-modal.component.scss'
 })
 export class PenaltiesModalStateReasonComponent {
-  reasonText:String = ""
-  @Input() idComplaint:number=0
-  @Input() complaintState: string = ""
-  @Input() userId:number = 0
-  
+  //Variables
+  @Input() idComplaint: number = 0;
+  @Input() complaintState: string = "";
 
-  constructor(public activeModal: NgbActiveModal, private complaintService: ComplaintService) {}
+  reasonText: String = ""
+
+
+  //Constructor
+  constructor(
+    public activeModal: NgbActiveModal,
+    private complaintService: ComplaintService,
+    private authService: AuthService
+  ) { }
   ngOnInit(): void {
-    console.log(this.idComplaint, this.complaintState)
   }
+
+  //-----------------------------------Metodos modal--------------------------------------//
+
+  //Cierra el modal
   close() {
-    this.activeModal.close(); 
+    this.activeModal.close();
   }
 
 
-  //This method is used to update
-  //the state of a complaint.
-
-  //Returns an alert if the 
-  //state was updated or not.
-
-  //Throws an error if the 
-  //state could not be updated.
-  putComplaint(){
-    const ComplaintDto:PutStateComplaintDto = {
+  //Envia la peticion a la api para el cambio de estado e informa con SW el resultado
+  putComplaint() {
+    const ComplaintDto: PutStateComplaintDto = {
       id: this.idComplaint,
-      userId: this.userId,
+      userId: this.authService.getUser().id,
       complaintState: this.complaintState,
       stateReason: this.reasonText
     };
-    // Sends the form only after confirmation.
-    this.complaintService.putStateComplaint(this.idComplaint, ComplaintDto).subscribe( res => {
-        Swal.fire({
-          title: '¡Denuncia actualizada!',
-          text: 'El estado de la denuncia fue actualizado con éxito',
-          icon: 'success',
-          timer: 1500,
-          showConfirmButton: false
-          
-        });
-        this.close();
-      }, error => {
-        console.error('Error al enviar la denuncia', error);
-        Swal.fire({
-          title: 'Error',
-          text: 'No se pudo enviar la denuncia. Inténtalo de nuevo.',
-          icon: 'error',
-          confirmButtonText: 'Aceptar'
-        });
-      })
+    //Llama al servicio para actualizar la denuncia y dispara sweet alerts
+    this.complaintService.putStateComplaint(this.idComplaint, ComplaintDto).subscribe(res => {
+      Swal.fire({
+        title: '¡Denuncia actualizada!',
+        text: 'El estado de la denuncia fue actualizado con éxito',
+        icon: 'success',
+        timer: 1500,
+        showConfirmButton: false
+      });
+      this.close();
+    }, error => {
+      Swal.fire({
+        title: 'Error',
+        text: 'No se pudo actualizar la denuncia. Inténtelo de nuevo mas tarde.',
+        icon: 'error',
+        confirmButtonText: 'Aceptar'
+      });
+    })
+  }
 
-
-}
 }

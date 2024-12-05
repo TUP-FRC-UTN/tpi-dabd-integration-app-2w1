@@ -107,6 +107,7 @@ export class PenaltiesModalFineComponent implements OnInit {
     });
     modal.componentInstance.id = this.fine.id;
     modal.componentInstance.fineState = state;
+    modal.componentInstance.fine = this.fine;
     modal.result
       .then((result) => {
         this.close()
@@ -114,6 +115,13 @@ export class PenaltiesModalFineComponent implements OnInit {
       .catch((error) => {
         console.log("Error con modal: " + error);
       });
+  }
+
+  getActualState(){
+    if(this.fine?.fineState == 'Apelada' || this.fine?.disclaimer != "No hay reclamo." ){
+      return true
+    }
+    else return false;
   }
 
 

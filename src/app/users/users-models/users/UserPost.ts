@@ -3,13 +3,13 @@ export class UserPost {
     lastname: string;   
     username: string;     
     password: string;
-    email: string;       
-    phone_number: string;
+    email: string | null;       
+    phone_number: string | null;
     dni_type_id : number;
     dni: string;         
     active: boolean;      
     avatar_url: string;   
-    datebirth: string;    
+    datebirth: string | null;    
     roles: string[];  
     userUpdateId: number;
     plot_id?: number;

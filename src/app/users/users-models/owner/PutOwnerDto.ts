@@ -13,6 +13,7 @@ export class PutOwnerDto {
     active: boolean;
     files: File[] = [];
     plotId: number[];
+    roles: string[];
 
     constructor() {
         this.name = '';        
@@ -27,5 +28,6 @@ export class PutOwnerDto {
         this.userUpdateId = 0; 
         this.active = true;
         this.plotId = [];
+        this.roles = [];
     }
 }

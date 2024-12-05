@@ -4,24 +4,13 @@
 
     <form class="form">
       <!-- Modal para información adicional sobre el inventario -->
-      <div
-        class="modal fade"
-        id="infoModal"
-        tabindex="-1"
-        aria-labelledby="infoModalLabel"
-        aria-hidden="true"
-      >
+      <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
             <!-- Encabezado del modal -->
             <div class="modal-header">
               <h5 class="modal-title" id="infoModalLabel">Información</h5>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <!-- Contenido del modal -->
             <div class="modal-body">
@@ -78,11 +67,7 @@
             </div>
             <!-- Pie del modal con botón para cerrar -->
             <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                 Cerrar
               </button>
             </div>
@@ -91,101 +76,58 @@
       </div>
 
       <!-- Botones para generar PDF o Excel -->
-      <div class="row mb-2">
+      <div class="row mb-2" id="filtros">
         <!-- Sección de filtros y botones de exportación -->
-        <div
-          class="d-flex mb-3 justify-content-between align-items-center w-100"
-        >
+        <div class="d-flex mb-3 justify-content-between align-items-center w-100">
           <!-- Contenedor de filtros -->
           <div class="d-flex align-items-center flex-grow-1">
             <!-- Campo de Búsqueda -->
             <div class="me-3" style="min-width: 200px">
-              <input
-                type="text"
-                id="filterInput"
-                class="form-control"
-                placeholder="Buscar"
-                [(ngModel)]="filters.nombre"
-                name="nombre"
-                (input)="applyFilter()"
-              />
+              <input type="text" id="filterInput" class="form-control" placeholder="Buscar" [(ngModel)]="filters.nombre"
+                name="nombre" (input)="applyFilter()" />
             </div>
 
             <div class="me-3" style="min-width: 200px">
-              <input
-                type="date"
-                id="filterDateStart"
-                [attr.max]="fechaMaxima"
-                class="form-control"
-                placeholder="Desde"
-                name="dateStarts"
-                [formControl]="dateStartFilter"
-                (input)="applyFilter()"
-              />
+              <input type="date" id="filterDateStart" [attr.max]="fechaMaxima" class="form-control" placeholder="Desde"
+                name="dateStarts" [formControl]="dateStartFilter" (input)="applyFilter()" />
             </div>
 
             <div class="me-3" style="min-width: 200px">
-              <input
-                type="date"
-                id="filterDateEnd"
-                [attr.max]="fechaMaxima"
-                class="form-control"
-                placeholder="Hasta"
-                name="dateEnd"
-                [formControl]="dateEndFilter"
-                (input)="applyFilter()"
-              />
+              <input type="date" id="filterDateEnd" [attr.max]="fechaMaxima" class="form-control" placeholder="Hasta"
+                name="dateEnd" [formControl]="dateEndFilter" (input)="applyFilter()" />
             </div>
-            
-            
+
+
             <!-- Filtro de Estado -->
-             <div div style="" class="">
-              <ng-select
-              multiple="true"
-              [formControl]="estadoFilter"
-              [items]="estadosCombo"
-              bindLabel="label"
-              bindValue="value"
-              placeholder="Seleccionar Estado"
-              (change)="applyFilter()">
+            <div div style="" class="">
+              <ng-select multiple="true" [formControl]="estadoFilter" [items]="estadosCombo" bindLabel="label"
+                bindValue="value" placeholder="Seleccionar Estado" (change)="applyFilter()">
 
-              <ng-template ng-multi-label-tmp let-items="items">
-                Seleccionar Estado
-                <span *ngIf="items.length > 0">({{ items.length }})</span>
-              </ng-template>
+                <ng-template ng-multi-label-tmp let-items="items">
+                  Seleccionar Estado
+                  <span *ngIf="items.length > 0">({{ items.length }})</span>
+                </ng-template>
               </ng-select>
 
             </div>
 
-            
-            </div>
-            
+
+          </div>
+
 
           <!-- Botones para mostrar/ocultar y limpiar filtros, exportar datos a PDF y Excel -->
           <div class="d-flex align-items-center ms-2">
-            <button
-              class="btn btn-primary ms-2 filterbutton"
-              data-bs-toggle="modal"
-              title="Filtros Avanzados"
-              data-bs-target="#filtrosAvanzados"
-            >
+            <button class="btn btn-primary ms-2 filterbutton" data-bs-toggle="modal" title="Filtros Avanzados"
+              data-bs-target="#filtrosAvanzados">
               <i class="bi bi-funnel-fill"></i>
             </button>
             <button title="Limpiar Filtros" class="btn btn-secondary ms-2 filterbutton" (click)="cleanFilters()">
               <i class="bi bi-trash"></i>
             </button>
-            <button
-              class="btn btn-success ms-2 filterbutton"
-              (click)="generarExcel()"
-              title="Exportar a Excel"
-            >
+            <button class="btn btn-success ms-2 filterbutton" (click)="generarExcel()" title="Exportar a Excel">
               <i class="fa-solid bi-file-earmark-excel"></i>
             </button>
-            <button
-              class="btn btn-danger ms-2 filterbutton"
-              (click)="generarPdf()"
-              title="Exportar a PDF"
-            >
+            <button class="btn btn-danger ms-2 filterbutton" (click)="generarPdf()" title="Exportar a PDF">
               <i class="fas bi-file-earmark-pdf"></i>
             </button>
           </div>
@@ -193,10 +135,7 @@
       </div>
 
       <div>
-        <table
-          class="table table-striped border border-4 rounded table-hover"
-          id="productsList"
-        >
+        <table class="table table-striped border border-4 rounded table-hover" id="productsList">
           <thead class="table-light border border-4">
             <tr>
               <th></th>
@@ -215,23 +154,15 @@
       <!-- Botones de navegación: Volver y agregar nuevo producto -->
     </form>
 
-    <button
-      class="floating-btn btn btn-primary"
-      (click)="goTo('main/inventories/new-product')"
-    >
+    <button class="floating-btn btn btn-primary" (click)="goTo('main/inventories/new-product')" id="addProduct">
       <span class="bi-plus-lg"></span>
     </button>
 
     <!-- Modal para aumento de stock -->
   </div>
 
-  <div
-    class="modal fade"
-    id="filtrosAvanzados"
-    tabindex="-1"
-    aria-labelledby="filtrosAvanzadosLabel"
-    aria-hidden="true"
-  >
+  <div class="modal fade" id="filtrosAvanzados" tabindex="-1" aria-labelledby="filtrosAvanzadosLabel"
+    aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <!-- Modal Header -->
@@ -239,90 +170,60 @@
           <h5 class="modal-title" id="filtrosAvanzadosLabel">
             Filtros Avanzados
           </h5>
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-          ></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
 
         <div class="modal-body">
-<!-- Cantidad mínima -->
-<div class="row mb-3">
-  <label for="CantMinima" class="col-sm-3 col-form-label">Cantidad Mínima</label>
-  <div class="col-sm-9">
-    <input
-      type="number"
-      id="CantMinima"
-      name="CantMinima"
-      class="form-control text-end"
-      pattern="^(0|[1-9]\d*)$"
-      [(ngModel)]="filters.cantMinima"
-      (ngModelChange)="applyFilter()"
-      min="0"
-      placeholder=""
-    />
-    <div *ngIf="filters.cantMinima < 0" class="text-danger small mt-1">
-      La cantidad mínima no puede ser menor a 0
-    </div>
-    <div *ngIf="filters.cantMinima > filters.cantMaxima && filters.cantMaxima > 0" class="text-danger small mt-1">
-      La cantidad mínima no puede ser mayor a la cantidad máxima
-    </div>
-  </div>
-</div>
+          <!-- Cantidad mínima -->
+          <div class="row mb-3">
+            <label for="CantMinima" class="col-sm-3 col-form-label">Cantidad Mínima</label>
+            <div class="col-sm-9">
+              <input type="number" id="CantMinima" name="CantMinima" class="form-control text-end"
+                pattern="^(0|[1-9]\d*)$" [(ngModel)]="filters.cantMinima" (ngModelChange)="applyFilter()" min="0"
+                placeholder="" />
+              <div *ngIf="filters.cantMinima < 0" class="text-danger small mt-1">
+                La cantidad mínima no puede ser menor a 0
+              </div>
+              <div *ngIf="filters.cantMinima > filters.cantMaxima && filters.cantMaxima > 0"
+                class="text-danger small mt-1">
+                La cantidad mínima no puede ser mayor a la cantidad máxima
+              </div>
+            </div>
+          </div>
 
-<!-- Cantidad máxima -->
-<div class="row mb-3">
-  <label for="CantMaxima" class="col-sm-3 col-form-label">Cantidad Máxima</label>
-  <div class="col-sm-9">
-    <input
-      type="number"
-      id="CantMaxima"
-      name="CantMaxima"
-      class="form-control text-end"
-      pattern="^(0|[1-9]\d*)$"
-      [(ngModel)]="filters.cantMaxima"
-      (ngModelChange)="applyFilter()"
-      min="0"
-      placeholder=""
-    />
-    <div *ngIf="filters.cantMaxima < 0" class="text-danger small mt-1">
-      La cantidad máxima no puede ser menor a 0
-    </div>
-  </div>
-</div>
+          <!-- Cantidad máxima -->
+          <div class="row mb-3">
+            <label for="CantMaxima" class="col-sm-3 col-form-label">Cantidad Máxima</label>
+            <div class="col-sm-9">
+              <input type="number" id="CantMaxima" name="CantMaxima" class="form-control text-end"
+                pattern="^(0|[1-9]\d*)$" [(ngModel)]="filters.cantMaxima" (ngModelChange)="applyFilter()" min="0"
+                placeholder="" />
+              <div *ngIf="filters.cantMaxima < 0" class="text-danger small mt-1">
+                La cantidad máxima no puede ser menor a 0
+              </div>
+            </div>
+          </div>
 
-  <!-- Filtro de Reutilizable -->
+          <!-- Filtro de Reutilizable -->
 
-  <div class="row mb-3">
-  <label for="" class="col-sm-3 col-form-label">Reutilizable</label>
-    <div class="col-sm-9">
-      <ng-select
-    multiple="true"
-    [formControl]="reutilizableFilter"
-    [items]="reutilizablesCombo"
-    bindLabel="label"
-    bindValue="value"
-    placeholder="Seleccionar Reutilizable"
-    (change)="applyFilter()">
-    <ng-template ng-multi-label-tmp let-items="items">
-      Seleccionar Reutilizable
-      <span *ngIf="items.length > 0">({{ items.length }})</span>
-    </ng-template>
-    </ng-select>
-    </div>
-  </div>
+          <div class="row mb-3">
+            <label for="" class="col-sm-3 col-form-label">Reutilizable</label>
+            <div class="col-sm-9">
+              <ng-select multiple="true" [formControl]="reutilizableFilter" [items]="reutilizablesCombo"
+                bindLabel="label" bindValue="value" placeholder="Seleccionar Reutilizable" (change)="applyFilter()">
+                <ng-template ng-multi-label-tmp let-items="items">
+                  Seleccionar Reutilizable
+                  <span *ngIf="items.length > 0">({{ items.length }})</span>
+                </ng-template>
+              </ng-select>
+            </div>
+          </div>
 
 
 
           <!-- Modal Footer -->
           <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
               Cerrar
             </button>
           </div>
@@ -334,7 +235,8 @@
 
 
 <!-- Modal para Confirmar Eliminación -->
-<div class="modal fade" id="eliminarProductoModal" tabindex="-1" aria-labelledby="eliminarProductoModalLabel" aria-hidden="true">
+<div class="modal fade" id="eliminarProductoModal" tabindex="-1" aria-labelledby="eliminarProductoModalLabel"
+  aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">

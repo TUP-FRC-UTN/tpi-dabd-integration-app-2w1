@@ -1,28 +1,24 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgbModal, NgbModule, } from '@ng-bootstrap/ng-bootstrap';
-import * as XLSX from 'xlsx';
-
-// Imports de DataTable con soporte para Bootstrap 5
-import $ from 'jquery';
-import 'datatables.net-bs5'; // DataTables con Bootstrap 5
-// import 'datatables.net-buttons-bs5'; // Botones con estilos de Bootstrap 5
-// import 'datatables.net-buttons/js/buttons.html5';
-// import 'datatables.net-buttons/js/buttons.print';
-
-//Imports propios de multas
 import { PenaltiesModalConsultComplaintComponent } from '../modals/penalties-get-complaint-modal/penalties-get-complaint.component';
 import { PenaltiesModalStateReasonComponent } from '../modals/penalties-update-stateReason-modal/penalties-update-stateReason-modal.component';
 import { ComplaintService } from '../../../services/complaints.service';
 import { ComplaintDto } from '../../../models/complaint';
 import { RoutingService } from '../../../../common/services/routing.service';
-import moment from 'moment';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
 import { AuthService } from '../../../../users/users-servicies/auth.service';
+import moment from 'moment';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import * as XLSX from 'xlsx';
+import $ from 'jquery';
+import 'datatables.net-bs5';
+import { Subscription } from 'rxjs';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 
 
 @Component({
@@ -34,7 +30,7 @@ import { AuthService } from '../../../../users/users-servicies/auth.service';
 })
 export class PenaltiesListComplaintComponent implements OnInit {
   //Variables
-  Complaint: ComplaintDto[] = [];                 //Lista de datos
+  complaints: ComplaintDto[] = [];                 //Lista de datos
   filterComplaint: ComplaintDto[] = [];           //Datos filtrados a mostrar
   filterComplaintsecond: ComplaintDto[] = [];     //Datos filtrados a mostrar 2??
   states: { key: string; value: string }[] = [];  //Lista de estados
@@ -49,16 +45,54 @@ export class PenaltiesListComplaintComponent implements OnInit {
   options: { value: string, name: string }[] = []
   @ViewChild(CustomSelectComponent) customSelect!: CustomSelectComponent;
 
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
+
+  
+  //Destroy
+  ngOnDestroy(): void {
+    //TUTORIAL
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
+
+  }
+
   //Constructor
   constructor(
     private _modal: NgbModal,
     private complaintService: ComplaintService,
     private routingService: RoutingService,
-    private authService: AuthService
+    private authService: AuthService,
+    private tutorialService: TutorialService
   ) {
     (window as any).viewComplaint = (id: number) => this.viewComplaint(id);
-    (window as any).changeState = (state: string, id: number, userId: number) =>
-      this.changeState(state, id, userId);
+    (window as any).changeState = (id: number, state: string) =>
+      this.changeState(id, state);
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+        canClickTarget: false,
+        scrollTo: {
+          behavior: 'smooth',
+          block: 'center'
+        }
+      },
+      keyboardNavigation: false,
+      
+      useModalOverlay: true,
+    });
   }
 
 
@@ -67,7 +101,222 @@ export class PenaltiesListComplaintComponent implements OnInit {
     this.refreshData();
     this.getStates();
     this.eraseFilters();
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    );
   }
+
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    // CÓDIGO PARA PREVENIR SCROLLEO DURANTE TUTORIAL
+    const preventScroll = (e: Event) => {
+      e.preventDefault();
+    };
+
+    const restoreScroll = () => {
+      document.body.style.overflow = 'auto';
+      window.removeEventListener('wheel', preventScroll);
+      window.removeEventListener('touchmove', preventScroll);
+    };
+
+    // Al empezar, lo desactiva
+    this.tour.on('start', () => {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('wheel', preventScroll, { passive: false });
+      window.addEventListener('touchmove', preventScroll, { passive: false });
+    });
+
+    // Al completar lo reactiva, al igual que al cancelar
+    this.tour.on('complete', restoreScroll);
+    this.tour.on('cancel', restoreScroll);
+    
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Listado de Denuncias',
+      text: 'Acá puede ver una lista completa de las denuncias que se han realizado. Desde el botón de acciones puede ver más información de la denuncia, así como rechazarla o resolverla.', 
+      attachTo: {
+        element: '#complaintsTable',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+
+    this.tour.addStep({
+      id: 'filter-step',
+      title: 'Filtros',
+      text: 'Desde acá podrá filtrar las denuncias por nombre, fecha y tipo. También puede exportarlas a Excel o PDF, o borrar los filtros aplicados con el botón de basura.',
+      attachTo: {
+        element: '#filtros',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'float-button-step',
+      title: 'Agregar denuncia',
+      text: 'Haciendo click en este botón puede acceder a la página de alta de denuncias. Acá puede crear una nueva denuncia con sus datos correspondientes.',
+      attachTo: {
+        element: '#addButton',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+      
+    });
+
+    this.tour.start();
+  }
+
+  //Crea la tabla con sus configuraciones 
+  updateDataTable() {
+    if ($.fn.dataTable.isDataTable('#complaintsTable')) {
+      $('#complaintsTable').DataTable().clear().destroy();
+    }
+    $.fn.dataTable.ext.type.order['date-moment-pre'] = (d: string) => moment(d, 'DD/MM/YYYY').unix()
+    let table = this.table = $('#complaintsTable').DataTable({
+      paging: true,
+      searching: true,
+      ordering: true,
+      lengthChange: true,
+      order: [0, 'desc'],
+      lengthMenu: [5, 10, 25, 50],
+      pageLength: 5,
+      data: this.filterComplaint, //Fuente de datos
+      columns: [
+        {
+          data: 'createdDate',
+          render: (data, type, row) => {
+            const boldClass = row.complaintState === 'Nueva' ? 'fw-bold' : '';
+            return `<span class="${boldClass}">${moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY')}</span>`;
+          },
+          type: 'date-moment'
+        },
+        {
+          data: 'complaintState',
+          className: 'align-middle',
+          render: (data) => {
+            let displayText = data;
+            let badgeClass = this.getStatusClass(data);
+
+            if (data === "Nueva") {
+              displayText = "Pendiente";
+              badgeClass = "badge bg-warning";
+
+              return `
+                <div class="text-center">
+                  <div class="badge ${badgeClass} border rounded-pill text-body-emphasis">
+                    ${displayText}
+                  </div>
+                </div>`;
+            }
+
+            return `
+              <div class="text-center">
+                <div class="badge ${badgeClass} border rounded-pill">${displayText}</div>
+              </div>`;
+          }
+        },
+        {
+          data: 'description',
+          className: 'align-middle',
+          render: (data, type, row) => {
+            const boldClass = row.complaintState === 'Nueva' ? 'fw-bold' : '';
+            return `<div class="${boldClass}">${data}</div>`;
+          }
+        },
+        {
+          data: 'fileQuantity',
+          className: 'align-middle',
+          render: (data, type, row) => {
+            const boldClass = row.complaintState === 'Nueva' ? 'fw-bold' : '';
+            return `<i class="bi bi-paperclip ${boldClass}"></i> <span class="${boldClass}">${data} Archivo adjunto</span>`;
+          }
+        },
+        {
+          data: null,
+          className: 'align-middle',
+          searchable: false,
+          render: (data, type, row) => {
+            const boldClass = row.complaintState === 'Nueva' ? 'fw-bold' : '';
+            return `
+              <div class="text-center ${boldClass}">
+                <div class="btn-group">
+                  <div class="dropdown">
+                    <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
+                    <ul class="dropdown-menu">
+                      <li><a class="btn dropdown-item" onclick="viewComplaint(${data.id})">Ver más</a></li>
+                      ${(data.complaintState === "Pendiente" || data.complaintState === "Nueva") ? `
+                      <li><hr class="dropdown-divider"></li>
+                      <li><a class="btn dropdown-item" onclick="changeState('REJECTED', ${data.id}, ${this.authService.getUser().id})">Rechazar</a></li>
+                      <li><a class="btn dropdown-item" onclick="changeState('SOLVED', ${data.id}, ${this.authService.getUser().id})">Resuelta</a></li>` : ``}
+                    </ul>
+                  </div>
+                </div>
+              </div>`;
+          }
+        },
+      ],
+      dom:
+        '<"mb-3"t>' +                           //Tabla
+        '<"d-flex justify-content-between"lp>', //Paginacion
+      language: {
+        lengthMenu: `
+          <select class="form-select">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>`,
+        zeroRecords: "No se encontraron resultados",
+        loadingRecords: "Cargando...",
+        processing: "Procesando...",
+        emptyTable: "No hay datos disponibles",
+      },
+    });
+  }
+
+
+  //Metodo para filtrar con la barra de busqueda
+  onSearch(event: any) {
+    const searchValue = event.target.value;
+
+    //Dispara la busqueda despues del tercer caracter
+    if (searchValue.length >= 3) {
+      this.table.search(searchValue).draw();
+    } else if (searchValue.length === 0) {
+      this.table.search('').draw();
+    }
+  }
+
 
   //Setea el valor default de las fechas
   resetDates() {
@@ -89,103 +338,9 @@ export class PenaltiesListComplaintComponent implements OnInit {
   }
 
 
-  //Crea la tabla con sus configuraciones 
-  updateDataTable() {
-    if ($.fn.dataTable.isDataTable('#complaintsTable')) {
-      $('#complaintsTable').DataTable().clear().destroy();
-    }
-    $.fn.dataTable.ext.type.order['date-moment-pre'] = (d: string) => moment(d, 'DD/MM/YYYY').unix()
-    let table = this.table = $('#complaintsTable').DataTable({
-      paging: true,
-      searching: true,
-      ordering: true,
-      lengthChange: true,
-      order: [0, 'desc'],
-      lengthMenu: [5, 10, 25, 50],
-      pageLength: 5,
-      data: this.filterComplaint, //Fuente de datos
-      columns: [
-        {
-          data: 'createdDate',
-          render: (data) => moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY'),
-          type: 'date-moment'
-        },
-        {
-          data: 'complaintState',
-          className: 'align-middle',
-          render: (data) => `
-              <div class="text-center">
-                <div class="badge ${this.getStatusClass(data)} border rounded-pill">${data}</div>
-              </div>`
-        },
-        {
-          data: 'description',
-          className: 'align-middle',
-          render: (data) =>
-            `<div>${data}</div>`
-        },
-        {
-          data: 'fileQuantity',
-          className: 'align-middle',
-          render: (data) =>
-            `<i class="bi bi-paperclip"></i> ${data} Archivo adjunto`
-        },
-        {
-          data: null,
-          className: 'align-middle',
-          searchable: false,
-          render: (data) => `
-            <div class="text-center">
-              <div class="btn-group">
-                <div class="dropdown">
-                  <button type="button" class="btn border border-2 bi-three-dots-vertical" data-bs-toggle="dropdown"></button>
-                  <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" onclick="viewComplaint(${data.id})">Ver más</a></li>
-                    ${data.complaintState == "Pendiente" ? `
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" onclick="changeState('REJECTED', ${data.id}, ${this.authService.getUser().id})">Rechazar</a></li>
-                    <li><a class="dropdown-item" onclick="changeState('SOLVED', ${data.id}, ${this.authService.getUser().id})">Resuelta</a></li>` : ``}
-                  </ul>
-                </div>
-              </div>
-            </div>`
-        },
-      ],
-      dom:
-        '<"mb-3"t>' +                           //Tabla
-        '<"d-flex justify-content-between"lp>', //Paginacion
-      language: {
-        lengthMenu: `
-          <select class="form-select">
-            <option value="5">5</option>
-            <option value="10">10</option>
-            <option value="25">25</option>
-            <option value="50">50</option>
-          </select>`,
-        zeroRecords: "No se encontraron resultados",
-        loadingRecords: "Cargando...",
-        processing: "Procesando...",
-      },
-    });
-  }
-
-
-  //Metodo para filtrar con la barra de busqueda
-  onSearch(event: any) {
-    const searchValue = event.target.value;
-
-    //Dispara la busqueda despues del tercer caracter
-    if (searchValue.length >= 3) {
-      this.table.search(searchValue).draw();
-    } else if (searchValue.length === 0) {
-      this.table.search('').draw();
-    }
-  }
-
-
   //
   filterComplaintData() {
-    let filteredComplaints = [...this.Complaint];  // Copiar los datos de las que no han sido filtradas aún
+    let filteredComplaints = [...this.complaints];  // Copiar los datos de las que no han sido filtradas aún
 
     //Filtra por los estados
     if (this.selectedStates.length > 0) {
@@ -275,20 +430,34 @@ export class PenaltiesListComplaintComponent implements OnInit {
 
 
   //Metodo para actualizar el estado de una denuncia
-  changeState(option: string, idComplaint: number, userId: number) {
+  changeState(idComplaint: number, option: string) {
     const newState = option;
-    this.openModal(idComplaint, userId, newState);
+    this.openUpdateStateModal(idComplaint, newState);
   }
 
 
-  //Metodos propios de nuestro micro:
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //Abre el modal para cambiar el estado de la denuncia
+  openUpdateStateModal(idComplaint: number, complaintState: string) {
+    const modal = this._modal.open(PenaltiesModalStateReasonComponent, {
+      size: 'md',
+      keyboard: false,
+    });
+    modal.componentInstance.idComplaint = idComplaint;
+    modal.componentInstance.complaintState = complaintState;
+    modal.result
+      .then((result) => {
+        this.refreshData();
+      })
+      .catch((error) => {
+        console.log("Error con modal: " + error);
+      });
+  }
 
 
   //Consulta los datos del listado con la api
   refreshData() {
     this.complaintService.getAllComplaints().subscribe((data) => {
-      this.Complaint = data;
+      this.complaints = data;
       this.filterComplaint = [...data];
       this.updateDataTable();
       this.filterDate()
@@ -313,25 +482,6 @@ export class PenaltiesListComplaintComponent implements OnInit {
         console.error('error: ', error);
       }
     })
-  }
-
-
-  //Abre el modal para cambiar el estado de la denuncia
-  openModal(idComplaint: number, userId: number, complaintState: string) {
-    const modal = this._modal.open(PenaltiesModalStateReasonComponent, {
-      size: 'md',
-      keyboard: false,
-    });
-    modal.componentInstance.idComplaint = idComplaint;
-    modal.componentInstance.complaintState = complaintState;
-    modal.componentInstance.userId = userId;
-    modal.result
-      .then((result) => {
-        this.refreshData();
-      })
-      .catch((error) => {
-        console.log("Error con modal: " + error);
-      });
   }
 
 

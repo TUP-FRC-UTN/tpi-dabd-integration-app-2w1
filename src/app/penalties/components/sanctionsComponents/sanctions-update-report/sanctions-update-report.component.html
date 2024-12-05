@@ -1,6 +1,6 @@
 <div class="container p-3">
   <div
-    class="post-complaint-section p-4 border shadow-lg p-3 mb-5 bg-white rounded"
+    class="post-complaint-section p-4 border shadow-lg p-3 mb-5 bg-white rounded"  id="formDenuncia"
   >
     <form #formDenuncia="ngForm" novalidate>
       <div class="row">
@@ -40,7 +40,7 @@
         </div>
 
         <!-- Textarea descripcion -->
-        <div class="col-lg-12 mb-3">
+        <div class="col-lg-12 mb-3" id="reportDescription">
           <div class="row">
             <label class="col-2 col-lg-1 col-form-label">Descripción</label>
             <div class="col-10 col-lg-11">
@@ -89,7 +89,7 @@
 
         <!-- Adjuntar -->
         <div class="col">
-          <button type="button" class="btn btn-warning" (click)="openModal()">
+          <button type="button" class="btn btn-warning" (click)="openModal()" id="complaintModalButton">
             <i class="bi bi-paperclip"></i>
             Adjuntar Denuncias
             <span class="ms-1 badge text-bg-danger">{{
@@ -108,6 +108,7 @@
           class="btn btn-primary"
           [disabled]="formDenuncia.invalid"
           (click)="updateReport()"
+          id="saveButton"
         >
           Guardar
         </button>
@@ -136,13 +137,15 @@
       <div class="modal-body">
         <!-- body con tus inputs -->
         <p>
-          En este apartado podrá realizar la respectiva actualizacion de el
-          informe seleccionada.
+          Aquí se puede realizar la modificación de un informe con sus datos correspondientes. El mismo pueden tener ninguna, una o varias denuncias anexadas. El informe incluye la siguiente información:
         </p>
-        <p>
-          En el usted podra modificar la descripcion y adjuntar las denuncias
-          que necesite.
-        </p>
+        <ul>
+          <li><b>Estado: </b>El estado actual del informe. No se puede modificar el campo.</li>
+          <li><b>Fecha: </b>La fecha cuando se dió de alta el informe. No se puede modificar el campo.</li>
+          <li><b>Descripción: </b>La razón descriptiva del por qué se creó ese informe. El campo puede ser modificado en base a una nueva descripción.</li>
+          <li><b>Infractor: </b>Los datos del Bloque con el Lote infractor. No se puede modificar el campo.</li>
+          <li><b>Adjuntar Denuncias: </b>Este botón abrirá una ventana donde podra visualizar y seleccionar denuncias que estén en estado "Pendiente" y "Nueva" para anexar al informe. En caso de confirmar la modificación del informe, las denuncias seleccionadas pasarán al estado "Anexada"</li>
+        </ul>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>

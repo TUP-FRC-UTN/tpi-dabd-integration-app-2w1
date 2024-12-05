@@ -12,6 +12,9 @@ import { Owner } from "../expense-generation-interfaces/expense-generation-owner
 import { DebtorExpense } from '../expense-generation-interfaces/expense-generation-expense-interface';
 import { CustomSelectComponent } from '../../common/components/custom-select/custom-select.component';
 import { CustomKpiComponent } from '../../common/components/custom-kpi/custom-kpi.component';
+import { Subscription } from 'rxjs';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../common/services/tutorial.service';
 
 
 @Component({
@@ -23,11 +26,31 @@ import { CustomKpiComponent } from '../../common/components/custom-kpi/custom-kp
 })
 export class ExpenseGenerationCounterView2Component {
 
-  constructor(public counterService: ExpenseGenerationCounterServiceService, public expenseService: ExpenseGenerationExpenseService) {
+  constructor(public counterService: ExpenseGenerationCounterServiceService, public expenseService: ExpenseGenerationExpenseService, private tutorialService: TutorialService
+  ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+        scrollTo: {
+          behavior: 'smooth',
+          block: 'center'
+        }
+      },
+      useModalOverlay: true,
+    }); 
   }
   counterData: ExpenseGenerationCounter[] = [];
 
-  
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
+
   debtorExpenses: DebtorExpense[] = []
   ownerName: string = ''
   owners: Owner[] = [];
@@ -266,42 +289,47 @@ export class ExpenseGenerationCounterView2Component {
 
   columnChartOptions = {
     backgroundColor: 'transparent',
-    colors: ['#709775', '#64b6ac'], // Verde para cobrado, Azul claro para facturado
+    colors: ['#709775', '#64b6ac'],
     legend: {
-      display: true,
       position: 'top',
       alignment: 'center',
       textStyle: {
         color: '#6c757d',
-        fontSize: 12
+        fontSize: 15
       },
     },
     chartArea: {
-      width: '85%',
-      height: '70%',
-      top: 60
+      width: '90%',   
+      height: '55%',   
+      top: 30,         
+      left: '12%',    
+      bottom: 80       
     },
     vAxis: {
       title: 'Miles de pesos (ARS)',
       textStyle: {
         color: '#6c757d',
-        fontSize: 12
+        fontSize: 15
       },
-      format: 'decimal', // Cambiar de currency a decimal
+      format: 'decimal',
       viewWindow: {
         min: 0,
       },
-      ticks: {
-        // Personaliza las etiquetas en el eje Y para mostrar "Mil"
-        callback: (value: number) => {
-          return '$' + (value / 1000) + 'Mil'; // Dividir por 1000 y agregar "Mil"
-        }
+      gridlines: {
+        count: 4
       }
     },
     hAxis: {
       title: 'Periodo',
       format: 'MMM yyyy',
-      textStyle: { color: '#6c757d' }
+      textStyle: { 
+        color: '#6c757d',
+        fontSize: 15
+      },
+      slantedText: true,
+      slantedTextAngle: 45,
+      maxTextLines: 1,
+      maxAlternation: 1
     },
     animation: {
       duration: 1000,
@@ -309,18 +337,26 @@ export class ExpenseGenerationCounterView2Component {
       startup: true
     },
     width: '100%',
-    height: '75%',
-    bar: { groupWidth: '70%' },
+    height: '75%',      
+    bar: { 
+      groupWidth: '65%'
+    },
     seriesType: 'bars',
     series: {
       1: { targetAxisIndex: 0, label: 'Facturado' },
       0: { targetAxisIndex: 0, label: 'Cobrado' }
     },
-
+    isStacked: false
   };
 
   ngOnInit() {
     this.loadOwners();
+      //TUTORIAL
+      this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+        () => {
+          this.startTutorial();
+        }
+      ); 
     this.counterService.getTransactions().subscribe({
       next: (data) => {
         this.counterData = data;
@@ -335,6 +371,173 @@ export class ExpenseGenerationCounterView2Component {
 
     console.log(this.owners)
   }
+
+  ngOnDestroy() {
+    //TUTORIAL
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    // Cancelar suscripción del tutorial
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
+  
+   
+  }
+
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    // CÓDIGO PARA PREVENIR SCROLLEO DURANTE TUTORIAL
+    const preventScroll = (e: Event) => {
+      e.preventDefault();
+    };
+
+    const restoreScroll = () => {
+      document.body.style.overflow = 'auto';
+      window.removeEventListener('wheel', preventScroll);
+      window.removeEventListener('touchmove', preventScroll);
+    };
+
+    // Al empezar, lo desactiva
+    this.tour.on('start', () => {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('wheel', preventScroll, { passive: false });
+      window.addEventListener('touchmove', preventScroll, { passive: false });
+    });
+
+    // Al completar lo reactiva, al igual que al cancelar
+    this.tour.on('complete', restoreScroll);
+    this.tour.on('cancel', restoreScroll);
+    
+    this.tour.addStep({
+      id: 'filtros',
+      title: 'Filtros',
+      text: 'Desde acá podrá filtrar los gráficos por fecha. También puede agregar filtros avanzados clickeando en el boton azul de filtros, o borrar los filtros aplicados con el botón de basura.',      attachTo: {
+        element: '#filtros',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+      
+    });
+    
+    this.tour.addStep({
+      id: 'graficos',
+      title: 'Gráficos',
+      text: 'Acá puede ver gráficos y KPIs con información resumida sobre boletas y morosidad, según los filtros aplicados.',
+      attachTo: {
+        element: '#graficos',
+        on: 'top-start'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'promedio',
+      title: 'Promedios por metodo de pago',
+      text: 'Este gráfico muestra el promedios de metodo de pago utilizados para pagar las boletas.',
+      attachTo: {
+        element: '#promedio',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'deudores',
+      title: 'Top 5 deudores',
+      text: 'Este gráfico muestra un top 5 de deudores por no pago de boletas.',
+      attachTo: {
+        element: '#deudores',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'facturado',
+      title: ' Comparación de facturado y cobrado',
+      text: 'Este gráfico muestra una comparación entre lo facturado en las boletas y lo que realmente se recaudó.',
+      attachTo: {
+        element: '#facturado',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+      
+    });
+
+   
+
+    this.tour.addStep({
+      id: 'kpis',
+      title: 'KPIs',
+      text: 'Estos KPIs muestran información general y resumida sobre las boletas.',
+      attachTo: {
+        element: '#kpis',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+    });
+    this.tour.start();
+}
+
 
 
   //-----| Estos tres metodos son para el select de metodos de pago |-----------------
@@ -368,6 +571,7 @@ export class ExpenseGenerationCounterView2Component {
           uuid: expense.uuid,
           second_expiration_date: expense.second_expiration_date,
           second_expiration_amount: expense.second_expiration_amount,
+          first_expiration_amount: expense.first_expiration_amount,
           actual_amount: expense.actual_amount,
         } as DebtorExpense));
     });
@@ -415,13 +619,13 @@ export class ExpenseGenerationCounterView2Component {
   private processTop5Debtors(): DebtorInfo[] {
     const debtorsMap = new Map<number, DebtorInfo>();
     const debtors: DebtorInfo[] = [];
-    
+   
     const filteredData = this.counterData.filter(transaction => {
       const transactionPeriod = this.convertPeriodToYearMonth(transaction.period);
-      return transactionPeriod >= this.periodFrom && 
+      return transactionPeriod >= this.periodFrom &&
              transactionPeriod <= this.periodTo;
     });
-  
+ 
     filteredData.forEach(transaction => {
       const owner = this.owners.find(o => o.id === transaction.ownerId);
       const currentDebtorInfo = debtorsMap.get(transaction.ownerId) || {
@@ -434,51 +638,54 @@ export class ExpenseGenerationCounterView2Component {
         unpaidBills: 0,
         oldestDebtDate: undefined
       };
-  
+ 
       currentDebtorInfo.totalBills++;
-  
+ 
       if (transaction.status !== 'Pago') {
         const daysOverdue = this.calculateDaysOverdue(transaction.secondExpirationDate);
-        const debtDate = new Date(
-          transaction.secondExpirationDate[0],
-          transaction.secondExpirationDate[1] - 1,
-          transaction.secondExpirationDate[2]
-        );
-  
-        currentDebtorInfo.totalDebt += transaction.firstExpirationAmount;
-        currentDebtorInfo.unpaidBills++;
-  
-        if (!currentDebtorInfo.oldestDebtDate || debtDate < currentDebtorInfo.oldestDebtDate) {
-          currentDebtorInfo.oldestDebtDate = debtDate;
-          currentDebtorInfo.oldestDebtDays = daysOverdue;
+        
+        // Solo procesar si hay al menos 1 día de mora
+        if (daysOverdue > 0) {
+          const debtDate = new Date(
+            transaction.secondExpirationDate[0],
+            transaction.secondExpirationDate[1] - 1,
+            transaction.secondExpirationDate[2]
+          );
+   
+          currentDebtorInfo.totalDebt += transaction.firstExpirationAmount;
+          currentDebtorInfo.unpaidBills++;
+   
+          if (!currentDebtorInfo.oldestDebtDate || debtDate < currentDebtorInfo.oldestDebtDate) {
+            currentDebtorInfo.oldestDebtDate = debtDate;
+            currentDebtorInfo.oldestDebtDays = daysOverdue;
+          }
+   
+          const currentTotalDays = currentDebtorInfo.averageDebtDays * (currentDebtorInfo.unpaidBills - 1);
+          currentDebtorInfo.averageDebtDays =
+            (currentTotalDays + daysOverdue) / currentDebtorInfo.unpaidBills;
         }
-  
-        const currentTotalDays = currentDebtorInfo.averageDebtDays * (currentDebtorInfo.unpaidBills - 1);
-        currentDebtorInfo.averageDebtDays = 
-          (currentTotalDays + daysOverdue) / currentDebtorInfo.unpaidBills;
       }
-  
+ 
       debtorsMap.set(transaction.ownerId, currentDebtorInfo);
       debtors.push(currentDebtorInfo)
     });
-
     this.top5Data = debtors;
     console.log("TOP 5 DATA: " +this.top5Data);
-  
+ 
     return Array.from(debtorsMap.values())
       .filter(debtor => {
-        const meetsDebtRange = 
-          debtor.totalDebt >= this.debtRangeMin && 
+        const meetsDebtRange =
+          debtor.totalDebt >= this.debtRangeMin &&
           debtor.totalDebt <= this.debtRangeMax;
-        
+       
         const hasUnpaidBills = debtor.unpaidBills > 0;
-        
+       
         return meetsDebtRange && hasUnpaidBills;
       })
       .sort((a, b) => {
         const debtDiff = b.totalDebt - a.totalDebt;
         if (debtDiff !== 0) return debtDiff;
-        
+       
         return b.oldestDebtDays - a.oldestDebtDays;
       })
       .slice(0, 5); // Tomar solo los top 5
@@ -561,8 +768,8 @@ export class ExpenseGenerationCounterView2Component {
         return transactionPeriod >= this.periodFrom &&
                transactionPeriod <= this.periodTo &&
                meetsPaymentMethodFilter &&
-               (transaction.status === 'Pago' || transaction.status === 'PAGO') &&  // Modificado para manejar ambos casos
-               transaction.amountPayed != null &&  // Cambio importante
+               (transaction.status === 'Pago' || transaction.status === 'PAGO') &&  
+               transaction.amountPayed != null && 
                transaction.amountPayed > 0;
       })
       .forEach(transaction => {
@@ -628,7 +835,6 @@ export class ExpenseGenerationCounterView2Component {
       }
     });
 
-    // Actualizar KPIs
     this.columnKpis[0].amount = totalProjected;
     this.columnKpis[3].amount = totalIncome;
     this.columnKpis[2].amount = maxIncome;
@@ -785,7 +991,6 @@ export class ExpenseGenerationCounterView2Component {
   
     console.log('Plataforma top:', topPlatformEntry);
   
-    // Actualizar KPIs principales
     this.principalKpis[0].amount = totalIncome;
     this.principalKpis[1].amount = totalDebt;
     this.principalKpis[2].amount = delinquentCount;
@@ -815,11 +1020,9 @@ export class ExpenseGenerationCounterView2Component {
       return '';
     }
     try {
-      // Si ya está en formato YYYY-MM, lo devuelve directamente
       if (typeof period === 'string' && /^\d{4}-\d{2}$/.test(period)) {
         return period;
       }
-      // Maneja el nuevo formato "MM/YYYY"
       if (typeof period === 'string' && /^\d{2}\/\d{4}$/.test(period)) {
         const [month, year] = period.split('/');
         return `${year}-${month.padStart(2, '0')}`;

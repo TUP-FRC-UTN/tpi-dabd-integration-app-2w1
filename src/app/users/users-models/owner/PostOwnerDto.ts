@@ -3,15 +3,15 @@ export class OwnerModel {
     lastname: string;
     dni: string;
     dni_type_id: number;
-    dateBirth: Date;
+    dateBirth: Date | null;
     ownerTypeId: number;
     taxStatusId: number;
     businessName?: string;
     active: boolean;
     username: string;
     password: string;
-    email: string;
-    phoneNumber: string;
+    email: string | null;
+    phoneNumber: string | null;
     avatarUrl: string;
     roles: string[];
     userCreateId: number;

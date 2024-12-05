@@ -9,6 +9,9 @@ import { RoutingService } from '../../../../common/services/routing.service';
 import Swal from 'sweetalert2';
 import { PlotService } from '../../../../users/users-servicies/plot.service';
 import { HttpClient } from '@angular/common/http';
+import { Subscription } from 'rxjs';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 
 @Component({
   selector: 'app-report-modify',
@@ -34,11 +37,34 @@ export class ReportModifyComponent implements OnInit {
   modalInstance: any;
   formType = 'modify';
 
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
+
   constructor(private complaintService: ComplaintService,
      private reportService: SanctionService,
        route: ActivatedRoute,
-       private routingService: RoutingService
+       private routingService: RoutingService, 
+       private tutorialService: TutorialService
       ) {
+        this.tour = new Shepherd.Tour({
+          defaultStepOptions: {
+            cancelIcon: {
+              enabled: true,
+            },
+            arrow: false,
+            canClickTarget: false,
+            modalOverlayOpeningPadding: 10,
+            modalOverlayOpeningRadius: 10,
+            scrollTo: {
+              behavior: 'smooth',
+              block: 'center'
+            }
+          },
+          keyboardNavigation: false,
+
+          useModalOverlay: true,
+        }); 
     this.route = route;
   }
 
@@ -61,6 +87,138 @@ export class ReportModifyComponent implements OnInit {
         console.log(params);
       }
     });
+
+    //TUTORIAL
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    ); 
+  }
+
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    };
+    while (this.tour.steps.length > 0) {
+      this.tour.removeStep(this.tour.steps[this.tour.steps.length - 1].id);
+    }
+
+    // CÓDIGO PARA PREVENIR SCROLLEO DURANTE TUTORIAL
+    const preventScroll = (e: Event) => {
+      e.preventDefault();
+    };
+
+    const restoreScroll = () => {
+      document.body.style.overflow = 'auto';
+      window.removeEventListener('wheel', preventScroll);
+      window.removeEventListener('touchmove', preventScroll);
+    };
+
+    // Al empezar, lo desactiva
+    this.tour.on('start', () => {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('wheel', preventScroll, { passive: false });
+      window.addEventListener('touchmove', preventScroll, { passive: false });
+    });
+
+    // Al completar lo reactiva, al igual que al cancelar
+    this.tour.on('complete', restoreScroll);
+    this.tour.on('cancel', restoreScroll);
+    
+    this.tour.addStep({
+      id: 'general-step',
+      title: 'Editar Informe',
+      text: 'En este formulario puede editar la información del informe.',
+      attachTo: {
+        element: '#formDenuncia',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+
+
+    this.tour.addStep({
+      id: 'description-step',
+      title: 'Descripción',
+      text: 'Acá puede editar la descripción del informe.',
+      attachTo: {
+        element: '#reportDescription',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'complaint-step',
+      title: 'Adjuntar Denuncias',
+      text: 'Este botón abrirá una ventana donde podrá visualizar y seleccionar denuncias...',
+      attachTo: {
+        element: '#complaintModal',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back,
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        },
+      ],
+    });
+
+    
+    this.tour.addStep({
+      id: 'final-step',
+      title: 'Guardar',
+      text: 'Finalmente, haga click en el botón azul para guardar los cambios realizados.',
+      attachTo: {
+        element: '#saveButton',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+      
+    });
+
+    this.tour.start();
+  }
+
+  ngOnDestroy(): void {
+    //TUTORIAL
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
   }
 
   loadSelectedComplaints(reportId: number): void {
@@ -89,21 +247,7 @@ export class ReportModifyComponent implements OnInit {
   }
 
   updateReport(): void {
-    Swal.fire({
-      title: '¿Está seguro?',
-      text: '¿Desea actualizar el informe?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Actualizar',
-      cancelButtonText: 'Cancelar',
-      reverseButtons: true, 
-      customClass: {
-        confirmButton: 'btn btn-success ms-2',
-        cancelButton: 'btn btn-secondary'
-      },
-      buttonsStyling: false
-    }).then((result) => {
-      if (result.isConfirmed) {
+    
         const userId = 1;
 
         const complaintsIds = this.selectedComplaints.length > 0
@@ -136,8 +280,7 @@ export class ReportModifyComponent implements OnInit {
           });
         });
       }
-    });
-  }
+ 
 
   cancel(){
     this.routingService.redirect("main/sanctions/report-list", "Listado de Informes")

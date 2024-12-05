@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators, AbstractControl } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { PlotService } from '../../../users-servicies/plot.service';
 import { PlotTypeModel } from '../../../users-models/plot/PlotType';
@@ -12,6 +12,10 @@ import { ValidatorsService } from '../../../users-servicies/validators.service';
 import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
 import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
 import { RoutingService } from '../../../../common/services/routing.service';
+import { min } from 'moment';
+import { Subscription } from 'rxjs';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 
 @Component({
   selector: 'app-users-new-plot',
@@ -21,6 +25,9 @@ import { RoutingService } from '../../../../common/services/routing.service';
   styleUrl: './users-new-plot.component.css'
 })
 export class UsersNewPlotComponent implements OnInit, OnDestroy {
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
 
   showOwners: boolean = false;
 
@@ -39,7 +46,27 @@ export class UsersNewPlotComponent implements OnInit, OnDestroy {
   files: File[] = [];
   formReactivo: FormGroup;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private tutorialService: TutorialService
+  ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+        scrollTo: {
+          behavior: 'smooth',
+          block: 'center'
+        }
+      },
+      keyboardNavigation: false,
+
+      useModalOverlay: true,
+    }); 
+
     this.formReactivo = this.fb.group({
       plotNumber: new FormControl(1, [
         Validators.required, Validators.min(1),
@@ -68,27 +95,143 @@ export class UsersNewPlotComponent implements OnInit, OnDestroy {
 
     //Validar que la superficie construida no sea mayor a la superficie total, cuando se cambia la superficie construida
     const sus = this.formReactivo.get('totalBuild')?.valueChanges.subscribe(() => {
-      this.formReactivo.get('totalBuild')?.setValidators([Validators.max(this.formReactivo.get('totalArea')?.value)]);
+      this.formReactivo.get('totalBuild')?.setValidators([Validators.max(this.formReactivo.get('totalArea')?.value), Validators.min(0)]);
     });
 
-    //Validar que la superficie construida no sea mayor a la superficie total, cuando se cambia la superficie total
-    const sus1 = this.formReactivo.get('totalArea')?.valueChanges.subscribe(() => {
-      this.formReactivo.get('totalBuild')?.setValidators([Validators.max(this.formReactivo.get('totalArea')?.value)]);
+    const sus2 = this.formReactivo.get('totalArea')?.valueChanges.subscribe(() => {
+      this.formReactivo.get('totalBuild')?.setValidators([Validators.max(this.formReactivo.get('totalArea')?.value), Validators.min(0)]);
     });
 
-    //Agregar suscripciones
-    [sus, sus1].forEach(s => s && this.suscriptionService.addSuscription(s));
+    const sus3 = this.formReactivo.get('type')?.valueChanges.subscribe(() => {
+        if(this.formReactivo.get('type')?.value == 3){
+          this.formReactivo.get('totalBuild')?.setValue(0);
+          this.formReactivo.get('totalBuild')?.disable();
+        }else{
+          this.formReactivo.get('totalBuild')?.enable();
+        }
+    });
+    
+    //Agregar suscripción
+    [sus, sus2, sus3].forEach(s => s && this.suscriptionService.addSuscription(s));
+
   }
 
   ngOnInit(): void {
     this.loadAllStates();
     this.loadAllTypes();
+
+      //TUTORIAL
+      this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+        () => {
+          this.startTutorial();
+        }
+      ); 
+  
   }
+ 
 
   ngOnDestroy(): void {
     this.suscriptionService.unsubscribeAll();
+
+    //TUTORIAL
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
   }
 
+
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    // CÓDIGO PARA PREVENIR SCROLLEO DURANTE TUTORIAL
+    const preventScroll = (e: Event) => {
+      e.preventDefault();
+    };
+
+    const restoreScroll = () => {
+      document.body.style.overflow = 'auto';
+      window.removeEventListener('wheel', preventScroll);
+      window.removeEventListener('touchmove', preventScroll);
+    };
+
+    // Al empezar, lo desactiva
+    this.tour.on('start', () => {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('wheel', preventScroll, { passive: false });
+      window.addEventListener('touchmove', preventScroll, { passive: false });
+    });
+
+    // Al completar lo reactiva, al igual que al cancelar
+    this.tour.on('complete', restoreScroll);
+    this.tour.on('cancel', restoreScroll);
+    
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Alta de lote',
+      text: 'Acá puede realizar la alta de un nuevo lote. Recuerde agregar todos los campos necesarios, procurando no equivocarse en ninguno.',
+      attachTo: {
+        element: '#addPlot',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        },
+      ],
+    });
+
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Añadir archivos',
+      text: 'Acá puede subir archivos relevantes al lote, como documentos o imágenes relacionadas.',
+      attachTo: {
+        element: '#files',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back,
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        },
+      ],
+    });
+
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Envio de formulario',
+      text: 'Al finalizar, presione este botón para registrar el nuevo lote.',
+      attachTo: {
+        element: '#register',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back,
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete,
+        },
+      ],
+    });
+
+    this.tour.start();
+  }
   //--------------------------------------------------Carga de datos--------------------------------------------------
 
   //Cargar todos los estados de lote

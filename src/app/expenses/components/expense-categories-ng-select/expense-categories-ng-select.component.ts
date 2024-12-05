@@ -90,4 +90,8 @@ export class ExpenseCategoriesNgSelectComponent implements OnInit, OnDestroy {
   get selectValue() {
     return this.multiple ? this.selectedCategories : this.selectedCategory;
   }
+
+  reloadCategories(): void {
+    this.loadCategories();
+  }
 }

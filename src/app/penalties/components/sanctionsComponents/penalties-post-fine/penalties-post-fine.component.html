@@ -1,5 +1,5 @@
 <section class="py-5">
-  <div class="container p-3 border border-2 rounded shadow-lg">
+  <div class="container p-3 border border-2 rounded shadow-lg" id="page">
 
     <form [formGroup]="reactiveForm" (ngSubmit)="onSubmit()">
       <div class="row">
@@ -29,10 +29,10 @@
         </div>
 
         <!-- Radio multa/advertencia -->
-        <div class="col-lg-6 mb-3">
+        <div class="col-lg-6 mb-3" id="sanctionType">
           <div class="row">
             <div class="col-2 col-form-label">
-              <label for="reportReason" class="me-2">Tipo de Infracción</label>
+              <label for="reportReason" class="me-2">Tipo de Sanción</label>
             </div>
             <div class="col-10">
               <div class="form-check">
@@ -83,7 +83,7 @@
         <div class="row">
           <div class="col d-flex justify-content-end gap-3">
             <button type="button" class="btn btn-secondary me-3" (click)="cancel()">Cancelar</button>
-            <button type="submit" class="btn btn-success"
+            <button type="submit" class="btn btn-success" id="sendButton"
               [disabled]="reactiveForm.invalid || (newFine && reactiveForm.get('amount')?.value === 0)">Registrar</button>
           </div>
         </div>
@@ -104,11 +104,15 @@
       <div class="modal-body">
         <!-- body con tus inputs -->
         <p>
-          En este apartado podrá registrar una infracción en base al informe seleccionado.
-        </p>
-        <p>
-          La infracción podrá ser una multa (con un monto base establecido) o una advertencia, sin monto.
-        </p>
+          Aquí se puede realizar el alta de una multa o advertencia con sus datos correspondientes. La infracción incluye la siguiente información:
+        </p>                
+        <ul>
+          <li><b>Infractor: </b>Muestra el Lote al cual irá dirigida la infracción.</li>
+          <li><b>Motivo: </b>Motivo por el cual se registrará la infracción.</li>
+          <li><b>Tipo de infracción: </b>Aquí puede elegir si la misma será una multa o una advertencia. En caso de ser una multa, se podrá elegir el importe destinado a la misma, el cual se podrá modificar.</li>
+          <li><b>Descripción: </b>Aquí se verá el por qué se realiza la infracción con ese motivo, correspondiente al informe seleccionado.</li>
+        </ul>
+        <p>Al completar todos los campos de forma correcta, podrá hacer click en el botón Registrar para enviar la información. En caso de hacer click en el botón Cancelar, podrá volver hacia el listado de informes.</p>
         </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>

@@ -8,33 +8,29 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body overflow-auto" style="max-height: 500px;">
-                <table class="table table-bordered">
+                <table class="table table-striped table-hover border border-2">
                     <thead>
                         <tr>
                             <th>Tipo de Denuncia</th>
+                            <th>Descripcion</th>
                             <th>Estado</th>
                             <th>Fecha</th>
                             <th>Seleccionar</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let complaint of complaints">
-                            <td>
-                                @if (complaint?.complaintReason==="Otro"){
-                                    <p> {{ complaint?.complaintReason + " - " + complaint?.anotherReason || 'N/A' }}</p>
-                      
-                                  }
-                                  @else {
-                                    <p> {{ complaint?.complaintReason || 'N/A' }}</p>
-                                  }
-                            </td>
-                            
-                            <td>{{ complaint.complaintState }}</td>
-                            <td>{{ complaint.createdDate | date:"dd/MM/yyyy" }}</td>
+                        @for (complaint of filteredComplaints; track $index) {
+                        <tr>
+                            <td>{{ getComplaintReason(complaint) }}</td>
+                            <td>{{ (complaint?.description) || 'N/A' }}</td>
+                            <td>{{ (complaint?.complaintState) || 'N/A' }}</td>
+                            <td>{{ (complaint?.createdDate | date:"dd/MM/yyyy") || 'N/A' }}</td>
                             <td class="text-center">
-                                <input type="checkbox" [(ngModel)]="complaint.selected">
+                                <input type="checkbox" class="form-check-input border border-2" [(ngModel)]="complaint.selected">
                             </td>
                         </tr>
+                        }
+
                     </tbody>
                 </table>
             </div>

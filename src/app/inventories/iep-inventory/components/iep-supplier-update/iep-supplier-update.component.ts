@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule, RouterOutlet } from '@angular/router';
 import { SuppliersService } from '../../services/suppliers.service';
 import { Supplier } from '../../models/suppliers';
@@ -6,6 +6,9 @@ import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModu
 import { CommonModule } from '@angular/common';
 import Swal from 'sweetalert2';
 import { AuthService } from '../../../../users/users-servicies/auth.service';
+import { Subscription } from 'rxjs';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 
 @Component({
   selector: 'app-iep-supplier-update',
@@ -14,11 +17,134 @@ import { AuthService } from '../../../../users/users-servicies/auth.service';
   templateUrl: './iep-supplier-update.component.html',
   styleUrl: './iep-supplier-update.component.css'
 })
-export class IepSupplierUpdateComponent implements OnInit{
-
+export class IepSupplierUpdateComponent implements OnInit,OnDestroy{
+//TUTORIAL
+tutorialSubscription = new Subscription();
+private tour: Shepherd.Tour;
   proveedorForm!: FormGroup;
   id:number=0;
 
+  constructor(private activateRoute:ActivatedRoute,private supplierService:SuppliersService,private fb: FormBuilder,
+    private router:Router,private userService : AuthService, private tutorialService: TutorialService
+  ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+        scrollTo: {
+          behavior: 'smooth',
+          block: 'center'
+        }
+      },
+      keyboardNavigation: false,
+      useModalOverlay: true,
+    })}
+    
+    
+    ngOnDestroy(): void {
+//TUTORIAL
+this.tutorialSubscription.unsubscribe();
+if (this.tour) {
+  this.tour.complete();
+}
+
+if (this.tutorialSubscription) {
+  this.tutorialSubscription.unsubscribe();
+} 
+}
+; 
+startTutorial() {
+  if (this.tour) {
+    this.tour.complete();
+  }
+
+  // CÓDIGO PARA PREVENIR SCROLLEO DURANTE TUTORIAL
+  const preventScroll = (e: Event) => {
+    e.preventDefault();
+  };
+
+  const restoreScroll = () => {
+    document.body.style.overflow = 'auto';
+    window.removeEventListener('wheel', preventScroll);
+    window.removeEventListener('touchmove', preventScroll);
+  };
+
+  // Al empezar, lo desactiva
+  this.tour.on('start', () => {
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('wheel', preventScroll, { passive: false });
+    window.addEventListener('touchmove', preventScroll, { passive: false });
+  });
+
+  // Al completar lo reactiva, al igual que al cancelar
+  this.tour.on('complete', restoreScroll);
+  this.tour.on('cancel', restoreScroll);
+  
+  this.tour.addStep({
+    id: 'intro-step',
+    title: 'Formulario para editar un proveedor',
+    text: 'Acá puede editar la información de un proveedor con los datos que indique.',
+    attachTo: {
+      element: '#pantalla',
+      on: 'auto'
+    },
+    buttons: [
+      {
+        text: 'Siguiente',
+        action: this.tour.next,
+      }
+    ]
+  });
+
+  this.tour.addStep({
+    id: 'type-step',
+    title: 'Tipo de proveedor',
+    text: 'Desde acá podrá seleccionar el tipo de proveedor.', 
+      attachTo: {
+      element: '#combo',
+      on: 'auto'
+    },
+    buttons: [
+      {
+        text: 'Anterior',
+        action: this.tour.back
+      },
+      {
+        text: 'Siguiente',
+        action: this.tour.next,
+      }
+    ]
+    
+  });
+  this.tour.addStep({
+    id: 'submit-step',
+    title: 'Guardar',
+    text: 'Para finalizar haga click en Guardar para guardar los cambios realizados.',
+      attachTo: {
+      element: '#registrar',
+      on: 'auto'
+    },
+    buttons: [
+      {
+        text: 'Anterior',
+        action: this.tour.back
+      },
+      {
+        text: 'Finalizar',
+        action: this.tour.complete
+      }
+    ]
+    
+  });
+
+
+  this.tour.start();
+}
 
   onSubmit() {
 
@@ -87,6 +213,12 @@ export class IepSupplierUpdateComponent implements OnInit{
     });
   
     this.searchSupplier();
+     //TUTORIAL
+     this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    ); 
   }
   
   searchSupplier() {
@@ -129,6 +261,5 @@ export class IepSupplierUpdateComponent implements OnInit{
     return control ? control.invalid && (control.touched || control.dirty) : false;
   }
   
-constructor(private activateRoute:ActivatedRoute,private supplierService:SuppliersService,private fb: FormBuilder,private router:Router,private userService : AuthService){}
 
 }

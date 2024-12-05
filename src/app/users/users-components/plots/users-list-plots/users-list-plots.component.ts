@@ -20,6 +20,12 @@ import { CustomSelectComponent } from '../../../../common/components/custom-sele
 import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
 import { RoutingService } from '../../../../common/services/routing.service';
 import { UsersTransferPlotComponent } from "../users-transfer-plot/users-transfer-plot.component";
+import { UserService } from '../../../users-servicies/user.service';
+import { GetuserDto } from '../../../users-models/users/GetUserDto';
+import { UserGet } from '../../../users-models/users/UserGet';
+import { Subscription } from 'rxjs';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 
 @Component({
   selector: 'app-users-list-plots',
@@ -29,9 +35,15 @@ import { UsersTransferPlotComponent } from "../users-transfer-plot/users-transfe
   styleUrl: './users-list-plots.component.css'
 })
 export class UsersListPlotsComponent implements OnInit, OnDestroy {
+
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
+  
   plots: GetPlotModel[] = [];
   private readonly plotService = inject(PlotService);
   private readonly ownerService = inject(OwnerService);
+  private readonly userService = inject(UserService);
   showDeactivateModal: boolean = false;
   userToDeactivate: number = 0;
 
@@ -50,15 +62,53 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
   private readonly suscriptionService = inject(SuscriptionManagerService);
   private readonly routingService = inject(RoutingService);
 
-  constructor(private modal: NgbModal) { }
+  constructor(private modal: NgbModal, private tutorialService: TutorialService
+  ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+        scrollTo: {
+          behavior: 'smooth',
+          block: 'center'
+        }
+      },
+      keyboardNavigation: false,
+
+      useModalOverlay: true,
+    }); 
+ }
 
   ngOnDestroy(): void {
     this.suscriptionService.unsubscribeAll();
+
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
   }
 
   async ngOnInit() {
+      //TUTORIAL
+      this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+        () => {
+          this.startTutorial();
+        }
+      ); 
+
+      
     this.loadAllPlotsStates();
     this.loadAllPlotsTypes();
+
 
     const sus = this.plotService.getAllPlots().subscribe({
       next: async (data: GetPlotModel[]) => {
@@ -92,12 +142,12 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
               owners[index] // Usar el nombre del propietario cargado
             ]),
             columns: [
-              { title: 'Lote', width: '10%', className: 'text-start' },
-              { title: 'Manzana', width: '10%', className: 'text-start' },
-              { title: 'Mts.2 Terreno', width: '15%', className: 'text-start' },
-              { title: 'Mts.2 Construidos', width: '15%', className: 'text-start' },
-              { title: 'Tipo Lote', width: '15%', className: 'text-start' },
-              { title: 'Estado', width: '15%', className: 'text-start' },
+              { title: 'Lote', width: '10%', className: 'text-end' },
+              { title: 'Manzana', width: '10%', className: 'text-end' },
+              { title: 'Mts.2 Terreno', width: '15%', className: 'text-end' },
+              { title: 'Mts.2 Construidos', width: '15%', className: 'text-end' },
+              { title: 'Tipo Lote', width: '15%', className: 'text-center' },
+              { title: 'Estado', width: '15%', className: 'text-center' },
               { title: 'Propietario', width: '15%', className: 'text-start' }, // Nueva columna
               {
           title: 'Acciones',
@@ -108,7 +158,7 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
             const plotId = this.plots[meta.row].id;
             return `
               <div class="dropdown-center d-flex align-items-center justify-content-center">
-                <button class="btn btn-light border border-1" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <button class="btn btn-light border border-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="actions">
             <i class="bi bi-three-dots-vertical"></i>
                 </button>
                 <ul class="dropdown-menu">
@@ -184,6 +234,115 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
     //Agregar servicio
     this.suscriptionService.addSuscription(sus);
 
+  }
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    // CÓDIGO PARA PREVENIR SCROLLEO DURANTE TUTORIAL
+    const preventScroll = (e: Event) => {
+      e.preventDefault();
+    };
+
+    const restoreScroll = () => {
+      document.body.style.overflow = 'auto';
+      window.removeEventListener('wheel', preventScroll);
+      window.removeEventListener('touchmove', preventScroll);
+    };
+
+    // Al empezar, lo desactiva
+    this.tour.on('start', () => {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('wheel', preventScroll, { passive: false });
+      window.addEventListener('touchmove', preventScroll, { passive: false });
+    });
+
+    // Al completar lo reactiva, al igual que al cancelar
+    this.tour.on('complete', restoreScroll);
+    this.tour.on('cancel', restoreScroll);
+    
+    console.log('EMPEZANDO TUTORIAL');
+    this.tour.addStep({
+      id: 'profile-step',
+      title: 'Lista de lotes',
+      text: 'Acá puede ver una lista de los lotes presentes en el barrio, junto con su ubicación, sus datos de construcción, su estado actual y su propietario.',
+
+      attachTo: {
+        element: '#myTablePlot',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        },
+      ],
+    });
+
+    this.tour.addStep({
+      id: 'edit-step',
+      title: 'Filtros',
+      text: 'Desde acá podrá filtrar los lotes. También puede exportar la lista a Excel o PDF, o borrar los filtros aplicados con el botón de basura.',
+      attachTo: {
+        element: '#filtros',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back,
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        },
+      ],
+    });
+
+    this.tour.addStep({
+      id: 'profile-step',
+      title: 'Acciones',
+      text: 'Desde acá puede ver las acciones disponibles para cada lote. Puede editar el perfil, borrar el usuario o ver más información.',
+
+      attachTo: {
+        element: '#actions',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back,
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        },
+      ],
+    });
+    
+    this.tour.addStep({
+      id: 'profile-step',
+      title: 'Agregar',
+      text: 'Para agregar una propiedad, pulse este botón y será enviado al alta de lotes.',
+
+      attachTo: {
+        element: '#addPlot',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back,
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete,
+        },
+      ],
+    });
+
+    this.tour.start();
   }
   //--------------------------------------------------Carga de datos--------------------------------------------------
 
@@ -279,8 +438,8 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
       //Agregar servicio
       this.suscriptionService.addSuscription(sus);
     });
-
   }
+
 
   //--------------------------------------------------Filtros------------------------------------------------
 

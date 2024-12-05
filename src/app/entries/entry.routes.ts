@@ -1,5 +1,10 @@
 import { Routes } from "@angular/router";
 import { AccessVehiclesViewComponent } from "./components/access_vehicles-register/access-vehicles-view/access-vehicles-view.component";
+import { AccessContainerVisitorsRegistrationComponent } from "./components/access_visitors/access_visitors_register/access-container-visitors-registration/access-container-visitors-registration.component";
+import { MetricsComponent } from "./components/metrics/metrics.component";
+import { authGuard } from "../users/guards/auth.guard";
+import { roleGuard } from "../users/guards/role.guard";
+import { AccessGlobalReportComponent } from "./components/entries_reports/entries-global-report/access-global-report.component";
 import { AccessRegisterVisitorsComponent } from "./components/access_visitors/access_visitors_register/access-register-visitors/access-register-visitors.component";
 import { roleWhitelistGuard } from "./guards/role-whitelist.guard";
 import { AccesesUpdateAccesesComponent } from "./components/access_visitors/acceses-update-acceses/acceses-update-acceses/acceses-update-acceses.component";

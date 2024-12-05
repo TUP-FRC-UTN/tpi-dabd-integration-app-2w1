@@ -51,23 +51,23 @@
           <app-users-kpi class="mb-3" title="Baldíos" icon="bi bi-tree" [amount]="emptyLots"
             [customStyles]="{ 'background-color': '#d8ffedde' }" tooltip="Cantidad de lotes sin construcción"
             formatPipe="text">
-          </app-users-kpi>  
+          </app-users-kpi>
         </div>
 
         <div class="col-md-9">
           @if(loadingPieChart){
-            <div class="loading">Cargando...</div>
-            }
-  
-            <div *ngIf="errorPieChart" class="error-container">
-              <i class="bi bi-exclamation-triangle-fill error-icon"></i>
-              <p>{{ errorPieChart }}</p>
-            </div>
-            @if(!loadingPieChart && !errorPieChart){
-  
-            <google-chart [type]="pieChart" [data]="plotStateData" [options]="pieChartOptions" [height]="300">
-            </google-chart>
-            }
+          <div class="loading">Cargando...</div>
+          }
+
+          <div *ngIf="errorPieChart" class="error-container">
+            <i class="bi bi-exclamation-triangle-fill error-icon"></i>
+            <p>{{ errorPieChart }}</p>
+          </div>
+          @if(!loadingPieChart && !errorPieChart){
+
+          <google-chart [type]="pieChart" [data]="plotStateData" [options]="pieChartOptions" [height]="300">
+          </google-chart>
+          }
         </div>
       </div>
     </div>
@@ -97,6 +97,54 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
         <!-- <button type="button" class="btn btn-primary" (click)="applyAdvancedFilters()">Aplicar Filtro</button> -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="infoModal" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Reporte</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <ul>
+          <li>
+            <p>
+              <strong>Estado de los Lotes</strong>:
+              Este gráfico ofrece un análisis del estado actual de los lotes. Incluye cuatro KPI que 
+              muestran la cantidad total de lotes, la cantidad de lotes residenciales, la cantidad de
+              lotes comerciales y la cantidad de lotes baldíos.
+            </p>
+            <p>
+              El gráfico circular muestra la distribución de los lotes según su estado actual. Los
+              colores representan los siguientes estados:
+            </p>
+            <ul>
+              <li>Disponible: Representado en color azul.</li>
+              <li>Habitado: Representado en color verde.</li>
+              <li>En construcción: Representado en color rojo.</li>
+            </ul>
+          <li>
+            <strong>Botones</strong>:
+            <ul>
+              <li><button class="btn btn-primary bi bi-funnel-fill mb-2"></button> Permite aplicar filtros
+                avanzados.
+              </li>
+              <li><button class="btn btn-secondary bi bi-trash mb-2"></button> Elimina los filtros
+                avanzados aplicados.
+              </li>
+              <li><button class="btn btn-sm btn-link text-muted bi bi-arrow-left fs-5"></button> Vuelve a
+                la pantalla
+                principal.</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
       </div>
     </div>
   </div>

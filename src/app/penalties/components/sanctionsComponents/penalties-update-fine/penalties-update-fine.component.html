@@ -1,5 +1,5 @@
 <section class="py-5">
-  <div class="container p-3 border border-2 rounded shadow-lg">
+  <div class="container p-3 border border-2 rounded shadow-lg" id="page">
     <!-- Datos de la multa -->
     <div class="row mb-3">
 
@@ -44,7 +44,7 @@
       <div class="row flex-row-reverse">
 
         <!-- Importe -->
-        <div class="col-lg-6 mb-3">
+        <div class="col-lg-6 mb-3" id="amount">
           <div class="row">
             <label class="col-2 col-form-label">Importe $</label>
             <div class="col-10">
@@ -58,7 +58,7 @@
         <div class="buttons-box d-flex justify-content-end">
           <div class="submit-box">
             <button type="button" class="btn btn-secondary me-3" (click)="cancel()">Cancelar</button>
-            <button type="submit" class="btn btn-success" [disabled]="reactiveForm.invalid">Guardar</button>
+            <button type="submit" class="btn btn-success" [disabled]="reactiveForm.invalid" id="saveButton">Guardar</button>
           </div>
         </div>
       </div>
@@ -79,11 +79,16 @@
       <div class="modal-body">
         <!-- body con tus inputs -->
         <p>
-          En este apartado podrá modificar el valor relacionado con la multa
-          seleccionada.
+          Aquí se puede realizar la modificación del importe de una multa. La multa incluye la siguiente información:
         </p>
+        <ul>
+          <li><b>Motivo: </b>Motivo por el cuál se registró la multa. El campo no se puede modificar.</li>
+          <li><b>Fecha: </b>Fecha en la cuál se registró la multa. El campo no se puede modificar.</li>
+          <li><b>Descripción: </b>Descripción que acompaña a la razón de la multa. El campo no se puede modificar.</li>
+          <li><b>Importe: </b>Aquí estará el importe con el cuál se creó la multa. El mismo puede ser modificado en base a la multa correspondiente.</li>
+        </ul>
         <p>
-          Recuerde que cambiar el precio no es una decisión menor; asegúrese de
+          Recuerde que cambiar el importe no es una decisión menor; asegúrese de
           estar seguro antes de realizar el cambio.
         </p>
       </div>

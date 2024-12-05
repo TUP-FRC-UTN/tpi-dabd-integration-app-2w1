@@ -2,12 +2,13 @@ import { Component, inject, Input, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { SanctionService } from '../../../../services/sanctions.service';
 import { FormsModule } from '@angular/forms';
-import { DatePipe } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
+import { SanctionsDTO } from '../../../../models/SanctionsDTO';
 
 @Component({
   selector: 'app-penalties-modal-report',
   standalone: true,
-  imports: [FormsModule,DatePipe],
+  imports: [FormsModule,DatePipe, CommonModule],
   templateUrl: './penalties-get-report-modal.component.html',
   styleUrl: './penalties-get-report-modal.component.scss'
 })
@@ -18,13 +19,12 @@ export class PenaltiesModalReportComponent implements OnInit{
   public service = inject(SanctionService)
   @Input() id:number = 0
   report: any;
-  constructor(public activeModal: NgbActiveModal){
+  advetencias : SanctionsDTO[] = [];
+  constructor(public activeModal: NgbActiveModal, private reportServices: SanctionService) {
 
   }
   ngOnInit(): void {
-    //throw new Error('Method not implemented.');
     this.getReport()
-    //alert(this.data.createdDate) 
   }
 
 
@@ -32,14 +32,8 @@ export class PenaltiesModalReportComponent implements OnInit{
     this.activeModal.close()
   }
 
-
-  // Fetches the report details using the provided ID.
   
-  // This method calls `getById()` on the injected service with the specified ID
-  // and subscribes to handle the response. On success, it assigns the response to `report`
-  // and formats the date using the service's `formatDate()` method.
-  
-  // In case of an error, it logs an error message in the console.
+  //Busca el informe en especifico
   getReport(){
     this.service.getById(this.id)
     .subscribe(
@@ -52,6 +46,16 @@ export class PenaltiesModalReportComponent implements OnInit{
       (error) => {
         console.error('Error:', error);
       });
+      
+      this.reportServices.getAllSactions().subscribe(
+        response => {
+          this.advetencias = response.filter((a)=>a.reportId==this.id && a.fineState==null);
+          console.log(response)
+          console.log(this.advetencias)
+        }, error => {
+          alert(error)
+        }
+      )
   }
   
 

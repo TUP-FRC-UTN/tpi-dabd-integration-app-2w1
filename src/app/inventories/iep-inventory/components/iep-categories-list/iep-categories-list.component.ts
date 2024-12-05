@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import { PutCategoryDTO } from '../../models/putCategoryDTO';
@@ -13,6 +13,9 @@ import { ProductService } from '../../services/product.service';
 import * as XLSX from 'xlsx';
 import { NgSelectModule } from '@ng-select/ng-select';
 import $ from 'jquery';
+import { Subscription } from 'rxjs';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 
 declare var bootstrap: any; // Añadir esta declaración al principio
 @Component({
@@ -22,7 +25,11 @@ declare var bootstrap: any; // Añadir esta declaración al principio
   imports: [CommonModule, ReactiveFormsModule, RouterModule, FormsModule, NgSelectModule],
   standalone: true
 })
-export class IepCategoriesListComponent implements OnInit {
+export class IepCategoriesListComponent implements OnInit, OnDestroy {
+    //TUTORIAL
+    tutorialSubscription = new Subscription();
+    private tour: Shepherd.Tour;
+
   selectedStatuses: string[] = [];
   statusOptions = [
     { id: 'active', name: 'Activo' },
@@ -47,8 +54,27 @@ export class IepCategoriesListComponent implements OnInit {
   constructor(
     categoryService: CategoriaService,
     usersMockService: UsersMockIdService,
-    productService: ProductService
+    productService: ProductService,
+     private tutorialService: TutorialService
   ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+        scrollTo: {
+          behavior: 'smooth',
+          block: 'center'
+        }
+      },
+      keyboardNavigation: false,
+      useModalOverlay: true,
+    }); 
+
     this.usersMockService = usersMockService;
     this.categoryService = categoryService;
     this.productService = productService;
@@ -60,10 +86,10 @@ export class IepCategoriesListComponent implements OnInit {
     doc.setFontSize(18);
     doc.text(pageTitle, 15, 10);
     doc.setFontSize(12);
-    
+
     const dataToExport = this.categories.map((category) => [
       category.category,
-      category.discontinued ? 'Inactivo' : 'Activo' 
+      category.discontinued ? 'Inactivo' : 'Activo'
     ]);
 
     (doc as any).autoTable({
@@ -74,20 +100,20 @@ export class IepCategoriesListComponent implements OnInit {
       margin: { top: 30, bottom: 20 },
     });
     doc.save(`${this.getFormattedDate()}_Listado_De_Categorías.pdf`);
-}
+  }
 
-exportToExcel(): void {
-  // Transformamos los datos antes de crear el Excel
-  const dataToExport = this.categories.map(category => ({
+  exportToExcel(): void {
+    // Transformamos los datos antes de crear el Excel
+    const dataToExport = this.categories.map(category => ({
       Categoría: category.category,
       Estado: category.discontinued ? 'Inactivo' : 'Activo'
-  }));
+    }));
 
-  const worksheet = XLSX.utils.json_to_sheet(dataToExport);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'Categorías');
-  XLSX.writeFile(workbook, `${this.getFormattedDate()}_Listado_De_Categorías.xlsx`);
-}
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Categorías');
+    XLSX.writeFile(workbook, `${this.getFormattedDate()}_Listado_De_Categorías.xlsx`);
+  }
 
   getFormattedDate(): string {
     const today = new Date();
@@ -99,6 +125,92 @@ exportToExcel(): void {
 
   ngOnInit() {
     this.loadCategories();
+    //TUTORIAL
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    ); 
+  }
+
+  ngOnDestroy(): void {
+    //TUTORIAL
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    } 
+
+  }
+
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    // CÓDIGO PARA PREVENIR SCROLLEO DURANTE TUTORIAL
+    const preventScroll = (e: Event) => {
+      e.preventDefault();
+    };
+
+    const restoreScroll = () => {
+      document.body.style.overflow = 'auto';
+      window.removeEventListener('wheel', preventScroll);
+      window.removeEventListener('touchmove', preventScroll);
+    };
+
+    // Al empezar, lo desactiva
+    this.tour.on('start', () => {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('wheel', preventScroll, { passive: false });
+      window.addEventListener('touchmove', preventScroll, { passive: false });
+    });
+
+    // Al completar lo reactiva, al igual que al cancelar
+    this.tour.on('complete', restoreScroll);
+    this.tour.on('cancel', restoreScroll);
+    
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Tabla de Categorias',
+      text: 'Acá puede ver todas las categorias de los productos de inventario. Puede hacer click en el botón de acciones para editar una categoria.',
+      attachTo: {
+        element: '#categoryTable',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Filtros',
+      text: 'Desde acá puede filtrar las las categorias por nombre y por su estado (Activo o inactivo). También puede exportar las categorias a Excel o PDF, o borrar los filtros aplicados con el botón de basura.'
+      ,attachTo: {
+        element: '#filtros',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+      
+    });
+
+    this.tour.start();
   }
 
   private refreshDataTable(): void {
@@ -112,90 +224,90 @@ exportToExcel(): void {
   }
 
   filterData(event?: any): void {
-    const searchTerm = event?.target?.value?.toLowerCase().trim() || 
+    const searchTerm = event?.target?.value?.toLowerCase().trim() ||
       (document.getElementById('searchTerm') as HTMLInputElement)?.value?.toLowerCase().trim() || '';
-  
+
     this.filteredData = this.categories.filter(cat => {
       const matchesSearch = cat.category.toLowerCase().includes(searchTerm);
-  
+
       // Filtrado por estados seleccionados en ngSelect
-      const matchesStatus = this.selectedStatuses.length === 0 || 
+      const matchesStatus = this.selectedStatuses.length === 0 ||
         this.selectedStatuses.includes(cat.discontinued ? 'Inactivo' : 'Activo');
-  
+
       return matchesSearch && matchesStatus;
     });
-  
+
     this.refreshDataTable();
   }
-  
+
 
   cleanFilters(): void {
     // Limpia los valores de los inputs de texto en el DOM
     const textInputs = document.querySelectorAll('input.form-control');
     textInputs.forEach(input => (input as HTMLInputElement).value = '');
-  
+
     // Reinicia el combo de estados
     this.selectedStatuses = [];
-  
+
     // Restablece la lista filtrada a todas las categorías
     this.filteredData = [...this.categories];
     this.refreshDataTable();
   }
-  
 
 
- 
+
+
   initializeDataTable() {
     if (this.table) {
       this.table.destroy();
     }
     this.table = $('#categoryTable').DataTable({
-       //Atributos de la tabla
-       paging: true,
-       searching: true,
-       ordering: true,
-       lengthChange: true,
-       order: [0, 'asc'],
-       lengthMenu: [5, 10, 25, 50],
-       pageLength: 5,
-       data: this.categories,
+      //Atributos de la tabla
+      paging: true,
+      searching: true,
+      ordering: true,
+      lengthChange: true,
+      order: [0, 'asc'],
+      lengthMenu: [5, 10, 25, 50],
+      pageLength: 5,
+      data: this.categories,
       columns: [
         {
           data: 'discontinued',
           title: 'Estado',
           className: 'text-center', // solo esta clase para alinear el texto a la izquierda
-                  render: (data: any) => {
-                    let colorClass;
-                    let text;
-                        
-                    if (data) {
-                      colorClass = '#dc3545'; // Rojo para "Inactivo"
-                      text = 'Inactivo';
-                    } else {
-                      colorClass = '#198754'; // Verde para "Activo"
-                      text = 'Activo';
-                    }
-                        
-                    return `<span class="badge border rounded-pill" style="background-color: ${colorClass};">${text}</span>`;
-                  }
-        
-             },
-                {
-                  data: 'category',
-                  title: 'Categoría',
-                  className: 'align-middle'
-                }
-          ,
-          {
-            data: null,
-            title: 'Acciones',
-            className: 'align-middle text-center', // Alinea el título al centro          orderable: false,
-            render: (data: any) => {
-              let deleteButtonClass = '';
-              if (data.discontinued) {
-                deleteButtonClass = 'disabled'; // Agregar clase "disabled" al botón de eliminar
-              }
-              return `
+          render: (data: any) => {
+            let colorClass;
+            let text;
+
+            if (data) {
+              colorClass = '#dc3545'; // Rojo para "Inactivo"
+              text = 'Inactivo';
+            } else {
+              colorClass = '#198754'; // Verde para "Activo"
+              text = 'Activo';
+            }
+
+            return `<span class="badge border rounded-pill" style="background-color: ${colorClass};">${text}</span>`;
+          }
+
+        },
+        {
+          data: 'category',
+          title: 'Categoría',
+          className: 'align-middle'
+        }
+        ,
+        {
+          data: null,
+          title: 'Acciones',
+          className: 'align-middle text-center', // Alinea el título al centro          orderable: false,
+          render: (data: any) => {
+            let deleteButtonClass = '';
+            if (data.discontinued) {
+              deleteButtonClass = 'disabled'; // Agregar clase "disabled" al botón de eliminar
+            }
+            return `
                 <div class="text-center">
                   <div class="btn-group">
                     <div class="dropdown">
@@ -208,8 +320,8 @@ exportToExcel(): void {
                     </div>
                   </div>
                 </div>`;
-            }
           }
+        }
       ],
       dom:
         '<"mb-3"t>' +                           //Tabla
@@ -240,14 +352,14 @@ exportToExcel(): void {
     // Obtener el modal de Bootstrap
     const modalElement = document.getElementById('confirmDeleteModal');
     const confirmButton = document.getElementById('confirmDeleteButton');
-  
+
     if (modalElement && confirmButton) {
       // Crear una instancia del modal de Bootstrap
       const modal = new bootstrap.Modal(modalElement);
-  
+
       // Mostrar el modal
       modal.show();
-  
+
       // Lógica de confirmación para eliminar la categoría
       confirmButton.onclick = () => {
         this.deleteCategory(); // Llamar a la función de eliminación
@@ -476,7 +588,7 @@ exportToExcel(): void {
   }
 
 
-  loadCategories() {  
+  loadCategories() {
     this.loading = true;
     this.categoryService.getCategorias().subscribe({
       next: (categories) => {

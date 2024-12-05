@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, Input, OnInit } from '@angular/core';
+import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ReportDTO, plotOwner } from '../../../models/reportDTO';
@@ -8,6 +8,11 @@ import Swal from 'sweetalert2';
 import { RoutingService } from '../../../../common/services/routing.service';
 import { PlotService } from '../../../../users/users-servicies/plot.service';
 import { ReportService } from '../../../services/report.service';
+import { UserService } from '../../../../users/users-servicies/user.service';
+import { UserGet } from '../../../../users/users-models/users/UserGet';
+import { Subscription } from 'rxjs';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 @Component({
   selector: 'app-penalties-post-fine',
   standalone: true,
@@ -15,8 +20,9 @@ import { ReportService } from '../../../services/report.service';
   templateUrl: './penalties-post-fine.component.html',
   styleUrls: ['./penalties-post-fine.component.css']
 })
-export class PenaltiesPostFineComponent implements OnInit {
+export class PenaltiesPostFineComponent implements OnInit, OnDestroy {
   private readonly plotService = inject(PlotService);
+  private readonly userService = inject(UserService);
   //Variables
   report: any
   formattedDate: any;
@@ -24,6 +30,10 @@ export class PenaltiesPostFineComponent implements OnInit {
   reactiveForm!: FormGroup;
   newFine: boolean = false;
   reportId: number = 0;
+
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
 
   @Input() reportDto: ReportDTO = {
     id: 0,
@@ -41,14 +51,34 @@ export class PenaltiesPostFineComponent implements OnInit {
     private penaltiesService: SanctionService,
     private route: ActivatedRoute,
     private routingService: RoutingService,
-    private reportService: ReportService
-  ) { }
+    private reportService: ReportService,
+    private tutorialService: TutorialService
+  ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+        scrollTo: {
+          behavior: 'smooth',
+          block: 'center'
+        }
+      },
+      keyboardNavigation: false,
+
+      useModalOverlay: true,
+    });
+  }
 
   //Init
   private initForm(): void {
     this.reactiveForm = this.fb.group({
       infractionType: ['warning', Validators.required],
-      amount: [null, [Validators.required, Validators.min(1)]]
+      amount: [null, [Validators.required, Validators.min(1), Validators.max(999999)]]
     });
   }
 
@@ -61,6 +91,112 @@ export class PenaltiesPostFineComponent implements OnInit {
       this.getReport(this.reportId);
     });
     this.initForm();
+
+    //TUTORIAL
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    );
+  }
+
+  //Destroy
+  ngOnDestroy(): void {
+    //TUTORIAL
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
+  }
+  
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    // CÓDIGO PARA PREVENIR SCROLLEO DURANTE TUTORIAL
+    const preventScroll = (e: Event) => {
+      e.preventDefault();
+    };
+
+    const restoreScroll = () => {
+      document.body.style.overflow = 'auto';
+      window.removeEventListener('wheel', preventScroll);
+      window.removeEventListener('touchmove', preventScroll);
+    };
+
+    // Al empezar, lo desactiva
+    this.tour.on('start', () => {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('wheel', preventScroll, { passive: false });
+      window.addEventListener('touchmove', preventScroll, { passive: false });
+    });
+
+    // Al completar lo reactiva, al igual que al cancelar
+    this.tour.on('complete', restoreScroll);
+    this.tour.on('cancel', restoreScroll);
+    
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Alta de Sanción',
+      text: 'Acá puede realizar el alta de una sanción, ya sea una multa o una advertencia. Complete los campos para dar de alta la sanción sobre el informe adjunto.',
+      attachTo: {
+        element: '#page',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Tipo de Sanción',
+      text: 'Aqui puede seleccionar la severidad de la sanción que se aplicara sobre el infractor. Si se selecciona una multa, se habilitara un campo obligatorio con el importe que se le cobrara al infractor',
+      attachTo: {
+        element: '#sanctionType',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+    
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Boton de registro',
+      text: 'Con este boton esta confirmando el alta de la sanción. Se notificara instantaneamente al infractor y se cerrara el informe.',
+      attachTo: {
+        element: '#sendButton',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+    });
+
+    this.tour.start();
   }
 
 
@@ -119,6 +255,19 @@ export class PenaltiesPostFineComponent implements OnInit {
 
         this.penaltiesService.postFine(fineData).subscribe(
           res => {
+            let ownersIds: number[] = this.getOwnersIdByPlotId(this.report.plotId)
+            ownersIds.forEach(id => {
+              let notification = {
+                user_id: id,
+                reason: this.report.reportReason.reportReason, // report => ReportReason (Entidad) => reportReason propiedad de la entidad
+                amount: this.reactiveForm.get('amount')?.value,
+                warning: false
+              }
+              this.penaltiesService.notifyNewFineOrWarning(notification).subscribe({
+                next: () => { },
+                error: (e) => { console.log("Error al notificar al propietario: ", e) }
+              });
+            });
             Swal.fire({
               title: '¡Multa enviada!',
               text: 'La multa ha sido enviada correctamente.',
@@ -157,6 +306,18 @@ export class PenaltiesPostFineComponent implements OnInit {
 
         this.penaltiesService.postWarning(warningData).subscribe(
           res => {
+            let ownersIds: number[] = this.getOwnersIdByPlotId(this.report.plotId)
+            ownersIds.forEach(id => {
+              let notification = {
+                user_id: id,
+                reason: this.report.reportReason.reportReason, // report => ReportReason (Entidad) => reportReason propiedad de la entidad
+                warning: true
+              }
+              this.penaltiesService.notifyNewFineOrWarning(notification).subscribe({
+                next: () => { },
+                error: (e) => { console.log("Error al notificar al propietario: ", e) }
+              });
+            });
             Swal.fire({
               title: '¡Advertencia enviada!',
               text: 'La advertencia ha sido enviada correctamente.',
@@ -196,7 +357,7 @@ export class PenaltiesPostFineComponent implements OnInit {
     }
   }
 
-  
+
   //Controla que se tenga que enviar un mensaje de error, lo busca y retorna
   showError(controlName: string): string {
     const control = this.reactiveForm.get(controlName);
@@ -208,7 +369,7 @@ export class PenaltiesPostFineComponent implements OnInit {
     return '';
   }
 
-  
+
   //Devuelve el mensaje de error
   private getErrorMessage(errorKey: string, errorValue: any): string {
     const errorMessages: { [key: string]: (error: any) => string } = {
@@ -227,5 +388,20 @@ export class PenaltiesPostFineComponent implements OnInit {
     };
 
     return errorMessages[errorKey]?.(errorValue) ?? 'Error no identificado en el campo.';
+  }
+
+  getOwnersIdByPlotId(plotId: number): number[] {
+    let ownersIds: number[] = [];
+    let users: UserGet[] = [];
+    this.userService.getUsersByPlotID(plotId).subscribe({
+      next: (data) => { users = data },
+      error: (e) => { console.log("Error al cargar usuarios: ", e) }
+    });
+    users.forEach((user: UserGet) => {
+      if (user.roles.includes('Propietario')) {
+        ownersIds.push(user.id);
+      }
+    });
+    return ownersIds;
   }
 }

@@ -1,4 +1,4 @@
-<section class="container p-5 border rounded border-3 border-secundary">
+<section class="container p-5 border rounded border-3 border-secundary" id="newUser" >
   <form (ngSubmit)="createUser()" [formGroup]="reactiveForm">
     <div class="row">
       <div class="col-lg-6 mb-3">
@@ -27,13 +27,7 @@
         <div class="row">
           <label class="col-2 col-form-label">Tipo de Documento</label>
           <div class="col-10">
-            <!-- <select id="selectOption" class="form-select" formControlName="dniType" [ngClass]="onValidate('dniType')">
-              <option value="" disabled selected>Seleccione una opción</option>
-              <option value="1">DNI</option>
-              <option value="2">Pasaporte</option>
-            </select> -->
-            <!-- CheckMe -->
-            <app-custom-select [options]="[{value: 1, name: 'DNI'}, {value: 2, name: 'Pasaporte'}, {value: 2, name: 'CUIT/CUIL'}]"
+            <app-custom-select [options]="[{value: 1, name: 'DNI'}, {value: 2, name: 'Pasaporte'}, {value: 3, name: 'CUIT/CUIL'}]"
               [selectedOptions]="reactiveForm.get('dniType')?.value"
               (selectedOptionsChange)="reactiveForm.get('dniType')?.setValue($event)"
               [validations]="reactiveForm.get('dniType')?.validator" />
@@ -108,7 +102,7 @@
 
 
 
-      <div class="col-lg-6 mb-3">
+      <div class="col-lg-6 mb-3" id="roles">
         <div class="row">
           <label class="col-2 col-form-label">Roles</label>
           <div class="col-10">
@@ -159,7 +153,7 @@
           <button type="button" class="btn btn-secondary" (click)="redirect()">Cancelar</button>
         </div>
         <div class="col-auto">
-          <button type="submit" class="btn btn-success" [disabled]="reactiveForm.invalid">
+          <button type="submit" class="btn btn-success" [disabled]="reactiveForm.invalid" id="register">
             Registrar
           </button>
         </div>

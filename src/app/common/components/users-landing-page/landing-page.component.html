@@ -1,103 +1,240 @@
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-  <div class="container">
-      <a class="navbar-brand" href="#welcome">
-          <img src="https://www.villadelcondor.com/imagenes/villa_del_condor.png" style="height: 40px; width: 100px;" alt="logo del consorcio">
-      </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-          <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse d-flex justify-content-end" id="navbarNav">
+    <div class="d-flex w-100 justify-content-between px-3">
+        <div class="d-flex align-items-center">
+            <a class="navbar-brand" href="#welcome">
+                <img src="https://www.villadelcondor.com/imagenes/villa_del_condor.png"
+                    style="height: 40px; width: 100px;" alt="logo del consorcio">
+            </a>
+        </div>
 
-          <button type="button" class="btn btn-primary" (click)="redirect('/login')">Iniciar Sesión
-              <i class="bi bi-person-circle"></i> 
-          </button>
-      </div>
-  </div>
+        <div class="d-flex align-items-center">
+            <button type="button" class="btn btn-light" (click)="redirect('/login')">Iniciar Sesión
+                <i class="bi-person-circle"></i>
+            </button>
+        </div>
+    </div>
 </nav>
 
-
-<section class="py-5 text-center bg-light" style="margin-top: 56px;" id="welcome">
-  <div class="row py-lg-5">
-      <div class="col-lg-6 col-md-8 mx-auto">
-          <h1 class="fw-light">Bienvenido a Villa del Cóndor</h1>
-          <p class="lead text-muted">Encuentra el terreno perfecto para construir tus sueños</p>
-          <p>Villa del Cóndor es más que un consorcio: es un refugio donde la naturaleza se encuentra con la vida moderna. Ubicado en un entorno rodeado por colinas majestuosas y verdes praderas, cada rincón ofrece vistas espectaculares que invitan a la tranquilidad y a la contemplación. Aquí, el canto de las aves y el susurro del viento entre los árboles crean un ambiente sereno, ideal para aquellos que buscan un hogar en armonía con la naturaleza.</p></div>
-  </div>
-</section>
-
-
-<!-- Loteo Section -->
-<section class="py-5" id="plots">
-  <div class="container">
-      <h2 class="text-center mb-4">Nuestros Lotes</h2>
-      <p>En nuestro consorcio ofrecemos una exclusiva variedad de lotes, ideales tanto para proyectos residenciales como comerciales. 
-        Cada lote ha sido cuidadosamente seleccionado para garantizar su potencial de valorización y conectividad, 
-        brindando un espacio seguro y en constante crecimiento.</p>
-      <div class="row row-cols-1 row-cols-md-3 g-4">
-          @for (plot of plotsCard; track $index) {
-            <div class="col">
-              <div class="card">
-                  <div class="card-body">
-                      <h5 class="card-title">Lote {{plot.number}}</h5>
-                      <p class="card-text">Área total: {{plot.totalArea}}m²</p>
-                      <ul class="list-unstyled">
-                          <li><i class="bi bi-check-circle-fill text-success"></i>Tipo: {{plot.type}}</li>
-                          <li><i class="bi bi-check-circle-fill text-success"></i> Estado: {{plot.status}}</li>
-                      </ul>
-                  </div>
-              </div>
-          </div>
-          }
-          @if(plotsCard.length === 0) {
-              <div class="col">
-                  <div class="alert alert-warning" role="alert">
-                      No se han encontrado lotes disponibles
-                  </div>
-              </div>
-          }
-      </div>
-  </div>
-</section>
+<!-- Contenido de la pagina -->
 <div>
-    <object
-    id="mapa"
-    type="image/svg+xml"
-    data="maps.svg"
-    style="height: 900px;"
-    >
-  </object>
+    <!-- Introduccion -->
+    <section class="text-center bg-light py-5" id="welcome">
+        <div class="d-flex">
+            <div class="row px-4 py-lg-5">
+                <!-- Descripcion -->
+                <div class="col-lg-6 col-md-8 mx-auto align-items-center justify-content-center d-flex flex-column">
+                    <h1 class="fw-light"><strong>Bienvenido a Villa del Cóndor</strong></h1>
+                    <p class="lead text-muted mb-5">Encuentra el terreno perfecto para construir tus sueños</p>
+                    <p>Villa del Cóndor es más que un consorcio: es un refugio donde la naturaleza se encuentra con la
+                        vida
+                        moderna. Ubicado en un entorno rodeado por colinas majestuosas y verdes praderas, cada rincón
+                        ofrece
+                        vistas espectaculares que invitan a la tranquilidad y a la contemplación. Aquí, el canto de las
+                        aves
+                        y el susurro del viento entre los árboles crean un ambiente sereno, ideal para aquellos que
+                        buscan
+                        un hogar en armonía con la naturaleza.
+                    </p>
+                </div>
+                <!-- Carousel -->
+                <div class="col">
+                    <div class="h-100">
+                        <div id="carouselExampleAutoplaying" class="carousel slide h-100" data-bs-ride="carousel">
+                            <div class="carousel-inner h-100 rounded shadow">
+                                <div class="carousel-item active h-100">
+                                    <img src="{{images[0]}}" class="d-block w-100 h-100" alt="..."
+                                        style="object-fit: cover;">
+                                </div>
+                                @for (img of images.slice(1, images.length); track $index) {
+                                <div class="carousel-item h-100">
+                                    <img src="{{img}}" class="d-block w-100 h-100" alt="..." style="object-fit: cover;">
+                                </div>
+                                }
+                            </div>
+                            <button class="carousel-control-prev" type="button"
+                                data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button"
+                                data-bs-target="#carouselExampleAutoplaying" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <hr>
+
+    <!-- Loteo Section -->
+    <section class="py-5" id="plots">
+        <div class="container">
+            <h2 class="text-center mb-4">Nuestros Lotes</h2>
+            <p>
+                En nuestro consorcio ofrecemos una exclusiva variedad de lotes, ideales tanto para proyectos
+                residenciales como comerciales.
+                Cada lote ha sido cuidadosamente seleccionado para garantizar su potencial de valorización y
+                conectividad, brindando un espacio seguro y en constante crecimiento.
+            </p>
+            <div class="row">
+                <div class="col-6">
+                    <div>
+                        <object id="mapa" type="image/svg+xml" data="landingPlotsMap.svg"
+                            style="height: 750px;"></object>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="row">
+                        <div class="col-12 verticalAnimation" [ngClass]="{'expanded': selectedPlot}">
+                            <!-- Lote seleccionado -->
+                            <div class="card mb-3">
+                                <div class="card-header d-flex justify-content-between">
+                                    <h5>
+                                        {{'Lote: ' + selectedPlot?.id + ( selectedPlot?.plot_state == 'Disponible' ?
+                                        ' - Manzana: ' + selectedPlot?.block_number : '' )}}
+                                    </h5>
+                                    @if (selectedPlot?.plot_state == 'Disponible') {
+                                    <button type="button" class="btn btn-light border border-2"
+                                        (click)="formMessage.get('plot_id')?.setValue(selectedPlot?.id)">
+                                        Consultar
+                                    </button>
+                                    }
+                                </div>
+                                <div class="card-body">
+                                    @if (selectedPlot?.plot_state == 'Disponible') {
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <img [src]="selectedPng" alt="">
+                                        </div>
+                                        <div class="col-6 ps-3 border-start border-1 border-secondary">
+                                            <div class="d-flex flex-column justify-content-between gap-3">
+                                                <div class="col">Área total: {{selectedPlot?.total_area_in_m2}}m² </div>
+                                                <div class="col">Dirección: Manzana {{selectedPlot?.block_number}}, lote
+                                                    {{selectedPlot?.plot_number}} </div>
+                                                <div class="col"><i class="bi-check-circle-fill text-success"></i> Tipo:
+                                                    {{selectedPlot?.plot_type}} </div>
+                                                <div class="col"><i class="bi-check-circle-fill text-success"></i>
+                                                    Estado:
+                                                    {{selectedPlot?.plot_state}} </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    }
+                                    @else {
+                                    <div class="text-center">
+                                        Este lote no se encuentra disponible.
+                                    </div>
+                                    }
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                    </div>
+                    
+                    <div class="card verticalAnimation" [ngClass]="{'expanded': formMessage.get('plot_id')?.value}">
+                        <div class="card-header d-flex justify-content-between">
+                            <h5>Realice una consulta sobre el lote {{selectedPlot?.plot_number}}</h5>
+                            <button class="btn btn-light bi-x-lg border border-2" (click)="formMessage.reset()"></button>
+                        </div>
+                        <div class="card-body">
+                            <form class="px-3" [formGroup]="formMessage" (submit)="postRequest()">
+                                <div class="row mb-3">
+                                    <label class="col-form-label col-3">Nombre</label>
+                                    <div class="col-9">
+                                        <input type="text" class="form-control col-auto" formControlName="name" [ngClass]="onValidate('name')">
+                                        @if(formMessage.get('name')?.invalid && (formMessage.get('name')?.dirty || formMessage.get('name')?.touched)){
+                                            <div class="text-danger">{{showError('name')}}</div>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label class="col-form-label col-3">Email</label>
+                                    <div class="col-9">
+                                        <input type="email" class="form-control col-auto" formControlName="email" [ngClass]="onValidate('email')">
+                                        @if(formMessage.get('email')?.invalid && (formMessage.get('email')?.dirty || formMessage.get('email')?.touched)){
+                                            <div class="text-danger">{{showError('email')}}</div>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label class="col-form-label col-3">Teléfono</label>
+                                    <div class="col-9">
+                                        <input type="tel" class="form-control col-auto" formControlName="phone" [ngClass]="onValidate('phone')">
+                                        @if(formMessage.get('phone')?.invalid && (formMessage.get('phone')?.dirty || formMessage.get('phone')?.touched)){
+                                            <div class="text-danger">{{showError('phone')}}</div>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label class="col-3 col-form-label">Observaciones</label>
+                                    <div class="col-9">
+                                        <textarea class="form-control col-auto" formControlName="observations" cols="2" style="resize: none;"></textarea>
+                                    </div>
+                                </div>
+                                @if(formMessage.invalid && (formMessage.get('email')?.dirty || formMessage.get('email')?.touched || formMessage.get('phone')?.dirty || formMessage.get('phone')?.touched)){
+                                    <div class="text-danger text-center mt-3">
+                                        Debe ingresar al menos un email o un teléfono de contacto.
+                                    </div>
+                                }
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-light border border-2" [disabled]="formMessage.invalid">Enviar</button>
+                                </div>
+                            </form>
+                           
+                        </div>
+                    </div>
+
+                    <!-- Alerta de lotes no encontrados -->
+                    @if(plotsCard.length === 0) {
+                    <div class="alert alert-warning text-center" role="alert">
+                        No se han encontrado lotes disponibles.
+                    </div>
+                    }
+
+                </div>
+
+            </div>
+        </div>
+
+    </section>
 </div>
 
 <!-- Footer -->
 <footer class="bg-dark text-white py-4">
-  <div class="container">
-      <div class="row d-flex justify-content-between">
-          <div class="col-md-4">
-              <h5>Villa del Cóndor</h5>
-              <p>Desarrollando el futuro inmobiliario</p>
-              <div class="social-icons">
-                  <a href="#" class="text-white me-3"><i class="bi bi-facebook"></i></a>
-                  <a href="#" class="text-white me-3"><i class="bi bi-instagram"></i></a>
-                  <a href="#" class="text-white me-3"><i class="bi bi-twitter-x"></i></a>
-              </div>
-          </div>
+    <div class="container">
+        <div class="row d-flex justify-content-between">
+            <div class="col-md-4">
+                <h5>Villa del Cóndor</h5>
+                <p>Desarrollando el futuro inmobiliario</p>
+                <div class="social-icons">
+                    <a href="https://www.facebook.com/VILLAdelCONDOR/?locale=es_LA" class="text-white me-3"><i
+                            class="bi bi-facebook"></i></a>
+                    <a href="#" class="text-white me-3"><i class="bi bi-instagram"></i></a>
+                    <a href="#" class="text-white me-3"><i class="bi bi-twitter-x"></i></a>
+                </div>
+            </div>
 
-          <div class="col-md-4">
-              <h5>Contacto</h5>
-              <ul class="list-unstyled">
-                  <li><i class="bi bi-geo-alt"></i> Av. Principal 123</li>
-                  <li><i class="bi bi-telephone"></i> +1 234 567 890</li>
-                  <li><i class="bi bi-envelope"></i> {{'villadelcondor@gmail.com'}}</li>
-              </ul>
-          </div>
-      </div>
-      <hr>
-      <div class="text-center">
-          <small>&copy; 2024 Villa del Cóndor. Todos los derechos reservados.</small>
-      </div>
-  </div>
+            <div class="col-md-4">
+                <h5>Contacto</h5>
+                <ul class="list-unstyled">
+                    <li><i class="bi bi-geo-alt"></i> Av. Principal 123</li>
+                    <li><i class="bi bi-telephone"></i> +1 234 567 890</li>
+                    <li><i class="bi bi-envelope"></i> {{'villadelcondor@gmail.com'}}</li>
+                </ul>
+            </div>
+        </div>
+        <hr>
+        <div class="text-center">
+            <small>&copy; 2024 Villa del Cóndor. Todos los derechos reservados.</small>
+        </div>
+    </div>
 </footer>
-
-<router-outlet/>
-

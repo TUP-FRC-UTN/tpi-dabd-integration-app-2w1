@@ -1,4 +1,4 @@
-<div class="card mt-3">
+<div class="card mt-3" id="authorizedTime">
   <div class="card-body">
     <h5 class="card-title">Días y Horarios Autorizados</h5>
     <form [formGroup]="form">
@@ -20,7 +20,7 @@
       </div>
 
       <div class="row g-2 align-items-center mb-3">
-        <div class="col-md-10">
+        <div class="col-md-10" id="dayCheckboxes">
           <div class="btn-group d-flex flex-wrap" role="group" aria-label="Días de visita">
             @for (day of days; track $index) {
               <ng-container>
@@ -34,7 +34,7 @@
         </div>
 
         <div class="col-md-2 ps-3"> 
-          <button class="btn btn-secondary w-100" (click)="addAllDays()">Todos</button>
+          <button class="btn btn-secondary w-100" (click)="addAllDays()" id="addAllDays">Todos</button>
         </div>
 
         <div class="col-md-12">
@@ -102,6 +102,7 @@
                 type="button"
                 (click)="agregarDiasPermitidos()"
                 [disabled]="form.get('initHour')?.invalid || form.get('endHour')?.invalid"
+                id="addDays"
               >
                 <i class="bi bi-plus-lg"></i>
               </button>

@@ -26,6 +26,8 @@ import { AllNotifications } from "../../models/all-notifications";
 import { Inventory } from "../../models/inventory";
 import { SelectMultipleComponent } from "../../select-multiple/select-multiple.component";
 import { Subscription } from "rxjs";
+import { TutorialService } from "../../../common/services/tutorial.service";
+import Shepherd from "shepherd.js";
 
 declare var bootstrap: any;
 
@@ -50,6 +52,8 @@ export class AllNotificationComponent implements OnInit {
   originalPaymentsList: Payments[] = [];
   originalGeneralsList: General[] = [];
   originalInventoryList: Inventory[] = [];
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
   form: FormGroup;
   table: any;
   data: AllNotifications = {
@@ -81,9 +85,21 @@ export class AllNotificationComponent implements OnInit {
   }
   ngOnDestroy(): void {
     this.subscription.unsubscribe()
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
+
   }
   //onInit y onDestroy
   ngOnInit(): void {
+
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    );
+
+
     this.table = $("#myTable").DataTable({
       dom: '<"mb-3"t>' + '<"d-flex justify-content-between"lp>',
       columns: [
@@ -134,10 +150,82 @@ export class AllNotificationComponent implements OnInit {
       this.updatedList();
     });
   }
+
+
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    // CÓDIGO PARA PREVENIR SCROLLEO DURANTE TUTORIAL
+    const preventScroll = (e: Event) => {
+      e.preventDefault();
+    };
+
+    const restoreScroll = () => {
+      document.body.style.overflow = 'auto';
+      window.removeEventListener('wheel', preventScroll);
+      window.removeEventListener('touchmove', preventScroll);
+    };
+
+    // Al empezar, lo desactiva
+    this.tour.on('start', () => {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('wheel', preventScroll, { passive: false });
+      window.addEventListener('touchmove', preventScroll, { passive: false });
+    });
+
+    // Al completar lo reactiva, al igual que al cancelar
+    this.tour.on('complete', restoreScroll);
+    this.tour.on('cancel', restoreScroll);
+    
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Tabla de Notificaciones',
+      text: 'Acá puede ver todas las notificaciones que se enviaron en general. Puede hacer click en una notificación particular para ver más información de la misma.',
+      attachTo: {
+        element: '#myTable',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Filtros',
+      text: 'Desde acá podrá filtrar las notificaciones por fecha y tipo. También puede exportar las notificaciones a Excel o PDF, o borrar los filtros aplicados con el botón de basura.',      attachTo: {
+        element: '#filtros',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+      
+    });
+
+    this.tour.start();
+  }
+
+
+
+
   //injecciones
   constructor(
     private service: NotificationRegisterService,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private tutorialService: TutorialService,
   ) {
     this.form = new FormGroup({
       startDate: new FormControl(new Date(), [
@@ -149,6 +237,26 @@ export class AllNotificationComponent implements OnInit {
         DateValidator.greatherThanToday,
       ]),
     });
+
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+        canClickTarget: false,
+        scrollTo: {
+          behavior: 'smooth',
+          block: 'center'
+        }
+      },
+      keyboardNavigation: false,
+      
+      useModalOverlay: true,
+    });
+
   }
   //metodos
   llenarData() {
@@ -493,6 +601,7 @@ export class AllNotificationComponent implements OnInit {
       today.getMonth() - 1,
       today.getDate()
     );
+    
     console.log(today.toISOString(), "startDate", today.getDate(), today.getMonth(), today.getFullYear());
     const endDate = new Date(
       today.getFullYear(),
@@ -505,6 +614,7 @@ export class AllNotificationComponent implements OnInit {
       endDate: this.formatDate2(endDate),
     });
   }
+
   formatDate2(date: Date): string {
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Mes debe ser 1-12
@@ -532,6 +642,7 @@ export class AllNotificationComponent implements OnInit {
     if (searchInput) {
       searchInput.value = "";
     }
+
     this.selected = "Todas";
     this.initialzeDates();
     this.fillTable();

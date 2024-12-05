@@ -11,13 +11,15 @@ import { FileDto } from '../../../users-models/owner/FileDto';
 import { OwnerPlotUserDto, PlotDtoForOwner } from '../../../users-models/owner/OwnerPlotUserDto';
 import { OwnerTypeModel } from '../../../users-models/owner/OwnerType';
 import { OwnerStateModel } from '../../../users-models/owner/OwnerState';
-import { lastValueFrom } from 'rxjs';
+import { lastValueFrom, Subscription } from 'rxjs';
 import { DniTypeModel } from '../../../users-models/owner/DniTypeModel';
 import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
 import { PlotService } from '../../../users-servicies/plot.service';
 import { GetPlotModel } from '../../../users-models/plot/GetPlot';
 import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
 import { RoutingService } from '../../../../common/services/routing.service';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 
 @Component({
   selector: 'app-users-update-owner',
@@ -27,6 +29,11 @@ import { RoutingService } from '../../../../common/services/routing.service';
   styleUrl: './users-update-owner.component.css'
 })
 export class UsersUpdateOwnerComponent implements OnInit, OnDestroy {
+
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
+
   owner: Owner = new Owner();
   plotsForOwner: PlotDtoForOwner[] = [];
   existingFiles: File[] = [];
@@ -53,7 +60,27 @@ export class UsersUpdateOwnerComponent implements OnInit, OnDestroy {
   private readonly suscriptionService = inject(SuscriptionManagerService);
   private readonly routingService = inject(RoutingService);
 
-  constructor(private route: ActivatedRoute, private fb: FormBuilder) {
+  constructor(private route: ActivatedRoute, private fb: FormBuilder, private tutorialService: TutorialService
+  ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+        scrollTo: {
+          behavior: 'smooth',
+          block: 'center'
+        }
+      },
+      keyboardNavigation: false,
+
+      useModalOverlay: true,
+    }); 
+
     this.editOwner = this.fb.group({
       name: new FormControl("", [Validators.required, Validators.minLength(3), Validators.maxLength(50)]),
       lastname: new FormControl("", [Validators.required, Validators.minLength(3), Validators.maxLength(50)]),
@@ -87,6 +114,14 @@ export class UsersUpdateOwnerComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit(): Promise<void> {
+  //TUTORIAL
+  this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+    () => {
+      this.startTutorial();
+    }
+  ); 
+
+
     const typeControl = this.editOwner.get('ownerType');
     if (typeControl) {
       typeControl.valueChanges.subscribe(value => {
@@ -174,9 +209,126 @@ export class UsersUpdateOwnerComponent implements OnInit, OnDestroy {
     this.editOwner.get('birthdate')?.disable();
   }
 
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    // CÓDIGO PARA PREVENIR SCROLLEO DURANTE TUTORIAL
+    const preventScroll = (e: Event) => {
+      e.preventDefault();
+    };
+
+    const restoreScroll = () => {
+      document.body.style.overflow = 'auto';
+      window.removeEventListener('wheel', preventScroll);
+      window.removeEventListener('touchmove', preventScroll);
+    };
+
+    // Al empezar, lo desactiva
+    this.tour.on('start', () => {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('wheel', preventScroll, { passive: false });
+      window.addEventListener('touchmove', preventScroll, { passive: false });
+    });
+
+    // Al completar lo reactiva, al igual que al cancelar
+    this.tour.on('complete', restoreScroll);
+    this.tour.on('cancel', restoreScroll);
+    
+   this.tour.addStep({
+      id: 'table-step',
+      title: 'Editar propietario',
+      text: 'Desde acá puede realizar cambios en los datos del propietario. Tenga en cuenta que algunos campos no pueden ser editados.',
+      attachTo: {
+        element: '#newOwner',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        },
+      ],
+    });
+
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Selección de lotes',
+      text: 'Acá puede seleccionar los lotes que le corresponden al propietario.', 
+      attachTo: {
+        element: '#lotes',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back,
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        },
+      ],
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Añadir archivos',
+      text: 'Acá puede subir los archivos necesarios para la certificación del propietario, o dar de baja los que ya no se necesitan.',
+      attachTo: {
+        element: '#files',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back,
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        },
+      ],
+    });
+
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Envio de formulario',
+      text: 'Al finalizar, presione este botón para registrar los cambios.',
+      attachTo: {
+        element: '#register',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back,
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete,
+        },
+      ],
+    });
+
+    this.tour.start();
+  }
+
   //Desuscribirse de todos los observables
   ngOnDestroy(): void {
     this.suscriptionService.unsubscribeAll();
+
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
   }
 
   //--------------------------------------------------Carga de datos--------------------------------------------------
@@ -371,14 +523,15 @@ export class UsersUpdateOwnerComponent implements OnInit, OnDestroy {
       dateBirth: form.get('birthdate')?.value,
       ownerTypeId: form.get('ownerType')?.value,
       taxStatusId: Number(form.get('state').value),
-      dniTypeId: form.get('dniType')?.value,
+      dniTypeId: Number(form.get('dniType')?.value),
       businessName: form.get('bussinesName')?.value,
       phoneNumber: form.get('phoneNumber')?.value,
       email: form.get('email')?.value,
       files: this.files,
       userUpdateId: 1,
       active: true,
-      plotId: form.get('plots')?.value
+      plotId: form.get('plots')?.value,
+      roles: ['Propietario']
     } as PutOwnerDto
   }
 
@@ -394,9 +547,10 @@ export class UsersUpdateOwnerComponent implements OnInit, OnDestroy {
       //se crea el objeto
       let ownerPut = this.createObject(form);
 
+      console.log(this.id);
+      
       console.log(ownerPut);
       
-
       //llama al service
       const sus = this.ownerService.putOwner(ownerPut, Number(this.id)).subscribe({
         next: () => {

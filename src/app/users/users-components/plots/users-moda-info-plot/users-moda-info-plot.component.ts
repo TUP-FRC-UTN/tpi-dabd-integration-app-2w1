@@ -7,6 +7,8 @@ import { FileDto } from '../../../users-models/owner/FileDto';
 import { FileService } from '../../../users-servicies/file.service';
 import { OwnerService } from '../../../users-servicies/owner.service';
 import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
+import { UserGet } from '../../../users-models/users/UserGet';
+import { UserService } from '../../../users-servicies/user.service';
 
 @Component({
   selector: 'app-users-moda-info-plot',
@@ -25,9 +27,13 @@ export class UsersModaInfoPlotComponent implements OnInit, OnDestroy {
   ownerName: string = '';           // Para almacenar el nombre del propietario
   ownerLastName: string = '';      // Para almacenar el apellido del propietario
   ownerDNI: string = '';          // Para almacenar el DNI del propietario
-  ownerType: string = ''         //Tipo de propietario
+  ownerType: string = '';         //Tipo de propietario
+  ownerDniType: string = '';
+  users: UserGet[] = [];
+  CoOwners: UserGet[] = [];
 
   private readonly ownerService = inject(OwnerService);
+  private readonly userService = inject(UserService);
   private readonly fileService = inject(FileService);
   private readonly suscriptionService = inject(SuscriptionManagerService);
 
@@ -58,6 +64,8 @@ export class UsersModaInfoPlotComponent implements OnInit, OnDestroy {
 
       // Obtener información del propietario
       this.getOwnerByPlotId(this.plotModel.id);
+      this.getUsers();
+      this.showCoOwners(this.plotModel.id);
   }
 
   ngOnDestroy(): void {
@@ -71,6 +79,7 @@ export class UsersModaInfoPlotComponent implements OnInit, OnDestroy {
         if (owners.length > 0) {
           this.ownerName = owners[0].name;
           this.ownerLastName = owners[0].lastname;
+          this.ownerDniType = owners[0].dni_type;
           this.ownerDNI = owners[0].dni;
           this.ownerType = owners[0].ownerType;
         }
@@ -83,6 +92,43 @@ export class UsersModaInfoPlotComponent implements OnInit, OnDestroy {
     //Agregar suscripcion
     this.suscriptionService.addSuscription(sus);
   }
+
+  getUsers(){
+    const sus = this.userService.getUsersByPlotID(this.plotModel.id).subscribe({
+      next: (users) => {
+        this.users = users;
+        // Filtrar a todos aquellos usuarios que sean propietarios o co propietarios, buscar x el nombre del rol
+        this.users = this.users.filter(user => !user.roles.some(role => role == 'Propietario' || role == 'Co-Propietario'));
+
+        console.log('Usuarios:', users);
+        
+      },
+      error: (error) => {
+        console.error('Error al obtener los usuarios:', error);
+      }
+    });
+
+    //Agregar suscripcion
+    this.suscriptionService.addSuscription(sus);
+  }
+
+  showCoOwners(plotId: number) {
+    const sus = this.userService.getAllCoOwnerByPlotId(plotId).subscribe({
+      next: (data: UserGet[]) => {
+        if (data.length > 0) {
+          this.CoOwners = data;
+        } else {
+          this.CoOwners = [];
+        }
+      },
+      error: (error) => {
+        console.error('Error al cargar el co-propietario:', error);
+      }
+    });
+    //Agregar servicio
+    this.suscriptionService.addSuscription(sus);
+  }
+
 
   //Cierra el modal
   closeModal(){

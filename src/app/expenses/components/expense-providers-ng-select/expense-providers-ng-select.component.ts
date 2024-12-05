@@ -87,4 +87,7 @@ export class ExpenseProvidersNgSelectComponent implements OnInit, OnDestroy {
   get selectValue() {
     return this.multiple ? this.selectedProviders : this.selectedProvider;
   }
+  reloadCategories(): void {
+    this.loadProviders();
+  }
 }

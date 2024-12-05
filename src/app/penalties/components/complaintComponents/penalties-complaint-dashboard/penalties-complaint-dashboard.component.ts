@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, Renderer2, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, OnDestroy, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { ComplaintService } from '../../../services/complaints.service';
 import { ComplaintDto, EstadoDenuncia, TipoDenuncia, } from '../../../models/complaint';
 import { ChartType, GoogleChartsModule } from 'angular-google-charts';
@@ -9,6 +9,9 @@ import { ReportReason } from '../../../models/Dashboard-models';
 import { ReportReasonDto } from '../../../models/ReportReasonDTO';
 import { textShadow } from 'html2canvas/dist/types/css/property-descriptors/text-shadow';
 import { CustomKpiComponent } from '../../../../common/components/custom-kpi/custom-kpi.component';
+import { Subscription } from 'rxjs';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 
 //declare let bootstrap: any;
 @Component({
@@ -18,7 +21,11 @@ import { CustomKpiComponent } from '../../../../common/components/custom-kpi/cus
   templateUrl: './penalties-complaint-dashboard.component.html',
   styleUrl: './penalties-complaint-dashboard.component.scss',
 })
-export class PenaltiesComplaintDashboardComponent {
+export class PenaltiesComplaintDashboardComponent implements OnInit, OnDestroy {
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
+
   private sanctionsService: ComplaintService = inject(ComplaintService);
   complaintsData: ComplaintDto[] = [];
   status: number = 0;
@@ -134,7 +141,39 @@ export class PenaltiesComplaintDashboardComponent {
     }
   }
 
-  constructor(private renderer: Renderer2) { }
+  constructor(private renderer: Renderer2, private tutorialService: TutorialService
+  ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+        scrollTo: {
+          behavior: 'smooth',
+          block: 'center'
+        }
+      },
+      keyboardNavigation: false,
+      useModalOverlay: true,
+    });
+  }
+
+
+  ngOnDestroy(): void {
+    //TUTORIAL
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
+  }
 
   getCurrentYearMonth(): string {
     const now = new Date();
@@ -152,6 +191,12 @@ export class PenaltiesComplaintDashboardComponent {
     this.getReportReasons();
     this.getStates();
 
+    //TUTORIAL
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    );
   }
 
   checkChartData(): boolean {
@@ -548,6 +593,133 @@ export class PenaltiesComplaintDashboardComponent {
       this.renderer.setStyle(modalElement, 'display', 'none');
     }, 150);
   }
+
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+    // CÓDIGO PARA PREVENIR SCROLLEO DURANTE TUTORIAL
+    const preventScroll = (e: Event) => {
+      e.preventDefault();
+    };
+
+    const restoreScroll = () => {
+      document.body.style.overflow = 'auto';
+      window.removeEventListener('wheel', preventScroll);
+      window.removeEventListener('touchmove', preventScroll);
+    };
+
+    // Al empezar, lo desactiva
+    this.tour.on('start', () => {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('wheel', preventScroll, { passive: false });
+      window.addEventListener('touchmove', preventScroll, { passive: false });
+    });
+
+    // Al completar lo reactiva, al igual que al cancelar
+    this.tour.on('complete', restoreScroll);
+    this.tour.on('cancel', restoreScroll);
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Filtros',
+      text: 'Desde acá podrá filtrar por una fecha inicial y una fecha final. También puede clickear el botón de filtro para acceder a los filtros avanzados, y el botón de basurero para deshacer los filtros aplicados.', attachTo: {
+        element: '#filters',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Denuncias por Estado',
+      text: 'Este gráfico muestra las denuncias del período seleccionado ordenadas por su estado actual. Puede elegir expandirlo para ver información más detallada.', attachTo: {
+        element: '#chartSanctionsByState',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Denuncias por Motivo',
+      text: 'Este gráfico muestra las denuncias del período seleccionado ordenadas por motivo. Puede elegir expandirlo para ver información más detallada.', attachTo: {
+        element: '#chartSanctionsByReason',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Comparación del Período',
+      text: 'En este gráfico se muestra la comparación de la cantidad de denuncias recibidas por mes. Puede ver más información al expandir este gráfico.', attachTo: {
+        element: '#chartCompare',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'KPIs',
+      text: 'Estos KPIs muestran información sobre la cantidad de denuncias y el promedio recibido por día. ',
+      attachTo: {
+        element: '#kpis',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+
+    });
+
+    this.tour.start();
+  }
+
 }
 
 

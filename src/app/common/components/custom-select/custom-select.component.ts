@@ -23,11 +23,15 @@ export class CustomSelectComponent {
   //Lista de las validaciones que este necesitara usar
   @Input() validations: ValidatorFn | null | undefined = null
 
-    //Lista de las validaciones que este necesitara usar
-    @Input() placeholder: string = 'Seleccione...'
+  //Lista de las validaciones que este necesitara usar
+  @Input() placeholder: string = 'Seleccione...'
+
+  // Permite desabilitar el select
+  @Input() disabled: boolean = false;
 
   //Listado de ids de los objetos seleccionados (el value del select)
   @Output() selectedOptionsChange = new EventEmitter<any[]>();
+  
 
   reactiveForm: FormGroup;
   selectControl: FormControl;
@@ -49,7 +53,7 @@ export class CustomSelectComponent {
   //Devuelve los valores necesarios para mostrar los inputs en verde o rojo segun la validacion
   onValidate(controlName: string) {
     this.selectControl.setValidators(this.validations!)
-    if(this.validations){
+    if(this.validations && !this.disabled){
       const control = this.reactiveForm.get(controlName);
       return {
         'is-invalid': control?.invalid && (control?.dirty || control?.touched),
@@ -84,7 +88,8 @@ export class CustomSelectComponent {
       date: () => 'La fecha ingresada es inválida.',
       url: () => 'El formato de URL ingresado no es válido.',
       number: () => 'Este campo solo acepta números.',
-      customError: () => 'Error personalizado: verifique el dato ingresado.'
+      customError: () => 'Error personalizado: verifique el dato ingresado.',
+      customsErrors: (error) => 'Error: ' + error.message
     };
 
     return errorMessages[errorKey]?.(errorValue) ?? 'Error no identificado en el campo.';

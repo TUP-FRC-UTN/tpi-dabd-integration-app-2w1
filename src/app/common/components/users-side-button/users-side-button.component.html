@@ -1,5 +1,5 @@
 
-@if(info.roles.includes(userRole)){
+@if(info.roles.includes(userRole) && showComponent){
     @if(!info.childButtons){
         <button class="nav-link d-flex text-light w-100" (click)="send(info.route!, info.title!)" [title]="info.name">
             <i [ngClass]="info.icon"></i>
