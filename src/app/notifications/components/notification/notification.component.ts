@@ -332,8 +332,14 @@ export class NotificationComponent implements OnInit {
         },
         {
           text: 'Siguiente',
-          action: this.tour.next,
-          },
+          action: () => {
+            // Codigo para seleccionar el radio button "Solamente a"
+            const viewDetails = document.getElementById(
+              'viewDetailsBtn'
+            ) as HTMLInputElement;
+            viewDetails.click();
+            this.tour.next();
+          },        },
       ],
     });
 

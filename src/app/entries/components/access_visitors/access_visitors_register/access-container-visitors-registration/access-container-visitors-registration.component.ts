@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Subject, Subscription, combineLatest } from 'rxjs';
@@ -13,7 +13,6 @@ import { AccessVisitorsRegisterServiceService } from '../../../../services/acces
 import { AccessVisitorFormComponent } from "../access-visitor-form/access-visitor-form.component";
 import { AuthService } from '../../../../../users/users-servicies/auth.service';
 import { UserLoged } from '../../../../../users/users-models/users/UserLoged';
-import { Router } from '@angular/router';
 @Component({
   selector: 'app-access-container-visitors-registration',
   standalone: true,
@@ -28,10 +27,6 @@ import { Router } from '@angular/router';
 ],
 })
 export class AccessContainerVisitorsRegistrationComponent implements OnInit, OnDestroy {
-  private router=inject(Router);
-  goTo(path: string) {
-  this.router.navigate([path]);
-  }
   uid?: string;
   qrCodeId?: string;
   isQRCodeAvailable: boolean = false;
@@ -43,7 +38,7 @@ export class AccessContainerVisitorsRegistrationComponent implements OnInit, OnD
   currentStep = 0;
 
   isLoading: boolean = false;
-  buttonText: string = 'Registrar';
+  buttonText: string = 'Autorizar';
 
   constructor(
     private visitorService: AccessVisitorsRegisterServiceService,

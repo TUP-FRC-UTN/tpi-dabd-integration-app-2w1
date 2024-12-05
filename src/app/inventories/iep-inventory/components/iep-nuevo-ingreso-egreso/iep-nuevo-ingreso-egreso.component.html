@@ -225,28 +225,38 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title">Información sobre registro de movimientos</h5>
+              <h5 class="modal-title">Información sobre Registro de Proveedores</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <p>
-                Esta es la pantalla de registro de movimientos.
+                Bienvenido al sistema de registro de proveedores. Esta sección te permite gestionar la información de los proveedores, asegurando que los datos sean correctos y completos antes de registrar o modificar un proveedor.
               </p>
               <ul>
                 <li>
                   <strong>Campos a Completar:</strong>
                   <ul>
-                    <li><em>Artículo:</em> Selecciona el artículo que desea registrar. (En caso de no encontrar el artículo, puede crear uno nuevo haciendo click en el +.)</li>
-                    <li><em>Cantidad:</em> Cantidad del artículo que desea registrar.</li>
-                    <li><em>Proveedor:</em> Selecciona el proveedor que desea registrar. (En caso de no encontrar el proveedor, puede crear uno nuevo haciendo click en el +.)</li>
-                    <li><em>Justificación:</em> Justificación del movimiento.</li>
+                    <li><em>Nombre:</em> Nombre del proveedor. Este campo es obligatorio.</li>
+                    <li><em>CUIT:</em> Número de CUIT del proveedor. Este campo es obligatorio.</li>
+                    <li><em>Teléfono:</em> Número de contacto del proveedor. Se debe ingresar un número válido.</li>
+                    <li><em>Email:</em> Correo electrónico del proveedor. Este campo es obligatorio y debe ser único.</li>
+                    <li><em>Tipo de Proveedor:</em> Selecciona el tipo de proveedor (Ejemplo: Otro, Servicio externo, Proveedor de Inventario).</li>
+                    <li><em>Dirección:</em> Dirección física del proveedor. Este campo es obligatorio.</li>
+                  </ul>
+                </li>
+                <li>
+                  <strong>Acciones Disponibles:</strong>
+                  <ul>
+                    <li><em>Registrar:</em> Guarda la información del proveedor en el sistema.</li>
+                    <li><em>Cancelar:</em> Regresa sin guardar cambios.</li>
                   </ul>
                 </li>
               </ul>
               <p><strong>Notas importantes:</strong></p>
               <ul>
-                <li>El proceso es similar tanto en ingresos como egresos.</li>
-                <li>La unica diferencia es que en el ingreso debe ingresar el proveedor.</li>
+                <li>Los campos "Nombre", "CUIT", "Email", y "Dirección" son obligatorios para completar el registro.</li>
+                <li>El CUIT y el nombre del proveedor deben ser únicos.</li>
+                <li>Verifica que el número de teléfono y el email sean válidos antes de registrar un proveedor.</li>
               </ul>
             </div>
           </div>

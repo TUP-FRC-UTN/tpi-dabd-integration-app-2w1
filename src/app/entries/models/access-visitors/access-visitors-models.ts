@@ -116,7 +116,7 @@ export interface UserType{
       vehicle?: AccessNewVehicleDto;
       email: string;
     }
- 
+
     export interface AccessNewVehicleDto {
       plate: string;
       vehicle_Type: AccessVehicleTypeDto;

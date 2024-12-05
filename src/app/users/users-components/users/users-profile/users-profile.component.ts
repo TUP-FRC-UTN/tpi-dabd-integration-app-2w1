@@ -150,17 +150,9 @@ export class UsersProfileComponent implements OnInit, OnDestroy {
 
   //Desuscribirse de los observables
   ngOnDestroy(): void {
-
-    //TUTORIAL
-    this.tutorialSubscription.unsubscribe();
-    if (this.tour) {
-      this.tour.complete();
-    }
-
     if (this.tutorialSubscription) {
       this.tutorialSubscription.unsubscribe();
-    } 
-
+    }
     this.suscriptionService.unsubscribeAll();
   }
 
