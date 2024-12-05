@@ -135,10 +135,10 @@ export class UsersHomeComponent implements OnInit, OnDestroy {
       if (pathElement) {
         switch (plot.plot_state) {
           case 'Habitado':
-            pathElement.setAttribute('fill', '#FFE6A9');
+            pathElement.setAttribute('fill', '#DEAA79');
             break;
           case 'En construccion':
-            pathElement.setAttribute('fill', '#DEAA79');
+            pathElement.setAttribute('fill', '#FFE6A9');
             break;
           case 'Disponible':
             pathElement.setAttribute('fill', '#B1C29E');
