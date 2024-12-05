@@ -152,15 +152,17 @@
                 <app-access-time-range-visitors-registration></app-access-time-range-visitors-registration>
                 <div class="row mt-3">
                     <div class="col-12 d-flex justify-content-end">
+
+                        <button type="submit" class="btn btn-secondary btn-sm me-3" style="margin-bottom: 2px" (click)="cancelar()">
+                        Cancelar
+                        </button>
                         <button type="submit" class="btn btn-primary btn-sm" style="margin-bottom: 2px"
                             [disabled]="!(visitorForm.get('document')?.valid && visitorForm.get('firstName')?.valid)">
-                            Actualizar
+                            Guardar
                         </button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
- 
-
 </div>

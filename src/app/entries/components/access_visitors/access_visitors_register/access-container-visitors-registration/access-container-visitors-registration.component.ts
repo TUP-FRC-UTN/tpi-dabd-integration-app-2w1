@@ -43,7 +43,7 @@ export class AccessContainerVisitorsRegistrationComponent implements OnInit, OnD
   currentStep = 0;
 
   isLoading: boolean = false;
-  buttonText: string = 'Autorizar';
+  buttonText: string = 'Registrar';
 
   constructor(
     private visitorService: AccessVisitorsRegisterServiceService,

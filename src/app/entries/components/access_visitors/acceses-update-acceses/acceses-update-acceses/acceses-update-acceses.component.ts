@@ -11,7 +11,7 @@ import { AccessAuthRange, UserType } from '../../../../models/access-visitors/ac
 import { AccessVisitorsRegisterServiceHttpClientService } from '../../../../services/access_visitors/access-visitors-register/access-visitors-register-service-http-client/access-visitors-register-service-http-client.service';
 import { AccessTimeRangeVisitorsRegistrationComponent } from "../../access_visitors_register/access-time-range-visitors-registration/access-time-range-visitors-registration.component";
 import { AccessVisitorsRegisterServiceService } from '../../../../services/access_visitors/access-visitors-register/access-visitors-register-service/access-visitors-register-service.service';
-
+import Swal from 'sweetalert2';
 @Component({
   selector: 'app-acceses-update-acceses',
   standalone: true,
@@ -26,6 +26,9 @@ import { AccessVisitorsRegisterServiceService } from '../../../../services/acces
   styleUrl: './acceses-update-acceses.component.scss'
 })
 export class AccesesUpdateAccesesComponent implements OnInit, OnDestroy {
+cancelar() {
+    window.history.back();
+}
 
   private readonly updateService = inject(AccessOwnerRenterserviceService);
   private readonly visitorService = inject(AccessUserServiceService);
@@ -48,7 +51,7 @@ export class AccesesUpdateAccesesComponent implements OnInit, OnDestroy {
   allowedDays: AccessAllowedDaysDto[] = [];
 
   visitorForm: FormGroup = new FormGroup({
-    authorizedType: new FormControl('', [Validators.required]),
+    authorizedType: new FormControl({ value: '', disabled: true }, [Validators.required]),
     documentType: new FormControl('', [Validators.required]),
     document: new FormControl('', [Validators.required]),
     firstName: new FormControl('', [Validators.required]),
@@ -190,8 +193,14 @@ export class AccesesUpdateAccesesComponent implements OnInit, OnDestroy {
         console.error(`${key} validation errors:`, control.errors);
       }
     });
-  }
 
+    Swal.fire({
+      title: 'Error de validación',
+      text: 'Por favor, complete todos los campos requeridos correctamente',
+      icon: 'warning',
+      confirmButtonColor: '#3085d6'
+    });
+  }
   private getAuthRangeAndUpdate(): void {
     const sub = this.authRService.getAuthRange().subscribe({
       next: (authRange) => {
@@ -265,23 +274,46 @@ export class AccesesUpdateAccesesComponent implements OnInit, OnDestroy {
   }
 
   private submitUpdate(updateAccess: any): void {
-    const sub = this.updateService.updateAccess(
-      this.document,
-      this.documentType,
-      updateAccess
-    ).subscribe({
-      next: (response) => {
-        console.log('Update successful:', response);
-        alert('Acceso actualizado exitosamente');
-        this.onUpdateSuccess();
-      },
-      error: (error) => {
-        console.error('Update failed:', error);
-        alert('Error al actualizar el acceso');
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: "¿Deseas actualizar la información del visitante?",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const sub = this.updateService.updateAccess(
+          this.document,
+          this.documentType,
+          updateAccess
+        ).subscribe({
+          next: (response) => {
+            console.log('Update successful:', response);
+            Swal.fire({
+              title: '¡Actualizado!',
+              text: 'El visitante ha sido actualizado exitosamente',
+              icon: 'success',
+              confirmButtonColor: '#3085d6'
+            });
+            this.onUpdateSuccess();
+          },
+          error: (error) => {
+            console.error('Update failed:', error);
+            Swal.fire({
+              title: 'Error',
+              text: 'No se pudo actualizar la información del visitante',
+              icon: 'error',
+              confirmButtonColor: '#d33'
+            });
+          }
+        });
+
+        this.suscription.add(sub);
       }
     });
-
-    this.suscription.add(sub);
   }
 
   private onUpdateSuccess(): void {
