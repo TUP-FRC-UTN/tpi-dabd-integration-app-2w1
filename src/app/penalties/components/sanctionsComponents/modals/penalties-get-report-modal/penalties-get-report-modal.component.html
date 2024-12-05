@@ -28,7 +28,7 @@
 
     
 
-    @if(report?.reportState == 'Cerrado' || report?.reportState == 'Finalizado'){
+    @if(report?.reportState == 'Cerrado' || report?.reportState == 'Finalizado' || report?.reportState == 'Pendiente'){
       <!-- Step 4 -->
     <div class="step" [ngClass]="{'completed': report?.reportState == 'Cerrado' || report?.reportState == 'Finalizado'}" data-step="4">
       <div class="step-icon">4</div>
