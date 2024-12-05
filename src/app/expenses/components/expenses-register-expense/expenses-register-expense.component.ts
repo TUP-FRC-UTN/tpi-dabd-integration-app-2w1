@@ -30,8 +30,11 @@ import { ExpensesOwnersNgSelectComponent } from "../expenses-owners-ng-select/ex
 import { FileService } from '../../services/expenseFileService/file.service';
 import { PenaltiesComplaintDashboardComponent } from '../../../penalties/components/complaintComponents/penalties-complaint-dashboard/penalties-complaint-dashboard.component';
 import { Subscription } from 'rxjs';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ExpenseRegisterCategoryComponent } from "../expenses-register-category/expenses-register-category.component";
 import Shepherd from 'shepherd.js';
 import { TutorialService } from '../../../common/services/tutorial.service';
+import { ExpenseRegisterProviderComponent } from '../expense-register-provider/expense-register-provider.component';
 
 @Component({
   selector: 'app-expenses-register-expense',
@@ -58,6 +61,8 @@ export class ExpensesRegisterExpenseComponent implements OnInit, OnDestroy {
   @ViewChild('form') form!: NgForm;
   @ViewChild('fileInput', { static: false }) fileInput!: ElementRef;
   @ViewChild('modalConfirmDelete') modalConfirmDelete!: ElementRef;
+  @ViewChild(ExpenseCategoriesNgSelectComponent) expenseCategoriesNgSelect!: ExpenseCategoriesNgSelectComponent;
+  @ViewChild(ExpenseProvidersNgSelectComponent) expenseProvidersNgSelect!: ExpenseProvidersNgSelectComponent;
   // Modal states
   showModal = false;
   modalMessage = '';
@@ -89,7 +94,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
-  constructor(private tutorialService: TutorialService) {
+  constructor(private tutorialService: TutorialService, private modalNG: NgbModal) {
     this.expense = {
       description: '',
       providerId: 0,
@@ -794,5 +799,33 @@ export class ExpensesRegisterExpenseComponent implements OnInit, OnDestroy {
     this.cdRef.detectChanges();
   }
 
-
+  addCategory() {
+    const modalElement = this.modalNG.open(ExpenseRegisterCategoryComponent);
+    modalElement.componentInstance.eventSucces.subscribe(() => {
+      this.showSuccessAlert('Se registró la categoría con éxito');
+      this.expenseCategoriesNgSelect.reloadCategories();
+    });
+    modalElement.componentInstance.eventError.subscribe((errorMessage: string) => {
+      this.showErrorAlert(errorMessage);
+    });
+  }
+  addProvider(){
+    const modalElement = this.modalNG.open(ExpenseRegisterProviderComponent,{
+      size: 'xl'
+    });
+    modalElement.componentInstance.eventSucces.subscribe(() => {
+      this.showSuccessAlert('Se registró el proveedor con exito');
+      this.expenseProvidersNgSelect.reloadCategories();
+    });
+    modalElement.componentInstance.eventError.subscribe((errorMessage: string) => {
+      this.showErrorAlert(errorMessage);
+    });
+  }
+  showSuccessAlert(message: string) {
+    return Swal.fire({
+      title: '¡Éxito!',
+      text: message,
+      icon: 'success',
+    });
+  }
 }

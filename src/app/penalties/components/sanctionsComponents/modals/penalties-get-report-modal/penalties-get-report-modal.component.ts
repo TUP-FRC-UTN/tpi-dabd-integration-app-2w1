@@ -2,13 +2,13 @@ import { Component, inject, Input, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { SanctionService } from '../../../../services/sanctions.service';
 import { FormsModule } from '@angular/forms';
-import { DatePipe } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { SanctionsDTO } from '../../../../models/SanctionsDTO';
 
 @Component({
   selector: 'app-penalties-modal-report',
   standalone: true,
-  imports: [FormsModule,DatePipe],
+  imports: [FormsModule,DatePipe, CommonModule],
   templateUrl: './penalties-get-report-modal.component.html',
   styleUrl: './penalties-get-report-modal.component.scss'
 })
@@ -50,7 +50,8 @@ export class PenaltiesModalReportComponent implements OnInit{
       this.reportServices.getAllSactions().subscribe(
         response => {
           this.advetencias = response.filter((a)=>a.reportId==this.id && a.fineState==null);
-
+          console.log(response)
+          console.log(this.advetencias)
         }, error => {
           alert(error)
         }

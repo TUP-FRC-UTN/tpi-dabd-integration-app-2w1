@@ -379,11 +379,13 @@ export class ViewGastosAdminComponent implements OnInit, OnDestroy {
   }
 
   loadBillsFiltered() {
+    this.isLoading=true;
     const dataTable = $('#expensesTable').DataTable();
     let billsFiltered = this.filteredbyType(this.bills.slice());
     billsFiltered = this.filteredByCategiries(billsFiltered);
     billsFiltered = this.filteredByProviders(billsFiltered);
     dataTable.clear().rows.add(billsFiltered).draw();
+    this.isLoading=false;
   }
   filteredByCategiries(bills: Bill[]): Bill[] {
 
@@ -492,13 +494,13 @@ export class ViewGastosAdminComponent implements OnInit, OnDestroy {
         {
           data: 'amount',
           title: 'Monto',
-          className: 'align-middle',
+          className: 'align-middle text-end',
           render: (data) => {
             let formattedAmount = new Intl.NumberFormat('es-AR', {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2
             }).format(data);
-            return `<div>$ ${formattedAmount} </div>`;
+            return `<div class="text-end">$ ${formattedAmount} </div>`;
           }
         },
         {

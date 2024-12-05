@@ -5,6 +5,49 @@
   </div>
   <div class="modal-body">
 
+    <!-- Stepper -->
+<div class="stepper-wrapper mb-4">
+  <div class="stepper">
+    <!-- Step 1 -->
+    <div class="step" [ngClass]="{'active': true}" data-step="1">
+      <div class="step-icon">1</div>
+      <p>Generación Informe</p>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step" [ngClass]="{'active': report?.complaints.length > 0}" data-step="2">
+      <div class="step-icon">2</div>
+      <p>Denuncias anexadas</p>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step" [ngClass]="{'active': advetencias.length > 0}" data-step="3">
+      <div class="step-icon">3</div>
+      <p>Generación Advertencia</p>
+    </div>
+
+    
+
+    @if(report?.reportState == 'Cerrado' || report?.reportState == 'Finalizado' || report?.reportState == 'Pendiente'){
+      <!-- Step 4 -->
+    <div class="step" [ngClass]="{'completed': report?.reportState == 'Cerrado' || report?.reportState == 'Finalizado'}" data-step="4">
+      <div class="step-icon">4</div>
+      <p>Generación Multa</p>
+    </div>
+    }
+    @if(report?.reportState == 'Rechazado'){
+      <div class="step" [ngClass]="{'rejected': report?.reportState == 'Rechazado'}" data-step="4">
+        <div class="step-icon">4</div>
+        <p>Rechazado</p>
+      </div>
+    }
+
+    
+  </div>
+</div>
+<!-- Stepper -->
+
+
     <h5>Información del Informe</h5>
       <div class="row mb-3">
           <div class="col-md-6">

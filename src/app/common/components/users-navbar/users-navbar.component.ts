@@ -5,11 +5,12 @@ import { NavbarNotificationComponent } from "../../../notifications/components/n
 import { RoutingService } from '../../services/routing.service';
 import { AuthService } from '../../../users/users-servicies/auth.service';
 import { TutorialService } from '../../services/tutorial.service';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-users-navbar',
   standalone: true,
-  imports: [UsersSideButtonComponent, NavbarNotificationComponent],
+  imports: [UsersSideButtonComponent, NavbarNotificationComponent, RouterOutlet],
   templateUrl: './users-navbar.component.html',
   styleUrl: './users-navbar.component.css'
 })

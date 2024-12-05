@@ -66,7 +66,7 @@
                   <div class="col-3">
                     <label for="selectprovider" class="form-label">Proveedor</label>
                   </div>
-                  <div class="position-relative flex-grow-1">
+                  <div class="col">
                     <app-expense-providers-ng-select 
                       [(selectedProvider)]="expense.providerId" 
                       [emptyValue]="true" 
@@ -75,6 +75,9 @@
                       >
                     </app-expense-providers-ng-select>
                   </div>
+                  <div class="col-1 p-1 text-end">
+                    <button type="button" class="bi-plus btn btn-light border border-1" (click)="addProvider()"></button>
+                  </div>
                 </div>
               </div>
               <div class="col">
@@ -82,13 +85,17 @@
                   <div class="col-3">
                     <label for="categoryId" class="form-label">Categoría </label>
                   </div>
-                  <div class="position-relative flex-grow-1">
+                  <div class="col">
                     <app-expense-categories-ng-select 
                       [(selectedCategory)]="expense.categoryId" 
                       [multiple]="false"
                       [showValidBorder]="true"
                       >
                     </app-expense-categories-ng-select>
+                  </div>
+                  <div class="col-1 p-1 text-end">
+                    
+                    <button type="button" class="bi-plus btn btn-light border border-1" (click)="addCategory()"></button>
                   </div>
                 </div>
               </div>

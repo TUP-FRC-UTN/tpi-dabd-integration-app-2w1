@@ -85,68 +85,64 @@
             <div class="row">
                 <div class="col-6">
                     <div>
-                        <object id="mapa" type="image/svg+xml" data="plotsMap.svg" style="height: 750px;"></object>
+                        <object id="mapa" type="image/svg+xml" data="landingPlotsMap.svg"
+                            style="height: 750px;"></object>
                     </div>
                 </div>
-                <div class="col-6" style="height: 750px;">
-                    <!-- Lote seleccionado -->
+                <div class="col-6">
                     <div class="row">
                         <div class="col-12 verticalAnimation" [ngClass]="{'expanded': selectedPlot}">
+                            <!-- Lote seleccionado -->
                             <div class="card">
                                 <div class="card-header d-flex justify-content-between">
-                                    <h5>{{'Lote: ' + selectedPlot?.id + ' - Manzana: ' + selectedPlot?.block_number}}
+                                    <h5>
+                                        {{'Lote: ' + selectedPlot?.id + ( selectedPlot?.plot_state == 'Disponible' ?
+                                        ' - Manzana: ' + selectedPlot?.block_number : '' )}}
                                     </h5>
-                                    <button type="button" class="btn-close" (click)="clearPlot()"></button>
+                                    @if (selectedPlot?.plot_state == 'Disponible') {
+                                    <button type="button" class="btn btn-light border border-2" (click)="openRequestModal(selectedPlot!.id)">
+                                        Consultar
+                                    </button>
+                                    }
                                 </div>
                                 <div class="card-body">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="200"
-                                        height="200">
-                                        <path [attr.d]="selectedPath?.getAttribute('d')"
-                                            [attr.fill]="selectedPath?.getAttribute('fill')" [attr.stroke]="'#343A40'"
-                                            [attr.transform]="selectedPath ? updatePathToOrigin(selectedPath.getAttribute('d')!) : ''" />
-                                    </svg>
-                                    <span>{{'Estado: ' + selectedPlot?.plot_state}}</span>
+                                    @if (selectedPlot?.plot_state == 'Disponible') {
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <img [src]="selectedPng" alt="">
+                                        </div>
+                                        <div class="col-6 ps-3 border-start border-1 border-secondary">
+                                            <div class="d-flex flex-column justify-content-between gap-3">
+                                                <div class="col">Área total: {{selectedPlot?.total_area_in_m2}}m² </div>
+                                                <div class="col">Dirección: Manzana {{selectedPlot?.block_number}}, lote
+                                                    {{selectedPlot?.plot_number}} </div>
+                                                <div class="col"><i class="bi-check-circle-fill text-success"></i> Tipo:
+                                                    {{selectedPlot?.plot_type}} </div>
+                                                <div class="col"><i class="bi-check-circle-fill text-success"></i>
+                                                    Estado:
+                                                    {{selectedPlot?.plot_state}} </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    }
+                                    @else {
+                                    <div class="text-center">
+                                        Este lote no se encuentra disponible.
+                                    </div>
+                                    }
                                 </div>
                             </div>
-                        </div>
-                        <hr>
-
-                        <!-- Alerta de lotes no encontrados -->
-                        @if(plotsCard.length === 0) {
-                        <div class="alert alert-warning text-center mb-0" role="alert">
-                            No se han encontrado lotes disponibles.
-                        </div>
-                        }
-
-                        <!-- Listado de lotes disponibles -->
-                        <div class="row overflow-auto" style="max-height: 100%;">
-                            @for (plot of plotsCard; track $index) {
-                            <div class="col-12 col-lg-6 mb-3">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5>Lote {{plot.number}}</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <blockquote class="blockquote mb-0">
-                                            <ul class="list-unstyled">
-                                                Área total: {{plot.totalArea}}m²
-                                                Dirección: Manzana {{plot.blockNumber}}, lote {{plot.number}}
-                                                <li><i class="bi bi-check-circle-fill text-success"></i> Tipo:
-                                                    {{plot.type}}
-                                                </li>
-                                                <li><i class="bi bi-check-circle-fill text-success"></i> Estado:
-                                                    {{plot.status}}
-                                                </li>
-                                            </ul>
-                                        </blockquote>
-                                    </div>
-                                </div>
-                            </div>
-                            }
                         </div>
                     </div>
 
-                    <hr>
+
+                    <!-- Alerta de lotes no encontrados -->
+                    @if(plotsCard.length === 0) {
+                    <div class="alert alert-warning text-center" role="alert">
+                        No se han encontrado lotes disponibles.
+                    </div>
+                    }
 
                 </div>
 

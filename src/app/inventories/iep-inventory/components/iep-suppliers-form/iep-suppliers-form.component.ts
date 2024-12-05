@@ -63,7 +63,7 @@ export class IepSuppliersFormComponent implements OnInit,OnDestroy {
       name: ['', Validators.required],
       cuit: ['', [
         Validators.required, this.validarCUIT()]],
-      phoneNumber: ['', [Validators.required, Validators.pattern('[1-9]{10}$')]],
+      phoneNumber: ['', [Validators.required, Validators.pattern('[0-9]{10}$')]],
       createdUser:[this.userService.getUser().id],
       email: ['', [Validators.required, Validators.email, this.emailDomainValidator]],
       supplierType: ['OTHER', Validators.required],
@@ -309,7 +309,7 @@ export class IepSuppliersFormComponent implements OnInit,OnDestroy {
         // Verifica que los primeros 2 dígitos sean un tipo válido (20, 23, 24, 27, 30, 33, 34)
         const tipo = parseInt(cuilLimpio.substring(0, 2), 10);
         console.log(tipo);
-        const tiposValidos = [30, 33, 34];
+        const tiposValidos = [20, 23, 24, 27, 30, 33, 34];
         if (!tiposValidos.includes(tipo)) {
           console.log("no es valido")
           return { cuilInvalido: true };
