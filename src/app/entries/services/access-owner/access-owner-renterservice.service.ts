@@ -4,8 +4,6 @@ import { BehaviorSubject, Observable, Subject, take, tap } from 'rxjs';
 import { AccessNewMovementsEntryDtoOwner, AccessUserAllowedInfoDtoOwner } from '../../models/access-visitors/interface/access-owner';
 import { AccessRegistryUpdateService } from '../access-registry-update/access-registry-update.service';
 import { API_ENDPOINTS } from '../../entries-environment';
-import { AccessesUpdateAccesDto } from '../../models/access-visitors/access-VisitorsModels';
-
 
 
 @Injectable({
@@ -20,7 +18,7 @@ export class AccessOwnerRenterserviceService {
 
  private httpClient: HttpClient = inject(HttpClient);
  private readonly registryUpdate = inject(AccessRegistryUpdateService);
- private readonly UPDATE_ACCESES=API_ENDPOINTS.UPDATE_ACCESS; 
+
  private movemenSubject = new BehaviorSubject<{ document: string, movement: string, plate: string }>({
    document: '',
    movement: '',
@@ -73,9 +71,5 @@ export class AccessOwnerRenterserviceService {
          this.registryUpdate.updateTable(true);
        })
      );
- }
- updateAccess(document:string,documentType:string,updateAccesDto:any):Observable<any>{
-  const headers = new HttpHeaders({'Content-Type': 'application/json'});
-  return this.httpClient.put<any>(`${this.UPDATE_ACCESES}/${document}/${documentType}`,updateAccesDto,{headers});
  }
 }
