@@ -147,7 +147,7 @@ export class AccessVisitorsRegisterServiceHttpClientService {
    };
  }
 
- public transformAllowedDay(allowedDay: AccessAllowedDay): any {
+ private transformAllowedDay(allowedDay: AccessAllowedDay): any {
    return {
      day: this.dayMapping[allowedDay.day.name] || allowedDay.day.name,
      init_hour: this.transformTime(allowedDay.startTime),
@@ -155,7 +155,7 @@ export class AccessVisitorsRegisterServiceHttpClientService {
    };
  }
 
- public transformTime(date: Date): string {
+ private transformTime(date: Date): string {
    return date.toTimeString().slice(0, 8); 
  }
 
