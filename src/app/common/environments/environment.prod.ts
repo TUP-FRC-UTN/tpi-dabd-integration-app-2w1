@@ -15,7 +15,7 @@ export const environment = {
     fileManager: `${BASE_URL}/file-manager`,
     inventory: `${BASE_URL}/inventory`,
     mercadoPago: `${BASE_URL}/mercado-pago-service`,
-    notifications: `http://localhost:8080`,
+    notifications: `${BASE_URL}/notifications`,
     ownersAndPlots: `${BASE_URL}/owners-and-plots`,
     sanctions: `${BASE_URL}/sanctions`,
     stripeService: `${BASE_URL}/stripe-service`,
