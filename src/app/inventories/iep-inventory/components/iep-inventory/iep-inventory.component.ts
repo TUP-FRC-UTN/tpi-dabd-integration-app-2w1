@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit, AfterViewInit, NgModule} from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, AfterViewInit, NgModule } from '@angular/core';
 import { debounceTime, min, Observable, Subscription } from 'rxjs';
 import { ProductService } from '../../services/product.service';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -15,7 +15,7 @@ import 'jspdf-autotable';
 import { IepStockIncreaseComponent } from '../iep-stock-increase/iep-stock-increase.component';
 import { Details } from '../../models/details';
 import { ProductCategory } from '../../models/product-category';
-import { ProductXDetailDto, ProductXDetailDto2,} from '../../models/product-xdetail-dto';
+import { ProductXDetailDto, ProductXDetailDto2, } from '../../models/product-xdetail-dto';
 import { CategoriaService } from '../../services/categoria.service';
 import { DetailServiceService } from '../../services/detail-service.service';
 import { EstadoService } from '../../services/estado.service';
@@ -23,6 +23,8 @@ import { Row } from 'jspdf-autotable';
 import Swal from 'sweetalert2';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { AuthService } from '../../../../users/users-servicies/auth.service';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 declare var bootstrap: any; // Añadir esta declaración al principio
 // Interfaces existentes actualizadas
 interface Filters {
@@ -60,6 +62,10 @@ interface ReusableOption {
   styleUrl: './iep-inventory.component.css',
 })
 export class IepInventoryComponent implements OnInit, OnDestroy {
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
+
   fechaMaxima: string;
   errorMessage: string = '';
   // Objeto que mantiene el estado de todos los filtros
@@ -73,13 +79,13 @@ export class IepInventoryComponent implements OnInit, OnDestroy {
     cantMaxima: 0,
   };
 
-  dateStartFilter= new FormControl();
-  dateEndFilter= new FormControl();
+  dateStartFilter = new FormControl();
+  dateEndFilter = new FormControl();
 
   productoSeleccionado: ProductXDetailDto2 | null = null;
   estadoFilter = new FormControl();
   reutilizableFilter = new FormControl();
-  
+
   estadosCombo = [
     { value: 'activo', label: 'Activo' },
     { value: 'inactivo', label: 'Inactivo' },
@@ -114,7 +120,7 @@ export class IepInventoryComponent implements OnInit, OnDestroy {
   formatDateForInput(date: Date): string {
     return date.toISOString().split('T')[0];
   }
-  
+
   private parseDate(dateStr: string): Date {
     const [day, month, year] = dateStr.split('/');
     return new Date(Number(year), Number(month) - 1, Number(day));
@@ -122,74 +128,74 @@ export class IepInventoryComponent implements OnInit, OnDestroy {
 
   globalFilter: string = '';
 
- // Método para aplicar el filtro global y filtros adicionales
-applyFilter(): void {
-  const globalFilterLower = this.filters.nombre.toLowerCase();
-  const startDate = this.dateStartFilter.value;
-  const endDate = this.dateEndFilter.value;
+  // Método para aplicar el filtro global y filtros adicionales
+  applyFilter(): void {
+    const globalFilterLower = this.filters.nombre.toLowerCase();
+    const startDate = this.dateStartFilter.value;
+    const endDate = this.dateEndFilter.value;
 
-  this.productosFiltered = this.productosALL.filter((producto) => {
-    // Filtro global: buscar en nombre del producto y nombre de la categoría
-    const matchesGlobalFilter =
-      producto.name.toLowerCase().includes(globalFilterLower) ||
-      producto.category.categoryName.toLowerCase().includes(globalFilterLower);
+    this.productosFiltered = this.productosALL.filter((producto) => {
+      // Filtro global: buscar en nombre del producto y nombre de la categoría
+      const matchesGlobalFilter =
+        producto.name.toLowerCase().includes(globalFilterLower) ||
+        producto.category.categoryName.toLowerCase().includes(globalFilterLower);
 
-    // Filtrar por estados seleccionados
-    const selectedEstados = this.estadoFilter.value || [];
-    const productoEstado = producto.discontinued
-      ? 'descontinuado'
-      : producto.stock > 0
-      ? 'activo'
-      : 'inactivo';
-    const matchesEstado = 
-      selectedEstados.length === 0 || 
-      selectedEstados.includes(productoEstado);
+      // Filtrar por estados seleccionados
+      const selectedEstados = this.estadoFilter.value || [];
+      const productoEstado = producto.discontinued
+        ? 'descontinuado'
+        : producto.stock > 0
+          ? 'activo'
+          : 'inactivo';
+      const matchesEstado =
+        selectedEstados.length === 0 ||
+        selectedEstados.includes(productoEstado);
 
-    // Filtrar por reutilizable
-    const selectedReutilizables = this.reutilizableFilter.value || [];
-    const matchesReutilizable = 
-      selectedReutilizables.length === 0 || 
-      selectedReutilizables.includes(producto.reusable);
+      // Filtrar por reutilizable
+      const selectedReutilizables = this.reutilizableFilter.value || [];
+      const matchesReutilizable =
+        selectedReutilizables.length === 0 ||
+        selectedReutilizables.includes(producto.reusable);
 
-    // Filtrado por cantidad
-    const matchesCantidad =
-      (this.filters.cantMinima ? producto.stock >= this.filters.cantMinima : true) &&
-      (this.filters.cantMaxima ? producto.stock <= this.filters.cantMaxima : true);
+      // Filtrado por cantidad
+      const matchesCantidad =
+        (this.filters.cantMinima ? producto.stock >= this.filters.cantMinima : true) &&
+        (this.filters.cantMaxima ? producto.stock <= this.filters.cantMaxima : true);
 
-    // Filtrado por fechas
-    let matchesFechas = true;
-    if (startDate || endDate) {
-      try {
-        // Convertir la fecha del producto
-        const dateProduct = this.parseDate(this.formatFullDate(producto.lastEntry));
-        
-        // Establecer fechas de inicio y fin
-        const start = startDate ? this.parseDate(this.formatDate(startDate)) : null;
-        const end = endDate ? this.parseDate(this.formatDate(endDate)) : null;
+      // Filtrado por fechas
+      let matchesFechas = true;
+      if (startDate || endDate) {
+        try {
+          // Convertir la fecha del producto
+          const dateProduct = this.parseDate(this.formatFullDate(producto.lastEntry));
 
-        if (start) start.setHours(0, 0, 0, 0);
-        if (end) end.setHours(23, 59, 59, 999);
+          // Establecer fechas de inicio y fin
+          const start = startDate ? this.parseDate(this.formatDate(startDate)) : null;
+          const end = endDate ? this.parseDate(this.formatDate(endDate)) : null;
 
-        matchesFechas = (!start || dateProduct >= start) && (!end || dateProduct <= end);
-      } catch (error) {
-        console.error('Error al procesar fecha:', error);
-        matchesFechas = false;
+          if (start) start.setHours(0, 0, 0, 0);
+          if (end) end.setHours(23, 59, 59, 999);
+
+          matchesFechas = (!start || dateProduct >= start) && (!end || dateProduct <= end);
+        } catch (error) {
+          console.error('Error al procesar fecha:', error);
+          matchesFechas = false;
+        }
       }
-    }
 
-    // Retornar la combinación de todos los filtros
-    return (
-      matchesGlobalFilter &&
-      matchesReutilizable &&
-      matchesEstado &&
-      matchesCantidad &&
-      matchesFechas
-    );
-  });
+      // Retornar la combinación de todos los filtros
+      return (
+        matchesGlobalFilter &&
+        matchesReutilizable &&
+        matchesEstado &&
+        matchesCantidad &&
+        matchesFechas
+      );
+    });
 
-  // Actualizar la tabla si es necesario
-  this.updateDataTable();
-}
+    // Actualizar la tabla si es necesario
+    this.updateDataTable();
+  }
 
 
   filtersVisible = false; // Controla la visibilidad de los filtros
@@ -201,7 +207,7 @@ applyFilter(): void {
     }
   }
 
-  private userService = inject(AuthService); 
+  private userService = inject(AuthService);
   private categoriaService = inject(CategoriaService);
   private estadoService = inject(EstadoService);
   private productoService = inject(ProductService);
@@ -210,7 +216,20 @@ applyFilter(): void {
   private router = inject(Router);
   modalVisible: boolean = false;
 
-  constructor() {
+  constructor(private tutorialService: TutorialService
+  ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+      },
+      useModalOverlay: true,
+    });
     this.estadoFilter.valueChanges.subscribe(() => this.applyFilter());
     this.reutilizableFilter.valueChanges.subscribe(() => this.applyFilter());
     const hoy = new Date();
@@ -275,6 +294,12 @@ applyFilter(): void {
   endDate: string | undefined;
 
   ngOnInit(): void {
+    //TUTORIAL
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    );
     // Mantener la inicialización de fechas existente
     const hoy = new Date();
     const hace30Dias = new Date();
@@ -381,8 +406,8 @@ applyFilter(): void {
 
   formatFullDate(inputDate: string): string {
     const [year, month, day, hour, minute, second, millisecond] = inputDate;
-            const dateString = `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`;
-            return dateString;
+    const dateString = `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`;
+    return dateString;
   }
 
   initializeDataTable(): void {
@@ -393,7 +418,7 @@ applyFilter(): void {
         {
           data: 'lastEntry',
           title: 'Último ingreso',
-          render: (data:any) => {
+          render: (data: any) => {
             const [year, month, day, hour, minute, second, millisecond] = data;
             const dateString = `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`;
             return dateString;
@@ -401,7 +426,7 @@ applyFilter(): void {
         },
         {
           data: null,
-          title: 'Estado', 
+          title: 'Estado',
           className: 'text-center',
           render: (data: any) => {
             const discontinued = data.discontinued;
@@ -471,24 +496,24 @@ applyFilter(): void {
             const isActive = row.stock > 0;
             const status = discontinued ? 'Discontinuado' : isActive ? 'Activo' : 'Inactivo';
             const shouldShowDeleteButton = status === 'Inactivo';
-        
+
             return `
             <div class="text-center">
               <div class="btn-group">
                 <div class="dropdown">
-                  <button type="button" class="btn border border-2 bi-three-dots-vertical btn-cambiar-estado" data-bs-toggle="dropdown"></button>
+                  <button type="button" class="btn border border-2 bi-three-dots-vertical btn-cambiar-estado" data-bs-toggle="dropdown" id="actions"></button>
                   <ul class="dropdown-menu">
                     <li>
                       <button class="dropdown-item btn botonDetalleEditar" data-id="${row.id}">Editar</button>
                     </li>
                     ${shouldShowDeleteButton
-                        ? `<li>
+                ? `<li>
                              <button class="dropdown-item btn delete-btn" data-id="${row.id}" 
                                (click)="giveLogicalLow(${row.id})" data-bs-target="#eliminarProductoModal" 
                                data-bs-toggle="modal">Eliminar</button>
                            </li>`
-                        : ''
-                    }
+                : ''
+              }
                   </ul>
                 </div>
               </div>
@@ -501,7 +526,7 @@ applyFilter(): void {
       lengthMenu: [5, 10, 25, 50],
       searching: false,
       ordering: true,
-      order: [[0, 'desc'],[1, 'desc']],
+      order: [[0, 'desc'], [1, 'desc']],
       autoWidth: false,
       language: {
         search: '',
@@ -624,7 +649,7 @@ applyFilter(): void {
     const doc = new jsPDF();
     doc.setFontSize(16);
     doc.text('Lista de Productos', 10, 10);
-  
+
     // Reordenamos los datos según el orden de columnas en la tabla HTML
     const dataToExport = this.productosFiltered.map((producto) => [
       producto.discontinued ? 'Descontinuado' : producto.stock > 0 ? 'Activo' : 'Inactivo', // Estado
@@ -634,7 +659,7 @@ applyFilter(): void {
       producto.stock, // Stock
       producto.minQuantityWarning || '', // Min. Alerta
     ]);
-  
+
     // Orden de encabezados de columnas según la tabla HTML
     (doc as any).autoTable({
       head: [
@@ -652,39 +677,39 @@ applyFilter(): void {
       theme: 'grid',
       margin: { top: 30, bottom: 20 },
     });
-  
+
     // Guardar archivo PDF
     const formattedDate = this.getFormattedDate();
     doc.save(`${formattedDate}_Lista_Productos.pdf`);
   }
-  
+
   generarExcel(): void {
     const encabezado = [
       ['Listado de Productos'],
       [],
       [
-        'Estado',        
-        'Reutilizable', 
-        'Artículo',     
-        'Categoría',     
-        'Stock',        
-        'Min. Alerta',   
+        'Estado',
+        'Reutilizable',
+        'Artículo',
+        'Categoría',
+        'Stock',
+        'Min. Alerta',
       ],
     ];
-  
+
     // Reordenamos los datos según el orden de columnas en la tabla HTML
     const excelData = this.productosFiltered.map((producto) => [
-      producto.discontinued ? 'Descontinuado' : producto.stock > 0 ? 'Activo' : 'Inactivo', 
-      producto.reusable ? 'Sí' : 'No', 
-      producto.name, 
-      producto.category ? producto.category.categoryName : '', 
-      producto.stock, 
-      producto.minQuantityWarning || '', 
+      producto.discontinued ? 'Descontinuado' : producto.stock > 0 ? 'Activo' : 'Inactivo',
+      producto.reusable ? 'Sí' : 'No',
+      producto.name,
+      producto.category ? producto.category.categoryName : '',
+      producto.stock,
+      producto.minQuantityWarning || '',
     ]);
-  
+
     const worksheetData = [...encabezado, ...excelData];
     const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
-  
+
     worksheet['!cols'] = [
       { wch: 20 },
       { wch: 30 },
@@ -693,11 +718,11 @@ applyFilter(): void {
       { wch: 10 },
       { wch: 15 },
     ];
-  
+
     // Crear el libro de trabajo y agregar la hoja
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Lista de Productos');
-  
+
     // Guardar el archivo con la fecha
     const formattedDate = this.getFormattedDate();
     XLSX.writeFile(workbook, `${formattedDate}_Lista_Productos.xlsx`);
@@ -750,6 +775,16 @@ applyFilter(): void {
   }
 
   ngOnDestroy(): void {
+    //TUTORIAL
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
+
     if (this.categoriasSubscription) {
       this.categoriasSubscription.unsubscribe();
     }
@@ -763,7 +798,88 @@ applyFilter(): void {
     this.selectedProductId = null;
   }
 
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Listado de Productos',
+      text: 'Acá puede ver todos los productos que se encuentran en disposición del barrio. Se señala también su estado de disponibilidad, su cantidad disponible y si es o no reutilizable.',
+      attachTo: {
+        element: '#productsList',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
 
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Filtros',
+      text: 'Desde acá podrá filtrar los productos por fecha y estado, o filtrar de forma más específica con el botón de filtros. También puede exportar la lista a Excel o PDF en caso de desearlo, o borrar los filtros aplicados con el botón de basura.',      attachTo: {
+        element: '#filtros',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Acciones',
+      text: 'Con este botón será enviado a la pestaña de edición, donde podrá modificar los datos del producto que haya elegido.',      attachTo: {
+        element: '#actions',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Añadir Productos',
+      text: 'Al tocar este botón, será redirigido a la pestaña para cargar nuevos productos a la lista.',      attachTo: { 
+        element: '#addProduct',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+      
+    });
+
+    this.tour.start();
+  }
 
   abrirModal() {
     this.modalVisible = true;

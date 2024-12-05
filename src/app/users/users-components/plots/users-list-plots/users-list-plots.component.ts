@@ -20,6 +20,9 @@ import { CustomSelectComponent } from '../../../../common/components/custom-sele
 import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
 import { RoutingService } from '../../../../common/services/routing.service';
 import { UsersTransferPlotComponent } from "../users-transfer-plot/users-transfer-plot.component";
+import { UserService } from '../../../users-servicies/user.service';
+import { GetuserDto } from '../../../users-models/users/GetUserDto';
+import { UserGet } from '../../../users-models/users/UserGet';
 import { Subscription } from 'rxjs';
 import Shepherd from 'shepherd.js';
 import { TutorialService } from '../../../../common/services/tutorial.service';
@@ -40,6 +43,7 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
   plots: GetPlotModel[] = [];
   private readonly plotService = inject(PlotService);
   private readonly ownerService = inject(OwnerService);
+  private readonly userService = inject(UserService);
   showDeactivateModal: boolean = false;
   userToDeactivate: number = 0;
 
@@ -70,6 +74,8 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
         modalOverlayOpeningPadding: 10,
         modalOverlayOpeningRadius: 10,
       },
+      keyboardNavigation: false,
+
       useModalOverlay: true,
     }); 
  }
@@ -98,6 +104,7 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
       
     this.loadAllPlotsStates();
     this.loadAllPlotsTypes();
+
 
     const sus = this.plotService.getAllPlots().subscribe({
       next: async (data: GetPlotModel[]) => {
@@ -401,8 +408,8 @@ export class UsersListPlotsComponent implements OnInit, OnDestroy {
       //Agregar servicio
       this.suscriptionService.addSuscription(sus);
     });
-
   }
+
 
   //--------------------------------------------------Filtros------------------------------------------------
 

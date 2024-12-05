@@ -1,5 +1,5 @@
 <form [formGroup]="reactiveForm">
-    <ng-select [formControl]="selectControl" bindLabel="name" bindValue="value" [closeOnSelect]="!multiple"
+    <ng-select [formControl]="selectControl" bindLabel="name" bindValue="value" [closeOnSelect]="!multiple" [readonly]="disabled"
         [multiple]="multiple" [items]="options" [placeholder]="placeholder" [ngClass]="onValidate('selectControl')">
         @if(multiple){
         <ng-template ng-multi-label-tmp let-items="items">

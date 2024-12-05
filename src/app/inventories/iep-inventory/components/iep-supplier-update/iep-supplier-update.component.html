@@ -1,5 +1,5 @@
 <div class="container-fluid d-flex flex-column justify-content-center align-items-center">
-  <form [formGroup]="proveedorForm" (ngSubmit)="onSubmit()" class="mt-5 bg-white shadow p-5 mx-2 w-100" style="max-width: 1200px">
+  <form [formGroup]="proveedorForm" (ngSubmit)="onSubmit()" class="mt-5 bg-white shadow p-5 mx-2 w-100" style="max-width: 1200px" id="pantalla">
     <div class="row">
       <div class="col-md-6">
         <div class="mb-3">
@@ -52,7 +52,7 @@
 
 
     <div class="row">
-      <div class="col-md-6">
+      <div class="col-md-6" id="combo">
         <div class="mb-3">
           <label class="form-label">Tipo Proveedor</label>
                 <select formControlName="supplierType" class="form-select" [ngClass]="{'is-invalid': isFieldInvalid('supplierType')}">
@@ -85,7 +85,7 @@
         <div class="col-auto">
           <button type="button" class="btn btn-secondary" [routerLink]="['/main/providers/suppliers']" routerLinkActive="router-link-active">Cancelar</button>
         </div>
-        <div class="col-auto">
+        <div class="col-auto" id="registrar">
           <button type="submit" class="btn btn-primary" style="width: 100%;" [disabled]="proveedorForm.invalid">Guardar</button>
         </div>
       </div>

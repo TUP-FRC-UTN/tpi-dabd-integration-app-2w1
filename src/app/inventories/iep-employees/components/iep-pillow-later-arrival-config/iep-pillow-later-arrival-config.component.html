@@ -1,5 +1,5 @@
 <!-- global-minutes-config.component.html -->
-<div class="container py-5 ">
+<div class="container py-5 " id="configuration">
     <div class="row justify-content-center  ">
       <div class="col-md-12 ">
         <!-- Encabezado -->
@@ -14,7 +14,7 @@
            
         <div class="col-6" >
                 
-        <div class="card shadow-sm p-4">
+        <div class="card shadow-sm p-4" id="lateArrival">
             <div class="pb-3">
               <div class="d-flex align-items-center gap-2">
                 <i class="fas fa-clock text-primary"></i>
@@ -75,14 +75,14 @@
             </div>
             <div class="col-6">
 
-                <div class="card shadow-sm p-4">
+                <div class="card shadow-sm p-4" id="justification">
                     <div class="">
                         <div class="d-flex align-items-center gap-2">
                             <i class="fas fa-clock text-primary"></i>
                             <h2 class="h5">Política de Justificacion por Falta</h2>
                           </div>
                       <p class="text-muted mt-2">
-                        Configure el tiempo de tolerancia global para justificación por Faltas de los empleados. Esta configuración se aplicará a todos los empleados de la organización.
+                        Configure el tiempo de tolerancia global para justificación por faltas de los empleados. Esta configuración se aplicará a todos los empleados de la organización.
                       </p>
                     </div>
             
@@ -93,13 +93,13 @@
                       <div class="alert alert-info d-flex align-items-center" role="alert">
                         <i class="fas fa-info-circle me-2"></i>
                         <span class="fs-6">
-                          Los valores configurados aquí afectarán el acceso a la carga de justificacion  para todos los empleados. Asegúrese de que este valor esté alineado con las políticas de la empresa.
+                          Los valores configurados aquí afectarán el acceso a la carga de justificación para todos los empleados. Asegúrese de que este valor esté alineado con las políticas de la empresa.
                         </span>
                       </div>
             
                       <!-- campo days -->
                       <div class="mb-4">
-                        <label for="days" class="form-label">Dias habiles para justificar </label>
+                        <label for="days" class="form-label">Días hábiles para justificar </label>
                         <div class="d-flex align-items-center gap-3">
                           <input
                             id="days"
@@ -111,7 +111,7 @@
                             max="60"
                             placeholder="0-30"
                           >
-                          <span class="text-muted">dias</span>
+                          <span class="text-muted">días</span>
                         </div>
                         
                         <!-- Errores -->
@@ -154,6 +154,7 @@
                           type="submit"
                           class="btn btn-primary "
                           [disabled]="configForm.invalid || configForm.pristine"
+                          id="register"
                         >
                           Guardar 
                         </button>

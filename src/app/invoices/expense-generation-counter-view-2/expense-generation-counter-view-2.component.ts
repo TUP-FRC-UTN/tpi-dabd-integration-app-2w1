@@ -12,6 +12,9 @@ import { Owner } from "../expense-generation-interfaces/expense-generation-owner
 import { DebtorExpense } from '../expense-generation-interfaces/expense-generation-expense-interface';
 import { CustomSelectComponent } from '../../common/components/custom-select/custom-select.component';
 import { CustomKpiComponent } from '../../common/components/custom-kpi/custom-kpi.component';
+import { Subscription } from 'rxjs';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../common/services/tutorial.service';
 
 
 @Component({
@@ -23,11 +26,27 @@ import { CustomKpiComponent } from '../../common/components/custom-kpi/custom-kp
 })
 export class ExpenseGenerationCounterView2Component {
 
-  constructor(public counterService: ExpenseGenerationCounterServiceService, public expenseService: ExpenseGenerationExpenseService) {
+  constructor(public counterService: ExpenseGenerationCounterServiceService, public expenseService: ExpenseGenerationExpenseService, private tutorialService: TutorialService
+  ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+      },
+      useModalOverlay: true,
+    }); 
   }
   counterData: ExpenseGenerationCounter[] = [];
 
-  
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
+
   debtorExpenses: DebtorExpense[] = []
   ownerName: string = ''
   owners: Owner[] = [];
@@ -328,6 +347,12 @@ export class ExpenseGenerationCounterView2Component {
 
   ngOnInit() {
     this.loadOwners();
+      //TUTORIAL
+      this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+        () => {
+          this.startTutorial();
+        }
+      ); 
     this.counterService.getTransactions().subscribe({
       next: (data) => {
         this.counterData = data;
@@ -342,6 +367,150 @@ export class ExpenseGenerationCounterView2Component {
 
     console.log(this.owners)
   }
+
+  ngOnDestroy() {
+    //TUTORIAL
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    // Cancelar suscripción del tutorial
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
+  
+   
+  }
+
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+    this.tour.addStep({
+      id: 'filtros',
+      title: 'Filtros',
+      text: 'Desde acá podrá filtrar los gráficos por fecha. También puede agregar filtros avanzados clickeando en el boton azul de filtros, o borrar los filtros aplicados con el botón de basura.',      attachTo: {
+        element: '#filtros',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+      
+    });
+    
+    this.tour.addStep({
+      id: 'graficos',
+      title: 'Gráficos',
+      text: 'Acá puede ver gráficos y KPIs con información resumida sobre boletas y morosidad, según los filtros aplicados.',
+      attachTo: {
+        element: '#graficos',
+        on: 'top-start'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'promedio',
+      title: 'Promedios por metodo de pago',
+      text: 'Este gráfico muestra el promedios de metodo de pago utilizados para pagar las boletas.',
+      attachTo: {
+        element: '#promedio',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'deudores',
+      title: 'Top 5 deudores',
+      text: 'Este gráfico muestra un top 5 de deudores por no pago de boletas.',
+      attachTo: {
+        element: '#deudores',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'facturado',
+      title: ' Comparación de facturado y cobrado',
+      text: 'Este gráfico muestra una comparación entre lo facturado en las boletas y lo que realmente se recaudó.',
+      attachTo: {
+        element: '#facturado',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+      
+    });
+
+   
+
+    this.tour.addStep({
+      id: 'kpis',
+      title: 'KPIs',
+      text: 'Estos KPIs muestran información general y resumida sobre las boletas.',
+      attachTo: {
+        element: '#kpis',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+    });
+    this.tour.start();
+}
+
 
 
   //-----| Estos tres metodos son para el select de metodos de pago |-----------------

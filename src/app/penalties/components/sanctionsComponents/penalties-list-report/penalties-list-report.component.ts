@@ -21,6 +21,9 @@ import { CustomSelectComponent } from '../../../../common/components/custom-sele
 import { PenaltiesUpdateStateReasonModalComponent } from '../modals/penalties-update-state-reason-modal/penalties-update-state-reason-modal.component';
 import { PenaltiesUpdateStateReasonReportModalComponent } from '../modals/penalties-update-state-reason-report-modal/penalties-update-state-reason-report-modal.component';
 import { PlotService } from '../../../../users/users-servicies/plot.service';
+import { Subscription } from 'rxjs';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 
 
 
@@ -49,6 +52,10 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
   options: { value: string, name: string }[] = []
   @ViewChild(CustomSelectComponent) customSelect!: CustomSelectComponent;
 
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
+
 
 
   //Constructor
@@ -57,9 +64,23 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
     private _modal: NgbModal,
     private router: Router,
     private routingService: RoutingService,
-    private plotService: PlotService
-
+    private plotService: PlotService, 
+    private tutorialService: TutorialService
   ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+      },
+      keyboardNavigation: false,
+
+      useModalOverlay: true,
+    }); 
     (window as any).viewReport = (id: number) => this.viewReport(id);
     (window as any).editReport = (id: number) => this.editReport(id);
 
@@ -94,8 +115,90 @@ export class PenaltiesSanctionsReportListComponent implements OnInit {
     })
     this.resetDates()
     this.today = new Date().toISOString().split('T')[0];
+
+    //TUTORIAL
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    ); 
   }
 
+  ngOnDestroy(): void {
+    //TUTORIAL
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
+  }
+
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Listado de Informes',
+      text: 'Acá puede ver una lista completa de los informes que se han realizado. Además, en las acciones, cuenta con la posibilidad de modificar el estado o ver más detalles sobre los informes.',
+      attachTo: {
+        element: '#reportsTable',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+
+    this.tour.addStep({
+      id: 'filter-step',
+      title: 'Filtros',
+      text: 'Desde acá podrá filtrar los informes por nombre, estado y fecha. También puede exportar el listado a Excel o PDF, o borrar los filtros aplicados con el botón de basura.',
+      attachTo: {
+        element: '#filters',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+
+    });
+
+    this.tour.addStep({
+      id: 'float-button-step',
+      title: 'Agregar Informe',
+      text: 'Haciendo click en este botón puede acceder a la página de alta de informes. Acá puede crear un nuevo informe con sus datos correspondientes.',
+      attachTo: {
+        element: '#addButton',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+    });
+
+    this.tour.start();
+  }
 
   resetDates() {
     const today = new Date();

@@ -11,6 +11,9 @@ import $ from 'jquery';
 import Swal from 'sweetalert2';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { UsersMockIdService } from '../../../common-services/users-mock-id.service';
+import { Subscription } from 'rxjs';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 declare var bootstrap: any; // Añadir esta declaración al principio
 
 @Component({
@@ -21,6 +24,10 @@ declare var bootstrap: any; // Añadir esta declaración al principio
   styleUrl: './iep-charges.component.css'
 })
 export class IepChargesComponent implements OnInit, OnDestroy, AfterViewInit {
+
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
 
   cargoForm: FormGroup;
   cargos: ChargeResponse[] = [];
@@ -55,8 +62,22 @@ export class IepChargesComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(
     private fb: FormBuilder,
     private cargoService: ChargeService,
-    private mockid:UsersMockIdService
+    private mockid:UsersMockIdService,
+    private tutorialService: TutorialService
   ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+      },
+      keyboardNavigation: false,
+      useModalOverlay: true,
+    }); 
     this.cargoForm = this.fb.group({
       charge: ['', Validators.required],
       description: ['', Validators.required],
@@ -152,6 +173,59 @@ export class IepChargesComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.table) {
       this.table.destroy();
     }
+    //TUTORIAL
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    } 
+  }
+
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Tabla de Cargos',
+      text: 'Acá puede ver todos los cargos de los empleados. Puede hacer click en un estado para modificarlo o eliminarlo.',
+      attachTo: {
+        element: '#cargosTable',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Filtros',
+      text: 'Desde acá puede filtrar los cargos por nombre y por estado. También puede exportar los estados a Excel o PDF, o borrar los filtros aplicados con el botón de basura.',
+        attachTo: {
+        element: '#filtros',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+      
+    });
+
+    this.tour.start();
   }
 
   resetFilters() {
@@ -295,6 +369,12 @@ closeInfoModal(): void{
   // Keep your existing methods for table management, export, etc.
   ngOnInit(): void {
     this.loadCargos();
+      //TUTORIAL
+      this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+        () => {
+          this.startTutorial();
+        }
+      ); 
   }
 
   filterData(event: any): void {

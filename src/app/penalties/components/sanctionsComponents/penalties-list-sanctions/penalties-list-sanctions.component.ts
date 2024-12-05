@@ -212,6 +212,8 @@ export class PenaltiesSanctionsListComponent implements OnInit, OnDestroy {
         modalOverlayOpeningPadding: 10,
         modalOverlayOpeningRadius: 10,
       },
+      keyboardNavigation: false,
+
       useModalOverlay: true,
     });
     (window as any).viewFine = (id: number) => this.viewFine(id);

@@ -1,6 +1,6 @@
 <div class="container p-3">
   <div
-    class="post-complaint-section p-4 border shadow-lg p-3 mb-5 bg-white rounded"
+    class="post-complaint-section p-4 border shadow-lg p-3 mb-5 bg-white rounded"  id="formDenuncia"
   >
     <form #formDenuncia="ngForm" novalidate>
       <div class="row">
@@ -40,7 +40,7 @@
         </div>
 
         <!-- Textarea descripcion -->
-        <div class="col-lg-12 mb-3">
+        <div class="col-lg-12 mb-3" id="reportDescription">
           <div class="row">
             <label class="col-2 col-lg-1 col-form-label">Descripción</label>
             <div class="col-10 col-lg-11">
@@ -89,7 +89,7 @@
 
         <!-- Adjuntar -->
         <div class="col">
-          <button type="button" class="btn btn-warning" (click)="openModal()">
+          <button type="button" class="btn btn-warning" (click)="openModal()" id="complaintModal">
             <i class="bi bi-paperclip"></i>
             Adjuntar Denuncias
             <span class="ms-1 badge text-bg-danger">{{
@@ -108,6 +108,7 @@
           class="btn btn-primary"
           [disabled]="formDenuncia.invalid"
           (click)="updateReport()"
+          id="saveButton"
         >
           Guardar
         </button>

@@ -52,6 +52,12 @@ export class PenaltiesListComplaintComponent implements OnInit {
   
   //Destroy
   ngOnDestroy(): void {
+    //TUTORIAL
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
     if (this.tutorialSubscription) {
       this.tutorialSubscription.unsubscribe();
     }

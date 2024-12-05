@@ -72,7 +72,6 @@ export class UsersNavbarComponent implements OnInit {
 
   //Seleccionar un rol
   selectRole(role: string) {
-    this.collapseSideButtons();
     this.authService.saveActualRole(role);
     this.actualRole = role;
     this.routingService.redirect('/main/home', 'Página principal');
@@ -83,7 +82,7 @@ export class UsersNavbarComponent implements OnInit {
   //Cerrar sesión
   logOut() {
     this.authService.logOut();
-    this.routingService.redirect('/login');
+    this.routingService.redirect('/home');
   }
 
 
@@ -93,12 +92,4 @@ export class UsersNavbarComponent implements OnInit {
     return rolesPermited.includes(this.actualRole) && this.routingService.getCurrentRoute() !== '/main/home';
   }
 
-
-  //Contrae todos los dropdowns de la sidebar
-  collapseSideButtons() {
-    document.querySelectorAll('#sideButtons .collapse').forEach((collapseElement) => {
-      const collapseInstance = new (window as any)['bootstrap'].Collapse(collapseElement as HTMLElement, { toggle: false });
-      collapseInstance.hide();
-    });
-  }
 }

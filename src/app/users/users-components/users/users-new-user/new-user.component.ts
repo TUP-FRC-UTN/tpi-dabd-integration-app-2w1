@@ -59,6 +59,8 @@ export class NewUserComponent implements OnInit, OnDestroy {
         modalOverlayOpeningPadding: 10,
         modalOverlayOpeningRadius: 10,
       },
+      keyboardNavigation: false,
+
       useModalOverlay: true,
     });
 
@@ -254,13 +256,9 @@ export class NewUserComponent implements OnInit, OnDestroy {
   loadPlotsAvailables() {
     const sus = this.plotService.getAllPlotsAvailables().subscribe({
       next: (data: GetPlotDto[]) => {
-        if (this.authService.getActualRole() == 'Propietario') {
-          this.lotes = data.filter((lote) =>
-            this.authService.getUser().plotId.includes(lote.id)
-          );
-          this.reactiveForm
-            .get('plot')
-            ?.setValue(this.authService.getUser().plotId.toString());
+        if (this.authService.getActualRole() == "Propietario") {
+          this.lotes = data.filter(lote => this.authService.getUser().plotId.includes(lote.id));
+          this.reactiveForm.get('plot')?.setValue(this.authService.getUser().plotId.toString());
           this.reactiveForm.get('plot')?.disable();
         } else {
           this.lotes = data;
@@ -269,75 +267,50 @@ export class NewUserComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('Error al cargar los lotes:', err);
-      },
+      }
     });
 
-    if (this.authService.getActualRole() == 'Propietario') {
+    if(this.authService.getActualRole() == "Propietario"){
       this.reactiveForm.controls['plot'].disable();
     }
 
+
     this.userService.getAllRoles().subscribe({
       next: (data: RolModel[]) => {
-        this.options = data.map((rol) => rol.description);
-        if (this.authService.getActualRole() == 'Propietario') {
-          let optionsFilter = this.options.filter(
-            (rol) =>
-              !['Familiar mayor', 'Familiar menor', 'Inquilino'].includes(rol)
-          );
-          this.options = [];
-          optionsFilter.forEach((o) =>
-            this.options.push({ value: o, name: o })
-          );
-        } else if (this.authService.getActualRole() == 'SuperAdmin') {
-          let optionsFilter = this.options.filter(
-            (rol) =>
-              ![
-                'Propietario',
-                'Familiar mayor',
-                'Familiar menor',
-                'Inquilino',
-              ].includes(rol)
-          );
-          this.options = [];
-          optionsFilter.forEach((o) =>
-            this.options.push({ value: o, name: o })
-          );
-        } else if (this.authService.getActualRole() == 'Gerente general') {
-          let optionsFilter = this.options.filter(
-            (rol) =>
-              ![
-                'SuperAdmin',
-                'Propietario',
-                'Familiar mayor',
-                'Familiar menor',
-                'Inquilino',
-              ].includes(rol)
-          );
-          this.options = [];
-          optionsFilter.forEach((o) =>
-            this.options.push({ value: o, name: o })
-          );
-        } else {
-          let optionsFilter = this.options.filter(
-            (rol) =>
-              !['Familiar mayor', 'Familiar menor', 'Inquilino'].includes(rol)
-          );
-          this.options = [];
-          optionsFilter.forEach((o) =>
-            this.options.push({ value: o, name: o })
-          );
+        this.options = data.map(rol => rol.description);
+        if(this.authService.getActualRole() == "Propietario"){
+          let optionsFilter = this.options.filter(rol => !["Familiar mayor", "Familiar menor", "Inquilino", "Co-Propietario"].includes(rol));
+          this.options = [];          
+          optionsFilter.forEach(o => this.options.push({value : o, name: o}))
+                    
         }
-      },
+        else if(this.authService.getActualRole() == "SuperAdmin"){
+            let optionsFilter = this.options.filter(rol => !["Propietario", "Familiar mayor", "Familiar menor", "Inquilino", "Co-Propietario"].includes(rol));
+          this.options = [];
+          optionsFilter.forEach(o => this.options.push({value : o, name: o}))
+          
+        }
+        else if(this.authService.getActualRole() == "Gerente general"){
+          let optionsFilter = this.options.filter(rol => !["SuperAdmin","Propietario", "Familiar mayor", "Familiar menor", "Inquilino"].includes(rol));
+          this.options = [];
+          optionsFilter.forEach(o => this.options.push({value : o, name: o}))           
+        }
+          else{
+            let optionsFilter = this.options.filter(rol => !["Familiar mayor", "Familiar menor", "Inquilino"].includes(rol));
+            this.options = [];
+            optionsFilter.forEach(o => this.options.push({value : o, name: o}))
+          }
+        },
       error: (error) => {
         console.error('Error al cargar los roles:', error);
-      },
+      }
     });
 
-    if (this.authService.getActualRole() == 'Gerente general') {
-      this.reactiveForm.get('plot')?.disable();
-      this.reactiveForm.get('plot')?.setValue('Sin lote');
+    if(this.authService.getActualRole() == "Gerente general"){
+      this.reactiveForm.get("plot")?.disable();
+      this.reactiveForm.get("plot")?.setValue("Sin lote");
     }
-    //Agregar suscripción
+    //Agregar suscripciÃ³n
     this.suscriptionService.addSuscription(sus);
   }
 
@@ -354,47 +327,30 @@ export class NewUserComponent implements OnInit, OnDestroy {
   }
 
   //Carga los roles y los filtra
-  loadFilteredRoles() {
+    loadFilteredRoles() {
     const sus = this.userService.getAllRoles().subscribe({
       next: (data: RolModel[]) => {
-        this.options = data.map((rol) => rol.description);
-        if (this.authService.getActualRole() == 'Propietario') {
-          let optionsFilter = this.options.filter((rol) =>
-            ['Familiar mayor', 'Familiar menor', 'Inquilino'].includes(rol)
-          );
+        this.options = data.map(rol => rol.description);
+        if (this.authService.getActualRole() == "Propietario") {
+          let optionsFilter = this.options.filter(rol => ["Familiar mayor", "Familiar menor", "Inquilino",  "Co-Propietario"].includes(rol));
           this.options = [];
-          optionsFilter.forEach((o) =>
-            this.options.push({ value: o, name: o })
-          );
-        } else if (this.authService.getActualRole() == 'SuperAdmin') {
-          let optionsFilter = this.options.filter(
-            (rol) =>
-              this.options.includes(rol) &&
-              rol != 'Propietario' &&
-              rol != 'Familiar mayor' &&
-              rol != 'Familiar menor' &&
-              rol != 'Inquilino'
-          );
+          optionsFilter.forEach(o => this.options.push({ value: o, name: o }))        
+        }
+        else if (this.authService.getActualRole() == "SuperAdmin") {
+          let optionsFilter = this.options.filter(rol => this.options.includes(rol) && rol != "Propietario" && rol != "Familiar mayor" && rol != "Familiar menor" && rol != "Inquilino");
           this.options = [];
-          optionsFilter.forEach((o) =>
-            this.options.push({ value: o, name: o })
-          );
-        } else {
-          let optionsFilter = this.options.filter(
-            (rol) =>
-              !this.optionsForOwner.includes(rol) &&
-              rol != 'Propietario' &&
-              rol != 'SuperAdmin'
-          );
+          optionsFilter.forEach(o => this.options.push({ value: o, name: o }))
+
+        }
+        else {
+          let optionsFilter = this.options.filter(rol => !this.optionsForOwner.includes(rol) && rol != "Propietario" && rol != "SuperAdmin" && rol != "Co-Propietario");
           this.options = [];
-          optionsFilter.forEach((o) =>
-            this.options.push({ value: o, name: o })
-          );
+          optionsFilter.forEach(o => this.options.push({ value: o, name: o }))
         }
       },
       error: (error) => {
         console.error('Error al cargar los roles:', error);
-      },
+      }
     });
 
     //Agregar suscripción+

@@ -130,6 +130,8 @@ export class AccessTableComponent implements OnInit, AfterViewInit, OnDestroy {
         modalOverlayOpeningPadding: 10,
         modalOverlayOpeningRadius: 10,
       },
+      keyboardNavigation: false,
+
       useModalOverlay: true,
     });
 
@@ -1100,8 +1102,8 @@ export class AccessTableComponent implements OnInit, AfterViewInit, OnDestroy {
           action: this.tour.back,
         },
         {
-          text: 'Siguiente',
-          action: this.tour.next,
+          text: 'Finalizar',
+          action: this.tour.complete,
         },
       ],
     });
