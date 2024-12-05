@@ -117,6 +117,13 @@ export class PenaltiesModalFineComponent implements OnInit {
       });
   }
 
+  getActualState(){
+    if(this.fine?.fineState == 'Apelada' || this.fine?.disclaimer != "No hay reclamo." ){
+      return true
+    }
+    else return false;
+  }
+
 
 
 }

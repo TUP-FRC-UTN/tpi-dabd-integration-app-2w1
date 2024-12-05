@@ -87,4 +87,11 @@ export class ModalComplaintsListComponent implements OnInit {
     return this.filteredComplaints.filter(complaint => complaint.selected);
   }
 
+  getComplaintReason(complaint: any): string {
+    if (complaint?.complaintReason === 'Otro') {
+        return complaint?.complaintReason + complaint?.anotherReason;
+    }
+    return complaint?.complaintReason || 'N/A';
+}
+
 }
