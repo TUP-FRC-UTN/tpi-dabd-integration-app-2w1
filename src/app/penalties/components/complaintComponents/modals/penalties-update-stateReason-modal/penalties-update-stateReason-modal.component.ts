@@ -39,6 +39,7 @@ export class PenaltiesModalStateReasonComponent {
 
   //Envia la peticion a la api para el cambio de estado e informa con SW el resultado
   putComplaint() {
+    alert("putComplaint" + ' - ' +this.idComplaint + ' - ' +this.complaintState + ' - ' + this.reasonText);
     const ComplaintDto: PutStateComplaintDto = {
       id: this.idComplaint,
       userId: this.authService.getUser().id,
