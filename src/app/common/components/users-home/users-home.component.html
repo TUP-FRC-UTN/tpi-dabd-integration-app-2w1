@@ -1,5 +1,5 @@
 <section class="p-5 pt-0">
-  <div class="container-fluid p-3 mt-0 pt-0" >
+  <div class="container-fluid p-3 mt-0 pt-0">
     <!-- Fila de Notificaciones y Clima -->
     <div class="row m-2 ">
       <!-- Card de Notificaciones (arriba) -->
@@ -8,7 +8,7 @@
           <div class="card-header custom-header p-3">
             <h3 class="mb-0 fs-5 text-center" style="color: black;">Últimas Notificaciones Generales</h3>
           </div>
-          <div class="card-body p-4  h-100"  >
+          <div class="card-body p-4  h-100">
             <!-- Recorre las notificaciones y muestra cada una -->
             <div *ngFor="let notification of notifications" class="announcement-item mb-3">
               <h5 class="fs-5 font-weight-bold">{{ notification.subject }}</h5>
@@ -32,7 +32,8 @@
               <div class="col-4 text-center">
                 <div class="weather-card" *ngIf="weather">
                   <h6 class="text-muted fs-6">Hoy</h6>
-                  <img [src]="'http://openweathermap.org/img/w/' + weather.weather[0].icon + '.png'" alt="Clima actual" style="width: 50px;">
+                  <img [src]="'http://openweathermap.org/img/w/' + weather.weather[0].icon + '.png'" alt="Clima actual"
+                    style="width: 50px;">
                   <h4 class="fs-5">{{weather.main.temp.toFixed(0)}} °C</h4>
                   <p class="weather-description fs-6">{{weather.weather[0].description}}</p>
                   <p class="text-muted fs-6 weather-details">
@@ -45,7 +46,8 @@
               <div class="col-4" *ngFor="let day of forecast">
                 <div class="weather-card text-center">
                   <h6 class="text-muted fs-6">{{formatDate(day.dt_txt || '')}}</h6>
-                  <img [src]="'http://openweathermap.org/img/w/' + day.weather[0].icon + '.png'" alt="Pronóstico" style="width: 50px;">
+                  <img [src]="'http://openweathermap.org/img/w/' + day.weather[0].icon + '.png'" alt="Pronóstico"
+                    style="width: 50px;">
                   <h4 class="fs-5">{{day.main.temp_min.toFixed(0)}} °C </h4>
                   <p class="weather-description fs-6">{{day.weather[0].description}}</p>
                   <p class="text-muted fs-6 weather-details">
@@ -68,6 +70,57 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <div class="row">
+      <div class="col-6">
+        <div>
+          <object id="mapa" type="image/svg+xml" data="plotsMap.svg" style="height: 750px;"></object>
+        </div>
+      </div>
+      <div class="col-6">
+        <!-- Lote seleccionado -->
+        <div class="row">
+          <div class="col-12 verticalAnimation" [ngClass]="{'expanded': selectedPlot}">
+            <!-- Lote seleccionado -->
+            <div class="card">
+              <div class="card-header d-flex justify-content-between">
+                <h5>
+                  {{'Lote: ' + selectedPlot?.id + ( selectedPlot?.plot_state == 'Disponible' ?
+                  ' - Manzana: ' + selectedPlot?.block_number : '' )}}
+                </h5>
+                @if (selectedPlot?.plot_state == 'Disponible') {
+                <button type="button" class="btn btn-light border border-2"
+                  (click)="openRequestModal(selectedPlot!.id)">
+                  Consultar
+                </button>
+                }
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-6">
+                    <img [src]="selectedPng" alt="">
+                  </div>
+                  <div class="col-6 ps-3 border-start border-1 border-secondary">
+                    <div class="d-flex flex-column justify-content-between gap-3">
+                      <div class="col">Área total: {{selectedPlot?.total_area_in_m2}}m² </div>
+                      <div class="col">Dirección: Manzana {{selectedPlot?.block_number}}, lote
+                        {{selectedPlot?.plot_number}} </div>
+                      <div class="col"><i class="bi-check-circle-fill text-success"></i> Tipo:
+                        {{selectedPlot?.plot_type}} </div>
+                      <div class="col"><i class="bi-check-circle-fill text-success"></i>
+                        Estado:
+                        {{selectedPlot?.plot_state}} </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
     </div>
   </div>
 </section>
