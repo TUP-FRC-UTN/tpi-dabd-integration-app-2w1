@@ -375,42 +375,68 @@ export class IepProductComponent implements OnInit, OnDestroy {
     this.tour.on('complete', restoreScroll);
     this.tour.on('cancel', restoreScroll);
     
-    this.tour.addStep({
-      id: 'subject-step',
-      title: 'Alta de producto',
-      text: 'En esta pestaña puede registrar un nuevo producto. Deberá asignarle una categoría, un nombre, una cantidad mínima de la que no debería bajar y la cantidad actual con la que es registrada.',
-      attachTo: {
-        element: '#newProduct',
-        on: 'auto',
-      },
-      buttons: [
+    while (this.tour.steps.length > 0) {
+      this.tour.removeStep(this.tour.steps[this.tour.steps.length - 1].id);
+    }
 
-        {
-          text: 'Siguiente',
-          action: this.tour.next,
+    if(this.idProductToEdit){
+      this.tour.addStep({
+        id: 'subject-step',
+        title: 'Edición de producto',
+        text: 'En esta pestaña puedes editar un producto existente. Puedes editar la categoría, el nombre y/o la cantidad mínima de la que no debería bajar.',
+        attachTo: {
+          element: '#newProduct',
+          on: 'auto',
         },
-      ],
-    });
+        buttons: [
+  
+          {
+            text: 'Siguiente',
+            action: this.tour.next,
+          },
+        ],
+      });
+    }
+    else{
+      this.tour.addStep({
+        id: 'subject-step',
+        title: 'Alta de producto',
+        text: 'En esta pestaña puede registrar un nuevo producto. Deberá asignarle una categoría, un nombre, una cantidad mínima de la que no debería bajar y la cantidad actual con la que es registrada.',
+        attachTo: {
+          element: '#newProduct',
+          on: 'auto',
+        },
+        buttons: [
+  
+          {
+            text: 'Siguiente',
+            action: this.tour.next,
+          },
+        ],
+      });
+    }
 
-    this.tour.addStep({
-      id: 'subject-step',
-      title: 'Selección de proveedor',
-      text: 'Desde acá puede seleccionar el proveedor asignado al producto. Para añadir mas, visite la pestaña de proveedores.',
-      attachTo: {
-        element: '#providerSelect',
-        on: 'auto',
-      },
-      buttons: [
-        {
-          text: 'Anterior',
-          action: this.tour.back,
+    if(!this.idProductToEdit){
+      this.tour.addStep({
+        id: 'subject-step',
+        title: 'Selección de proveedor',
+        text: 'Desde acá puede seleccionar el proveedor asignado al producto. Para añadir mas, visite la pestaña de proveedores.',
+        attachTo: {
+          element: '#providerSelect',
+          on: 'auto',
         },
-        {
-          text: 'Siguiente',
-          action: this.tour.next,
-        },
-      ],
-    });
+        buttons: [
+          {
+            text: 'Anterior',
+            action: this.tour.back,
+          },
+          {
+            text: 'Siguiente',
+            action: this.tour.next,
+          },
+        ],
+      });
+    }
 
     this.tour.addStep({
       id: 'subject-step',
@@ -432,25 +458,47 @@ export class IepProductComponent implements OnInit, OnDestroy {
       ],
     });
 
-    this.tour.addStep({
-      id: 'subject-step',
-      title: 'Registrar producto',
-      text: 'Al finalizar, presione este botón para registrar el producto.',
-      attachTo: {
-        element: '#register',
-        on: 'auto',
-      },
-      buttons: [
-        {
-          text: 'Anterior',
-          action: this.tour.back,
+    if(this.idProductToEdit){
+      this.tour.addStep({
+        id: 'subject-step',
+        title: 'Guardar producto',
+        text: 'Al finalizar, presione este botón para guardar el producto actualizado.',
+        attachTo: {
+          element: '#register',
+          on: 'auto',
         },
-        {
-          text: 'Finalizar',
-          action: this.tour.complete,
+        buttons: [
+          {
+            text: 'Anterior',
+            action: this.tour.back,
+          },
+          {
+            text: 'Finalizar',
+            action: this.tour.complete,
+          },
+        ],
+      });
+    } else {
+      this.tour.addStep({
+        id: 'subject-step',
+        title: 'Registrar producto',
+        text: 'Al finalizar, presione este botón para registrar el producto.',
+        attachTo: {
+          element: '#register',
+          on: 'auto',
         },
-      ],
-    });
+        buttons: [
+          {
+            text: 'Anterior',
+            action: this.tour.back,
+          },
+          {
+            text: 'Finalizar',
+            action: this.tour.complete,
+          },
+        ],
+      });
+    }
 
     this.tour.start();
   }

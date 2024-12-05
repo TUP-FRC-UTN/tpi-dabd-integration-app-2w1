@@ -1,5 +1,5 @@
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink, RouterModule } from '@angular/router';
@@ -13,6 +13,9 @@ import { UsersMockIdService } from '../../../common-services/users-mock-id.servi
 import { EmpPutEmployeeRequest } from '../../Models/EmpPutEmployeeRequest';
 import { EmpPutEmployeesResponse } from '../../Models/EmpPutEmployeesResponse';
 import { AuthService } from '../../../../users/users-servicies/auth.service';
+import { Subscription } from 'rxjs';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 
 @Component({
   selector: 'app-iep-put-employees',
@@ -21,7 +24,7 @@ import { AuthService } from '../../../../users/users-servicies/auth.service';
   templateUrl: './iep-put-employees.component.html',
   styleUrls: ['./iep-put-employees.component.css']
 })
-export class IepPutEmployeesComponent implements OnInit {
+export class IepPutEmployeesComponent implements OnInit, OnDestroy {
   // Variables para datos personales
   userId: number=0;
   nombre: string = '';
@@ -64,13 +67,38 @@ export class IepPutEmployeesComponent implements OnInit {
   horaSalida: string = '';
   private employeeId: number = 0;
   invalidDate: Boolean = false;
+
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private empleadoService: EmpListadoEmpleadosService,
     private postEmployeeService: EmpPostEmployeeService,
-    private userService: AuthService
-  ) {}
+    private userService: AuthService,
+    private tutorialService: TutorialService
+  ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+        scrollTo: {
+          behavior: 'smooth',
+          block: 'center'
+        }
+      },
+      keyboardNavigation: false,
+      useModalOverlay: true,
+      
+    }); 
+  }
   ngOnInit(): void {
     this.loadProvincias();
     this.loadSuppliers();
@@ -79,6 +107,12 @@ export class IepPutEmployeesComponent implements OnInit {
       this.employeeId = +params['id'];
       this.loadEmployeeData();
     });
+    //TUTORIAL
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    ); 
   }
   address: any = {};
   loadAddressData(): void {
@@ -294,7 +328,192 @@ loadContactsData(): void {
     this.router.navigate(['main/employees/employees']);
   }
 
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    // CÓDIGO PARA PREVENIR SCROLLEO DURANTE TUTORIAL
+    const preventScroll = (e: Event) => {
+      e.preventDefault();
+    };
+
+    const restoreScroll = () => {
+      document.body.style.overflow = 'auto';
+      window.removeEventListener('wheel', preventScroll);
+      window.removeEventListener('touchmove', preventScroll);
+    };
+
+    // Al empezar, lo desactiva
+    this.tour.on('start', () => {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('wheel', preventScroll, { passive: false });
+      window.addEventListener('touchmove', preventScroll, { passive: false });
+    });
+
+    // Al completar lo reactiva, al igual que al cancelar
+    this.tour.on('complete', restoreScroll);
+    this.tour.on('cancel', restoreScroll);
+
+
+    this.tour.addStep({
+      id: 'general-step',
+      title: 'Editar un empleado',
+      text: 'En este formulario podrá editar un empleado con sus datos correspondientes.',
+      attachTo: {
+        element: '#form-container-put',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+
+    this.tour.addStep({
+      id: 'personal-data-step',
+      title: 'Datos personales',
+      text: 'Ingrese acá los datos personales del empleado.',
+      attachTo: {
+        element: '#personal-data-put',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'contact-data-step',
+      title: 'Contacto',
+      text: 'Ingrese acá el teléfono y/o E-mail del empleado.',
+      attachTo: {
+        element: '#contact-data',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'address-step',
+      title: 'Domicilio',
+      text: 'Ingrese acá la dirección del empleado, seleccionando provincia y localidad.',
+      attachTo: {
+        element: '#address',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'contract-data-step',
+      title: 'Contrato',
+      text: 'Indique si el contrato es tercerizado o no. En caso de serlo, seleccione el proveedor. En caso de no serlo, indique el salario. Luego seleccione el cargo que corresponda (en caso de no existir, puede crear uno nuevo)',
+      attachTo: {
+        element: '#contract-data',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+      
+    });
+    
+    this.tour.addStep({
+      id: 'work-days-step',
+      title: 'Días y Horarios laborales',
+      text: 'Seleccione qué dias de la semana trabajará el empleado y especifique el horario de inicio y fin de los mismos.',
+      attachTo: {
+        element: '#work-days',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'submit-step',
+      title: 'Guardar',
+      text: 'Por último, haga click en el botón azul para guardar el empleado actualizado.',
+      attachTo: {
+        element: '#submit-button',
+        on: 'top'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+      
+    });
+
+    this.tour.start();
+  }
+
   toggleLicense(): void {
     this.license = !this.license;
+  }
+
+  ngOnDestroy(): void {
+    //TUTORIAL
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
   }
 }
