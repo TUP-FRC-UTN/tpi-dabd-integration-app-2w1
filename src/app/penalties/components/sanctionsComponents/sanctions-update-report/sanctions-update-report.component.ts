@@ -56,6 +56,10 @@ export class ReportModifyComponent implements OnInit {
             canClickTarget: false,
             modalOverlayOpeningPadding: 10,
             modalOverlayOpeningRadius: 10,
+            scrollTo: {
+              behavior: 'smooth',
+              block: 'center'
+            }
           },
           keyboardNavigation: false,
 
@@ -99,6 +103,29 @@ export class ReportModifyComponent implements OnInit {
     while (this.tour.steps.length > 0) {
       this.tour.removeStep(this.tour.steps[this.tour.steps.length - 1].id);
     }
+
+    // CÓDIGO PARA PREVENIR SCROLLEO DURANTE TUTORIAL
+    const preventScroll = (e: Event) => {
+      e.preventDefault();
+    };
+
+    const restoreScroll = () => {
+      document.body.style.overflow = 'auto';
+      window.removeEventListener('wheel', preventScroll);
+      window.removeEventListener('touchmove', preventScroll);
+    };
+
+    // Al empezar, lo desactiva
+    this.tour.on('start', () => {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('wheel', preventScroll, { passive: false });
+      window.addEventListener('touchmove', preventScroll, { passive: false });
+    });
+
+    // Al completar lo reactiva, al igual que al cancelar
+    this.tour.on('complete', restoreScroll);
+    this.tour.on('cancel', restoreScroll);
+    
     this.tour.addStep({
       id: 'general-step',
       title: 'Editar Informe',

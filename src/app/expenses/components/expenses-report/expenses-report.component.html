@@ -3,10 +3,10 @@
 <div class="container my-2 p-2 border border-2 rounded shadow-lg ">
 
   <!-- Fila de botones de filtro -->
-  <div class="row ">
+  <div class="row" id="filters">
     <!-- Filtro de fechas -->
     <div class="col d-flex gap-3">
-      <div id="filters" class="col">
+      <div  class="col">
 
         @if (cardView==3) {
           <app-expenses-year-ngSelect
@@ -83,8 +83,8 @@
       <!-- Graficos chicos (pie, lines, list)-->
       <div class="row mb-2">
         <!-- Grafico 1 -->
-        <div class="col">
-          <div class="card border-0 shadow-lg  rounded-4 h-100">
+        <div class="col" >
+          <div class="card border-0 shadow-lg  rounded-4 h-100" id="chartPeriod">
             <div class="card-body">
               <h4 class="card-title align-items-center">Gastos del Período <button type="button"
                   class="btn btn-sm btn-link text-muted bi bi-arrows-angle-expand fs-5 float-end" title="Expandir"
@@ -108,7 +108,7 @@
         </div>
         <!-- Grafico 2 -->
         <div class="col ">
-          <div class="card border-0 shadow-lg  rounded-4 h-100">
+          <div class="card border-0 shadow-lg  rounded-4 h-100" id="chartLastBill">
             <div class="card-body">
               <h4 class="card-title align-items-center">Último Período Facturado<button type="button"
                   class="btn btn-sm btn-link text-muted bi bi-arrows-angle-expand fs-5 float-end" title="Expandir"
@@ -135,7 +135,7 @@
       <div class="row ">
         <!-- Grafico 3 -->
         <div class="col ">
-          <div class="card border-0 shadow-lg  rounded-4 h-100">
+          <div class="card border-0 shadow-lg  rounded-4 h-100" id="chartCompare">
             <div class="card-body">
               <h4 class="card-title align-items-center"> Comparación Interanual <button type="button"
                   class="btn btn-sm btn-link text-muted bi bi-arrows-angle-expand fs-5 float-end" title="Expandir"

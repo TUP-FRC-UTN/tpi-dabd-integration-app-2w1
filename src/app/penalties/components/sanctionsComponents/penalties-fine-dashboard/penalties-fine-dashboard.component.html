@@ -1,5 +1,5 @@
 <!--Si ves esto es porque anda bien en nanvar y tenes que borrar este div -->
-<div class="container my-2 p-2 border border-2 rounded shadow-lg">
+<div class="container my-2 p-2 border border-2 rounded shadow-lg" id="filters">
   <!-- Fila de botones de filtro -->
   <div class="row">
     <div class="col d-flex gap-3">
@@ -108,7 +108,7 @@
   @if (status == 0) {
   <div class="row">
     <!-- KPIs generales-->
-    <div class="col-2 gap-2 d-flex flex-column justify-content-center">
+    <div class="col-2 gap-2 d-flex flex-column justify-content-center" id="kpis">
       <app-custom-kpi [value]="totalFines" title="Multas totales" subTitle="en el período"
         tooltip="Total de multas en el período" [customStyles]="{ 'background-color': '#D6F6FF' }" icon="bi-flag-fill"
         formatPipe="number">
@@ -139,7 +139,7 @@
       <div class="row mb-2">
         <!-- Grafico 1 -->
         <div class="col">
-          <div class="card border-0 shadow-lg rounded-4 h-100">
+          <div class="card border-0 shadow-lg rounded-4 h-100" id="chartSanctionsByState">
             <div class="card-body">
               <h4 class="card-title align-items-center">
                 Multas por Estado
@@ -164,7 +164,7 @@
         </div>
         <!-- Grafico 2 -->
         <div class="col">
-          <div class="card border-0 shadow-lg rounded-4 h-100">
+          <div class="card border-0 shadow-lg rounded-4 h-100" id="chartSanctionsByReason">
             <div class="card-body">
               <h4 class="card-title align-items-center">
                 Multas por Motivo
@@ -190,7 +190,7 @@
       <div class="row">
         <!-- Grafico 3 -->
         <div class="col">
-          <div class="card border-0 shadow-lg rounded-4 h-100">
+          <div class="card border-0 shadow-lg rounded-4 h-100" id="chartCompare">
             <div class="card-body">
               <h4 class="card-title align-items-center">
                 Comparación del Período

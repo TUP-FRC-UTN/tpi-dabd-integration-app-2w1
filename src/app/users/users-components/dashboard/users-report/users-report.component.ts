@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ChartType, GoogleChartsModule } from 'angular-google-charts';
 import { PlotStateCount } from '../../../users-models/dashboard/PlotStateCount';
@@ -12,6 +12,8 @@ import { BlockData } from '../../../users-models/dashboard/BlockData';
 import { Router } from '@angular/router';
 import { AgeDistributionResponse } from '../../../users-models/dashboard/age-distribution';
 import { RoutingService } from '../../../../common/services/routing.service';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 
 @Component({
   selector: 'app-users-report',
@@ -20,14 +22,49 @@ import { RoutingService } from '../../../../common/services/routing.service';
   templateUrl: './users-report.component.html',
   styleUrl: './users-report.component.css'
 })
-export class UsersReportComponent implements OnInit{
+export class UsersReportComponent implements OnInit, OnDestroy {
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
 
   //Datos comunes a todos los graficos
   private readonly dashboardService = inject(DashboardService);
   private readonly routerService = inject(RoutingService);
+  constructor(private tutorialService: TutorialService
+  ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+        scrollTo: {
+          behavior: 'smooth',
+          block: 'center'
+        }
+      },
+      keyboardNavigation: false,
+      useModalOverlay: true,
+    });
+  }
+
+  ngOnDestroy(): void {
+    //TUTORIAL
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
+  }
 
   subscriptions = new Subscription();
-  cardView : number = 0;
+  cardView: number = 0;
   errorRange: string | null = null;
 
   //Filtros comunes a todos los graficos
@@ -75,6 +112,12 @@ export class UsersReportComponent implements OnInit{
   emptyLots: number = 0;
 
   ngOnInit() {
+    //TUTORIAL
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    );
 
     //Grafico de torta de estado de los lotes
     this.loadPlotStateData();
@@ -85,10 +128,137 @@ export class UsersReportComponent implements OnInit{
     this.loadDataBlocks();
     this.setupSubscriptionsBlocks();
     this.setupSelectFiltersBlocks();
-    
+
     //Grafico de barras para la distribución de edades
     this.loadDataAgeRange();
   }
+
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    // CÓDIGO PARA PREVENIR SCROLLEO DURANTE TUTORIAL
+    const preventScroll = (e: Event) => {
+      e.preventDefault();
+    };
+
+    const restoreScroll = () => {
+      document.body.style.overflow = 'auto';
+      window.removeEventListener('wheel', preventScroll);
+      window.removeEventListener('touchmove', preventScroll);
+    };
+
+    // Al empezar, lo desactiva
+    this.tour.on('start', () => {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('wheel', preventScroll, { passive: false });
+      window.addEventListener('touchmove', preventScroll, { passive: false });
+    });
+
+    // Al completar lo reactiva, al igual que al cancelar
+    this.tour.on('complete', restoreScroll);
+    this.tour.on('cancel', restoreScroll);
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Filtros',
+      text: 'Desde acá podrá filtrar por una fecha inicial y una fecha final. También puede clickear el botón de filtro para acceder a los filtros avanzados, y el botón de basura para deshacer los filtros aplicados.', attachTo: {
+        element: '#filtros',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Estado de los Lotes',
+      text: 'Este gráfico muestra la distribción de los lotes según su estado actual. También puede interactuar con él para ver información más detallada.', attachTo: {
+        element: '#chartPlotState',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Último Período Facturado',
+      text: 'Este gráfico muestra la distribución de usuarios por edad. También puede interactuar con él para ver información más detallada.', attachTo: {
+        element: '#chartAgeRange',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Comparación Interanual',
+      text: 'Este gráfico muestra una comparación entre las manzanas según el área construida versus el área total. También puede interactuar con él para ver información más detallada.', attachTo: {
+        element: '#chartBlocks',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'KPIs',
+      text: 'Estos KPIs muestran información sobre los lotes y usuarios. Al interactuar con ellos, puede ver información más detallada.', attachTo: {
+        element: '#kpis',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+
+    });
+
+    this.tour.start();
+  }
+
 
   private setupFilters() {
     // Suscribirse a cambios en los filtros y actualizar los datos en consecuencia
@@ -125,7 +295,7 @@ export class UsersReportComponent implements OnInit{
           this.processPlotStateData(data);
           this.updateTotalLots(data);
 
-          if(data.length === 0) {
+          if (data.length === 0) {
             this.errorPieChart = 'No se encontraron datos para los filtros seleccionados';
           }
         },
@@ -185,12 +355,12 @@ export class UsersReportComponent implements OnInit{
   //-------------Grafico de torta para mostrar la cantidad de lotes por estado-------------
 
   //-------------Grafico de barras para mostrar la coparativa entre dos manzanas-------------
-  
+
   //Controles para los filtros
-  blockControl1 = new FormControl(0); 
+  blockControl1 = new FormControl(0);
   blockControl2 = new FormControl(0);
-  
-  
+
+
   blocksNumber: number[] = []; // números de las manzanas
   availableBlocksForSelect1: number[] = [];
   availableBlocksForSelect2: number[] = [];
@@ -201,7 +371,7 @@ export class UsersReportComponent implements OnInit{
   errorBlocksChart: string | null = null;
 
   //Datos para renderizar el gráfico
-  chartType : ChartType = ChartType.ColumnChart;
+  chartType: ChartType = ChartType.ColumnChart;
   chartData: any[] = [];
 
   chartOptions = {
@@ -228,7 +398,7 @@ export class UsersReportComponent implements OnInit{
     series: {
       0: { color: '#5dade2', targetAxisIndex: 0, label: 'Área Total', labelInLegend: 'Mzna 1' },       // Área Total - Eje izquierdo
       1: { color: '#48c9b0', targetAxisIndex: 0, label: 'Área Construida', labelInLegend: 'Mzna 2' },  // Área Construida - Eje izquierdo
-      2: { color: '#4f46e5', targetAxisIndex: 1, label: 'Área Construida', labelInLegend: 'Mzna 1'},  // % Construido - Eje derecho
+      2: { color: '#4f46e5', targetAxisIndex: 1, label: 'Área Construida', labelInLegend: 'Mzna 1' },  // % Construido - Eje derecho
       3: { color: '#f97316', targetAxisIndex: 1, label: 'Área Construida', labelInLegend: 'Mzna 2' }   // % No Construido - Eje derecho
     },
     legend: {
@@ -259,7 +429,7 @@ export class UsersReportComponent implements OnInit{
 
         this.availableBlocksForSelect1 = [...this.blocksNumber];
         this.availableBlocksForSelect2 = [...this.blocksNumber];
-        
+
         if (this.blocksNumber.length >= 2) {
           this.blockControl1.setValue(this.blocksNumber[0]);
           this.blockControl2.setValue(this.blocksNumber[1]);
@@ -283,7 +453,7 @@ export class UsersReportComponent implements OnInit{
       map(([block1, block2, blocks]) => {
         if (block1 && block2) {
           this.updateChartDataBlocks(Number(block1), Number(block2), blocks);
-          this.updateSelectedBlocksKPIs( blocks);
+          this.updateSelectedBlocksKPIs(blocks);
           //Number(block1), Number(block2),
         }
       })
@@ -326,53 +496,53 @@ export class UsersReportComponent implements OnInit{
     const b2PercentNotBuilt = Number((100 - b2PercentBuilt).toFixed(1));
 
     this.chartData = [
-      ['Área Total', 
-       {
-         v: b1.totalArea,
-         f: `Manzana ${block1}: ${b1.totalArea.toLocaleString()} m²`
-       },
-       {
-         v: b2.totalArea,
-         f: `Manzana ${block2}: ${b2.totalArea.toLocaleString()} m²`
-       }, 
-       null, 
-       null
+      ['Área Total',
+        {
+          v: b1.totalArea,
+          f: `Manzana ${block1}: ${b1.totalArea.toLocaleString()} m²`
+        },
+        {
+          v: b2.totalArea,
+          f: `Manzana ${block2}: ${b2.totalArea.toLocaleString()} m²`
+        },
+        null,
+        null
       ],
       ['Área Construida',
-       {
-         v: b1.builtArea,
-         f: `Manzana ${block1}: ${b1.builtArea.toLocaleString()} m²`
-       },
-       {
-         v: b2.builtArea,
-         f: `Manzana ${block2}: ${b2.builtArea.toLocaleString()} m²`
-       },
-       null,
-       null
+        {
+          v: b1.builtArea,
+          f: `Manzana ${block1}: ${b1.builtArea.toLocaleString()} m²`
+        },
+        {
+          v: b2.builtArea,
+          f: `Manzana ${block2}: ${b2.builtArea.toLocaleString()} m²`
+        },
+        null,
+        null
       ],
       ['Porcentaje Construido',
-       null,
-       null,
-       {
-         v: b1PercentBuilt,
-         f: `Manzana ${block1}: ${b1PercentBuilt}%`
-       },
-       {
-         v: b2PercentBuilt,
-         f: `Manzana ${block2}: ${b2PercentBuilt}%`
-       }
+        null,
+        null,
+        {
+          v: b1PercentBuilt,
+          f: `Manzana ${block1}: ${b1PercentBuilt}%`
+        },
+        {
+          v: b2PercentBuilt,
+          f: `Manzana ${block2}: ${b2PercentBuilt}%`
+        }
       ],
       ['Porcentaje No Construido',
-       null,
-       null,
-       {
-         v: b1PercentNotBuilt,
-         f: `Manzana ${block1}: ${b1PercentNotBuilt}%`
-       },
-       {
-         v: b2PercentNotBuilt,
-         f: `Manzana ${block2}: ${b2PercentNotBuilt}%`
-       }
+        null,
+        null,
+        {
+          v: b1PercentNotBuilt,
+          f: `Manzana ${block1}: ${b1PercentNotBuilt}%`
+        },
+        {
+          v: b2PercentNotBuilt,
+          f: `Manzana ${block2}: ${b2PercentNotBuilt}%`
+        }
       ]
     ];
   }
@@ -384,7 +554,7 @@ export class UsersReportComponent implements OnInit{
     notUtilizationPercentage: 0
   };
 
-  private updateSelectedBlocksKPIs( blocks: BlockData[]): void {
+  private updateSelectedBlocksKPIs(blocks: BlockData[]): void {
     //block1: number, block2: number,
     //const b1 = blocks.find(b => b.blockNumber === block1);
     //const b2 = blocks.find(b => b.blockNumber === block2);
@@ -407,7 +577,7 @@ export class UsersReportComponent implements OnInit{
 
 
   private updateDashboardBlocks(startDate: string, endDate: string) {
-    
+
     this.loadingBlocksChart = true;
     this.errorBlocksChart = null;
 
@@ -420,7 +590,7 @@ export class UsersReportComponent implements OnInit{
         next: (stats) => {
           this.blocks = stats;
           this.blocksNumber = stats.map(block => block.blockNumber).sort((a, b) => a - b);
-          
+
           if (this.blocksNumber.length === 0) {
             this.errorBlocksChart = 'No se encontraron datos para los filtros seleccionados';
           }
@@ -428,7 +598,7 @@ export class UsersReportComponent implements OnInit{
 
           this.availableBlocksForSelect1 = [...this.blocksNumber];
           this.availableBlocksForSelect2 = [...this.blocksNumber];
-          
+
           if (this.blocksNumber.length >= 2) {
             this.blockControl1.setValue(this.blocksNumber[0]);
             this.blockControl2.setValue(this.blocksNumber[1]);
@@ -444,8 +614,8 @@ export class UsersReportComponent implements OnInit{
 
   }
 
-  
-  loadPage(){
+
+  loadPage() {
     this.loadDataBlocks();
     this.startDate.reset();
     this.endDate.reset();
@@ -628,7 +798,7 @@ export class UsersReportComponent implements OnInit{
   //-------------Grafico de barras para la distribución de edades-------------
 
 
-  redirect(url : string){
+  redirect(url: string) {
     this.routerService.redirect('/main' + url);
   }
 }

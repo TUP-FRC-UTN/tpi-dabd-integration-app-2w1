@@ -12,6 +12,9 @@ import { Producto } from '../../models/producto';
 import { FormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 
 @Component({
   selector: 'app-iep-table',
@@ -38,7 +41,9 @@ export class IepTableComponent implements OnInit, AfterViewInit, OnDestroy {
   endDate: string | undefined;
   selectedMovementTypes: string[] = [];
 
-
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
 
   goTo(params:string) {
     this.router.navigate([params]) 
@@ -121,8 +126,26 @@ export class IepTableComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private productService: ProductService,
     private excelPdfService: GenerateExcelPdfService,
-    private router : Router
-  ) { 
+    private router : Router, 
+    private tutorialService: TutorialService
+  ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+        scrollTo: {
+          behavior: 'smooth',
+          block: 'center'
+        }
+      },
+      keyboardNavigation: false,
+      useModalOverlay: true,
+    }); 
     const hoy = new Date();
     this.fechaMaxima = hoy.toISOString().split('T')[0];
   }
@@ -151,6 +174,101 @@ export class IepTableComponent implements OnInit, AfterViewInit, OnDestroy {
     this.startDate = hace30Dias.toISOString().split('T')[0];
     this.setInitialDates();
     this.loadProductos(); // Carga los productos al inicializar el componente
+    //TUTORIAL
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    ); 
+  }
+
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    // CÓDIGO PARA PREVENIR SCROLLEO DURANTE TUTORIAL
+    const preventScroll = (e: Event) => {
+      e.preventDefault();
+    };
+
+    const restoreScroll = () => {
+      document.body.style.overflow = 'auto';
+      window.removeEventListener('wheel', preventScroll);
+      window.removeEventListener('touchmove', preventScroll);
+    };
+
+    // Al empezar, lo desactiva
+    this.tour.on('start', () => {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('wheel', preventScroll, { passive: false });
+      window.addEventListener('touchmove', preventScroll, { passive: false });
+    });
+
+    // Al completar lo reactiva, al igual que al cancelar
+    this.tour.on('complete', restoreScroll);
+    this.tour.on('cancel', restoreScroll);
+    
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Historial de Stock',
+      text: 'Acá puede ver el historial de movimientos de productos.',
+      attachTo: {
+        element: '#tablaHistorial',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+    
+
+    this.tour.addStep({
+      id: 'filters-step',
+      title: 'Filtros',
+      text: 'Desde acá podrá filtrar el historial de movimientos por fecha y tipo. Cuenta con el boton azul para poner filtros avanzados, puede exportar el historial a Excel o PDF, o borrar los filtros aplicados con el botón de basura.',      
+      attachTo: {
+        element: '#filtros',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'addButton-step',
+      title: 'Añadir',
+      text: 'Desde este botón puede registrar un movimiento (ingreso o egreso)',      
+      attachTo: {
+        element: '#addButton',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+      
+    });
+
+    this.tour.start();
   }
 
   setInitialDates(): void {
@@ -442,6 +560,16 @@ export class IepTableComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.table) {
       this.table.destroy(); 
     }
+    //TUTORIAL
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    } 
+
   }
 
 

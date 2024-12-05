@@ -79,16 +79,18 @@
                     @if (expand) {<span class="ms-2">Dashboard</span>}
                 </button>
                 }
-                <button class="nav-link d-flex text-light w-100 px-3 py-2" (click)="startTutorial()"
-                    title="Información">
-                    <!-- data-bs-target="#infoModal" data-bs-toggle="modal" AGREGAR EN CASO DE NO LLEGAR CON LOS TUTORIALES -->
+                <button class="nav-link d-flex text-light w-100 px-3 py-2" data-bs-target="#infoModal"
+                    data-bs-toggle="modal" title="Información">
                     <i class="bi-info-circle"></i>
                     @if (expand) {<span class="ms-2">Información</span>}
+                </button>
+                <button class="nav-link d-flex text-light w-100 px-3 py-2" (click)="startTutorial()" title="Tutorial">
+                    <i class="bi bi-book"></i> @if (expand) {<span class="ms-2">Tutorial</span>}
                 </button>
                 <button class="nav-link d-flex text-light w-100 px-3 py-2" data-bs-toggle="modal"
                     data-bs-target="#confirmExit" title="Salir">
                     <i class="bi-box-arrow-left"></i>
-                    @if (expand) {<span class="ms-2">Cerrar Sesión</span>}
+                    @if (expand) {<span class="ms-2">Salir</span>}
                 </button>
             </div>
         </div>

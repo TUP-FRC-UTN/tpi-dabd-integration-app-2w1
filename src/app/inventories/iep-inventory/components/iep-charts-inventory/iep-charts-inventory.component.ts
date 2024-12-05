@@ -6,6 +6,9 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { CustomKpiComponent } from "../../../../common/components/custom-kpi/custom-kpi.component";
+import Shepherd from 'shepherd.js';
+import { Subscription } from 'rxjs';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 interface productosFaltantes{
   producto: string,
   cantidad: number
@@ -19,6 +22,30 @@ interface productosFaltantes{
 })
 export class IepChartsInventoryComponent implements OnInit, OnDestroy { 
   
+  constructor(private tutorialService: TutorialService) 
+  {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+        scrollTo: {
+          behavior: 'smooth',
+          block: 'center'
+        }
+      },
+      keyboardNavigation: false,
+      useModalOverlay: true,
+    }); 
+  }  
+
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
+
   // Servicios para obtener los datos 
   private productoService = inject(ProductService);
   private stockHistorial = inject(StockAumentoService);
@@ -74,6 +101,12 @@ export class IepChartsInventoryComponent implements OnInit, OnDestroy {
     this.loadMovimientos();
     this.initializeDates();
     this.setInitialDates();
+
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    ); 
   }
 
   initializeDates(): void {
@@ -394,11 +427,148 @@ export class IepChartsInventoryComponent implements OnInit, OnDestroy {
     else this.boolFaltantes = true;
   }
 
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+    const preventScroll = (e: Event) => {
+      e.preventDefault();
+    };
+
+    const restoreScroll = () => {
+      document.body.style.overflow = 'auto';
+      window.removeEventListener('wheel', preventScroll);
+      window.removeEventListener('touchmove', preventScroll);
+    };
+
+    // Al empezar, lo desactiva
+    this.tour.on('start', () => {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('wheel', preventScroll, { passive: false });
+      window.addEventListener('touchmove', preventScroll, { passive: false });
+    });
+
+    // Al completar lo reactiva, al igual que al cancelar
+    this.tour.on('complete', restoreScroll);
+    this.tour.on('cancel', restoreScroll);
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Filtros',
+      text: 'Desde acá podrá filtrar por una fecha inicial y una fecha final. También puede clickear el botón de filtro para acceder a los filtros avanzados, y el botón de basurero para deshacer los filtros aplicados.',
+      attachTo: {
+        element: '#d1',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Graficos',
+      text: 'Acá puede ver gráficos y KPIs con información resumida sobre los movimientos realizados dentro del inventario, según los filtros aplicados.',      
+      attachTo: {
+        element: '#d2',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Movimientos de stock',
+      text: 'Este gráfico muestra la evolucion de movimientos de aumentos y disminuciones de productos en general.',      
+      attachTo: {
+        element: '#d3',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Productos aumentados y disminuidos',
+      text: 'Este grafico muestra la cantidad de aumentos y disminuciones de cada producto.',      
+      attachTo: {
+        element: '#d4',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'KPIs',
+      text: 'Los KPIs muestran la cantidad total de movimientos de stock realizados, la cantidad de procutos aumentados y disminuidos y los 5 productos con mayor faltante actual.',      
+      attachTo: {
+        element: '#d5',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+      
+    });
+
+    this.tour.start();
+  }
+
   ngOnDestroy(): void {
     this.dataEstadosProductos = [];
     this.dataHistorial = [];
     this.dataProductos = []
     this.productosFaltantes = [];
+
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    } 
+
   }
 
 }
