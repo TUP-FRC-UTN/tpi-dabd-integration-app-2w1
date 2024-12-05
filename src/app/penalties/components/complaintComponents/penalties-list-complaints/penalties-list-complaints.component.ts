@@ -84,6 +84,10 @@ export class PenaltiesListComplaintComponent implements OnInit {
         modalOverlayOpeningPadding: 10,
         modalOverlayOpeningRadius: 10,
         canClickTarget: false,
+        scrollTo: {
+          behavior: 'smooth',
+          block: 'center'
+        }
       },
       keyboardNavigation: false,
       
@@ -108,6 +112,29 @@ export class PenaltiesListComplaintComponent implements OnInit {
     if (this.tour) {
       this.tour.complete();
     }
+
+    // CÓDIGO PARA PREVENIR SCROLLEO DURANTE TUTORIAL
+    const preventScroll = (e: Event) => {
+      e.preventDefault();
+    };
+
+    const restoreScroll = () => {
+      document.body.style.overflow = 'auto';
+      window.removeEventListener('wheel', preventScroll);
+      window.removeEventListener('touchmove', preventScroll);
+    };
+
+    // Al empezar, lo desactiva
+    this.tour.on('start', () => {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('wheel', preventScroll, { passive: false });
+      window.addEventListener('touchmove', preventScroll, { passive: false });
+    });
+
+    // Al completar lo reactiva, al igual que al cancelar
+    this.tour.on('complete', restoreScroll);
+    this.tour.on('cancel', restoreScroll);
+    
     this.tour.addStep({
       id: 'table-step',
       title: 'Listado de Denuncias',
