@@ -1,11 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { AccessOwnerRenterserviceService } from '../../../../services/access-owner/access-owner-renterservice.service';
-import { Subscription, takeUntil } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { AuthService } from '../../../../../users/users-servicies/auth.service';
-import { userTypeMap, documentTypeMap } from '../../../../models/access-report/constants';
 import { AccessUserAllowedInfoDto, AccessDay, AccessNewAuthRangeDto, AccessAllowedDaysDto } from '../../../../models/access-visitors/access-VisitorsModels';
 import { AccessUserServiceService } from '../../../../services/access-user/access-user-service.service';
 import { AccessAuthRange, UserType } from '../../../../models/access-visitors/access-visitors-models';
@@ -16,183 +15,277 @@ import { AccessVisitorsRegisterServiceService } from '../../../../services/acces
 @Component({
   selector: 'app-acceses-update-acceses',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, NgSelectModule, FormsModule, AccessTimeRangeVisitorsRegistrationComponent],
+  imports: [
+    ReactiveFormsModule, 
+    CommonModule, 
+    NgSelectModule, 
+    FormsModule, 
+    AccessTimeRangeVisitorsRegistrationComponent
+  ],
   templateUrl: './acceses-update-acceses.component.html',
   styleUrl: './acceses-update-acceses.component.scss'
 })
-export class AccesesUpdateAccesesComponent implements OnInit,OnDestroy {
-  ngOnDestroy(): void {
-    this.suscription.unsubscribe()
-  }
-  private userId:number=0;
+export class AccesesUpdateAccesesComponent implements OnInit, OnDestroy {
+
+  private readonly updateService = inject(AccessOwnerRenterserviceService);
+  private readonly visitorService = inject(AccessUserServiceService);
+  private readonly authService = inject(AuthService);
+  private readonly visitorHttpService = inject(AccessVisitorsRegisterServiceHttpClientService);
+  private readonly authRService = inject(AccessVisitorsRegisterServiceService);
+
+
+  private userId: number = 0;
+  private readonly suscription = new Subscription();
+  private authRange: AccessAuthRange | null = null;
+  
+
+  visitors: AccessUserAllowedInfoDto[] = [];
+  selectedVisitor?: AccessUserAllowedInfoDto;
+  selectedVisitorId: AccessUserAllowedInfoDto | null = null;
+  document: string = '';
+  documentType: string = '';
+  usersType: UserType[] = [];
+  allowedDays: AccessAllowedDaysDto[] = [];
+
+  visitorForm: FormGroup = new FormGroup({
+    authorizedType: new FormControl('', [Validators.required]),
+    documentType: new FormControl('', [Validators.required]),
+    document: new FormControl('', [Validators.required]),
+    firstName: new FormControl('', [Validators.required]),
+    lastName: new FormControl('', [Validators.required]),
+    email: new FormControl('', [Validators.email])
+  });
+
   ngOnInit(): void {
-   this.userId  = this.authService.getUser().id;  
+    this.initializeComponent();
+  }
+
+  ngOnDestroy(): void {
+    this.suscription.unsubscribe();
+  }
+
+  private initializeComponent(): void {
+    this.userId = this.authService.getUser().id;
     this.loadVisitors(this.userId);
     this.loadUsersType();
+    this.setupFormValidation();
   }
-  private readonly updateService=inject(AccessOwnerRenterserviceService);
-  private readonly visitorService=inject(AccessUserServiceService)
-  private readonly authService=inject(AuthService)
-  private readonly visitorHttpService=inject(AccessVisitorsRegisterServiceHttpClientService)
-  private readonly authRService=inject(AccessVisitorsRegisterServiceService)
-  private readonly suscription=new Subscription();
-  private authRange: AccessAuthRange | null = null;
-  private day:AccessAllowedDaysDto[]=[]
-  allowedDays: any[] = [];
-   selectedVisitor?: AccessUserAllowedInfoDto;
-  visitors: AccessUserAllowedInfoDto[] = [];
-  selectedVisitorId: AccessUserAllowedInfoDto | null = null;
-  document:string='';
-  documentType:string='';
-  usersType: UserType[] = [];
- 
 
-  visitorForm:FormGroup=new FormGroup({
-    authorizedType:new FormControl({ value: '', disabled: false },[Validators.required]),
-    documentType:new FormControl({ value: '', disabled: false },[Validators.required]),
-    document:new FormControl({ value: '', disabled: false },[Validators.required]),
-    firstName:new FormControl({ value: '', disabled: false },[Validators.required]),
-    lastName:new FormControl({ value: '', disabled: false }),
-    email:new FormControl({ value: '', disabled: false },[Validators.email]), 
-  })
-  setDocument(document:string,documentType:string):void{
-    this.document=document;
-    this.documentType=documentType;
+  private setupFormValidation(): void {
+    this.visitorForm.get('document')?.valueChanges.subscribe(value => {
+      console.log('Document value changed:', value);
+    });
   }
- 
 
-
-  loadVisitors(neighborId: number) {
-  const sub=  this.visitorService.fetchVisitorsByNeighbor(neighborId)
-    .subscribe(visitors => {
-     this.visitors = visitors;
-    
-     console.log('Visitors loaded:', this.visitors);
-   });
-   this.suscription.add(sub);
-  }
-  resetForm() {
-    this.visitorForm.reset();
-    this.selectedVisitor = undefined;
-
- }
-
-  onVisitorSelect(visitor: AccessUserAllowedInfoDto) {
-    if (!visitor) {
-      this.resetForm();
-    }
-    else  {
-      
-      console.log('Email del visitante:', visitor.email);
-
-      this.visitorForm.patchValue({
-        authorizedType:visitor.userType.description,
-        documentType:visitor.documentTypeDto.description,
-        document: visitor.document,
-        firstName: visitor.name,
-        lastName: visitor.last_name,
-        email: visitor.email 
-        
+  loadVisitors(neighborId: number): void {
+    const sub = this.visitorService.fetchVisitorsByNeighbor(neighborId)
+      .subscribe({
+        next: (visitors) => {
+          this.visitors = visitors;
+          console.log('Visitors loaded successfully:', visitors);
+        },
+        error: (error) => {
+          console.error('Error loading visitors:', error);
+        }
       });
-      this.selectedVisitor = visitor;
-      this.setDocument(this.selectedVisitor.document,this.selectedVisitor.documentTypeDto.description);
-      
-    }
-   }
- 
+    this.suscription.add(sub);
+  }
+
   loadUsersType(): void {
-    const insuranceSubscription = this.visitorHttpService.getUsersType().subscribe({
+    const sub = this.visitorHttpService.getUsersType().subscribe({
       next: (types: UserType[]) => {
-        this.usersType = types;
+        this.usersType = types.map(type => ({
+          ...type,
+          description: this.tiposUsuarioTraduccion[type.description.toUpperCase()] || type.description
+        }));
         console.log('Tipos de usuario cargados:', this.usersType);
       },
       error: (error) => {
-        console.error('Error al cargar tipos de usuarios:', error);
+        console.error('Error al cargar tipos de usuario:', error);
       }
     });
-    this.suscription.add(insuranceSubscription);
+    this.suscription.add(sub);
   }
-  
-  onSubmit():void{
-    if(!this.visitorForm.valid){
-      const formValue=this.visitorForm.value;
-      console.log("TipoDoc")
-      console.log("VALOR DEL FORM :"+JSON.stringify(formValue));
-      const formData={
-        document:formValue.document,
-        name:formValue.firstName,
-        last_name:formValue.lastName,
-        email: formValue.email,
-        vehicles: [],
-        userType: formValue.authorizedType, 
-        authRanges: [],  
-        documentTypeDto: formValue.documentType,
-        neighbor_id:this.userId
-      }
-         
-     this.authRService.getAuthRange().subscribe({
-  next: (data) => {
-   this. authRange = data; 
-    console.log(this.authRange); 
-  },
-  error: (err) => {
-    console.error('Error obteniendo el authRange:', err);
-  }
-});
 
-if(this.authRange!==null){
-  this.authRange.allowedDays.forEach(dy=>{
-    console.log("dia : ",dy)
-    if (dy.day.name === 'Lun') {
-      dy.day.name = 'MONDAY';
-    } else if (dy.day.name === 'Mar') {
-      dy.day.name = 'TUESDAY';
-    } else if (dy.day.name === 'Mié') {
-      dy.day.name = 'WEDNESDAY';
-    } else if (dy.day.name === 'Jue') {
-      dy.day.name = 'THURSDAY';
-    } else if (dy.day.name === 'Vie') {
-      dy.day.name = 'FRIDAY';
-    } else if (dy.day.name === 'Sáb') {
-      dy.day.name = 'SATURDAY';
-    } else if (dy.day.name === 'Dom') {
-      dy.day.name = 'SUNDAY';
-    }
-    let d:AccessAllowedDaysDto={
-
-      day:dy.day.name,
-      init_hour:dy.startTime.toTimeString().slice(0, 8),
-      end_hour:dy.endTime.toTimeString().slice(0, 8)
-    }
-    this.allowedDays.push(d) 
-
-  })
-
-  const dto:AccessNewAuthRangeDto={
-    init_date:this.authRange.initDate.toISOString().split('T')[0],
-    end_date:this.authRange.endDate.toISOString().split('T')[0],
-    neighbor_id:this.authRange.neighbourId,
-    allowedDaysDtos:this.allowedDays
-  }
-  
-  const updateAccess={
-    userAllowedInfoDto:formData,
-    authRangeDto:dto
-  }
-  console.log("Dto: ",updateAccess)
-  const sub=this.updateService.updateAccess(this.document,this.documentType,updateAccess).subscribe({
-    next:(response)=>{
-      alert("Se actualizo el auth")
-      console.log(response);
+  onVisitorSelect(visitor: AccessUserAllowedInfoDto | null): void {
+    if (!visitor) {
       this.resetForm();
-    },
-    error:(error)=>{
-      alert("hubo un error")
-      console.log(error);
+      return;
     }
-  })
-  }
-}
-}
 
+    console.log('Visitante seleccionado:', visitor);
+    
+   
+    const tipoUsuarioCoincidente = this.usersType.find(
+      tipo => tipo.description.toLowerCase() === 
+        (this.tiposUsuarioTraduccion[visitor.userType.description.toUpperCase()] || visitor.userType.description).toLowerCase()
+    );
+
+    if (!tipoUsuarioCoincidente) {
+      console.warn('No se encontró un tipo de usuario coincidente para:', visitor.userType.description);
+    }
+
+
+    this.visitorForm.patchValue({
+      authorizedType: tipoUsuarioCoincidente?.description || 
+        (this.tiposUsuarioTraduccion[visitor.userType.description] || visitor.userType.description),
+      documentType: visitor.documentTypeDto.description,
+      document: visitor.document,
+      firstName: visitor.name,
+      lastName: visitor.last_name,
+      email: visitor.email
+    });
+
+    this.selectedVisitor = visitor;
+    this.setDocument(visitor.document, visitor.documentTypeDto.description);
+  }
+
+  private tiposUsuarioTraduccion: { [key: string]: string } = {
+    'Visitor': 'Visitante',
+    'Worker': 'Obrero',
+    'Delivery': 'Delivery',
+    'Taxi': 'Taxi',
+    'Cleaning': 'Personal de limpieza',
+    'Gardener': 'Jardinero'
+  };
+
+  compareUserTypes(type1: any, type2: any): boolean {
+    if (!type1 || !type2) return false;
+    
+
+    if (type1.description && type2.description) {
+      return type1.description.toLowerCase() === type2.description.toLowerCase();
+    }
+
+    return type1 === type2;
+  }
+
+  setDocument(document: string, documentType: string): void {
+    this.document = document;
+    this.documentType = documentType;
+  }
+
+  resetForm(): void {
+    this.visitorForm.reset();
+    this.selectedVisitor = undefined;
+    this.document = '';
+    this.documentType = '';
+    this.allowedDays = [];
+  }
+
+  onSubmit(): void {
+    if (!this.visitorForm.valid) {
+      this.showFormErrors();
+      return;
+    }
+
+    this.getAuthRangeAndUpdate();
+  }
+
+  private showFormErrors(): void {
+    console.error('Form is invalid');
+    Object.keys(this.visitorForm.controls).forEach(key => {
+      const control = this.visitorForm.get(key);
+      if (control?.errors) {
+        console.error(`${key} validation errors:`, control.errors);
+      }
+    });
+  }
+
+  private getAuthRangeAndUpdate(): void {
+    const sub = this.authRService.getAuthRange().subscribe({
+      next: (authRange) => {
+        if (!authRange) {
+          console.error('No auth range received');
+          return;
+        }
+
+        this.authRange = authRange;
+        this.processAuthRange(authRange);
+      },
+      error: (err) => {
+        console.error('Error getting auth range:', err);
+        alert('Error al obtener el rango de autorización');
+      }
+    });
+
+    this.suscription.add(sub);
+  }
+
+  private processAuthRange(authRange: AccessAuthRange): void {
+    this.allowedDays = this.processAllowedDays(authRange);
+    const updateAccess = this.createUpdateAccessDto(authRange);
+    this.submitUpdate(updateAccess);
+  }
+
+  private processAllowedDays(authRange: AccessAuthRange): AccessAllowedDaysDto[] {
+    const dayMappings: { [key: string]: string } = {
+      'Lun': 'MONDAY',
+      'Mar': 'TUESDAY',
+      'Mié': 'WEDNESDAY',
+      'Jue': 'THURSDAY',
+      'Vie': 'FRIDAY',
+      'Sáb': 'SATURDAY',
+      'Dom': 'SUNDAY'
+    };
+
+    return authRange.allowedDays.map(dy => ({
+      day: dayMappings[dy.day.name] || dy.day.name,
+      init_hour: dy.startTime.toTimeString().slice(0, 8),
+      end_hour: dy.endTime.toTimeString().slice(0, 8)
+    }));
+  }
+
+  private createUpdateAccessDto(authRange: AccessAuthRange) {
+    const formValue = this.visitorForm.value;
+    
+    const formData = {
+      document: formValue.document,
+      name: formValue.firstName,
+      last_name: formValue.lastName,
+      email: formValue.email || null, 
+      vehicles: [],
+      userType: formValue.authorizedType,
+      authRanges: [],
+      documentTypeDto: formValue.documentType,
+      neighbor_id: this.userId
+    };
+
+    const dto: AccessNewAuthRangeDto = {
+      init_date: authRange.initDate.toISOString().split('T')[0],
+      end_date: authRange.endDate.toISOString().split('T')[0],
+      neighbor_id: authRange.neighbourId,
+      allowedDaysDtos: this.allowedDays
+    };
+
+    return {
+      userAllowedInfoDto: formData,
+      authRangeDto: dto
+    };
+  }
+
+  private submitUpdate(updateAccess: any): void {
+    const sub = this.updateService.updateAccess(
+      this.document,
+      this.documentType,
+      updateAccess
+    ).subscribe({
+      next: (response) => {
+        console.log('Update successful:', response);
+        alert('Acceso actualizado exitosamente');
+        this.onUpdateSuccess();
+      },
+      error: (error) => {
+        console.error('Update failed:', error);
+        alert('Error al actualizar el acceso');
+      }
+    });
+
+    this.suscription.add(sub);
+  }
+
+  private onUpdateSuccess(): void {
+    this.resetForm();
+    this.loadVisitors(this.userId); 
+  }
 }
