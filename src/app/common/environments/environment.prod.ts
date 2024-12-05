@@ -1,11 +1,11 @@
-const BASE_URL = 'http://localhost:8080';
-// const BASE_URL = 'http://2w1-villadelcondor.dynns.com:8080';
+//const BASE_URL = 'http://localhost:8080';
+ const BASE_URL = 'http://2w1-villadelcondor.dynns.com:8080';
 
 
 export const environment = {
   production: true,
   services: {
-    accesses: `${BASE_URL}/accesses`,
+    accesses: `http://localhost:8090`,
     addresses: `${BASE_URL}/addresses`,
     complaints: `${BASE_URL}/complaints`,
     contacts: `${BASE_URL}/contacts`,

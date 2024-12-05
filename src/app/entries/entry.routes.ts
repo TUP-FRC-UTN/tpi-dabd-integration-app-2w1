@@ -2,6 +2,7 @@ import { Routes } from "@angular/router";
 import { AccessVehiclesViewComponent } from "./components/access_vehicles-register/access-vehicles-view/access-vehicles-view.component";
 import { AccessRegisterVisitorsComponent } from "./components/access_visitors/access_visitors_register/access-register-visitors/access-register-visitors.component";
 import { roleWhitelistGuard } from "./guards/role-whitelist.guard";
+import { AccesesUpdateAccesesComponent } from "./components/access_visitors/acceses-update-acceses/acceses-update-acceses/acceses-update-acceses.component";
 
 export const ENTRY_ROUTES: Routes = [
     { 
@@ -14,6 +15,14 @@ export const ENTRY_ROUTES: Routes = [
     { 
         path: 'visitor', 
         component: AccessRegisterVisitorsComponent,
+        canActivate: [roleWhitelistGuard],
+        data: {
+            roles: ['Propietario', 'Inquilino', 'Gerente General']
+        }
+    },
+    {
+        path: 'accessesUpdate', 
+        component: AccesesUpdateAccesesComponent,
         canActivate: [roleWhitelistGuard],
         data: {
             roles: ['Propietario', 'Inquilino', 'Gerente General']
