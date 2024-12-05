@@ -31,7 +31,7 @@ import { RoutingService } from '../../../../../common/services/routing.service';
 export class AccessContainerVisitorsRegistrationComponent implements OnInit, OnDestroy {
   private router=inject(Router);
   goTo(path: string) {
-  this.routingService.redirect(path, '');
+  this.routingService.redirect(path, 'Actualizar Visitante');
   }
   uid?: string;
   qrCodeId?: string;
