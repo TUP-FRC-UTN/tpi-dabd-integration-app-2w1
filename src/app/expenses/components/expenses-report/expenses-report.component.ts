@@ -273,8 +273,24 @@ export class ReportExpenseComponent implements OnInit, OnDestroy {
     this.tour.addStep({
       id: 'subject-step',
       title: 'Filtros',
-      text: 'Desde acá podrá filtrar por una fecha inicial y una fecha final. También puede clickear el botón de embudo para acceder a los filtros avanzados y pulsando el botón de basurero podrá deshacer los filtros aplicados.', attachTo: {
+      text: 'Desde acá podrá filtrar por una fecha inicial y una fecha final. También puede clickear el botón de filtro para acceder a los filtros avanzados, y el botón de basurero para deshacer los filtros aplicados.', attachTo: {
         element: '#filters',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Gastos del Período',
+      text: 'En este gráfico se muestran los gastos del período seleccionado, con información resumida. También puede interactuar con él para ver información más detallada.', attachTo: {
+        element: '#chartPeriod',
         on: 'auto'
       },
       buttons: [
@@ -292,8 +308,48 @@ export class ReportExpenseComponent implements OnInit, OnDestroy {
 
     this.tour.addStep({
       id: 'subject-step',
-      title: 'Añadir',
-      text: 'Aquí puede visualizar los KPI de los gastos, con información resumida.', attachTo: {
+      title: 'Último Período Facturado',
+      text: 'Este gráfico muestra los gastos del último período facturado, con información resumida. También puede interactuar con él para ver información más detallada.', attachTo: {
+        element: '#chartLastBill',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Comparación Interanual',
+      text: 'Este gráfico muestra la comparación de gastos entre los meses del año, comparando también con los meses del año anterior. También puede interactuar con él para ver información más detallada.', attachTo: {
+        element: '#chartCompare',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'KPIs',
+      text: 'Estos KPIs muestran en orden el total de gastos del período seleccionado, el total del último período facturado y el índice de variación. También puede interactuar con ellos para ver información más detallada.', attachTo: {
         element: '#kpis',
         on: 'auto'
       },
