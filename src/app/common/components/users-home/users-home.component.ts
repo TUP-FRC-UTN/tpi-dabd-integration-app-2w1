@@ -201,7 +201,7 @@ export class UsersHomeComponent implements OnInit, OnDestroy {
     ctx.fillStyle = this.selectedPath?.getAttribute('fill') as string || '#000000';
     ctx.fill(svgPath);
     // Configurar y aplicar el contorno (stroke)
-    ctx.lineWidth = 1; // Grosor del contorno
+    ctx.lineWidth = 0.5; // Grosor del contorno
     ctx.strokeStyle = '#343A40'; // Color del contorno (puedes cambiarlo)
     ctx.stroke(svgPath)
 

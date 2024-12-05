@@ -1,9 +1,9 @@
 <section class="p-5 pt-0">
   <div class="container-fluid p-3 mt-0 pt-0">
     <!-- Fila de Notificaciones y Clima -->
-    <div class="row m-2 ">
+    <div class="row m-2">
       <!-- Card de Notificaciones (arriba) -->
-      <div class="col-md-6 col-sm-12 p-0 pe-2  h-100 flex-grow-1" id="notificaciones">
+      <div class="col-12 col-md-6" id="notificaciones">
         <div class="card border border-2 rounded-3 shadow-lg overflow-hidden">
           <div class="card-header custom-header p-3">
             <h3 class="mb-0 fs-5 text-center" style="color: black;">Últimas Notificaciones Generales</h3>
@@ -20,7 +20,7 @@
       </div>
 
       <!-- Card de Clima y Contactos (abajo derecha) -->
-      <div class="col-md-6 col-sm-12 p-0 ps-2">
+      <div class="col-12 col-md-6">
         <!-- Card de Clima -->
         <div class="card border border-2 rounded-3 shadow-lg mb-4" id="clima">
           <div class="card-header custom-header p-3">
@@ -72,55 +72,64 @@
       </div>
     </div>
 
+    <!-- Mapa del lugar -->
     <div class="row">
-      <div class="col-6">
-        <div>
-          <object id="mapa" type="image/svg+xml" data="plotsMap.svg" style="height: 750px;"></object>
+      <div class="col-12 col-md-6">
+        <div class="card important-numbers-card border border-2 rounded-3 shadow-lg mt-3" id="contactos">
+          <div class="card-header custom-header p-3">
+            <h3 class="mb-0 fs-5 text-center text-dark">Mapa del lugar</h3>
+          </div>
+          <div>
+            <object id="mapa" type="image/svg+xml" data="plotsMap.svg" style="height: 750px;"></object>
+          </div>
         </div>
       </div>
-      <div class="col-6">
-        <!-- Lote seleccionado -->
-        <div class="row">
-          <div class="col-12 verticalAnimation" [ngClass]="{'expanded': selectedPlot}">
-            <!-- Lote seleccionado -->
-            <div class="card">
-              <div class="card-header d-flex justify-content-between">
-                <h5>
-                  {{'Lote: ' + selectedPlot?.id + ( selectedPlot?.plot_state == 'Disponible' ?
-                  ' - Manzana: ' + selectedPlot?.block_number : '' )}}
-                </h5>
-                @if (selectedPlot?.plot_state == 'Disponible') {
-                <button type="button" class="btn btn-light border border-2"
-                  (click)="openRequestModal(selectedPlot!.id)">
-                  Consultar
-                </button>
-                }
-              </div>
-              <div class="card-body">
-                <div class="row">
-                  <div class="col-6">
-                    <img [src]="selectedPng" alt="">
-                  </div>
-                  <div class="col-6 ps-3 border-start border-1 border-secondary">
-                    <div class="d-flex flex-column justify-content-between gap-3">
-                      <div class="col">Área total: {{selectedPlot?.total_area_in_m2}}m² </div>
-                      <div class="col">Dirección: Manzana {{selectedPlot?.block_number}}, lote
-                        {{selectedPlot?.plot_number}} </div>
-                      <div class="col"><i class="bi-check-circle-fill text-success"></i> Tipo:
-                        {{selectedPlot?.plot_type}} </div>
-                      <div class="col"><i class="bi-check-circle-fill text-success"></i>
-                        Estado:
-                        {{selectedPlot?.plot_state}} </div>
-                    </div>
+
+      <div class="col-12 col-md-6">
+        <div class="card important-numbers-card border border-2 rounded-3 shadow-lg mt-3" id="contactos">
+          <div class="card-header custom-header p-3">
+            <h3 class="fs-5 text-center text-dark">Datos de lote: {{(selectedPlot ? selectedPlot.id + ' - Manzana: ' + selectedPlot.block_number : '')}}</h3>
+          </div>
+          <!-- Lote seleccionado -->
+          <div class="row">
+            <div class="col-12 verticalAnimation p-3" [ngClass]="{'expanded': selectedPlot}">
+              <!-- Lote seleccionado -->
+              <div class="row">
+                <div class="col-6">
+                  <img [src]="selectedPng" alt="">
+                </div>
+                <div class="col-6 ps-3 border-start border-1 border-secondary">
+                  <div class="d-flex flex-column justify-content-between gap-3">
+                    <div class="col">Área total: {{selectedPlot?.total_area_in_m2}}m² </div>
+                    <div class="col">Dirección: Manzana {{selectedPlot?.block_number}}, lote
+                      {{selectedPlot?.plot_number}} </div>
+                    <div class="col"><i class="bi-check-circle-fill text-success"></i> Tipo:
+                      {{selectedPlot?.plot_type}} </div>
+                    <div class="col"><i class="bi-check-circle-fill text-success"></i>
+                      Estado:
+                      {{selectedPlot?.plot_state}} </div>
                   </div>
                 </div>
               </div>
+              @if (selectedPlot?.plot_state == 'Disponible') {
+              <button type="button" class="btn btn-light border border-2 mt-3 w-100 rounded-pill"
+                (click)="openRequestModal(selectedPlot!.id)">
+                Consultar
+              </button>
+              }
+              @if (selectedPlot == null) {
+              <div class="text-center">
+                Seleccione un lote.
+              </div>
+              }
             </div>
           </div>
         </div>
-
       </div>
-
     </div>
+
+
+
+
   </div>
 </section>
