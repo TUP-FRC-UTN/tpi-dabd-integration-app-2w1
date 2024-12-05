@@ -332,4 +332,9 @@ export class RoutingService {
     this.title = 'Página principal';
     this.titleSubject.next(this.title);
   }
+  
+  getCurrentRoute() {
+    return this.router.url;
+  }
+  
 }

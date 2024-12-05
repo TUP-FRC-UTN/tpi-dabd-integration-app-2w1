@@ -6,7 +6,8 @@ import {
   ChangeDetectorRef,
   OnInit,
   ViewChild,
-  ElementRef
+  ElementRef,
+  OnDestroy
 } from '@angular/core';
 import { FormsModule, NgForm, ReactiveFormsModule } from '@angular/forms';
 import { Distributions } from '../../models/distributions';
@@ -28,6 +29,12 @@ import { ExpensesTypeExpenseNgSelectComponent } from "../expenses-type-expense-n
 import { ExpensesOwnersNgSelectComponent } from "../expenses-owners-ng-select/expenses-owners-ng-select.component";
 import { FileService } from '../../services/expenseFileService/file.service';
 import { PenaltiesComplaintDashboardComponent } from '../../../penalties/components/complaintComponents/penalties-complaint-dashboard/penalties-complaint-dashboard.component';
+import { Subscription } from 'rxjs';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ExpenseRegisterCategoryComponent } from "../expenses-register-category/expenses-register-category.component";
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../common/services/tutorial.service';
+import { ExpenseRegisterProviderComponent } from '../expense-register-provider/expense-register-provider.component';
 
 @Component({
   selector: 'app-expenses-register-expense',
@@ -47,13 +54,15 @@ import { PenaltiesComplaintDashboardComponent } from '../../../penalties/compone
     ExpenseProvidersNgSelectComponent,
     ExpensesTypeExpenseNgSelectComponent,
     ExpensesOwnersNgSelectComponent
-],
+  ],
   styleUrls: ['./expenses-register-expense.component.css'],
 })
-export class ExpensesRegisterExpenseComponent implements OnInit {
+export class ExpensesRegisterExpenseComponent implements OnInit, OnDestroy {
   @ViewChild('form') form!: NgForm;
   @ViewChild('fileInput', { static: false }) fileInput!: ElementRef;
   @ViewChild('modalConfirmDelete') modalConfirmDelete!: ElementRef;
+  @ViewChild(ExpenseCategoriesNgSelectComponent) expenseCategoriesNgSelect!: ExpenseCategoriesNgSelectComponent;
+  @ViewChild(ExpenseProvidersNgSelectComponent) expenseProvidersNgSelect!: ExpenseProvidersNgSelectComponent;
   // Modal states
   showModal = false;
   modalMessage = '';
@@ -75,6 +84,8 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   expenseCategoryList: ExpenseCategory[] = [];
   isEditMode = false;
   pageTitle = 'Registrar Gasto';
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
 
   private cdRef = inject(ChangeDetectorRef);
   private readonly expenseService = inject(ExpenseService);
@@ -82,25 +93,120 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   private readonly propietarioService = inject(OwnerService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  constructor(){
-    this.expense= {
-        description: '',
-        providerId: 0,
-        expenseDate: '',
-        invoiceNumber: '',
-        typeExpense: '',
-        categoryId: 1,
-        amount: 0,
-        installments: 0,
-        distributions: this.distributions,
-        fileId:''
-      };
+
+  constructor(private tutorialService: TutorialService, private modalNG: NgbModal) {
+    this.expense = {
+      description: '',
+      providerId: 0,
+      expenseDate: '',
+      invoiceNumber: '',
+      typeExpense: '',
+      categoryId: 1,
+      amount: 0,
+      installments: 0,
+      distributions: this.distributions,
+      fileId: ''
+    };
+
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+      },
+      keyboardNavigation: false,
+
+      useModalOverlay: true,
+    });
   }
+
+
   ngOnInit(): void {
     this.loadInitialData();
     this.checkForEditMode();
     //this.initializeDefaultExpense();
+
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    );
   }
+
+  ngOnDestroy(): void {
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
+  }
+
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Alta de Gasto',
+      text: 'Acá puede añadir un nuevo gasto ingresando todos los campos obligatorios del formulario. Procure colocar datos correctos.',
+      attachTo: {
+        element: '#addExpense',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Subir archivos',
+      text: 'Acá puede seleccionar y subir todos los archivos necesarios para justificar el gasto.',
+      attachTo: {
+        element: '#uploadFile',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back,
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Registrar',
+      text: 'Acá puede clickear éste botón para realizar el alta de un gasto. Este sólo se habilitará al rellenar todos los campos obligatorios del formulario.',
+      attachTo: {
+        element: '#register',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Finalizar',
+          action: this.tour.complete,
+        }
+      ]
+    });
+
+    this.tour.start();
+  }
+
   checkForEditMode() {
     this.route.params.subscribe(params => {
       const id = params['id'];
@@ -108,7 +214,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
         this.isEditMode = true;
         this.pageTitle = 'Editar Gasto';
         this.loadExpense(id);
-      }else{
+      } else {
         this.initializeDefaultExpense();
       }
     });
@@ -117,7 +223,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     this.selectedFile = null;
     this.fileInput.nativeElement.value = '';
   }
-  
+
   onFieldBlur(fieldName: string, control: any) {
     this.touchedFields[fieldName] = true;
     control.markAsTouched();
@@ -129,8 +235,8 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   }
 
   isFieldInvalid(fieldName: string, control: any): boolean {
-    return (control.errors && control.touched) || 
-           (this.formSubmitted && control.errors);
+    return (control.errors && control.touched) ||
+      (this.formSubmitted && control.errors);
   }
 
   getFieldClass(fieldName: string, control: any): any {
@@ -140,36 +246,36 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     };
   }
 
-  
+
   redirectToViewAdmin() {
     this.router.navigate(["/main/expenses/view-expense-admin"])
-    }
-    loadFile(fileId: string): void {
-      this.fileService.getFile(fileId).subscribe({
-        next: ({ blob, filename }) => {
-          const file = new File([blob], filename, { type: blob.type });
-          this.selectedFile = file;
-  
-          console.log('Archivo asignado a selectedFile:', this.selectedFile);
-        },
-        error: (error) => {
-          console.error('Error al descargar el archivo:', error);
-          Swal.fire({
-            title: '¡Error!',
-            text: 'No se pudo cargar el archivo. Inténtalo de nuevo.',
-            icon: 'error',
-            confirmButtonColor: '#f44336',
-            background: '#ffffff',
-            customClass: {
-              title: 'text-xl font-medium text-gray-900',
-              htmlContainer: 'text-sm text-gray-600',
-              confirmButton: 'px-4 py-2 text-white rounded-lg',
-              popup: 'swal2-popup'
-            }
-          });
-        }
-      });
-    }
+  }
+  loadFile(fileId: string): void {
+    this.fileService.getFile(fileId).subscribe({
+      next: ({ blob, filename }) => {
+        const file = new File([blob], filename, { type: blob.type });
+        this.selectedFile = file;
+
+        console.log('Archivo asignado a selectedFile:', this.selectedFile);
+      },
+      error: (error) => {
+        console.error('Error al descargar el archivo:', error);
+        Swal.fire({
+          title: '¡Error!',
+          text: 'No se pudo cargar el archivo. Inténtalo de nuevo.',
+          icon: 'error',
+          confirmButtonColor: '#f44336',
+          background: '#ffffff',
+          customClass: {
+            title: 'text-xl font-medium text-gray-900',
+            htmlContainer: 'text-sm text-gray-600',
+            confirmButton: 'px-4 py-2 text-white rounded-lg',
+            popup: 'swal2-popup'
+          }
+        });
+      }
+    });
+  }
   private loadExpense(id: number): void {
     this.expenseService.getById(id).subscribe({
       next: (expenseData: ExpenseGetById) => {
@@ -205,7 +311,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     }
 
     try {
-      
+
       // Determinar el número de cuotas basado en installmentList
       const installments = data.installmentList?.length || 1;
       // Mapear al modelo Expense con validaciones para cada campo
@@ -219,10 +325,10 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
         categoryId: data.categoryId,
         amount: data.amount ?? 0,
         installments: installments,
-        distributions: this.mapDistributions(data.distributionList),   
-        fileId:data.fileId
+        distributions: this.mapDistributions(data.distributionList),
+        fileId: data.fileId
       };
-      if(this.expense.fileId!=null){
+      if (this.expense.fileId != null) {
         this.loadFile(this.expense.fileId)
       }
       console.log('Expense mapeado:', this.expense); // Para debug
@@ -233,7 +339,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     }
   }
   private mapDistributions(distributionList: any[]): Distributions[] {
-    if (!distributionList?.length) return []; 
+    if (!distributionList?.length) return [];
     return distributionList.map(dist => ({
       ownerId: dist.ownerId,
       proportion: (dist.proportion * 100) // Convertir a porcentaje
@@ -251,7 +357,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       amount: 0,
       installments: 1,
       distributions: [],
-      fileId:''
+      fileId: ''
     };
   }
 
@@ -271,8 +377,8 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     }
   }
   confirmCancel() {
-   this.openModal(this.modalConfirmDelete)
-    }
+    this.openModal(this.modalConfirmDelete)
+  }
   private formatDateToString(date: Date): string {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -378,63 +484,63 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     const currentValue = input.value;
     const newChar = event.key;
     const cursorPosition = input.selectionStart;
-  
+
     // Permitir números y el punto decimal
     if (!/^\d$/.test(newChar) && newChar !== '.') {
       event.preventDefault();
       return;
     }
-  
+
     // Evitar múltiple punto decimal
     if (newChar === '.' && currentValue.includes('.')) {
       event.preventDefault();
       return;
     }
-  
+
     // Validar formato de decimales
     const newValue = this.getNewValue(currentValue, newChar, cursorPosition);
     if (!/^\d*\.?\d{0,2}$/.test(newValue)) {
       event.preventDefault();
       return;
     }
-  
+
     // Validar rango permitido
     if (parseFloat(newValue) > 100) {
       event.preventDefault();
       return;
     }
   }
-  
+
 
   onPaste(event: ClipboardEvent): void {
     const input = event.target as HTMLInputElement;
     if (!(input instanceof HTMLInputElement)) {
       return;
     }
-  
+
     event.preventDefault();
-    
+
     const pastedData = event.clipboardData?.getData('text');
     if (!pastedData) {
       return;
     }
-  
+
     let cleanValue = pastedData.replace(/[^0-9.]/g, ''); // Permitir solo números y punto
     if (!/^\d*\.?\d{0,2}$/.test(cleanValue)) { // Limitar a 2 decimales
       cleanValue = '0';
     }
-  
+
     const value = parseFloat(cleanValue);
     const finalValue = !isNaN(value) ? Math.min(100, Math.max(0, value)) : 0;
     input.value = finalValue.toFixed(2);
-  
+
     const index = parseInt(input.getAttribute('data-index') || '0', 10);
     this.onProportionChange(finalValue, index);
   }
 
   private getNewValue(currentValue: string, newChar: string, cursorPosition: number | null): string {
     if (cursorPosition === null) return currentValue + newChar;
-    
+
     return currentValue.slice(0, cursorPosition) + newChar + currentValue.slice(cursorPosition);
   }
   onProportionChange(value: number, index: number): void {
@@ -445,7 +551,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     }
     this.expense.distributions = [...this.distributions];
     const isValid = this.validateTotalProportion();
-  
+
     const totalPercentage = this.expense.distributions.reduce(
       (sum, dist) => sum + (Number(dist.proportion) || 0),
       0
@@ -471,7 +577,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
       (sum, distribution) => sum + distribution.proportion,
       0
     );
-  
+
     return total === 100;
   }
   validateNoZeroProportion(): boolean {
@@ -488,7 +594,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   //   this.expense.distributions.forEach(d => {
   //     console.log(this.expense.distributions)
   //     d.proportion=d.proportion/100
-      
+
   //   });
   // }
   // repairDistributions(): void {
@@ -539,7 +645,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   }
   isCategoryValid(): boolean {
     // Probar esto
-    return this.expense.categoryId>0 ? true : false;
+    return this.expense.categoryId > 0 ? true : false;
   }
 
 
@@ -560,7 +666,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
   isLoading = false;
   save(): void {
     if (!this.validateForm()) {
-      return; 
+      return;
     }
     console.log(this.expense)
     if (this.expense.typeExpense === 'INDIVIDUAL') {
@@ -576,10 +682,10 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     this.isLoading = true;
     // Llamamos al servicio para registrar el gasto
     const serviceCall = this.isEditMode
-    // Llamar al servicio de actualización si es true
-    ? this.expenseService.updateExpense(this.expense, this.selectedFile ?? undefined)
-    // Llamar al servicio de registro si es false
-    : this.expenseService.registerExpense(this.expense, this.selectedFile ?? undefined);
+      // Llamar al servicio de actualización si es true
+      ? this.expenseService.updateExpense(this.expense, this.selectedFile ?? undefined)
+      // Llamar al servicio de registro si es false
+      : this.expenseService.registerExpense(this.expense, this.selectedFile ?? undefined);
 
     serviceCall.subscribe({
       next: (response) => {
@@ -593,7 +699,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
             // Redirigir después de confirmar el alert
             this.router.navigate(['/main/expenses/view-expense-admin']);
           });
-    
+
           this.clearForm();
           this.isLoading = false;
         } else {
@@ -660,7 +766,7 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
         this.isLoading = false;
       }
     });
-    
+
   }
   showErrorAlert(message: string) {
     Swal.fire({
@@ -693,5 +799,33 @@ export class ExpensesRegisterExpenseComponent implements OnInit {
     this.cdRef.detectChanges();
   }
 
-
+  addCategory() {
+    const modalElement = this.modalNG.open(ExpenseRegisterCategoryComponent);
+    modalElement.componentInstance.eventSucces.subscribe(() => {
+      this.showSuccessAlert('Se registró la categoría con éxito');
+      this.expenseCategoriesNgSelect.reloadCategories();
+    });
+    modalElement.componentInstance.eventError.subscribe((errorMessage: string) => {
+      this.showErrorAlert(errorMessage);
+    });
+  }
+  addProvider(){
+    const modalElement = this.modalNG.open(ExpenseRegisterProviderComponent,{
+      size: 'xl'
+    });
+    modalElement.componentInstance.eventSucces.subscribe(() => {
+      this.showSuccessAlert('Se registró el proveedor con exito');
+      this.expenseProvidersNgSelect.reloadCategories();
+    });
+    modalElement.componentInstance.eventError.subscribe((errorMessage: string) => {
+      this.showErrorAlert(errorMessage);
+    });
+  }
+  showSuccessAlert(message: string) {
+    return Swal.fire({
+      title: '¡Éxito!',
+      text: message,
+      icon: 'success',
+    });
+  }
 }

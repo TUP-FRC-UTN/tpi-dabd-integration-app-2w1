@@ -16,6 +16,8 @@ import { RoutingService } from '../../services/routing.service';
 export class LandingPageComponent implements OnInit {
   lotes: GetPlotModel[] = [];
   selectedPlot: GetPlotModel | null = null;
+  selectedPath: HTMLElement | null = null;
+  selectedPng: string | null = null;
   //Injects
   private routingService = inject(RoutingService);
   private plotService = inject(PlotService);
@@ -75,14 +77,11 @@ export class LandingPageComponent implements OnInit {
       const pathElement = svgDoc?.getElementById(lote.plot_number.toString());
       if (pathElement) {
         switch (lote.plot_state) {
-          case 'Habitado':
-            pathElement.setAttribute('fill', '#FFE6A9');
-            break;
-          case 'En construccion':
-            pathElement.setAttribute('fill', '#DEAA79');
-            break;
           case 'Disponible':
             pathElement.setAttribute('fill', '#B1C29E');
+            break;
+          default:
+            pathElement.setAttribute('fill', '#DEAA79');
             break;
         }
 
@@ -100,8 +99,10 @@ export class LandingPageComponent implements OnInit {
 
         // Setteo de evento de clic
         pathElement.addEventListener('click', () => {
-          this.selectedPlot = this.lotes.find(l => l.id === lote.id)!;
-          console.log("Lote seleccionado:", this.selectedPlot);
+          this.selectedPlot = this.lotes.find(l => l.id === lote.id) || null;
+
+          this.selectedPath = pathElement.cloneNode(true) as HTMLElement;
+          this.selectedPng = this.convertPathToPngV2();
           this.cdRef.detectChanges();
         });
 
@@ -172,6 +173,113 @@ export class LandingPageComponent implements OnInit {
 
   clearPlot() {
     this.selectedPlot = null;
+  }
+
+  extractPathCoordinates(path: string): { minX: number, minY: number, maxX: number, maxY: number } {
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    let currentX = 0, currentY = 0;
+
+    //Separa los comandos del path
+    const pathCommands = path.match(/[a-zA-Z][^a-zA-Z]*/g);
+
+    pathCommands?.forEach(command => {
+      //Obtiene las coordenadas
+      const coords = command.slice(1).split(/[\s,]+/).map(Number);
+      let i = 0;
+
+      while (i < coords.length) {
+        const x = coords[i];
+        const y = coords[i + 1];
+
+        //Movimientos absolutos
+        if (command.startsWith('M') || command.startsWith('L') || command.startsWith('T')) {
+          currentX = x;
+          currentY = y;
+        }
+
+        //Movimientos relativos
+        else if (command.startsWith('m') || command.startsWith('l') || command.startsWith('t')) {
+          currentX += x;
+          currentY += y;
+        }
+
+        //
+        else if (command.startsWith('C') || command.startsWith('c') || command.startsWith('S') || command.startsWith('s') || command.startsWith('Q') || command.startsWith('q') || command.startsWith('T')) {
+          currentX = x;
+          currentY = y;
+        }
+
+        //Actualiza las coordenadas mínimas y máximas
+        minX = Math.min(minX, currentX);
+        minY = Math.min(minY, currentY);
+        maxX = Math.max(maxX, currentX);
+        maxY = Math.max(maxY, currentY);
+
+        //Avanza de dos en dos porque itera sobre x,y
+        i += 2;
+      }
+    });
+
+    return { minX, minY, maxX, maxY };
+  }
+
+  updatePathToOrigin(path: string): string {
+    const { minX, minY } = this.extractPathCoordinates(path);
+
+    // Calculamos el traslape necesario para llevar el path a (0, 0)
+    const translateX = -minX;
+    const translateY = -minY;
+
+    // Devuelve el transform para mover el path a (0, 0)
+    return `translate(${translateX}, ${translateY})`;
+  }
+
+  convertPathToPngV2(width: number = 150, height: number = 150): string {
+    debugger
+    const pathD = this.selectedPath?.getAttribute('d');
+    if (!pathD) {
+      throw new Error('Path no definido.');
+    }
+    console.log('Path d:', pathD);
+    const { minX, minY, maxX, maxY } = this.extractPathCoordinates(pathD);
+
+    // Crear un canvas temporal
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      throw new Error('No se pudo obtener el contexto del canvas.');
+    }
+
+    // Escalar y trasladar para ajustar el path al canvas
+    const scaleX = width / (maxX - minX);
+    const scaleY = height / (maxY - minY);
+    const scale = Math.min(scaleX, scaleY); // Mantener proporción
+
+    const translateX = -minX * scale;
+    const translateY = -minY * scale;
+
+    ctx.setTransform(scale, 0, 0, scale, translateX, translateY);
+
+    // Dibujar el path en el canvas
+    const svgPath = new Path2D(pathD);
+    ctx.fillStyle = this.selectedPath?.getAttribute('fill') as string || '#000000';
+    ctx.fill(svgPath);
+    // Configurar y aplicar el contorno (stroke)
+    ctx.lineWidth = 0.5; // Grosor del contorno
+    ctx.strokeStyle = '#343A40'; // Color del contorno (puedes cambiarlo)
+    ctx.stroke(svgPath)
+
+    // Convertir el canvas a una imagen en formato base64
+    return canvas.toDataURL('image/png');
+  }
+
+
+
+  openRequestModal(plotId: number) {
+
   }
 
 }

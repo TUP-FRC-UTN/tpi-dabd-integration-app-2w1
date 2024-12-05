@@ -89,6 +89,7 @@
     (ngSubmit)="onSubmit()"
     class="mt-5 bg-white shadow p-5 mx-2 w-100"
     style="max-width: 1200px"
+    id="pantalla"
   >
     <div class="row">
       <div class="col-md-6">
@@ -208,11 +209,12 @@
       </div>
     </div>
 
-    <div class="row">
+    <div class="row" >
       <div class="col-md-6">
         <div class="mb-3">
           <label class="form-label">Tipo Proveedor</label>
           <select
+            id="combo"
             formControlName="supplierType"
             class="form-select"
             [ngClass]="{
@@ -267,6 +269,7 @@
         </div>
         <div class="col-auto">
           <button
+            id="registrar"
             type="submit"
             class="btn btn-success"
             style="width: 100%"

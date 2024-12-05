@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule} from '@angular/common';
 import { ListadoDesempeñoService } from '../../services/listado-desempeño.service';
 import { EmployeePerformance } from '../../Models/listado-desempeño';
@@ -18,6 +18,9 @@ import { IepAttentionCallComponent } from '../iep-attention-call/iep-attention-c
 import { NgSelectModule } from '@ng-select/ng-select';
 import { EmpListadoEmpleados, Employee } from '../../Models/emp-listado-empleados';
 import { EmpListadoEmpleadosService } from '../../services/emp-listado-empleados.service';
+import Shepherd from 'shepherd.js';
+import { Subscription } from 'rxjs';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 declare var bootstrap: any; // Añadir esta declaración al principio
 
 @Component({
@@ -27,7 +30,11 @@ declare var bootstrap: any; // Añadir esta declaración al principio
   templateUrl: './iep-performancelist.component.html',
   styleUrl: './iep-performancelist.component.css'
 })
-export class IepPerformancelistComponent implements OnInit {
+export class IepPerformancelistComponent implements OnInit, OnDestroy {
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
+  
   // Modificar la estructura de las opciones de período
   periodOptions: { id: string; label: string }[] = [];
   showFilterModal = false;
@@ -75,9 +82,23 @@ export class IepPerformancelistComponent implements OnInit {
     private employeeService: ListadoDesempeñoService,
     private router: Router,
     private route: ActivatedRoute,
-    private employeeServices: EmpListadoEmpleadosService
-    
+    private employeeServices: EmpListadoEmpleadosService,
+    private tutorialService: TutorialService
   ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+      },
+      keyboardNavigation: false,
+      useModalOverlay: true,
+    }); 
+
     // Inicializar los arrays
     this.selectedYears = [];
     this.selectedMonths = [];
@@ -148,6 +169,14 @@ export class IepPerformancelistComponent implements OnInit {
     setTimeout(() => {
       this.updateCheckboxes();
     }, 100);
+
+
+      //TUTORIAL
+      this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+        () => {
+          this.startTutorial();
+        }
+      ); 
 }
 
 private initializePeriodOptions(): void {
@@ -296,6 +325,101 @@ openNewCallModal(employeeId: number) {
     if (this.dataTable) {
       this.dataTable.destroy();
     }
+
+    //TUTORIAL
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    } 
+
+  }
+
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Tabla de Desempeño de Empleado',
+      text: 'Acá puede ver el desempeño del empleado seleccionado previamente. La informacion se separa por períodos: se incluye la cantidad de observaciones que el empleado ha tenido en el periódo y el desempeño. El desempeño es calculado automáticamente en base a la cantidad de observaciones y la severidad de las mismas. ',
+      attachTo: {
+        element: '.table',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Filtros',
+      text: 'Desde acá se puede filtrar los períodos. También puede exportar los periodos a Excel o PDF, o borrar los filtros aplicados con el botón de basura.'
+      ,attachTo: {
+        element: '#filtros',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Boton de acciones',
+      text: 'Con este botón puede ver mas información de un período particular. Al presionar el bóton podrá ver todas las observaciones realizadas en el período.',
+      attachTo: {
+        element: '#acciones',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Salir',
+      text: 'Al terminar, puede pulsar este botón para volver a la página anterior.',
+      attachTo: {
+        element: '#leave',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete,
+        }
+      ]
+    });
+
+    this.tour.start();
   }
   
   closeNewCallModal() {
@@ -369,11 +493,11 @@ openNewCallModal(employeeId: number) {
             <div class="text-center">
                   <div class="btn-group">
                     <div class="dropdown">
-                      <button type="button" class="btn border border-2 bi-three-dots-vertical btn-cambiar-estado" data-bs-toggle="dropdown"></button>
+                      <button type="button" class="btn border border-2 bi-three-dots-vertical btn-cambiar-estado" data-bs-toggle="dropdown" id="acciones"></button>
                         <ul class="dropdown-menu">
                           <li>
                             <button class="dropdown-item btn-sm btn-primary view-details" data-bs-target="#viewDetail"  
-                            data-bs-toggle="modal" data-id="${data.id}" data-year="${data.year}" data-month="${data.month}">
+                            data-bs-toggle="modal" data-id="${data.id}" data-year="${data.year}" data-month="${data.month}" >
                             Ver más
                             </button>
                           </li>

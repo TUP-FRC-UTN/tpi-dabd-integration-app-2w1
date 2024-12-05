@@ -18,11 +18,13 @@ import { RoutingService } from '../../../../common/services/routing.service';
 import Swal from 'sweetalert2';
 import { PlotService } from '../../../../users/users-servicies/plot.service';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { PlotModel } from '../../../../users/users-models/plot/Plot';
 import { CommonModule } from '@angular/common';
 import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
 import { OwnerService } from '../../../../users/users-servicies/owner.service';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 
 @Component({
   selector: 'app-new-report',
@@ -66,13 +68,32 @@ export class NewReportComponent {
   options: { name: string; value: any }[] = [];
   optionsplot: { name: string; value: any }[] = [];
 
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
+
   constructor(
     private reportService: ReportService,
     private router: Router,
     private routingService: RoutingService,
     private formBuilder: FormBuilder,
-    private ownerService: OwnerService
+    private ownerService: OwnerService, 
+    private tutorialService: TutorialService
   ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+      },
+      keyboardNavigation: false,
+
+      useModalOverlay: true,
+    }); 
     this.dateView = this.setTodayDate();
 
     this.reactiveForm = this.formBuilder.group({
@@ -105,6 +126,158 @@ export class NewReportComponent {
   ngOnInit(): void {
     this.getReportReasons();
     this.getPlots();
+    //TUTORIAL
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    ); 
+  }
+
+  ngOnDestroy(): void {
+    //TUTORIAL
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
+  }
+
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    };
+    while (this.tour.steps.length > 0) {
+      this.tour.removeStep(this.tour.steps[this.tour.steps.length - 1].id);
+    }
+    this.tour.addStep({
+      id: 'general-step',
+      title: 'Registrar Informe',
+      text: 'Acá puede realizar el alta de un informe con sus datos correspondientes. En el mismo se puede tener ninguna, una o varias denuncias anexadas al momento de crearlo. El informe incluye la siguiente información...',
+      attachTo: {
+        element: '#addReportForm',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+
+    this.tour.addStep({
+      id: 'reason-step',
+      title: 'Motivo',
+      text: 'Seleccione el motivo por el cuál se creará el informe...',
+      attachTo: {
+        element: '#reportReason',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'description-step',
+      title: 'Descripción',
+      text: 'Escriba el por qué realiza el alta del informe con ese motivo...',
+      attachTo: {
+        element: '#reportDescription',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'lot-step',
+      title: 'Selección de Lote',
+      text: 'Seleccione a qué lote/s irá dirigido el informe...',
+      attachTo: {
+        element: '#reportLote',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+      
+    });
+
+    if (this.reactiveForm.value.plotIds.length < 2) {
+      console.log('Adding complaint step');
+      this.tour.addStep({
+        id: 'complaint-step',
+        title: 'Adjuntar Denuncias',
+        text: 'Este botón abrirá una ventana donde podrá visualizar y seleccionar denuncias...',
+        attachTo: {
+          element: '#complaintModal',
+          on: 'auto',
+        },
+        buttons: [
+          {
+            text: 'Anterior',
+            action: this.tour.back,
+          },
+          {
+            text: 'Siguiente',
+            action: this.tour.next,
+          },
+        ],
+      });
+    }
+
+    
+    this.tour.addStep({
+      id: 'final-step',
+      title: 'Registrar',
+      text: 'Finalmente, haga click en el botón verde para registrar el informe.',
+      attachTo: {
+        element: '#submitButton',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+      
+    });
+
+    this.tour.start();
   }
 
   getReportReasons(): void {
@@ -218,7 +391,7 @@ export class NewReportComponent {
   }
 
   openSelectComplaints(): void {
-    const modalElement = document.getElementById('complaintModal');
+    const modalElement = document.getElementById('complaintModal') as HTMLElement;
     if (modalElement) {
       const modal = new (window as any).bootstrap.Modal(modalElement);
       modal.show();

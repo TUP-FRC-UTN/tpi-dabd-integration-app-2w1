@@ -136,6 +136,4 @@ export class ProductService {
     const params = new HttpParams().set('idUser', userId).set('id', id.toString());
     return this.http.put<any>(url, {}, { headers, params });
   }
-
-  //http://localhost:8081/product/1/logicalLow?idUser=3
 }

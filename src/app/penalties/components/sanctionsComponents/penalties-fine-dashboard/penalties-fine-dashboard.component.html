@@ -107,22 +107,32 @@
   <!-- Inicia en esta vista -->
   @if (status == 0) {
   <div class="row">
-    <!-- KPI LIMITE 5-->
+    <!-- KPIs generales-->
     <div class="col-2 gap-2 d-flex flex-column justify-content-center">
-      <app-custom-kpi [value]="totalFines" title="Total Multas" subTitle="Período" tooltip="Total del Período"
-        [customStyles]="{ 'background-color': '#D6F6FF' }" icon="bi bi-flag-fill" formatPipe=""></app-custom-kpi>
-      <app-custom-kpi [value]="averageFinesPerMonth" title="Promedio" subTitle="Período" tooltip="Total del Período"
-        [customStyles]="{ 'background-color': '#FFE699' }" icon="bi bi-calendar-day" formatPipe=""></app-custom-kpi>
+      <app-custom-kpi [value]="totalFines" title="Multas totales" subTitle="en el período"
+        tooltip="Total de multas en el período" [customStyles]="{ 'background-color': '#D6F6FF' }" icon="bi-flag-fill"
+        formatPipe="number">
+      </app-custom-kpi>
+
+      <app-custom-kpi [value]="averageFinesPerMonth" title="Multas promedio" subTitle="por dia"
+        tooltip="Promedio de multas diarias en el período" [customStyles]="{ 'background-color': '#FFE699' }"
+        icon="bi-calendar-day" formatPipe="number">
+      </app-custom-kpi>
+
       <div class="lowestHighest" (click)="openModalPreview(5)">
-        <app-custom-kpi [value]="highestFine?.amount" title="Multa más alta" subTitle="Período"
-          tooltip="Total del Período" [customStyles]="{ 'background-color': '#B3F5BC' }" icon="bi bi-calendar-day"
-          formatPipe="currency"></app-custom-kpi>
+        <app-custom-kpi [value]="highestFine?.amount" title="Multa más alta" subTitle="en el período"
+          tooltip="Multa mas alta en el período" [customStyles]="{ 'background-color': '#B3F5BC' }"
+          icon="bi-graph-up-arrow" formatPipe="currency">
+        </app-custom-kpi>
       </div>
+
       <div class="lowestHighest" (click)="openModalPreview(6)">
-        <app-custom-kpi [value]="lowestFine?.amount" title="Multa más baja" subTitle="Período"
-          tooltip="Total del Período" [customStyles]="{ 'background-color': '#FCAE7C' }" icon="bi bi-calendar-day"
-          formatPipe="currency"></app-custom-kpi>
+        <app-custom-kpi [value]="lowestFine?.amount" title="Multa más baja" subTitle="en el período"
+          tooltip="Multa mas baja en el período" [customStyles]="{ 'background-color': '#FCAE7C' }"
+          icon="bi-graph-down-arrow" formatPipe="currency">
+        </app-custom-kpi>
       </div>
+
     </div>
     <div class="col-10">
       <!-- Graficos chicos (pie, lines, list)-->
@@ -210,16 +220,17 @@
           </h4>
           <hr />
           <div class="row">
+            <!-- KPIs de Estados -->
             <div class="col-3 gap-2 d-flex flex-column justify-content-center">
               <app-custom-kpi [value]="stateWithHighestPercentage.percentage" title="Estado Mayor"
                 [subTitle]="stateWithHighestPercentage.state" tooltip="Total del Período"
-                [customStyles]="{ 'background-color': '#D6F6FF' }" icon="bi bi-percent"
-                formatPipe="percent"></app-custom-kpi>
+                [customStyles]="{ 'background-color': '#D6F6FF' }" icon="bi-percent" formatPipe="percent">
+              </app-custom-kpi>
 
               <app-custom-kpi [value]="stateWithLowestPercentage.percentage" title="Estado Menor"
                 [subTitle]="stateWithLowestPercentage.state" tooltip="Total del Período"
-                [customStyles]="{ 'background-color': '#FFE699' }" icon="bi bi-percent"
-                formatPipe="percent"></app-custom-kpi>
+                [customStyles]="{ 'background-color': '#FFE699' }" icon="bi-percent" formatPipe="percent">
+              </app-custom-kpi>
             </div>
             <div class="col-9">
               <div class="row flex-grow-1 d-flex justify-content-center align-items-center mt-1 h-100">
@@ -419,7 +430,7 @@
         <button type="button" class="btn btn-secondary" (click)="closeFilterModal()">
           Cerrar
         </button>
-        
+
       </div>
     </div>
   </div>

@@ -6,8 +6,9 @@
 
         <!-- valor -->
         <div class="kpi-amount mb-2">
-            <span class="display-5 fw-semibold" [ngClass]="value!.toString().length > 7 ? 'fs-4' : 'fs-2'">{{ getValue()
-                }}</span>
+            <span class="display-5 fw-semibold" [ngClass]="Value!.toString().length > 8 ? 'fs-4' : 'fs-2'">
+                {{Value}}
+            </span>
         </div>
 
         <!-- titulo y subtitulo -->

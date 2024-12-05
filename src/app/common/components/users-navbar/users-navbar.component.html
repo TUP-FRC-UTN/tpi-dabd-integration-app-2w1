@@ -1,6 +1,6 @@
 <div class="mb-5">
     <!-- NavBar -->
-    <nav class="navbar mynav d-flex justify-content-between shadow fixed-top text-bg-dark">
+    <nav class="navbar mynav d-flex justify-content-between shadow fixed-top text-bg-dark" id="navbar">
 
         <!-- Lado izquierdo -->
         <div class="col-4">
@@ -25,35 +25,34 @@
             <h3>{{pageTitle}}</h3>
         </div>
 
-        <div class="col-4  d-flex justify-content-end align-items-center">
+        <div class="col-4 d-flex justify-content-end align-items-center gap-2">
 
-            <app-navbar-notification ></app-navbar-notification>
+            <app-navbar-notification></app-navbar-notification>
 
             <div class="dropdown">
-                <button type="button" class="btn btn-dark fs-5" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+                <button type="button" class="btn btn-dark fs-5" data-bs-toggle="dropdown" aria-expanded="false"
+                    data-bs-auto-close="outside">
 
                     {{username + ' ' + userLastname}}
                     <i class="bi-person-circle fs-5"></i>
                 </button>
                 <ul class="dropdown-menu">
-                    <li><a class="btn dropdown-item"
-                            (click)="changePath({path: 'main/users/profile', title: 'Mi perfil'})">
-                            <i class="bi bi-person"></i> Perfil</a></li>
+                    <li><a class="btn dropdown-item bi-person"
+                            (click)="changePath({path: 'main/users/profile', title: 'Mi perfil'})"> Perfil </a></li>
                     <!-- <li><a class="dropdown-item" href="#"><i class="bi bi-gear"></i> Configuración</a></li> -->
                     <li>
                         <hr class="dropdown-divider">
                     </li>
 
-                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#confirmExit"
-                            title="Salir">
-                            <i class="bi-box-arrow-left"></i> Cerrar sesión</a></li>
+                    <li><a class="btn dropdown-item bi-box-arrow-left" href="#" data-bs-toggle="modal"
+                            data-bs-target="#confirmExit" title="Salir"> Cerrar sesión </a></li>
                 </ul>
             </div>
         </div>
 
     </nav>
     <!-- SideBar -->
-    <aside class="myside text-bg-dark h-100 pt-5 fixed-top animation"
+    <aside class="myside text-bg-dark h-100 pt-5 fixed-top animation" id="sidebar"
         [class]="expand ? 'side-expanded' : 'side-compressed'" style="z-index: 9;">
         <div class="pt-3 fs-5 d-flex flex-column h-100">
             <button class="nav-link d-flex text-light w-100 px-3 py-2"
@@ -61,7 +60,7 @@
                 <i class="bi-house-fill"></i>
                 @if (expand) {<span class="ms-2">Home</span>}
             </button>
-            <ul class="nav flex-column overflow-auto custom-scroll">
+            <ul class="nav flex-column overflow-auto custom-scroll" id="sideButtons">
                 <li class="nav-item mb-2">
                     @for (button of sideButtons; track $index) {
                     <app-users-side-button [expanded]="expand" [info]="button" [userRole]="actualRole"
@@ -80,15 +79,18 @@
                     @if (expand) {<span class="ms-2">Dashboard</span>}
                 </button>
                 }
-                <button class="nav-link d-flex text-light w-100 px-3 py-2" data-bs-toggle="modal"
-                    data-bs-target="#infoModal" title="Información">
+                <button class="nav-link d-flex text-light w-100 px-3 py-2" data-bs-target="#infoModal"
+                    data-bs-toggle="modal" title="Información">
                     <i class="bi-info-circle"></i>
                     @if (expand) {<span class="ms-2">Información</span>}
+                </button>
+                <button class="nav-link d-flex text-light w-100 px-3 py-2" (click)="startTutorial()" title="Tutorial">
+                    <i class="bi bi-book"></i> @if (expand) {<span class="ms-2">Tutorial</span>}
                 </button>
                 <button class="nav-link d-flex text-light w-100 px-3 py-2" data-bs-toggle="modal"
                     data-bs-target="#confirmExit" title="Salir">
                     <i class="bi-box-arrow-left"></i>
-                    @if (expand) {<span class="ms-2">Cerrar Sesión</span>}
+                    @if (expand) {<span class="ms-2">Salir</span>}
                 </button>
             </div>
         </div>

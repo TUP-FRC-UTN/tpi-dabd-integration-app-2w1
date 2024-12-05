@@ -42,6 +42,7 @@
     "ngx-scanner-qrcode": "^1.6.9",
     "npm": "^10.9.0",
     "rxjs": "~7.8.0",
+    "shepherd.js": "^14.3.0",
     "sweetalert2": "^11.14.3",
     "tslib": "^2.3.0",
     "xlsx": "^0.18.5",

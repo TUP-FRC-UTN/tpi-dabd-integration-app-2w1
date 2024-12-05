@@ -1,4 +1,4 @@
-<section class="container p-5 border rounded border-3 border-secundary" style="min-height: 70vh;">
+<section class="container p-5 border rounded border-3 border-secundary" style="min-height: 70vh;" id="updateUser">
     <form [formGroup]="updateForm" (ngSubmit)="updateUser()">
         <div class="row">
 
@@ -30,6 +30,7 @@
                   <label class="col-2 col-form-label">Tipo de Documento</label>
                   <div class="col-10">
                     <app-custom-select #dniComponent [options]="[{value: 1, name: 'DNI'}, {value: 2, name: 'Pasaporte'}, {value: 3, name: 'CUIT/CUIL'}]"
+                        [disabled]="true"
                       [selectedOptions]="updateForm.get('dniType')?.value"
                       (selectedOptionsChange)="updateForm.get('dniType')?.setValue($event)"
                       [validations]="updateForm.get('dniType')?.validator" />
@@ -106,7 +107,7 @@
                     <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#cancelarConfirmacion">Cancelar</button>
                 </div>
                 <div class="col-auto">
-                    <button type="submit" class="btn btn-primary" [disabled]="!updateForm.valid">Guardar</button>
+                    <button type="submit" class="btn btn-primary" [disabled]="!updateForm.valid" id="register">Guardar</button>
                 </div>
             </div>
         </div>

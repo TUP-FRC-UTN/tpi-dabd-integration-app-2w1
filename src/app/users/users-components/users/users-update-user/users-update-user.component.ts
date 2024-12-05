@@ -13,6 +13,9 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { CustomSelectComponent } from '../../../../common/components/custom-select/custom-select.component';
 import { RoutingService } from '../../../../common/services/routing.service';
 import { SuscriptionManagerService } from '../../../../common/services/suscription-manager.service';
+import { Subscription } from 'rxjs';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 
 @Component({
   selector: 'app-users-update-user',
@@ -23,22 +26,40 @@ import { SuscriptionManagerService } from '../../../../common/services/suscripti
 })
 export class UsersUpdateUserComponent implements OnInit, OnDestroy {
 
-  constructor(private route: ActivatedRoute, private fb: FormBuilder) {
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
+  
+  constructor(private route: ActivatedRoute, private fb: FormBuilder, private tutorialService: TutorialService) {
     this.updateForm = this.fb.group({
       name: new FormControl('', [Validators.required]),
       lastname: new FormControl('', [Validators.required]),
-      phoneNumber: new FormControl('', [Validators.required, Validators.pattern(/^\d+$/), Validators.minLength(10), Validators.maxLength(20)]),
+      phoneNumber: new FormControl(null, [Validators.pattern(/^\d+$/), Validators.minLength(10), Validators.maxLength(20)]),
       telegram_id: new FormControl(0),
       dni: new FormControl('', [Validators.required, 
         Validators.pattern(/^\d+$/),
         Validators.minLength(8),
         this.validarCuit.bind(this)]),
       dniType: new FormControl(0, [Validators.required]),
-      email: new FormControl('', [Validators.email]),
+      email: new FormControl(null),
       avatar_url: new FormControl(''),
-      datebirth: new FormControl(''),
+      datebirth: new FormControl(null),
       roles: new FormControl([], [Validators.required])
     })
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+      },
+      keyboardNavigation: false,
+
+      useModalOverlay: true,
+    });
   }
   @ViewChild('rolesSelect') rolesComponent!: CustomSelectComponent; //FixMe: Usar el customSelect en este componente
   @ViewChild('dniComponent') dniComponent!: CustomSelectComponent; //FixMe: Usar el customSelect en este componente
@@ -74,14 +95,68 @@ export class UsersUpdateUserComponent implements OnInit, OnDestroy {
     // Desactiva campos específicos del formulario
     if (this.authService.getActualRole() != 'SuperAdmin') {
       this.updateForm.get('dni')?.disable();
+      this.updateForm.get('dniType')?.disable();
       this.updateForm.get('email')?.disable();
       this.updateForm.get('datebirth')?.disable();
     }
+
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    );
+  }
+  startTutorial() {
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Actualización de usuario',
+      text: 'Acá puede actualizar los datos de un usuario. Tenga en cuenta que algunos campos no pueden modificarse sin permisos especiales.',
+      attachTo: {
+        element: '#updateUser',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        },
+      ],
+    });
+
+
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Guardar cambios',
+      text: 'Al finalizar, presione este botón para guardar sus cambios.',
+      attachTo: {
+        element: '#register',
+        on: 'auto',
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back,
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete,
+        },
+      ],
+    });
+
+    this.tour.start();
   }
 
   //Desuscribirse de los observables
   ngOnDestroy(): void {
     this.suscriptionService.unsubscribeAll();
+    if (this.tour) {
+      this.tour.complete();
+    }
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
   }
 
   //---------------------------------------------------Carga de datos---------------------------------------------------
@@ -119,7 +194,7 @@ export class UsersUpdateUserComponent implements OnInit, OnDestroy {
           this.updateForm.get('name')?.setValue(data.name);
           this.updateForm.get('lastname')?.setValue(data.lastname);
           this.updateForm.get('dni')?.setValue(data.dni);
-          this.updateForm.get('email')?.setValue(data.email);
+          this.updateForm.get('email')?.setValue(data.email || null);
           this.updateForm.get('avatar_url')?.setValue(data.avatar_url);
           console.log(data.dni_type);
 
@@ -140,8 +215,12 @@ export class UsersUpdateUserComponent implements OnInit, OnDestroy {
             this.documentTypeChange();
           });
 
-
-          const formattedDate = DateService.parseDateString(data.datebirth);
+            let formattedDate = null;
+            if (data.datebirth) {
+            formattedDate = DateService.parseDateString(data.datebirth);
+            } else {
+            formattedDate = null;
+            }
 
           this.userRoles = data.roles;
 
@@ -154,6 +233,8 @@ export class UsersUpdateUserComponent implements OnInit, OnDestroy {
             this.updateForm.get('roles')?.setValue(this.userRoles);
             this.rolesComponent.setData(this.userRoles);
           }
+
+          this.updateForm.get('datebirth')?.setValue(formattedDate || null);
           if (formattedDate) {
             // Formatea la fecha a 'yyyy-MM-dd' para un input de tipo date
             const formattedDateString = formattedDate.toISOString().split('T')[0];
@@ -167,7 +248,7 @@ export class UsersUpdateUserComponent implements OnInit, OnDestroy {
             });
           }
 
-          this.updateForm.get('phoneNumber')?.setValue(data.phone_number.toString());
+          this.updateForm.get('phoneNumber')?.setValue(data.phone_number.toString() || null);
           this.updateForm.get('telegram_id')?.setValue(data.telegram_id) || 0;
 
           // Asigna `rolesSelected` después de obtener `data.roles`
@@ -296,17 +377,24 @@ export class UsersUpdateUserComponent implements OnInit, OnDestroy {
     user.name = this.updateForm.get('name')?.value || '';
     user.lastName = this.updateForm.get('lastname')?.value || '';
     user.dni = this.updateForm.get('dni')?.value || '';
-    user.phoneNumber = this.updateForm.get('phoneNumber')?.value?.toString() || '';
-    user.email = this.updateForm.get('email')?.value || '';
+    user.phoneNumber = this.updateForm.get('phoneNumber')?.value?.toString() || null;
+    user.email = this.updateForm.get('email')?.value || null;
     user.avatar_url = this.updateForm.get('avatar_url')?.value || '';
 
     //Formatea la fecha correctamente (año-mes-día)
-    const date: Date = new Date(this.updateForm.get('datebirth')?.value || '');
+    const date: Date = new Date(this.updateForm.get('datebirth')?.value || null);
 
     //Formatear la fecha como YYYY-MM-DD
-    const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+    let formattdDate = null;
+    if(date){
+      formattdDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+    }
+    else{
+      formattdDate = null;
+    }
+    
 
-    user.datebirth = formattedDate;
+    user.datebirth = formattdDate || null;
     user.roles = this.updateForm.get('roles')?.value + this.blockedRoles || [];
     user.userUpdateId = this.authService.getUser().id;
     user.dni_type_id = this.updateForm.get('dniType')?.value;

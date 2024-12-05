@@ -8,6 +8,7 @@ import { LoginService } from '../../../users/users-servicies/login.service';
 import { AuthService } from '../../../users/users-servicies/auth.service';
 import { UserLoged } from '../../../users/users-models/users/UserLoged';
 import { ValidatorsService } from '../../../users/users-servicies/validators.service';
+import { RoutingService } from '../../services/routing.service';
 
 @Component({
   selector: 'app-login',
@@ -17,10 +18,9 @@ import { ValidatorsService } from '../../../users/users-servicies/validators.ser
   styleUrl: './login.component.css',
 })
 export class LoginComponent {
-  private readonly router = inject(Router);
+  private readonly routingService = inject(RoutingService);
   private readonly apiService = inject(UserService);
   private readonly authService = inject(AuthService);
-  private readonly validatorService = inject(ValidatorsService)
   passwordVisible: boolean = false;
 
   //Muestra un mensaje si los datos ingresados son incorrectos
@@ -79,7 +79,7 @@ export class LoginComponent {
       next: async (data) => {
         await this.authService.login(data);
         this.errorLog = false;
-        this.router.navigate(['main/home']);
+        this.routingService.redirect('main/home', 'Página principal');
       
       },
       error: (error) => {

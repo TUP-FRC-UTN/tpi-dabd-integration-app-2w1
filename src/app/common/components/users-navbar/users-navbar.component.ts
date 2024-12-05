@@ -4,23 +4,24 @@ import { UsersSideButtonComponent } from '../users-side-button/users-side-button
 import { NavbarNotificationComponent } from "../../../notifications/components/navbar-notification/navbar-notification.component";
 import { RoutingService } from '../../services/routing.service';
 import { AuthService } from '../../../users/users-servicies/auth.service';
+import { TutorialService } from '../../services/tutorial.service';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-users-navbar',
   standalone: true,
-  imports: [UsersSideButtonComponent, NavbarNotificationComponent],
+  imports: [UsersSideButtonComponent, NavbarNotificationComponent, RouterOutlet],
   templateUrl: './users-navbar.component.html',
   styleUrl: './users-navbar.component.css'
 })
 export class UsersNavbarComponent implements OnInit {
   private readonly routingService: RoutingService = inject(RoutingService);
   private readonly authService = inject(AuthService);
+  private readonly tutorialService = inject(TutorialService);
 
-  pageTitle: string = ''
+  pageTitle: string = this.routingService.getTitle();
   username: string = this.authService.getUser().name!;
   userLastname: string = this.authService.getUser().lastname!;
-  // username: string = "Jhon";     //Hardcodeado para no levantar el micro para login
-  // userLastname: string = "Doe";  //Hardcodeado para no levantar el micro para login
 
   //Expande el side
   expand: boolean = false;
@@ -30,8 +31,6 @@ export class UsersNavbarComponent implements OnInit {
 
   //Roles del usuario
   userRoles: string[] = [];
-
-  // userRoles: string[] = ["SuperAdmin", "Gerente general"]; //Hardcodeado para no levantar el micro para login
 
   //Rol seleccionado
   actualRole: string = '';
@@ -43,10 +42,19 @@ export class UsersNavbarComponent implements OnInit {
     this.actualRole = this.authService.getActualRole()!;
   }
 
+
+  //Arranca el tutorial segun la pantalla
+  startTutorial() {
+    console.log("tutorial");
+    this.tutorialService.triggerTutorial();
+  }
+
+
   //Expandir y contraer el sidebar
   changeState() {
     this.expand = !this.expand;
   }
+
 
   //Obtiene el título y la url del hijo y llama al servicio para redirigir y setear el titulo
   changePath(info: any) {
@@ -56,27 +64,33 @@ export class UsersNavbarComponent implements OnInit {
     });
   }
 
+
   //Redirigir a los dashboards
   redirectDashboard() {
     this.routingService.redirect(this.routingService.getDashboardRoute(), 'Dashboard');
   }
+
 
   //Seleccionar un rol
   selectRole(role: string) {
     this.authService.saveActualRole(role);
     this.actualRole = role;
     this.routingService.redirect('/main/home', 'Página principal');
+
   }
+
 
   //Cerrar sesión
-  logOut(){
+  logOut() {
     this.authService.logOut();
-    this.routingService.redirect('/login');
+    this.routingService.redirect('/home');
   }
 
+
   //Comprobar si el rol actual puede acceder a los dashboards
-  showDashboard(){
+  showDashboard() {
     const rolesPermited = ['SuperAdmin', 'Gerente general', 'Gerente multas', 'Gerente finanzas', 'Gerente inventario', 'Gerente empleados'];
-    return rolesPermited.includes(this.actualRole);
+    return rolesPermited.includes(this.actualRole) && this.routingService.getCurrentRoute() !== '/main/home';
   }
+
 }

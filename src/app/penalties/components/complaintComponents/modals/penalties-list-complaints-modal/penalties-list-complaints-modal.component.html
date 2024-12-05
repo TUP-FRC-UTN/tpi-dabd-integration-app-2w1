@@ -21,7 +21,7 @@
                     <tbody>
                         @for (complaint of filteredComplaints; track $index) {
                         <tr>
-                            <td>{{ (complaint?.complaintReason + (complaint?.complaintReason==="Otro" ? complaint?.anotherReason : '')) || 'N/A' }}</td>
+                            <td>{{ getComplaintReason(complaint) }}</td>
                             <td>{{ (complaint?.description) || 'N/A' }}</td>
                             <td>{{ (complaint?.complaintState) || 'N/A' }}</td>
                             <td>{{ (complaint?.createdDate | date:"dd/MM/yyyy") || 'N/A' }}</td>

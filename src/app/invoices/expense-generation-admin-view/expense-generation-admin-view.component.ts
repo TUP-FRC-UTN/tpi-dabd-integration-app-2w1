@@ -12,15 +12,19 @@ import autoTable from 'jspdf-autotable';
 import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 import Swal from 'sweetalert2';
 import { Observable } from 'rxjs/internal/Observable';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subscription } from 'rxjs';
 import localeEsAr from '@angular/common/locales/es-AR';
 import { environment } from '../../common/environments/environment';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CustomSelectComponent } from '../../common/components/custom-select/custom-select.component';
+import { TutorialService } from '../../common/services/tutorial.service';
+import Shepherd from 'shepherd.js';
 
 registerLocaleData(localeEsAr, 'es-AR');
 
 declare var window: any;
+
+
 
 @Component({
   selector: 'app-expense-generation-admin-view',
@@ -37,6 +41,9 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
   @ViewChild(CustomSelectComponent) customSelect!: CustomSelectComponent;
 
 
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
+  
   // Formatear los períodos
   loadMultipliersData() {
     this.isLoadingMultipliers = true;
@@ -200,7 +207,21 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
   };
 
   showStatusDropdown = false;
-  constructor(private expenseService: ExpenseGenerationExpenseService, private modalService: NgbModal,) {}
+  constructor(private expenseService: ExpenseGenerationExpenseService, private modalService: NgbModal, private tutorialService: TutorialService
+  ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+      },
+      useModalOverlay: true,
+    }); 
+}
 
   originalLatePaymentPercentage: number = 0;
   originalExpirationPercentage: number = 0;
@@ -409,6 +430,13 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
       this.searchTickets();
     });
 
+     //TUTORIAL
+     this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    ); 
+
     this.loadInitialData();
 
     this.detallesModal = new window.bootstrap.Modal(
@@ -417,6 +445,107 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
     this.observationModal = new window.bootstrap.Modal(
       document.getElementById('observationModal')
     );
+    
+  }
+  
+  startTutorial() {
+    console.log("pruebas")
+    if (this.tour) {
+      this.tour.complete();
+    }
+    this.tour.addStep({
+      id: 'table',
+      title: 'Tabla de Boletas',
+      text: 'Acá puede ver todas las boletas que se emitieron.',
+      attachTo: {
+        element: '#table',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+
+    this.tour.addStep({
+      id: 'filtros',
+      title: 'Filtros',
+      text: 'Desde acá podrá filtrar las boletas por fecha y estado. También puede exportar las boletas a Excel o PDF, o borrar los filtros aplicados con el botón de basura.',      attachTo: {
+        element: '#filtros',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'facturacion',
+      title: 'Facturación',
+      text: 'Acá puede facturar un periodo o manejar opciones de facturación.',      attachTo: {
+        element: '#facturacion',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'dropdownVerMas',
+      title: 'Acciones',
+      text: 'Desde acá puede ver las acciones disponibles para cada boleta. Puede editar boletas pendientes o ver más información.',      attachTo: {
+        element: '#dropdownMenuButton',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+      
+    });
+
+
+    this.tour.start();
+  }
+
+  ngOnDestroy() {
+    if (this.filter$) {
+      this.filter$.unsubscribe();
+    }
+
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+  
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
   }
 
   loadInitialData() {

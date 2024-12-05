@@ -1,4 +1,4 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit, OnInit, OnDestroy } from '@angular/core';
 import { Supplier } from '../../models/suppliers';
 import { SuppliersService } from '../../services/suppliers.service';
 import { FormsModule } from '@angular/forms';
@@ -15,6 +15,9 @@ import $ from 'jquery';
 import 'datatables.net';
 import 'datatables.net-dt';
 import 'datatables.net-bs5';
+import Shepherd from 'shepherd.js';
+import { Subscription } from 'rxjs';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 
 interface SelectedTypes {
   OUTSOURCED_SERVICE: boolean;
@@ -41,7 +44,13 @@ interface SelectedStates {
   templateUrl: './iep-supplier-list.component.html',
   styleUrls: ['./iep-supplier-list.component.css'],
 })
-export class IepSupplierListComponent implements AfterViewInit {
+export class IepSupplierListComponent implements AfterViewInit ,OnInit,OnDestroy{
+
+
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
+
   stateOptions = [
     { label: 'Activo', value: 'ACTIVE' },
     { label: 'Inactivo', value: 'INACTIVE' },
@@ -60,6 +69,10 @@ export class IepSupplierListComponent implements AfterViewInit {
     ACTIVE: false,
     INACTIVE: false,
   };
+
+
+
+
 
   selectedStateCount: number = 0;
 
@@ -214,8 +227,45 @@ export class IepSupplierListComponent implements AfterViewInit {
 
   constructor(
     private supplierService: SuppliersService,
-    private router: Router
-  ) {}
+    private router: Router, 
+    private tutorialService: TutorialService
+  ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+      },
+      keyboardNavigation: false,
+      useModalOverlay: true,
+    })}
+;
+
+
+  ngOnDestroy(): void {
+   //TUTORIAL
+ this.tutorialSubscription.unsubscribe();
+ if (this.tour) {
+   this.tour.complete();
+ }
+
+ if (this.tutorialSubscription) {
+   this.tutorialSubscription.unsubscribe();
+ }
+  }
+
+ngOnInit(): void {
+    //TUTORIAL
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    ); 
+}
 
   getFormattedDate(): string {
     const date = new Date();
@@ -326,6 +376,67 @@ export class IepSupplierListComponent implements AfterViewInit {
     if (!this.tableInitialized && this.suppliers.length > 0) {
       this.initializeDataTable();
     }
+  }
+
+
+
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Tabla de Proveedores',
+      text: 'Acá puede ver todas los proveedores que se guardaron en el sistema. Puede hacer click en la columna  accines para editar o eliminar el provedor de la fila .',
+      attachTo: {
+        element: '#tabla',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+    this.tour.addStep({
+      id: 'table-step',
+      title: 'Filtros',
+      text: 'Desde acá podrá filtrar los proveedores por sus datos , por estado y tipo. También puede exportar los proveedores a Excel o PDF, o borrar los filtros aplicados con el botón de basura.',   
+
+      attachTo: {
+        element: '#filtros',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Agregar proveedor',
+      text: 'Acá puede acceder al formulario para guardar un nuevo proveedor en el sistema. ',
+         attachTo: {
+        element: '#agregar',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+      
+    });
+
+    this.tour.start();
   }
 
   initializeDataTable(): void {
@@ -529,4 +640,7 @@ export class IepSupplierListComponent implements AfterViewInit {
   goBack() {
     window.history.back();
   }
+
+
+
 }
