@@ -43,7 +43,7 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
 
   tutorialSubscription = new Subscription();
   private tour: Shepherd.Tour;
-  
+
   // Formatear los períodos
   loadMultipliersData() {
     this.isLoadingMultipliers = true;
@@ -56,7 +56,7 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
         this.latePaymentPercentage = multipliers.latePayment * 100;
         this.expirationPercentage = multipliers.expiration * 100;
         this.generationDay = generationDay;
-        
+
         // Guardar los valores originales
         this.originalLatePaymentPercentage = this.latePaymentPercentage;
         this.originalExpirationPercentage = this.expirationPercentage;
@@ -72,7 +72,7 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
   }
 
   saveAllChanges() {
-    const observation = 'Updated configuration'; 
+    const observation = 'Updated configuration';
 
     const latePaymentMultiplier = this.latePaymentPercentage / 100;
     const expirationMultiplier = this.expirationPercentage / 100;
@@ -90,7 +90,7 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
     ]).subscribe({
       next: () => {
         console.log('All fields updated successfully');
-        this.onModalClose(); 
+        this.onModalClose();
       },
       error: (error) => {
         console.error('Error updating fields', error);
@@ -118,6 +118,9 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
   visiblePages: number[] = [];
   pagedExpenses: any[] = [];
   isLoading: boolean = false;
+
+  awaitingResponse: boolean = false;
+
   error: string | null = null;
   expenses: ExpenseGenerationExpenseInterface[] = [];
   searchTerm: string = '';
@@ -141,7 +144,7 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
   totalPages: number = 0;
   observation: string = '';
 
-  todayNow: Date = new Date; 
+  todayNow: Date = new Date;
 
   isDefaultValue: boolean = true;
   startDate: string = '';
@@ -185,9 +188,9 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
     { value: 11, label: '11 - Noviembre' },
     { value: 12, label: '12 - Diciembre' },
   ];
-  listStatus: any[] = [{value: 'Pendiente', name: 'Pendiente'}, 
-    {value: 'Pago', name: 'Pago'}, 
-    {value: 'Exceptuado', name: 'Exceptuado'}];
+  listStatus: any[] = [{ value: 'Pendiente', name: 'Pendiente' },
+  { value: 'Pago', name: 'Pago' },
+  { value: 'Exceptuado', name: 'Exceptuado' }];
 
   typedoc = ['DNI', 'PASAPORTE', 'CUIT/CUIL'];
   filter = {
@@ -224,8 +227,8 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
         }
       },
       useModalOverlay: true,
-    }); 
-}
+    });
+  }
 
   originalLatePaymentPercentage: number = 0;
   originalExpirationPercentage: number = 0;
@@ -259,7 +262,7 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
     this.filter$.next({ ...this.filter });
   }
 
-  updateState(states : any[]){
+  updateState(states: any[]) {
     this.selectedFilters = states;
     this.filter.status = states.join(',');
     this.searchTickets();
@@ -290,8 +293,8 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
 
   getSelectedStatusText(): string {
     const selectedStatus = this.filter.status ? this.filter.status.split(',') : [];
-    
-    return selectedStatus.length > 0 
+
+    return selectedStatus.length > 0
       ? `Seleccionar Estado (${selectedStatus.length})`
       : 'Seleccionar Estado';
   }
@@ -340,13 +343,13 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
   onFieldChange(fieldName: 'generationDay' | 'latePayment' | 'expiration'): void {
     if (this.isFieldModified(fieldName)) {
       this.fieldModified = fieldName;
-   
+
       if (fieldName === 'generationDay') {
         this.isDefaultValue = false;
       }
     } else {
       this.fieldModified = null;
-      
+
       if (fieldName === 'generationDay') {
         this.isDefaultValue = true;
       }
@@ -396,11 +399,11 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
   onModalClose() {
     this.fieldModified = null;
     this.observation = '';
-    
+
     this.generationDay = this.originalGenerationDay;
     this.latePaymentPercentage = this.originalLatePaymentPercentage;
     this.expirationPercentage = this.originalExpirationPercentage;
-    
+
     this.isDefaultValue = true;
   }
 
@@ -434,12 +437,12 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
       this.searchTickets();
     });
 
-     //TUTORIAL
-     this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+    //TUTORIAL
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
       () => {
         this.startTutorial();
       }
-    ); 
+    );
 
     this.loadInitialData();
 
@@ -449,9 +452,9 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
     this.observationModal = new window.bootstrap.Modal(
       document.getElementById('observationModal')
     );
-    
+
   }
-  
+
   startTutorial() {
     if (this.tour) {
       this.tour.complete();
@@ -478,7 +481,7 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
     // Al completar lo reactiva, al igual que al cancelar
     this.tour.on('complete', restoreScroll);
     this.tour.on('cancel', restoreScroll);
-    
+
     this.tour.addStep({
       id: 'table',
       title: 'Tabla de Boletas',
@@ -498,7 +501,7 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
     this.tour.addStep({
       id: 'filtros',
       title: 'Filtros',
-      text: 'Desde acá podrá filtrar las boletas por fecha y estado. También puede exportar las boletas a Excel o PDF, o borrar los filtros aplicados con el botón de basura.',      attachTo: {
+      text: 'Desde acá podrá filtrar las boletas por fecha y estado. También puede exportar las boletas a Excel o PDF, o borrar los filtros aplicados con el botón de basura.', attachTo: {
         element: '#filtros',
         on: 'auto'
       },
@@ -512,13 +515,13 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
           action: this.tour.next
         }
       ]
-      
+
     });
 
     this.tour.addStep({
       id: 'facturacion',
       title: 'Facturación',
-      text: 'Acá puede facturar un periodo o manejar opciones de facturación.',      attachTo: {
+      text: 'Acá puede facturar un periodo o manejar opciones de facturación.', attachTo: {
         element: '#facturacion',
         on: 'auto'
       },
@@ -532,13 +535,13 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
           action: this.tour.next
         }
       ]
-      
+
     });
 
     this.tour.addStep({
       id: 'dropdownVerMas',
       title: 'Acciones',
-      text: 'Desde acá puede ver las acciones disponibles para cada boleta. Puede editar boletas pendientes o ver más información.',      attachTo: {
+      text: 'Desde acá puede ver las acciones disponibles para cada boleta. Puede editar boletas pendientes o ver más información.', attachTo: {
         element: '#dropdownMenuButton',
         on: 'auto'
       },
@@ -552,7 +555,7 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
           action: this.tour.complete
         }
       ]
-      
+
     });
 
 
@@ -568,7 +571,7 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
     if (this.tour) {
       this.tour.complete();
     }
-  
+
     if (this.tutorialSubscription) {
       this.tutorialSubscription.unsubscribe();
     }
@@ -705,30 +708,30 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
 
   isValidGenerationDay(): boolean {
     if (this.isDefaultValue) return true;
-     
+
     if (!this.generationDay) return false;
-  
+
     const today = new Date();
     const currentDay = today.getDate();
-  
+
     return (
       this.generationDay >= 1 &&
       this.generationDay <= 28 &&
       this.generationDay > currentDay
     );
   }
-  
+
   hasChangesExpense(): boolean {
     if (!this.selectedExpense) return false;
 
     return (
       this.updatedExpense.status !== this.selectedExpense.status ||
       this.updatedExpense.first_expiration_date !==
-        this.selectedExpense.first_expiration_date ||
+      this.selectedExpense.first_expiration_date ||
       this.updatedExpense.second_expiration_date !==
-        this.selectedExpense.second_expiration_date ||
+      this.selectedExpense.second_expiration_date ||
       this.updatedExpense.second_expiration_amount !==
-        this.selectedExpense.second_expiration_amount
+      this.selectedExpense.second_expiration_amount
     );
   }
 
@@ -774,74 +777,74 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
     );
   }
 
-    // Método para abrir el modal de observación
-    
-    openObservationModalExpenses() {
-      const observationModalElement = document.getElementById('observationModalExpenses');
-      if (observationModalElement) {
-        const modalInstance = new window.bootstrap.Modal(observationModalElement, { backdrop: 'static' });
-        modalInstance.show();
-      } else {
-        console.error('No se encontró el modal de observación');
+  // Método para abrir el modal de observación
+
+  openObservationModalExpenses() {
+    const observationModalElement = document.getElementById('observationModalExpenses');
+    if (observationModalElement) {
+      const modalInstance = new window.bootstrap.Modal(observationModalElement, { backdrop: 'static' });
+      modalInstance.show();
+    } else {
+      console.error('No se encontró el modal de observación');
+    }
+  }
+
+  openObservationModalGeneration() {
+    if (this.observationContent) {
+      this.modalService.open(this.observationContent, { backdrop: 'static' });
+    } else {
+      console.error('No se encontró el template del modal');
+    }
+  }
+
+  // Método para abrir el modal principal
+  openMultipliersModal() {
+    // Resetear a valores originales
+    this.generationDay = this.originalGenerationDay;
+    this.latePaymentPercentage = this.originalLatePaymentPercentage;
+    this.expirationPercentage = this.originalExpirationPercentage;
+
+    // Resetear estados de validación
+    this.isDefaultValue = true;
+    this.fieldModified = null;
+    this.activeField = null;
+
+    this.modalService.open(this.multipliersContent, {
+      size: 'lg',
+      backdrop: 'static'
+    }).result.then(
+      (result) => {
+        this.onModalClose();
+      },
+
+      (reason) => {
+        this.onModalClose();
       }
-    }
+    );
 
-    openObservationModalGeneration() {
-      if (this.observationContent) {
-        this.modalService.open(this.observationContent, { backdrop: 'static' });
-      } else {
-        console.error('No se encontró el template del modal');
+    this.loadMultipliersData();
+  }
+  // Método para abrir el modal de rango de fechas
+  openDateRangeModal() {
+    const modalRef = this.modalService.open(this.dateRangeContent, {
+      backdrop: 'static'
+    });
+    modalRef.result.then(
+      (result) => {
+        if (result === 'confirm') {
+          this.confirmDateRange();
+        }
+      },
+      () => {
+        // Modal dismissed
       }
-    }
+    );
+  }
 
-    // Método para abrir el modal principal
-    openMultipliersModal() {
-      // Resetear a valores originales
-      this.generationDay = this.originalGenerationDay;
-      this.latePaymentPercentage = this.originalLatePaymentPercentage;
-      this.expirationPercentage = this.originalExpirationPercentage;
-      
-      // Resetear estados de validación
-      this.isDefaultValue = true;
-      this.fieldModified = null;
-      this.activeField = null;
-    
-      this.modalService.open(this.multipliersContent, {
-        size: 'lg',
-        backdrop: 'static'
-      }).result.then(
-        (result) => {
-          this.onModalClose();
-        },
-
-        (reason) => {
-          this.onModalClose();
-        }
-      );
-    
-      this.loadMultipliersData();
-    }
-    // Método para abrir el modal de rango de fechas
-    openDateRangeModal() {
-      const modalRef = this.modalService.open(this.dateRangeContent, {
-        backdrop: 'static'
-      });
-      modalRef.result.then(
-        (result) => {
-          if (result === 'confirm') {
-            this.confirmDateRange();
-          }
-        },
-        () => {
-          // Modal dismissed
-        }
-      );
-    }
-
-    generateExpensesNow() {
-      this.modalService.dismissAll();
-      this.openDateRangeModal();
-    }
+  generateExpensesNow() {
+    this.modalService.dismissAll();
+    this.openDateRangeModal();
+  }
 
   closeObservationModal() {
     const observationModalElement = document.getElementById(
@@ -932,7 +935,7 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
     return hasMultiplierChanges || hasGenerationDayChanges;
   }
 
-  
+
   selectedFilters: string[] = [];
   onEstadoChange(): void {
     this.selectedFilters = this.selectedFilters.filter(
@@ -970,7 +973,9 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
       });
       return;
     }
-  
+
+    this.awaitingResponse = true;
+
     this.expenseService.generateAllExpenses(this.modalFilter.from, this.modalFilter.until)
       .subscribe({
         next: () => {
@@ -979,6 +984,7 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
             text: 'Facturas generadas correctamente',
             icon: 'success'
           });
+          this.awaitingResponse = false;
           this.modalService.dismissAll();
         },
         error: () => {
@@ -987,6 +993,7 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
             text: 'No se pudieron generar las facturas',
             icon: 'error'
           });
+          this.awaitingResponse = false;
         }
       });
   }
@@ -1063,7 +1070,7 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
       next: (responses) => {
         this.modalService.dismissAll();
         this.observation = '';
-        
+
         Swal.fire({
           title: 'Éxito',
           text: 'Los cambios se han guardado correctamente',
@@ -1102,7 +1109,7 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
     this.observation = '';
     const modal = document.getElementById('multipliersModal');
     if (modal) {
-      (modal as any).modal('hide'); 
+      (modal as any).modal('hide');
     }
   }
 
@@ -1142,7 +1149,7 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
   }
 
   validateDates(): boolean {
-    return !!(this.filter.from && this.filter.until && 
+    return !!(this.filter.from && this.filter.until &&
       new Date(this.filter.from) <= new Date(this.filter.until));
   }
 
@@ -1223,7 +1230,7 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
   cleanFilters() {
     const today = new Date();
     const threeMonthsAgo = new Date(today.getFullYear(), today.getMonth() - 3, today.getDate());
-  
+
     this.filter = {
       from: threeMonthsAgo.toISOString().split('T')[0],
       until: today.toISOString().split('T')[0],
@@ -1233,23 +1240,23 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
       typedoc: '',
       selectedPeriod: [],
     };
-      
+
     // Limpiar selectedFilters antes de llamar a setData
     this.selectedFilters = [];
     this.filter.status = '';
-  
+
     // Usar un setTimeout para asegurar que el cambio de estado se procese
     setTimeout(() => {
       if (this.customSelect) {
         this.customSelect.setData(this.selectedFilters); // Método específico para limpiar selección
       }
     });
-  
+
     this.searchTerm = '';
     this.selectedOwner = null;
     this.error = null;
     this.filteredUsers = [];
-  
+
     this.loadAllOwnersWithExpenses();
     this.searchTickets();
   }
@@ -1267,9 +1274,9 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
       this.applyPagination(this.expenses);
       return;
     }
-  
+
     const searchTermLower = this.searchTerm ? this.searchTerm.toLowerCase() : '';
-  
+
     const filteredExpenses = this.expenses.filter((expense) => {
       const ownerName = this.getOwnerName(expense.owner_id).toLowerCase();
       const ownerDni = this.getOwnerDni(expense.owner_id).toLowerCase();
@@ -1281,23 +1288,23 @@ export class ExpenseGenerationAdminViewComponent implements OnInit {
         ownerPlots.includes(searchTermLower);
 
       const matchesTypedoc = !this.filter.typedoc || dniType === this.filter.typedoc;
-  
+
       return matchesSearchTerm && matchesTypedoc;
     });
-  
+
     this.applyPagination(filteredExpenses);
   }
 
   onFilterChange() {
-    this.searchUsers(); 
+    this.searchUsers();
   }
 
-applyPagination(data: any[]) {
-  const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-  const endIndex = startIndex + this.itemsPerPage;
-  this.pagedExpenses = data.slice(startIndex, endIndex);
-  this.totalItems = data.length; 
-}
+  applyPagination(data: any[]) {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    this.pagedExpenses = data.slice(startIndex, endIndex);
+    this.totalItems = data.length;
+  }
   selectUser(owner: Owner) {
     this.selectedOwner = owner;
     this.searchTerm = `${owner.name} ${owner.lastname}`;
@@ -1497,10 +1504,10 @@ applyPagination(data: any[]) {
         owner.dni_type === 'DNI'
           ? 'D'
           : owner.dni_type === 'Pasaporte'
-          ? 'P'
-          : owner.dni_type === 'CUIT/CUIL'
-          ? 'C'
-          : 'N/A';
+            ? 'P'
+            : owner.dni_type === 'CUIT/CUIL'
+              ? 'C'
+              : 'N/A';
       return `${initial}- ${owner.dni}`;
     }
     return 'N/A';
@@ -1557,8 +1564,8 @@ applyPagination(data: any[]) {
       theme: 'grid',
       margin: { top: 30, bottom: 20 },
       columnStyles: {
-        4: { halign: 'right' }, 
-        5: { halign: 'right' }, 
+        4: { halign: 'right' },
+        5: { halign: 'right' },
       },
     });
 
@@ -1582,7 +1589,7 @@ applyPagination(data: any[]) {
         'Estado',
         'Monto Actual',
         'Monto Pagado',
-      ], 
+      ],
     ];
 
     const excelData = this.expenses.map(
@@ -1592,8 +1599,8 @@ applyPagination(data: any[]) {
           this.formatDate(new Date(expense.issueDate)),
           this.getOwnerName(expense.owner_id),
           expense.status,
-          `$${(expense.actual_amount || 0).toFixed(2)}`, 
-          `$${(expense.amount_payed || 0).toFixed(2)}`, 
+          `$${(expense.actual_amount || 0).toFixed(2)}`,
+          `$${(expense.amount_payed || 0).toFixed(2)}`,
         ];
       }
     );
