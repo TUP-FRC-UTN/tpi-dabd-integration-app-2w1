@@ -115,13 +115,13 @@
   <div class="row">
 
     <!-- KPIs Generales-->
-    <div class="col-2 gap-2 d-flex flex-column justify-content-center" id="kpis">
-      <app-custom-kpi [value]="totalComplaints" title="Denuncias" subTitle="en el periodo"
+    <div class="col-2 gap-2 d-flex flex-column justify-content-center">
+      <app-custom-kpi [value]="totalComplaints" title="Denuncias totales" subTitle="en el periodo"
         tooltip="Total de denuncias en el periodo" [customStyles]="{ 'background-color': '#D6F6FF' }"
         icon="bi-flag-fill" formatPipe="number">
       </app-custom-kpi>
 
-      <app-custom-kpi [value]="averageComplaintsPerMonth" title="Denuncias" subTitle="en el periodo"
+      <app-custom-kpi [value]="averageComplaintsPerMonth" title="Denuncias mensuales" subTitle="en el periodo"
         tooltip="Promedio de denuncias en el periodo" [customStyles]="{ 'background-color': '#FFE699' }"
         icon="bi-calendar-day" formatPipe="number">
       </app-custom-kpi>
