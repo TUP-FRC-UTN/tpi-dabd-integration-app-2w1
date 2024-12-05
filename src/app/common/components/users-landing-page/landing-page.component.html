@@ -178,6 +178,9 @@
                                     <label class="col-3 col-form-label">Observaciones</label>
                                     <div class="col-9">
                                         <textarea class="form-control col-auto" formControlName="observations" cols="2" style="resize: none;"></textarea>
+                                        @if(formMessage.get('observations')?.invalid && (formMessage.get('observations')?.dirty || formMessage.get('observations')?.touched)){
+                                            <div class="text-danger">{{showError('observations')}}</div>
+                                        }
                                     </div>
                                 </div>
                                 @if(formMessage.invalid && (formMessage.get('email')?.dirty || formMessage.get('email')?.touched || formMessage.get('phone')?.dirty || formMessage.get('phone')?.touched)){

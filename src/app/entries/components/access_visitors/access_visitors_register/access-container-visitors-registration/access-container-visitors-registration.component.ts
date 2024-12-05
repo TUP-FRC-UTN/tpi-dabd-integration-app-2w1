@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Subject, Subscription, combineLatest } from 'rxjs';
@@ -31,7 +31,7 @@ import { RoutingService } from '../../../../../common/services/routing.service';
 export class AccessContainerVisitorsRegistrationComponent implements OnInit, OnDestroy {
   private router=inject(Router);
   goTo(path: string) {
-  this.routingService.redirect(path, '');
+  this.routingService.redirect(path, 'Actualizar Visitante');
   }
   uid?: string;
   qrCodeId?: string;
@@ -44,7 +44,7 @@ export class AccessContainerVisitorsRegistrationComponent implements OnInit, OnD
   currentStep = 0;
 
   isLoading: boolean = false;
-  buttonText: string = 'Registrar';
+  buttonText: string = 'Autorizar';
 
   constructor(
     private visitorService: AccessVisitorsRegisterServiceService,

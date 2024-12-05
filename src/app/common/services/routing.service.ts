@@ -151,7 +151,7 @@ export class RoutingService {
           //botón Lista Categoria de Gastos
           icon: 'bi-list-task',
           name: 'Categorias',
-          title: 'Gestión Categoría Gastos',
+          title: 'Gestion Categoria gastos',
           route: 'main/expenses/view-category',
           roles: ['SuperAdmin', 'Gerente finanzas'],
         },

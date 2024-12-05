@@ -3,13 +3,13 @@ export class PostBuyRequestDto{
     email: string | null;
     phone: string | null;
     observations: string;
-    lot_id: number
+    plot_id: number
 
     constructor(){
         this.email = '';
         this.phone = '';
         this.observations = '';
         this.name = '';
-        this.lot_id = 0;
+        this.plot_id = 0;
     }
 }

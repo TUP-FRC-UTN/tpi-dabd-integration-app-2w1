@@ -74,22 +74,8 @@
       documentTypeDto: AccessDocumentTypeDto; // tipo de documento q se va a mostrar
       neighbor_id: number; //se necesita para el post del Visitor
     }
-    export interface AccessesUpdateAccesDto{
-      userAllowedInfoDto:AccessUserAllowedInfoDto1,
-      authRangeDto:AccessNewAuthRangeDto
-    }
-    export interface AccessUserAllowedInfoDto1 {
-      
-      document: string;
-      name: string;
-      last_name: string;
-      email: string;
-      vehicles: AccessNewVehicleDto[]; //List<NewVehicleDto> 
-      userType: AccessUserAllowedTypeDto;
-      authRanges: AuthRangeInfoDto[];
-      documentTypeDto: AccessDocumentTypeDto; // tipo de documento q se va a mostrar
-      neighbor_id: number;
-    }
+
+
     export interface QRData {
       neighborId: number;
       neighborName: string;

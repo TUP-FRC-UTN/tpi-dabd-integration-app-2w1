@@ -30,7 +30,7 @@
                   <label class="col-2 col-form-label">Tipo de Documento</label>
                   <div class="col-10">
                     <app-custom-select #dniComponent [options]="[{value: 1, name: 'DNI'}, {value: 2, name: 'Pasaporte'}, {value: 3, name: 'CUIT/CUIL'}]"
-                        [disabled]="true"
+                        
                       [selectedOptions]="updateForm.get('dniType')?.value"
                       (selectedOptionsChange)="updateForm.get('dniType')?.setValue($event)"
                       [validations]="updateForm.get('dniType')?.validator" />
