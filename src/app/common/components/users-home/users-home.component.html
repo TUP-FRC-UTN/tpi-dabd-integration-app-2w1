@@ -75,7 +75,7 @@
     <!-- Mapa del lugar -->
     <div class="row">
       <div class="col-12 col-md-6">
-        <div class="card important-numbers-card border border-2 rounded-3 shadow-lg mt-3" id="contactos">
+        <div class="card important-numbers-card border border-2 rounded-3 shadow-lg mt-3" id="map">
           <div class="card-header custom-header p-3">
             <h3 class="mb-0 fs-5 text-center text-dark">Mapa del lugar</h3>
           </div>
@@ -86,7 +86,7 @@
       </div>
 
       <div class="col-12 col-md-6">
-        <div class="card important-numbers-card border border-2 rounded-3 shadow-lg mt-3" id="contactos">
+        <div class="card important-numbers-card border border-2 rounded-3 shadow-lg mt-3" id="plot">
           <div class="card-header custom-header p-3">
             <h3 class="fs-5 text-center text-dark">Datos de lote: {{(selectedPlot ? selectedPlot.id + ' - Manzana: ' + selectedPlot.block_number : '')}}</h3>
           </div>
@@ -132,4 +132,39 @@
 
 
   </div>
+<!-- Modal de info -->
+<div class="modal fade" id="infoModal" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Pantalla de Bienvenida</h5> <button type="button" class="btn-close"
+          data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          En esta pantalla podrá ver información general sobre notificaciones, clima o el mapa del barrio.
+        </p>
+        <p>
+          La tabla también incluye una barra de búsqueda, filtros de fecha desde y hasta, y opciones de paginación, lo
+          que facilita la navegación y el filtrado de los datos disponibles.
+        </p>
+        <ul>
+          <li>
+            <strong>Notificaciones generales</strong>: Muestra las últimas tres notificaciones generales recibidas. Para ver más, visite la pestaña de notificaciones.
+          </li>
+          <li>
+            <strong>Clima</strong>: Muestra el clima actual y los pronósticos para los próximos días.
+          </li>
+          <li>
+            <strong>Mapa del barrio</strong>: Muestra el mapa del barrio, que al hacer click en un lote muestra información detallada sobre el mismo.
+          </li>
+        </ul>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
 </section>
