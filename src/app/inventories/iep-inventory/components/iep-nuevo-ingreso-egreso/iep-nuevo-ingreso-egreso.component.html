@@ -11,45 +11,44 @@
                                 <h5 class="mb-0">Tipo de Movimiento</h5>
                             </label>
                         </div>
-                        
+
                         <!-- Botones de Tipo de Movimiento -->
                         <div class="col-6">
                             <div class="btn-group" role="group" aria-label="Tipo de Movimiento">
-                                <input   [(ngModel)]="selectedType" type="radio" class="btn-check" id="btnRadio1" value="I">
+                                <input [(ngModel)]="selectedType" type="radio" class="btn-check" id="btnRadio1"
+                                    value="I">
                                 <label class="btn btn-outline-success" for="btnRadio1">Ingreso</label>
-                    
-                                <input [(ngModel)]="selectedType" type="radio" class="btn-check" id="btnRadio2" value="E">
+
+                                <input [(ngModel)]="selectedType" type="radio" class="btn-check" id="btnRadio2"
+                                    value="E">
                                 <label class="btn btn-outline-danger" for="btnRadio2">Egreso</label>
                             </div>
                         </div>
                     </div>
                     <!-- todo para la alta  -->
-                            
+
                     <form *ngIf="selectedType==='I'" [formGroup]="formulario" class="" (ngSubmit)="onSubmit()">
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <div class="row align-items-center">
                                     <label class="col-4 text-end form-label">Artículo</label>
-                                        <div class="col-8">
-                                            <ng-select
-                                            class="text-start"
-                                            formControlName="selectedArticule"
-                                            id="productos"
-                                            [items]="productos"    
-                                            [clearable]="false"
-                                            bindLabel= "name"  
-                                            bindValue="id"
+                                    <div class="col-8">
+                                        <ng-select class="text-start" formControlName="selectedArticule" id="productos"
+                                            [items]="productos" [clearable]="false" bindLabel="name" bindValue="id"
                                             required>
-                                            </ng-select>
-                                    <div *ngIf="formulario.controls['selectedArticule'].invalid && formulario.controls['selectedArticule'].touched" class="text-danger">
-                                        <label *ngIf="formulario.controls['selectedArticule'].errors?.['required']"> Artículo requerido</label>
+                                        </ng-select>
+                                        <div *ngIf="formulario.controls['selectedArticule'].invalid && formulario.controls['selectedArticule'].touched"
+                                            class="text-danger">
+                                            <label *ngIf="formulario.controls['selectedArticule'].errors?.['required']">
+                                                Artículo requerido</label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                            
+
                             <div class="col-1">
-                                    <button class="form-control" type="button" (click)="goTo('/main/inventories/new-product')"  id="addProductButton">+</button>
+                                <button class="form-control" type="button"
+                                    (click)="goTo('/main/inventories/new-product')" id="addProductButton">+</button>
                             </div>
 
                             <div class="col-md-5 mb-3">
@@ -57,9 +56,12 @@
                                     <label class="col-4 text-end form-label">Cantidad</label>
                                     <div class="col-8">
                                         <input type="number" class="form-control text-end" formControlName="amount">
-                                        <div *ngIf="formulario.controls['amount'].invalid && formulario.controls['amount'].touched" class="text-danger">
-                                            <div *ngIf="formulario.controls['amount'].errors?.['required']"> Cantidad requerida</div>
-                                            <div *ngIf="formulario.controls['amount'].errors?.['min']"> Cantidad minima 1 </div>
+                                        <div *ngIf="formulario.controls['amount'].invalid && formulario.controls['amount'].touched"
+                                            class="text-danger">
+                                            <div *ngIf="formulario.controls['amount'].errors?.['required']"> Cantidad
+                                                requerida</div>
+                                            <div *ngIf="formulario.controls['amount'].errors?.['min']"> Cantidad minima
+                                                1 </div>
                                         </div>
                                     </div>
                                 </div>
@@ -69,30 +71,25 @@
                                 <div class="row align-items-center">
                                     <label class="col-4 text-end form-label">Proveedor</label>
                                     <div class="col-8">
-                                        <ng-select
-                                        class="text-start"
-                                        formControlName="selectedSupplier"
-                                        id="supplier"
-                                        name="supplier"                             
-                                        [items]="suppliers"                                           
-                                        [clearable]="false"
-                                        bindLabel= "name"  
-                                        bindValue="id"
-                                        required>
-                                        </ng-select>   
-                                        <div *ngIf="formulario.controls['selectedSupplier'].invalid && formulario.controls['selectedSupplier'].touched" class="text-danger">
+                                        <ng-select class="text-start" formControlName="selectedSupplier" id="supplier"
+                                            name="supplier" [items]="suppliers" [clearable]="false" bindLabel="name"
+                                            bindValue="id" required>
+                                        </ng-select>
+                                        <div *ngIf="formulario.controls['selectedSupplier'].invalid && formulario.controls['selectedSupplier'].touched"
+                                            class="text-danger">
                                             <div>Proveedor requerido</div>
-                                        </div>                   
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                                
+
                             <!-- Campo SA/SCR -->
                             <div class="col-1">
-                                <button class="form-control" type="button"  routerLink="/main/inventories/new-provider"  id="addProviderButton">+</button>
+                                <button class="form-control" type="button" routerLink="/main/inventories/new-provider"
+                                    id="addProviderButton">+</button>
                             </div>
 
-                        <!-- <div class="col-md-5 mb-3">     
+                            <!-- <div class="col-md-5 mb-3">     
 
                             <div class="row align-items-center">
                                     <label class="col-4 text-end form-label">Precio Unit.</label>
@@ -112,108 +109,118 @@
 
 
 
-                                <div class="col-md-12 mb-3">
-                                    <div class="row">
-                                        <div class="col-2 text-end">
-                                            <label class="form-label">Justificación</label>
-                                        </div>
-                                        <div class="col-10"> 
-                                            <textarea class="form-control" formControlName="justify" placeholder="Escribe aquí" rows="3"></textarea>
-                                            <div *ngIf="formulario.controls['justify'].invalid && formulario.controls['justify'].touched" class="text-danger">
-                                                <div *ngIf="formulario.controls['justify'].errors?.['required']"> Justificación requerida</div>
-                                            </div> 
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-10 text-end mt-3">
-                                    <button type="button" (click)="cancelar()" class="btn btn-secondary">Cancelar</button>
-                                </div>
-                                <div class="col-2 text-end mt-3">
-                                    <button [disabled]="formulario.invalid" type="submit" class="btn btn-success">Registrar</button>
-                                </div>
-                            </div>
-
-                         </form>
-                        
-                            <!-- todo para la baja  -->
-                         
-                            
-                                <form *ngIf="selectedType==='E'" [formGroup]="formularioEgreso" (ngSubmit)="onSubmit()" class="row">
-
-                                <div class="col-md-6 mb-3">
-                                    <div class="row align-items-center">
-                                        <label class="col-4 text-end form-label">Artículo</label>
-                                        <div class="col-8">
-                                            <ng-select
-                                          class="text-start"
-                                          formControlName="selectedArticule"
-                                          id="productos"
-                                          [items]="productos"    
-                                          [clearable]="false"
-                                          bindLabel= "name"  
-                                          bindValue="id"
-                                          required>
-                                        </ng-select>
-                                        <div *ngIf="formularioEgreso.controls['selectedArticule'].invalid && formularioEgreso.controls['selectedArticule'].touched" class="text-danger">
-                                            <div *ngIf="formularioEgreso.controls['selectedArticule'].errors?.['required']"> Artículo requerido</div>
-                                        </div>
-                                        </div>
-                                       
-                                    </div>
-    
-                                </div>
-
-                                <div class="col-md-6 mb-3">
-                                    <div class="row align-items-center">
-                                        <label class="col-4 text-end form-label">Cantidad</label>
-                                        <div class="col-8">
-                                            <input type="number" class="form-control text-end" formControlName="amount" placeholder=" ">
-
-
-                                            <div *ngIf="formularioEgreso.controls['amount'].invalid && formularioEgreso.controls['amount'].touched" class="text-danger">
-                                                <div *ngIf="formularioEgreso.controls['amount'].errors?.['required']"> Cantidad requerida</div>
-                                                <div *ngIf="formularioEgreso.controls['amount'].errors?.['min']"> Cantidad minima 1 </div>
-                                                <div *ngIf="formularioEgreso.controls['amount'].errors?.['insuficientStock']"> Stock del producto insuficiente </div>
-                                                <div *ngIf="formularioEgreso.controls['amount'].errors?.['noExistProduct']"> el producto ya no esta disponible </div>
-
-
-
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-    
-                            
-    
-                                <div class="col-md-12 mb-3">
-                                    <div class="row">
-                                        <div class="col-2 text-end">
-                                             <label class="form-label">Justificación</label>
-                                        </div>
-                                       <div class="col-10"> 
-                                        <textarea class="form-control"formControlName="justify" placeholder="Escribe aquí" rows="3"></textarea>
-                                        <div *ngIf="formularioEgreso.controls['justify'].invalid && formularioEgreso.controls['justify'].touched" class="text-danger">
-                                            <div *ngIf="formularioEgreso.controls['justify'].errors?.['required']"> Justificación requerida</div>
-                                        </div> 
-                                       </div>
-                                    </div>
-                                </div>     
-
-
+                            <div class="col-md-12 mb-3">
                                 <div class="row">
-                                    <div class="col-10 text-end mt-3">
-                                        <button type="button" (click)="cancelar()" class="btn btn-secondary">Cancelar</button>
+                                    <div class="col-2 text-end">
+                                        <label class="form-label">Justificación</label>
                                     </div>
-                                    <div class="col-2 text-end mt-3">
-                                        <button  [disabled]="formularioEgreso.invalid" type="submit" class="btn btn-success">Registrar</button>
+                                    <div class="col-10">
+                                        <textarea class="form-control" formControlName="justify"
+                                            placeholder="Escribe aquí" rows="3"></textarea>
+                                        <div *ngIf="formulario.controls['justify'].invalid && formulario.controls['justify'].touched"
+                                            class="text-danger">
+                                            <div *ngIf="formulario.controls['justify'].errors?.['required']">
+                                                Justificación requerida</div>
+                                        </div>
                                     </div>
                                 </div>
-                       
-                            </form>
-     
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-10 text-end mt-3">
+                                <button type="button" (click)="cancelar()" class="btn btn-secondary">Cancelar</button>
+                            </div>
+                            <div class="col-2 text-end mt-3">
+                                <button [disabled]="formulario.invalid" type="submit"
+                                    class="btn btn-success">Registrar</button>
+                            </div>
+                        </div>
+
+                    </form>
+
+                    <!-- todo para la baja  -->
+
+
+                    <form *ngIf="selectedType==='E'" [formGroup]="formularioEgreso" (ngSubmit)="onSubmit()" class="row">
+
+                        <div class="col-md-6 mb-3">
+                            <div class="row align-items-center">
+                                <label class="col-4 text-end form-label">Artículo</label>
+                                <div class="col-8">
+                                    <ng-select class="text-start" formControlName="selectedArticule" id="productos"
+                                        [items]="productos" [clearable]="false" bindLabel="name" bindValue="id"
+                                        required>
+                                    </ng-select>
+                                    <div *ngIf="formularioEgreso.controls['selectedArticule'].invalid && formularioEgreso.controls['selectedArticule'].touched"
+                                        class="text-danger">
+                                        <div *ngIf="formularioEgreso.controls['selectedArticule'].errors?.['required']">
+                                            Artículo requerido</div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <div class="row align-items-center">
+                                <label class="col-4 text-end form-label">Cantidad</label>
+                                <div class="col-8">
+                                    <input type="number" class="form-control text-end" formControlName="amount"
+                                        placeholder=" ">
+
+
+                                    <div *ngIf="formularioEgreso.controls['amount'].invalid && formularioEgreso.controls['amount'].touched"
+                                        class="text-danger">
+                                        <div *ngIf="formularioEgreso.controls['amount'].errors?.['required']"> Cantidad
+                                            requerida</div>
+                                        <div *ngIf="formularioEgreso.controls['amount'].errors?.['min']"> Cantidad
+                                            minima 1 </div>
+                                        <div *ngIf="formularioEgreso.controls['amount'].errors?.['insuficientStock']">
+                                            Stock del producto insuficiente </div>
+                                        <div *ngIf="formularioEgreso.controls['amount'].errors?.['noExistProduct']"> el
+                                            producto ya no esta disponible </div>
+
+
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <div class="col-md-12 mb-3">
+                            <div class="row">
+                                <div class="col-2 text-end">
+                                    <label class="form-label">Justificación</label>
+                                </div>
+                                <div class="col-10">
+                                    <textarea class="form-control" formControlName="justify" placeholder="Escribe aquí"
+                                        rows="3"></textarea>
+                                    <div *ngIf="formularioEgreso.controls['justify'].invalid && formularioEgreso.controls['justify'].touched"
+                                        class="text-danger">
+                                        <div *ngIf="formularioEgreso.controls['justify'].errors?.['required']">
+                                            Justificación requerida</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-10 text-end mt-3">
+                                <button type="button" (click)="cancelar()" class="btn btn-secondary">Cancelar</button>
+                            </div>
+                            <div class="col-2 text-end mt-3">
+                                <button [disabled]="formularioEgreso.invalid" type="submit"
+                                    class="btn btn-success">Registrar</button>
+                            </div>
+                        </div>
+
+                    </form>
+
                 </div>
             </div>
         </div>
@@ -225,41 +232,30 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title">Información sobre Registro de Proveedores</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title">Información sobre registro de movimientos</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <p>
-                Bienvenido al sistema de registro de proveedores. Esta sección te permite gestionar la información de los proveedores, asegurando que los datos sean correctos y completos antes de registrar o modificar un proveedor.
-              </p>
-              <ul>
-                <li>
-                  <strong>Campos a Completar:</strong>
-                  <ul>
-                    <li><em>Nombre:</em> Nombre del proveedor. Este campo es obligatorio.</li>
-                    <li><em>CUIT:</em> Número de CUIT del proveedor. Este campo es obligatorio.</li>
-                    <li><em>Teléfono:</em> Número de contacto del proveedor. Se debe ingresar un número válido.</li>
-                    <li><em>Email:</em> Correo electrónico del proveedor. Este campo es obligatorio y debe ser único.</li>
-                    <li><em>Tipo de Proveedor:</em> Selecciona el tipo de proveedor (Ejemplo: Otro, Servicio externo, Proveedor de Inventario).</li>
-                    <li><em>Dirección:</em> Dirección física del proveedor. Este campo es obligatorio.</li>
-                  </ul>
-                </li>
-                <li>
-                  <strong>Acciones Disponibles:</strong>
-                  <ul>
-                    <li><em>Registrar:</em> Guarda la información del proveedor en el sistema.</li>
-                    <li><em>Cancelar:</em> Regresa sin guardar cambios.</li>
-                  </ul>
-                </li>
-              </ul>
-              <p><strong>Notas importantes:</strong></p>
-              <ul>
-                <li>Los campos "Nombre", "CUIT", "Email", y "Dirección" son obligatorios para completar el registro.</li>
-                <li>El CUIT y el nombre del proveedor deben ser únicos.</li>
-                <li>Verifica que el número de teléfono y el email sean válidos antes de registrar un proveedor.</li>
-              </ul>
+                <p>
+                    Esta es la pantalla de registro de movimientos.
+                </p>
+                <ul>
+                    <li>
+                        <strong>Campos a Completar:</strong>
+                        <ul>
+                            <li><em>Artículo:</em> Selecciona el artículo que desea registrar. (En caso de no encontrar el artículo, puede crear uno nuevo haciendo click en el +.)</li>
+                            <li><em>Cantidad:</em> Cantidad del artículo que desea registrar.</li>
+                            <li><em>Proveedor:</em> Selecciona el proveedor que desea registrar. (En caso de no encontrar el proveedor, puede crear uno nuevo haciendo click en el +.)</li>
+                            <li><em>Justificación:</em> Justificación del movimiento.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p><strong>Notas importantes:</strong></p>
+                <ul>
+                    <li>El proceso es similar tanto en ingresos como egresos.</li>
+                    <li>La unica diferencia es que en el ingreso debe ingresar el proveedor.</li>
+                </ul>
             </div>
-          </div>
         </div>
-      </div>
-      
+    </div>
+</div>
