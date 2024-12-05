@@ -1,11 +1,11 @@
 const BASE_URL = 'http://localhost:8080';
-//  const BASE_URL = 'http://2w1-villadelcondor.dynns.com:8080';
+// const BASE_URL = 'http://2w1-villadelcondor.dynns.com:8080';
 
 
 export const environment = {
   production: true,
   services: {
-    accesses: `http://localhost:8090`,
+    accesses: `${BASE_URL}/accesses`,
     addresses: `${BASE_URL}/addresses`,
     complaints: `${BASE_URL}/complaints`,
     contacts: `${BASE_URL}/contacts`,
@@ -15,7 +15,7 @@ export const environment = {
     fileManager: `${BASE_URL}/file-manager`,
     inventory: `${BASE_URL}/inventory`,
     mercadoPago: `${BASE_URL}/mercado-pago-service`,
-    notifications: `http://localhost:8080`,
+    notifications: `${BASE_URL}/notifications`,
     ownersAndPlots: `${BASE_URL}/owners-and-plots`,
     sanctions: `${BASE_URL}/sanctions`,
     stripeService: `${BASE_URL}/stripe-service`,

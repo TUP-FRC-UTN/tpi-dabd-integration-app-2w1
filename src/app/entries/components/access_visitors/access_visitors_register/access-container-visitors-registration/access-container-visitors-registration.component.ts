@@ -14,6 +14,7 @@ import { AccessVisitorFormComponent } from "../access-visitor-form/access-visito
 import { AuthService } from '../../../../../users/users-servicies/auth.service';
 import { UserLoged } from '../../../../../users/users-models/users/UserLoged';
 import { Router } from '@angular/router';
+import { RoutingService } from '../../../../../common/services/routing.service';
 @Component({
   selector: 'app-access-container-visitors-registration',
   standalone: true,
@@ -30,7 +31,7 @@ import { Router } from '@angular/router';
 export class AccessContainerVisitorsRegistrationComponent implements OnInit, OnDestroy {
   private router=inject(Router);
   goTo(path: string) {
-  this.router.navigate([path]);
+  this.routingService.redirect(path, '');
   }
   uid?: string;
   qrCodeId?: string;
@@ -48,7 +49,8 @@ export class AccessContainerVisitorsRegistrationComponent implements OnInit, OnD
   constructor(
     private visitorService: AccessVisitorsRegisterServiceService,
     private visitorHttpService: AccessVisitorsRegisterServiceHttpClientService,
-    private authService: AuthService
+    private authService: AuthService,
+    private routingService: RoutingService
   ) {}
   handleUpdateVisitor(event: any): void {
     // Primero actualizamos el visitante como lo hacías antes
