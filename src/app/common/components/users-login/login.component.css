@@ -25,13 +25,13 @@ input.custom-input:focus {
 
 .fondo {
     background-image:
-        url('../../assets/logo-letters.png'),
-        /* Imagen del logo VC */
-        url('../../assets/logo-condor.png');
-    /* Imagen del logo del ave */
-    background-size: 18%, 18%;
+        /* Imagen del logo del ave */
+        url('../../assets/logo-condor.png'),
+    /* Imagen del logo VC */
+        url('../../assets/logo-letters.png');
+    background-size: 20%, 15%;
     background-repeat: no-repeat, no-repeat;
-    background-position: calc(0% + 50px) calc(100% - 75px), calc(100% - 50px) calc(0% + 75px);
+    background-position: calc(0% + 50px) calc(0% + 75px), calc(100% - 50px) calc(100% - 75px);
     /* Desplaza desde laterales e inferior */
     min-height: 100vh;
     /* Garantiza que cubra toda la pantalla */
