@@ -1,5 +1,5 @@
 // access-visitors-eventual.component.ts 
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { AccessVisitorFormComponent } from '../../access_visitors_register/access-visitor-form/access-visitor-form.component';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../../../../users/users-servicies/auth.service';
