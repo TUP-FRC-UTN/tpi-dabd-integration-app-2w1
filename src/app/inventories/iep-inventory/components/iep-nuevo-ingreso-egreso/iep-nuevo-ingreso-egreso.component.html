@@ -1,9 +1,9 @@
-<div class="container d-flex align-items-center justify-content-center min-vh-100 ">
+<div class="container d-flex align-items-center justify-content-center py-5">
     <div class="row justify-content-center ">
         <div class="col-md-8 mx-auto ">
             <div class="card shadow">
-                <div class="card-body">
-                    <div class="row align-items-center mb-4">
+                <div class="card-body" style="max-width: 1000px">
+                    <div class="row align-items-center mb-4" id="movementTypes">
 
                         <!-- Label del Tipo de Movimiento -->
                         <div class="col-6 text-end">
@@ -23,42 +23,37 @@
                             </div>
                         </div>
                     </div>
-                   
-
-                            <!-- todo para la alta  -->
+                    <!-- todo para la alta  -->
                             
-                                <form *ngIf="selectedType==='I'" [formGroup]="formulario" class="" (ngSubmit)="onSubmit()">
-                                    <div class="row">
-                           
+                    <form *ngIf="selectedType==='I'" [formGroup]="formulario" class="" (ngSubmit)="onSubmit()">
+                        <div class="row">
                             <div class="col-md-6 mb-3">
                                 <div class="row align-items-center">
                                     <label class="col-4 text-end form-label">Artículo</label>
-                                    <div class="col-8">
-                                        <ng-select
-                                      class="text-start"
-                                      formControlName="selectedArticule"
-                                      id="productos"
-                                                               
-                                      [items]="productos"    
-                                      [clearable]="false"
-                                      bindLabel= "name"  
-                                      bindValue="id"
-                                      required>
-                                    </ng-select>
+                                        <div class="col-8">
+                                            <ng-select
+                                            class="text-start"
+                                            formControlName="selectedArticule"
+                                            id="productos"
+                                            [items]="productos"    
+                                            [clearable]="false"
+                                            bindLabel= "name"  
+                                            bindValue="id"
+                                            required>
+                                            </ng-select>
                                     <div *ngIf="formulario.controls['selectedArticule'].invalid && formulario.controls['selectedArticule'].touched" class="text-danger">
-                                        <div *ngIf="formulario.controls['selectedArticule'].errors?.['required']"> Artículo requerido</div>
+                                        <label *ngIf="formulario.controls['selectedArticule'].errors?.['required']"> Artículo requerido</label>
                                     </div>
-                                   </div>
                                 </div>
-
                             </div>
+                        </div>
                             
                             <div class="col-1">
-                                    <button class="form-control" type="button" (click)="goTo('/main/inventories/new-product')">+</button>
+                                    <button class="form-control" type="button" (click)="goTo('/main/inventories/new-product')"  id="addProductButton">+</button>
                             </div>
 
                             <div class="col-md-5 mb-3">
-                                <div class="row align-items-center">
+                                <div class="row align-items-center text-start">
                                     <label class="col-4 text-end form-label">Cantidad</label>
                                     <div class="col-8">
                                         <input type="number" class="form-control text-end" formControlName="amount">
@@ -69,54 +64,49 @@
                                     </div>
                                 </div>
                             </div>
-
-                  
-                                         
-                            
-                               <!-- Campo proveedores -->
-                              
-                                <div class="col-md-6 mb-3">
-                                    <div class="row align-items-center">
-                                        <label class="col-4 text-end form-label">Proveedor</label>
-                                        <div class="col-8">
-                                            <ng-select
-                                            class="text-start"
-                                              formControlName="selectedSupplier"
-                                              id="supplier"
-                                              name="supplier"                             
-                                              [items]="suppliers"                                           
-                                              [clearable]="false"
-                                              bindLabel= "name"  
-                                              bindValue="id"
-                                              required>
-                                            </ng-select>   
-                                            <div *ngIf="formulario.controls['selectedSupplier'].invalid && formulario.controls['selectedSupplier'].touched" class="text-danger">
-                                                <div *ngIf="formulario.controls['selectedSupplier'].errors?.['required']"> Proveedor requerido</div>
-                                            </div>                   
-                                        </div>
+                            <!-- Campo proveedores -->
+                            <div class="col-md-6 mb-3" id="provider">
+                                <div class="row align-items-center">
+                                    <label class="col-4 text-end form-label">Proveedor</label>
+                                    <div class="col-8">
+                                        <ng-select
+                                        class="text-start"
+                                        formControlName="selectedSupplier"
+                                        id="supplier"
+                                        name="supplier"                             
+                                        [items]="suppliers"                                           
+                                        [clearable]="false"
+                                        bindLabel= "name"  
+                                        bindValue="id"
+                                        required>
+                                        </ng-select>   
+                                        <div *ngIf="formulario.controls['selectedSupplier'].invalid && formulario.controls['selectedSupplier'].touched" class="text-danger">
+                                            <div>Proveedor requerido</div>
+                                        </div>                   
                                     </div>
                                 </div>
+                            </div>
                                 
-                              <!-- Campo SA/SCR -->
+                            <!-- Campo SA/SCR -->
                             <div class="col-1">
-                                  <button class="form-control" type="button"  routerLink="/main/inventories/new-provider">+</button>
+                                <button class="form-control" type="button"  routerLink="/main/inventories/new-provider"  id="addProviderButton">+</button>
                             </div>
 
-                         <!-- <div class="col-md-5 mb-3">     
+                        <!-- <div class="col-md-5 mb-3">     
 
-                             <div class="row align-items-center">
-                                     <label class="col-4 text-end form-label">Precio Unit.</label>
-                                      <div class="col-8">
-                                         <input type="number" class="form-control" formControlName="priceUnit" placeholder=" ">
-                                         
+                            <div class="row align-items-center">
+                                    <label class="col-4 text-end form-label">Precio Unit.</label>
+                                    <div class="col-8">
+                                        <input type="number" class="form-control" formControlName="priceUnit" placeholder=" ">
+                                        
                                          <div *ngIf="formulario.controls['priceUnit'].invalid && formulario.controls['priceUnit'].touched" class="text-danger">
                                             <div *ngIf="formulario.controls['priceUnit'].errors?.['required']"> Precio requerido</div>
                                             <div *ngIf="formulario.controls['priceUnit'].errors?.['min']"> Minimo 1 requerido</div>
 
                                         </div> 
 
-                                      </div>
-                             </div>
+                                </div>
+                            </div>
                         </div> -->
 
 
@@ -125,19 +115,19 @@
                                 <div class="col-md-12 mb-3">
                                     <div class="row">
                                         <div class="col-2 text-end">
-                                             <label class="form-label">Justificación</label>
+                                            <label class="form-label">Justificación</label>
                                         </div>
-                                       <div class="col-10"> 
-                                        <textarea class="form-control" formControlName="justify" placeholder="Escribe aquí" rows="3"></textarea>
-                                        <div *ngIf="formulario.controls['justify'].invalid && formulario.controls['justify'].touched" class="text-danger">
-                                            <div *ngIf="formulario.controls['justify'].errors?.['required']"> Justificación requerida</div>
-                                        </div> 
-                                       </div>
+                                        <div class="col-10"> 
+                                            <textarea class="form-control" formControlName="justify" placeholder="Escribe aquí" rows="3"></textarea>
+                                            <div *ngIf="formulario.controls['justify'].invalid && formulario.controls['justify'].touched" class="text-danger">
+                                                <div *ngIf="formulario.controls['justify'].errors?.['required']"> Justificación requerida</div>
+                                            </div> 
+                                        </div>
                                     </div>
                                 </div>
-                             </div>
+                            </div>
 
-                             <div class="row">
+                            <div class="row">
                                 <div class="col-10 text-end mt-3">
                                     <button type="button" (click)="cancelar()" class="btn btn-secondary">Cancelar</button>
                                 </div>
@@ -161,7 +151,6 @@
                                           class="text-start"
                                           formControlName="selectedArticule"
                                           id="productos"
-                                                                   
                                           [items]="productos"    
                                           [clearable]="false"
                                           bindLabel= "name"  
