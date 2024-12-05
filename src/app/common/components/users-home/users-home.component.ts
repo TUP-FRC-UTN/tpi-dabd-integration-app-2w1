@@ -330,12 +330,55 @@ export class UsersHomeComponent implements OnInit, OnDestroy {
           action: this.tour.back,
         },
         {
+          text: 'Siguiente',
+          action: this.tour.next,
+        },
+      ],
+    });
+
+    this.tour.addStep({
+      id: 'map-step',
+      title: 'Mapa',
+      text: 'Este es el mapa del barrio, puede hacer click en cualquier lote para ver los detalles del mismo.',
+      attachTo: {
+        element: '#map',
+        on: 'auto',
+      },
+      canClickTarget: true,
+
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back,
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        },
+      ],
+    });
+
+    this.tour.addStep({
+      id: 'plot-step',
+      title: 'Lote',
+      text: 'Acá puede ver el detalle del lote seleccionado en el mapa.',
+      attachTo: {
+        element: '#plot',
+        on: 'auto',
+      },
+      canClickTarget: true,
+
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back,
+        },
+        {
           text: 'Finalizar',
           action: this.tour.complete,
         },
       ],
     });
-
 
 
     this.tour.start();
