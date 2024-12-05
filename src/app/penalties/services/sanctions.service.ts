@@ -81,7 +81,7 @@ export class SanctionService {
   //Este metodo no tiene endpoint por ahora
   addDisclaimer(disclaimerData: any) {
     disclaimerData.userId = this.authService.getUser().id;
-    return this.http.post<any>(this.url + "/disclaimer", disclaimerData)
+    return this.http.post<any>(this.url + "/disclaimer/", disclaimerData)
   }
 
   updateReport(reportDTO: PutReportDTO): Observable<any> {

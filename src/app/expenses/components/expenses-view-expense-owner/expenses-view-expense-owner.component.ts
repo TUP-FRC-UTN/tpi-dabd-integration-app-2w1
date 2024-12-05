@@ -234,12 +234,14 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
     });
   }
   loadBillsFiltered() {
+    this.isLoading = true
     const dataTable = $('#myTable').DataTable();
     //this.bills es la lista filtrada por fecha desde la API, esa no se toca
     let billsFiltered = this.filteredByType(this.bills.slice());
     billsFiltered = this.filteredByCategiries(billsFiltered);
     billsFiltered = this.filteredByProviders(billsFiltered);
     dataTable.clear().rows.add(billsFiltered).draw();
+    this.isLoading = false
   }
   clearFiltered() {
 
@@ -392,12 +394,12 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
         {
           data: 'amount',
           title: 'Monto',
-          className: 'align-middle',
+          className: 'align-middle text-end',
           render: (data) => {
             let formattedAmount = new Intl.NumberFormat('es-AR', {
               minimumFractionDigits: 2
             }).format(data);
-            return `<div>$ ${formattedAmount} </div>`;
+            return `<div class="text-end">$ ${formattedAmount} </div>`;
           }
         },
         {
