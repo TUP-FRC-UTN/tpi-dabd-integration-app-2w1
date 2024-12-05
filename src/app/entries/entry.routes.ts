@@ -6,6 +6,7 @@ import { authGuard } from "../users/guards/auth.guard";
 import { roleGuard } from "../users/guards/role.guard";
 import { AccessGlobalReportComponent } from "./components/entries_reports/entries-global-report/access-global-report.component";
 import { AccessRegisterVisitorsComponent } from "./components/access_visitors/access_visitors_register/access-register-visitors/access-register-visitors.component";
+import { AccesesUpdateAccesesComponent } from "./components/access_visitors/acceses-update-acceses/acceses-update-acceses/acceses-update-acceses.component";
 
 export const ENTRY_ROUTES: Routes = [
     {
@@ -19,6 +20,10 @@ export const ENTRY_ROUTES: Routes = [
             },
             {
                 path: 'visitor', component: AccessRegisterVisitorsComponent,
+                data: { roles: ['SuperAdmin', 'Propietario', 'Inquilino', 'Familiar mayor'] }
+            },
+            {
+                path: 'accessesUpdate', component: AccesesUpdateAccesesComponent,
                 data: { roles: ['SuperAdmin', 'Propietario', 'Inquilino', 'Familiar mayor'] }
             },
             {

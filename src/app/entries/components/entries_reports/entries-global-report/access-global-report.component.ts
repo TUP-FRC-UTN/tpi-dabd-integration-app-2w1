@@ -28,13 +28,13 @@ export class AccessGlobalReportComponent implements OnInit {
     if (reportType === 'hood') {
       this.selectedHood = true;
       this.selectedNeighbor = false;
-   
+
     } else if (reportType === 'neighbor') {
       this.selectedNeighbor = true;
       this.selectedHood = false;
- 
+
     }
   }
-  
+
 
 }
