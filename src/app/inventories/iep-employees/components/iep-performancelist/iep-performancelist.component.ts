@@ -357,6 +357,28 @@ openNewCallModal(employeeId: number) {
         }
       ]
     });
+
+    this.tour.addStep({
+      id: 'subject-step',
+      title: 'Filtros',
+      text: 'Desde acá se puede filtrar los períodos. También puede exportar los periodos a Excel o PDF, o borrar los filtros aplicados con el botón de basura.'
+      ,attachTo: {
+        element: '#filtros',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+      
+    });
+
     this.tour.addStep({
       id: 'table-step',
       title: 'Boton de acciones',
@@ -378,11 +400,11 @@ openNewCallModal(employeeId: number) {
     });
 
     this.tour.addStep({
-      id: 'subject-step',
-      title: 'Filtros',
-      text: 'Desde acá se puede filtrar los períodos. También puede exportar los periodos a Excel o PDF, o borrar los filtros aplicados con el botón de basura.'
-      ,attachTo: {
-        element: '#filtros',
+      id: 'table-step',
+      title: 'Salir',
+      text: 'Al terminar, puede pulsar este botón para volver a la página anterior.',
+      attachTo: {
+        element: '#leave',
         on: 'auto'
       },
       buttons: [
@@ -392,10 +414,9 @@ openNewCallModal(employeeId: number) {
         },
         {
           text: 'Finalizar',
-          action: this.tour.complete
+          action: this.tour.complete,
         }
       ]
-      
     });
 
     this.tour.start();
