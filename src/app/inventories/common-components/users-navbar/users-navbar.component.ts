@@ -65,7 +65,7 @@ export class MOCKUsersNavbarComponent {
           {
 
             icon: "bi-tags-fill",
-            title: "Cateogorías de productos",
+            title: "Categorías de productos",
             route: "home/categories-list",
             roles: ["SuperAdmin", "Admin", "Encargado de inventario"]
 
