@@ -1,5 +1,5 @@
 // access-visitors-eventual.component.ts 
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { AccessVisitorFormComponent } from '../../access_visitors_register/access-visitor-form/access-visitor-form.component';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../../../../users/users-servicies/auth.service';
@@ -11,6 +11,8 @@ import {userTypeMap ,documentTypeMap } from '../../../../models/access-report/co
 import { AccessVisitorsRegisterServiceHttpClientService } from '../../../../services/access_visitors/access-visitors-register/access-visitors-register-service-http-client/access-visitors-register-service-http-client.service';
 import { accessTempRegist, AccessVisitor3, AccessVisitorRecord } from '../../../../models/access-visitors/access-visitors-models';
 import Swal from 'sweetalert2';
+import { Router } from '@angular/router';
+
 
 
 @Component({
@@ -21,6 +23,11 @@ import Swal from 'sweetalert2';
  styleUrls: ['./access-visitors-eventual.component.scss']
 })
 export class AccessVisitorsEventualComponent implements OnInit {
+
+private router=inject(Router);
+goTo(path: string) {
+this.router.navigate([path]);
+}
  visitorForm!: FormGroup;
  visitors: AccessUserAllowedInfoDto[] = [];
  selectedVisitorId: AccessUserAllowedInfoDto | null = null;

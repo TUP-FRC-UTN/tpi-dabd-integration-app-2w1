@@ -54,7 +54,10 @@ export const environmentEntries = {
         topUsersEntriesExits: '/top-users-entries-exits',
         guardWithMostExits: '/guard-with-most-exits',
         guardWithMostEntries: '/guard-with-most-entries',
-        neighborWithMostInvitations: '/neighbor-with-most-invitations'
+        neighborWithMostInvitations: '/neighbor-with-most-invitations',
+
+        //Update access
+        updateAccess:'/addNewAuthRange'
     }
 };
 
@@ -109,5 +112,5 @@ export const API_ENDPOINTS = {
     TOP_USERS_ENTRIES_EXITS: `${environmentEntries.movementsApi}${environmentEntries.endpoints.topUsersEntriesExits}`,
     GUARD_WITH_MOST_EXITS: `${environmentEntries.movementsApi}${environmentEntries.endpoints.guardWithMostExits}`,
     GUARD_WITH_MOST_ENTRIES: `${environmentEntries.movementsApi}${environmentEntries.endpoints.guardWithMostEntries}`,
-    NEIGHBOR_WITH_MOST_INVITATIONS: `${environmentEntries.movementsApi}${environmentEntries.endpoints.neighborWithMostInvitations}`
-};
+    NEIGHBOR_WITH_MOST_INVITATIONS: `${environmentEntries.movementsApi}${environmentEntries.endpoints.neighborWithMostInvitations}`,
+    UPDATE_ACCESS:`${environmentEntries.movementsApi}${environmentEntries.endpoints.updateAccess}`};
