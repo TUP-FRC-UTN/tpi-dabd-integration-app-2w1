@@ -1,0 +1,18 @@
+<section class="container pt-3">
+    <div class="mb-2" id="filters">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="col-3">
+                <input type="text" placeholder="Buscar" class="form-control" (input)="onSearch($event)">
+            </div>
+            <div class="col-auto d-flex gap-1 text-end">
+              <button (click)="exportToExcel()" id="exportExcelBtn" class="btn btn-success bi-file-earmark-excel filterbutton"
+                title="Exportar Excel"></button>
+              <button (click)="exportToPDF()" id="exportPdfBtn" class="btn btn-danger bi-file-earmark-pdf filterbutton"
+                title="Exportar PDF"></button>
+            </div>
+        </div>
+    </div>
+    <div class="mb-3">
+        <table id="myTableRequests" class="table table-striped table-hover border border-3 rounded"></table>
+    </div>
+</section>

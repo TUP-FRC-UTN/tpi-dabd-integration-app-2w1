@@ -45,6 +45,10 @@ export class UsersHomeComponent implements OnInit, OnDestroy {
         modalOverlayOpeningPadding: 10,
         modalOverlayOpeningRadius: 10,
         canClickTarget: false,
+        scrollTo: {
+          behavior: 'smooth',
+          block: 'center'
+        }
       },
       keyboardNavigation: false,
 
@@ -131,10 +135,10 @@ export class UsersHomeComponent implements OnInit, OnDestroy {
       if (pathElement) {
         switch (plot.plot_state) {
           case 'Habitado':
-            pathElement.setAttribute('fill', '#FFE6A9');
+            pathElement.setAttribute('fill', '#DEAA79');
             break;
           case 'En construccion':
-            pathElement.setAttribute('fill', '#DEAA79');
+            pathElement.setAttribute('fill', '#FFE6A9');
             break;
           case 'Disponible':
             pathElement.setAttribute('fill', '#B1C29E');
@@ -213,6 +217,28 @@ export class UsersHomeComponent implements OnInit, OnDestroy {
     if (this.tour) {
       this.tour.complete();
     }
+
+    // CÓDIGO PARA PREVENIR SCROLLEO DURANTE TUTORIAL
+    const preventScroll = (e: Event) => {
+      e.preventDefault();
+    };
+
+    const restoreScroll = () => {
+      document.body.style.overflow = 'auto';
+      window.removeEventListener('wheel', preventScroll);
+      window.removeEventListener('touchmove', preventScroll);
+    };
+
+    // Al empezar, lo desactiva
+    this.tour.on('start', () => {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('wheel', preventScroll, { passive: false });
+      window.addEventListener('touchmove', preventScroll, { passive: false });
+    });
+
+    // Al completar lo reactiva, al igual que al cancelar
+    this.tour.on('complete', restoreScroll);
+    this.tour.on('cancel', restoreScroll);
 
     this.tour.addStep({
       id: 'table-step',
@@ -304,12 +330,55 @@ export class UsersHomeComponent implements OnInit, OnDestroy {
           action: this.tour.back,
         },
         {
+          text: 'Siguiente',
+          action: this.tour.next,
+        },
+      ],
+    });
+
+    this.tour.addStep({
+      id: 'map-step',
+      title: 'Mapa',
+      text: 'Este es el mapa del barrio, puede hacer click en cualquier lote para ver los detalles del mismo.',
+      attachTo: {
+        element: '#map',
+        on: 'auto',
+      },
+      canClickTarget: true,
+
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back,
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        },
+      ],
+    });
+
+    this.tour.addStep({
+      id: 'plot-step',
+      title: 'Lote',
+      text: 'Acá puede ver el detalle del lote seleccionado en el mapa.',
+      attachTo: {
+        element: '#plot',
+        on: 'auto',
+      },
+      canClickTarget: true,
+
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back,
+        },
+        {
           text: 'Finalizar',
           action: this.tour.complete,
         },
       ],
     });
-
 
 
     this.tour.start();

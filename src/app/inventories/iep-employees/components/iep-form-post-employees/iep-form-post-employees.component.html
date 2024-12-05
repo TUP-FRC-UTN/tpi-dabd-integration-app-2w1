@@ -1,6 +1,6 @@
 <section class="py-2">
 
-    <div class="container mt-5 col-md-10">
+    <div class="container mt-5 col-md-10" id="form-container">
         <form #form="ngForm" (ngSubmit)="onSubmit(form)" class="form-container border rounded border shadow p-4">
 
             
@@ -54,6 +54,7 @@
             </div>
 
             <!-- Datos personales -->
+            <div id="personal-data">
                 <p class="text-start mb-3 mt-3 ">Datos personales:</p>
                 <hr>
                 <div class="form-group row mb-3 ">
@@ -164,15 +165,12 @@
                             </div>
                         </div>
                     </div>
-
-
-
-
                 </div>
-       
+            </div>
 
             <!-- contacto  -->
-                <p class="text-start mb-3 mt-3">Datos de contacto:</p>
+            <div id="contact-data">
+            <p class="text-start mb-3 mt-3">Datos de contacto:</p>
                 <hr>
 
                 <div class="form-group row mb-5 pb-2 ">
@@ -221,11 +219,11 @@
                         </div>
                     </div>
                 </div>
-          
+            </div>
 
 
             <!-- Dirección -->
-
+            <div id="address">
            
                 <p class="text-start mb-3 mt-3 ">Datos de domicilio:</p>
                 <hr>
@@ -394,9 +392,9 @@
                     </div>
                 </div>
         </div>
-
+    </div>
       
-    
+                <div id="contract-data">
                 <p class="text-start mb-3 mt-3">Datos del contrato:</p>
                 <hr>
 
@@ -626,14 +624,14 @@
                     </div>
 
                 </div>
-
+            </div>
           
 
 
 
             <!-- dias laborales -->
           
-
+            <div id="work-days">
                 <p class="text-start mb-3 mt-3  ">Dias laborales</p>
                 <hr>
 
@@ -715,7 +713,7 @@
 
 
                 </div>
-           
+            </div>
 
             <!-- Botones -->
           
@@ -725,7 +723,7 @@
 
                 </div>
                 <div class="col-md-2  d-flex justify-content-end">
-                    <button [disabled]="!form.valid" type="submit" class="btn btn-success">Registrar</button>
+                    <button [disabled]="!form.valid" type="submit" class="btn btn-success" id="submit-button">Registrar</button>
                 </div>
             </div> 
         </form>

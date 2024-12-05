@@ -36,6 +36,10 @@ private tour: Shepherd.Tour;
         canClickTarget: false,
         modalOverlayOpeningPadding: 10,
         modalOverlayOpeningRadius: 10,
+        scrollTo: {
+          behavior: 'smooth',
+          block: 'center'
+        }
       },
       keyboardNavigation: false,
       useModalOverlay: true,
@@ -58,10 +62,33 @@ startTutorial() {
   if (this.tour) {
     this.tour.complete();
   }
+
+  // CÓDIGO PARA PREVENIR SCROLLEO DURANTE TUTORIAL
+  const preventScroll = (e: Event) => {
+    e.preventDefault();
+  };
+
+  const restoreScroll = () => {
+    document.body.style.overflow = 'auto';
+    window.removeEventListener('wheel', preventScroll);
+    window.removeEventListener('touchmove', preventScroll);
+  };
+
+  // Al empezar, lo desactiva
+  this.tour.on('start', () => {
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('wheel', preventScroll, { passive: false });
+    window.addEventListener('touchmove', preventScroll, { passive: false });
+  });
+
+  // Al completar lo reactiva, al igual que al cancelar
+  this.tour.on('complete', restoreScroll);
+  this.tour.on('cancel', restoreScroll);
+  
   this.tour.addStep({
-    id: 'table-step',
-    title: 'Formulario para alta de proveedor',
-    text: 'Acá puede guardar en el sistema un proveedor con los datos que indique',
+    id: 'intro-step',
+    title: 'Formulario para editar un proveedor',
+    text: 'Acá puede editar la información de un proveedor con los datos que indique.',
     attachTo: {
       element: '#pantalla',
       on: 'auto'
@@ -75,7 +102,7 @@ startTutorial() {
   });
 
   this.tour.addStep({
-    id: 'subject-step',
+    id: 'type-step',
     title: 'Tipo de proveedor',
     text: 'Desde acá podrá seleccionar el tipo de proveedor.', 
       attachTo: {
@@ -95,9 +122,9 @@ startTutorial() {
     
   });
   this.tour.addStep({
-    id: 'subject-step',
-    title: 'Registrar',
-    text: 'Para finalizar podrá registrar la actualizacion del proveedor seleccionado en el sistema.', 
+    id: 'submit-step',
+    title: 'Guardar',
+    text: 'Para finalizar haga click en Guardar para guardar los cambios realizados.',
       attachTo: {
       element: '#registrar',
       on: 'auto'

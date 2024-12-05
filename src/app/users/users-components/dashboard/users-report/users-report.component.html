@@ -1,4 +1,4 @@
-<div class="container p-2 border border-2 rounded shadow-lg mt-0">
+<div class="container p-2 border border-2 rounded shadow-lg mt-0" id="filtros">
 
     <!-- Sección de Filtros -->
     <div class="row">
@@ -32,7 +32,7 @@
     <div class="row">
         <div class="col-md-2">
             <!-- KPI Cards -->
-            <div class="row">
+            <div class="row" id="kpis">
                 <app-users-kpi class="mb-2" title="Área Total" icon="bi bi-arrow-up-right"
                     [amount]="selectedBlockskPIs.totalArea" [customStyles]="{ 'background-color': '#d8ffedde' }"
                     tooltip="Área total disponible" formatPipe="metros" [selectable]="true"
@@ -59,7 +59,7 @@
         <div class="col-10">
             <div class="row">
                 <div class="col-md-4">
-                    <div class="card border-0 shadow-lg rounded-4">
+                    <div class="card border-0 shadow-lg rounded-4" id="chartPlotState">
                         <div class="card-body">
                             <div *ngIf="loadingPieChart" class="loading">Cargando...</div>
                             <div *ngIf="errorPieChart" class="error">{{ errorPieChart }}</div>
@@ -80,7 +80,7 @@
                 </div>
 
                 <div class="col-md-8">
-                    <div class="card border-0 shadow-lg rounded-4">
+                    <div class="card border-0 shadow-lg rounded-4" id="chartAgeRange">
                         <div class="card-body">
                             <div *ngIf="loadingAgeRange" class="loading">Cargando...</div>
                             <div *ngIf="errorAgeRange" class="error">{{ errorAgeRange }}</div>
@@ -103,7 +103,7 @@
                 </div>
 
                 <div class="col-md-12 mt-3">
-                    <div class="card border-0 shadow-lg rounded-4 h-100">
+                    <div class="card border-0 shadow-lg rounded-4 h-100" id="chartBlocks">
                         <div class="card-body">
                             <div *ngIf="loadingBlocksChart" class="loading">Cargando...</div>
                             <div *ngIf="errorBlocksChart" class="error">{{ errorBlocksChart }}</div>
