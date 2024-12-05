@@ -12,7 +12,7 @@
             <h5 class="card-title">{{showName(familiar.name + ", " + familiar.lastname)}}</h5>
             <p class="card-text">Roles: {{showRoles( familiar.roles)}}</p>
             <p class="card-text">Email: {{showEmail(familiar.email)}}</p>
-            <p class="card-text">Teléfono: {{familiar.phone_number}}</p>
+            <p class="card-text">Teléfono: {{familiar.phone_number || 'N/A'}}</p>
           </div>
         </div>
         <div class="col-md-4 d-flex flex-column justify-content-evenly align-items-center">

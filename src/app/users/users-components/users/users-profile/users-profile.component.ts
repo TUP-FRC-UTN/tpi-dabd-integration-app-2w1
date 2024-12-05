@@ -21,6 +21,7 @@ import { SuscriptionManagerService } from '../../../../common/services/suscripti
 import { TutorialService } from '../../../../common/services/tutorial.service';
 import { Subscription } from 'rxjs';
 import Shepherd from 'shepherd.js';
+import { ValidatorsService } from '../../../users-servicies/validators.service';
 
 @Component({
   selector: 'app-users-profile',
@@ -39,6 +40,7 @@ export class UsersProfileComponent implements OnInit, OnDestroy {
   private readonly usersService = inject(UserService);
   private readonly plotsService = inject(PlotService);
   private readonly suscriptionService = inject(SuscriptionManagerService);
+  private readonly validatorService = inject(ValidatorsService);
 
   dniType: number = 0;
   selectedIconUrl: string = '';
@@ -186,26 +188,24 @@ export class UsersProfileComponent implements OnInit, OnDestroy {
         Validators.maxLength(30),
       ]),
       telegram_id: new FormControl({ value: 0, disabled: true }),
-      email: new FormControl({ value: '...', disabled: true }, [
-        Validators.required,
-        Validators.email,
+      email: new FormControl({ value: null, disabled: true }, [
+        Validators.email
       ]),
 
-      phoneNumber: new FormControl({ value: '', disabled: true }, [
-        Validators.required,
+      phoneNumber: new FormControl({ value: null, disabled: true }, [
         Validators.minLength(9),
         Validators.maxLength(20),
         Validators.pattern('^[0-9]*$'),
       ]),
       dni: new FormControl({ value: 0, disabled: true }, [
         Validators.required,
-        Validators.minLength(1),
+        Validators.minLength(8),
         Validators.maxLength(11),
+        Validators.pattern(/^\d+$/)
       ]),
       dniType: new FormControl({ value: '', disabled: true }, []),
       avatar_url: new FormControl({ value: '...', disabled: true }),
-      datebirth: new FormControl({ value: '', disabled: true }, [
-        Validators.required,
+      datebirth: new FormControl({ value: null, disabled: true }, [
       ]),
       roles: new FormControl<string[]>({ value: [], disabled: true }),
     });
@@ -242,9 +242,9 @@ export class UsersProfileComponent implements OnInit, OnDestroy {
         this.formProfile.patchValue({
           name: user.name,
           lastName: user.lastname,
-          email: user.email || 'N/A',
+          email: user.email || '',
           username: user.username,
-          phoneNumber: user.phone_number == null ?  'N/A': String(user.phone_number),
+          phoneNumber: user.phone_number == null ? '' : String(user.phone_number),
           dni: user.dni || 'N/A',
           dniType: user.dni_type || 'N/A',
           avatar_url: user.avatar_url,
@@ -310,11 +310,11 @@ export class UsersProfileComponent implements OnInit, OnDestroy {
       userUpdateId: this.authService.getUser().id,
       name: this.formProfile.get('name')?.value || '',
       lastName: this.formProfile.get('lastName')?.value || '',
-      email: this.formProfile.get('email')?.value || '',
-      phoneNumber: this.formProfile.get('phoneNumber')?.value?.toString() || '',
+      email: this.formProfile.get('email')?.value || null,
+      phoneNumber: this.formProfile.get('phoneNumber')?.value?.toString() || null,
       dni: this.formProfile.get('dni')?.value?.toString() || '',
       avatar_url: this.selectedIconUrl,
-      datebirth: this.formProfile.get('datebirth')?.value || '',
+      datebirth: this.formProfile.get('datebirth')?.value || null,
       roles: this.formProfile.get('roles')?.value || [],
       telegram_id: this.formProfile.get('telegram_id')?.value || 0,
       dni_type_id: this.dniType,
@@ -371,6 +371,10 @@ export class UsersProfileComponent implements OnInit, OnDestroy {
       this.formProfile.get('lastName')?.enable();
       this.formProfile.get('phoneNumber')?.enable();
       this.formProfile.get('avatar_url')?.enable();
+      this.formProfile.get('datebirth')?.enable();
+      this.formProfile.get('email')?.enable();
+      // this.formProfile.get('dni')?.enable();
+      // this.formProfile.get('dniType')?.enable();
     }
     if (newType == 'info') {
       this.ngOnInit();
@@ -421,6 +425,8 @@ export class UsersProfileComponent implements OnInit, OnDestroy {
           return 'Este campo solo acepta números.';
         case 'customError':
           return 'Error personalizado: verifique el dato ingresado.';
+          case 'email':
+          return 'Formato de correo electrónico inválido.';
         default:
           return 'Error no identificado en el campo.';
       }
@@ -447,4 +453,6 @@ export class UsersProfileComponent implements OnInit, OnDestroy {
     }
     return color;
   }
+
+  
 }

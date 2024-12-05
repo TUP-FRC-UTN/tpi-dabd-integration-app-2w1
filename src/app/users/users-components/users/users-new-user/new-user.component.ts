@@ -121,7 +121,7 @@ export class NewUserComponent implements OnInit, OnDestroy {
         Validators.maxLength(9),
       ]),
       active: new FormControl(true),
-      datebirth: new FormControl(DateService.formatDate(new Date("2000-01-02"))),
+      datebirth: new FormControl(null),
       roles: new FormControl([], Validators.required),
       plot: new FormControl('', [Validators.required]),
       userUpdateId: new FormControl(this.authService.getUser().id),
@@ -147,8 +147,8 @@ export class NewUserComponent implements OnInit, OnDestroy {
   select: string = '';
   checkOption: boolean = false;
   lotes: GetPlotDto[] = [];
-  date: string = new Date(2000, 0, 1).toISOString().split('T')[0];
-  initialDate: FormControl = new FormControl(this.date);
+  // date: string = new Date(2000, 0, 1).toISOString().split('T')[0];
+  initialDate: FormControl = new FormControl(null);
   subTitleLabel: string = 'Seleccione los roles del usuario';
   optionsForOwner: string[] = ['Familiar mayor', 'Familiar menor'];
   options: any[] = [];
@@ -387,7 +387,7 @@ export class NewUserComponent implements OnInit, OnDestroy {
     this.suscriptionService.addSuscription(sus);
   }
 
-  // filtros ------------------------------------------------------
+  // ---------------------------------------------------Filtros ------------------------------------------------------
 
   validarCuit(control: AbstractControl): ValidationErrors | null {
     const cuit = control.value;
