@@ -282,12 +282,12 @@ export class UsersProfileComponent implements OnInit, OnDestroy {
   //Obtener un lote por id
   getPlotById() {
     const sus = this.plotsService
-      .getPlotById(this.authService.getUser().id)
+    .getPlotsByUserId(this.authService.getUser().id)
       .subscribe({
-        next: (plot: GetPlotDto) => {
-          this.plots = [];
-          this.plots.push(plot);
-        },
+        next: (plot: GetPlotDto[]) => {
+          this.plots =plot;
+          //this.plots.push(plot);
+        }
       });
 
     //Agregar suscripción
