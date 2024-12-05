@@ -332,8 +332,8 @@ export class NotificationComponent implements OnInit {
         },
         {
           text: 'Siguiente',
-         action: this.tour.next,
-        },
+          action: this.tour.next,
+          },
       ],
     });
 
