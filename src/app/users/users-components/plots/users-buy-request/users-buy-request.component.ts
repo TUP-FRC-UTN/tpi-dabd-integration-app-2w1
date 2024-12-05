@@ -370,7 +370,7 @@ export class UsersBuyRequestComponent implements OnInit, OnDestroy {
           orderable: false,
           className: 'text-center',
           render: function (data, type, row) {
-            return (data.contacted ? `<button type="button" class="btn btn-light text-primary bi-check-all fs-5" disabled></button>`: `<button type="button" class="btn-changeState btn btn-light bi-check fs-5" title="Marcar como contactado" data-action="changeState" data-id="${data.id}"></button>`);
+            return (data.contacted ? `<button type="button" class="btn btn-light text-primary bi-check-all fs-5" disabled></button>`: `<button type="button" class="btn-changeState btn btn-light bi-check fs-5" data-action="changeState" data-id="${data.id}"></button>`);
           }
         }
       ],

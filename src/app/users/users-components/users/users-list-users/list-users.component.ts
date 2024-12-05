@@ -108,7 +108,8 @@ export class ListUsersComponent implements OnInit, OnDestroy {
         //Cambiar guiones por barras en la fecha de nacimiento
         this.users = data.map((user) => ({
           ...user,
-          datebirth: (user.datebirth ? user.datebirth.replace(/-/g, '/') : 'N/A'),
+
+          datebirth: user.datebirth.replace(/-/g, '/'),
           create_date: user.create_date.replace(/-/g, '/'),
         }));
 
@@ -494,6 +495,8 @@ export class ListUsersComponent implements OnInit, OnDestroy {
       let user: any = this.userModal.plot_id;
       let userPlots: any = [];
       user.forEach((plot: any) => {
+        console.log('AA' + plot);
+
         const userPlot = this.plots.find((p: any) => p.id == plot);
         console.log(userPlot);
 

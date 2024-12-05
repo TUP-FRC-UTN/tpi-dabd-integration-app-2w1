@@ -95,10 +95,7 @@ export class UsersFamiliarGroupComponent implements OnInit, OnDestroy {
 
   //Mostrar el email
   showEmail(name: String) {
-    if(name){
-      return name.substring(0, 15) + "...";
-    }
-    return "N/A";
+    return name.substring(0, 15) + "...";
   }
 
   //Acorta el nombre completo

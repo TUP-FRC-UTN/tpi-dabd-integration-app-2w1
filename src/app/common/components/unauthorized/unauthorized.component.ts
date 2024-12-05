@@ -14,9 +14,9 @@ export class UnauthorizedComponent implements OnInit {
   timeLeft: number = 5; // Segundos para la cuenta regresiva
   intervalId: any; // Guardará el ID del intervalo
 
-  constructor(private routingService: RoutingService) { }
+  constructor(private routingService : RoutingService) { }
 
-  startCountdown(): void {
+   startCountdown(): void {
     this.intervalId = setInterval(() => {
       if (this.timeLeft > 0) {
         this.timeLeft--;
@@ -27,7 +27,7 @@ export class UnauthorizedComponent implements OnInit {
     }, 1000);
 
   }
-
+  
   ngOnInit(): void {
     this.startCountdown();
   }

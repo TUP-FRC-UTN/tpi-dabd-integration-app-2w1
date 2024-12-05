@@ -50,21 +50,39 @@ export class ModalInfoUserComponent implements OnInit, OnDestroy {
   editUser: FormGroup;
 
   // Método para detectar cambios en el @Input
-  ngOnInit() { 
-      const formattedCreatedDate = DateService.parseDateString(this.userModal.create_date);
-      
-      this.editUser.patchValue({
-        fullname: this.userModal.lastname + ', ' + this.userModal.name,
-        email: this.userModal.email,
-        dni: this.userModal.dni,
-        dni_type: this.userModal.dni_type,
-        phoneNumber: this.userModal.phone_number,
-        roles: this.rolesInput,
-        username: this.userModal.username,
-        telegram_id: this.userModal?.telegram_id || 'N/A',
-        birthdate: (this.userModal.datebirth ? DateService.parseDateString(this.userModal.datebirth) : null),
-        create_date: formattedCreatedDate || 'N/A'
-      });
+  ngOnInit() {
+
+      // Actualiza los valores del formulario cuando cambian los datos del usuario
+      if (this.userModal.datebirth) {
+        const formattedCreatedDate = DateService.parseDateString(this.userModal.create_date);
+        const formattedDate = DateService.parseDateString(this.userModal.datebirth);
+
+        if (formattedDate) {
+          // Formatea la fecha a 'yyyy-MM-dd' para un input de tipo date
+          const formattedDateString = formattedDate.toISOString().split('T')[0];
+
+          this.editUser.patchValue({
+            datebirth: formattedDateString
+          });
+        } else {
+          this.editUser.patchValue({
+            datebirth: ''
+          });
+        }
+        
+        this.editUser.patchValue({
+          fullname: this.userModal.lastname + ', ' + this.userModal.name,
+          email: this.userModal.email,
+          dni: this.userModal.dni,
+          dni_type: this.userModal.dni_type,
+          phoneNumber: this.userModal.phone_number,
+          roles: this.rolesInput,
+          username: this.userModal.username,
+          telegram_id: this.userModal?.telegram_id || 'N/A',
+          birthdate: formattedDate || 'N/A',
+          create_date: formattedCreatedDate || 'N/A'
+        });
+      }
 
       this.editUser.disable();
   }

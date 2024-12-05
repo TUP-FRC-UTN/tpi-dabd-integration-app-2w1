@@ -98,10 +98,10 @@ export class UsersUpdateUserComponent implements OnInit, OnDestroy {
 
     // Desactiva campos específicos del formulario
     if (this.authService.getActualRole() != 'SuperAdmin') {
-      // this.updateForm.get('dni')?.disable();
-      // this.updateForm.get('dniType')?.disable();
-      // this.updateForm.get('email')?.disable();
-      // this.updateForm.get('datebirth')?.disable();
+      this.updateForm.get('dni')?.disable();
+      this.updateForm.get('dniType')?.disable();
+      this.updateForm.get('email')?.disable();
+      this.updateForm.get('datebirth')?.disable();
     }
 
     this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
@@ -251,8 +251,7 @@ export class UsersUpdateUserComponent implements OnInit, OnDestroy {
             } else {
             formattedDate = null;
             }
-            console.log('fecha q viene de usuario' + formattedDate);
-            
+
           this.userRoles = data.roles;
 
           this.filteredUserRoles = this.filterUserRoles(this.userRoles);
@@ -266,11 +265,8 @@ export class UsersUpdateUserComponent implements OnInit, OnDestroy {
           }
 
           this.updateForm.get('datebirth')?.setValue(formattedDate || null);
-          console.log(formattedDate);
           if (formattedDate) {
             // Formatea la fecha a 'yyyy-MM-dd' para un input de tipo date
-            
-            
             const formattedDateString = formattedDate.toISOString().split('T')[0];
 
             this.updateForm.patchValue({
@@ -282,7 +278,7 @@ export class UsersUpdateUserComponent implements OnInit, OnDestroy {
             });
           }
 
-          this.updateForm.get('phoneNumber')?.setValue(data.phone_number ? data.phone_number.toString() : null);
+          this.updateForm.get('phoneNumber')?.setValue(data.phone_number.toString() || null);
           this.updateForm.get('telegram_id')?.setValue(data.telegram_id) || 0;
 
           // Asigna `rolesSelected` después de obtener `data.roles`
@@ -416,17 +412,17 @@ export class UsersUpdateUserComponent implements OnInit, OnDestroy {
     user.avatar_url = this.updateForm.get('avatar_url')?.value || '';
 
     //Formatea la fecha correctamente (año-mes-día)
-    const date: Date = (new Date(this.updateForm.get('datebirth')?.value || null));
+    const date: Date = new Date(this.updateForm.get('datebirth')?.value || null);
 
     //Formatear la fecha como YYYY-MM-DD
-    
-    let formattdDate;
-    if(this.updateForm.get('datebirth')?.value){
+    let formattdDate = null;
+    if(date){
       formattdDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
     }
     else{
       formattdDate = null;
     }
+    
 
     user.datebirth = formattdDate || null;
     user.roles = this.updateForm.get('roles')?.value + this.blockedRoles || [];
@@ -437,6 +433,8 @@ export class UsersUpdateUserComponent implements OnInit, OnDestroy {
     if (this.authService.getActualRole() != 'SuperAdmin') {
       user.roles.push(...this.blockedRoles);
     }
+
+    console.log(user);
 
 
     //Llama al servicio para actualizar el usuario

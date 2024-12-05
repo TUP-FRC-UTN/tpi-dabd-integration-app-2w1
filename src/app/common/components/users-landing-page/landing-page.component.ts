@@ -57,7 +57,7 @@ export class LandingPageComponent implements OnInit {
       email: new FormControl('', [Validators.email]),
       phone: new FormControl('', [Validators.minLength(10),
         Validators.maxLength(20),  Validators.pattern(/^\d+$/)]),
-      observations: new FormControl('', [Validators.maxLength(200)]),
+      observations: new FormControl(''),
       plot_id: new FormControl(this.selectedPlot?.id)
     })
     
@@ -186,8 +186,8 @@ export class LandingPageComponent implements OnInit {
       required: 'Este campo no puede estar vacío.',
       email: 'Formato de correo electrónico inválido.',
       pattern: 'Solo se permiten números.',
-      minlength: `El campo debe tener al menos ${control?.errors?.['minlength']?.requiredLength} caracteres.`,
-      maxlength: `El campo debe tener como máximo ${control?.errors?.['maxlength']?.requiredLength} caracteres.`,
+      minlength: `El campo debe tener al menos 10 caracteres.`,
+      maxlength: `El campo debe tener como máximo 20 caracteres.`,
       emailOrPhoneRequired: 'Debe ingresar al menos un correo electrónico o un número de teléfono.'
     };
 
@@ -259,6 +259,7 @@ export class LandingPageComponent implements OnInit {
   }
 
   convertPathToPngV2(width: number = 150, height: number = 150): string {
+    debugger
     const pathD = this.selectedPath?.getAttribute('d');
     if (!pathD) {
       throw new Error('Path no definido.');
