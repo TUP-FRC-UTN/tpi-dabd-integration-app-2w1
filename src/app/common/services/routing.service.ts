@@ -212,7 +212,7 @@ export class RoutingService {
         {
           icon: 'bi-tags-fill',
           name: 'Categorias',
-          title: 'Cateogorías de Productos',
+          title: 'Categorías de Productos',
           route: 'main/inventories/categories-list',
           roles: ['SuperAdmin', 'Gerente inventario'],
         },
