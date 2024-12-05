@@ -1,7 +1,7 @@
 <div class="row mb-2">-</div>
 <!-- Filtors -->
 <div class="container my-2 p-2 border border-2 rounded shadow-lg">
-    <div class="row">
+    <div class="row" id="d1">
         <!-- Filtro de fechas -->
         <div class="col d-flex gap-3">
             <div class="col">
@@ -64,13 +64,13 @@
     </div>
 </div>
 
-<div class="container">
+<div class="container" id="d2">
     
     <!-- Grilla del dashboard -->
     <div class="row">
 
         <!-- KPI LIMITE 5-->
-        <div class="col-2 gap-2 d-flex flex-column justify-content-center">
+        <div id="d5" class="col-2 gap-2 d-flex flex-column justify-content-center">
             <!-- KPI 1 -->
             <app-custom-kpi [value]="kpiTotalMovimientosAumento" title="Cant. productos" subTitle="Aumentos"
             [customStyles]="{ 'background-color': '#b3f5bc' }" icon="bi-arrow-up-circle"
@@ -107,7 +107,7 @@
             </div>
         </div>
         <div class="col-10">
-            <div class="row mb-2">
+            <div id="d3" class="row mb-2">
                 <!-- Grafico linea movimientos -->
                 <div class="col ">
                     <div class="card border-0 shadow-lg  rounded-4 h-100">
@@ -125,7 +125,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
+            <div id="d4" class="row">
                 <!-- Grafico barra productos -->
                 <div class="col ">
                     <div class="card border-0 shadow-lg  rounded-4 h-100">
