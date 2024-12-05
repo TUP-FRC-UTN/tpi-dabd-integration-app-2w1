@@ -106,7 +106,7 @@ export class UsersProfileComponent implements OnInit, OnDestroy {
     // Al completar lo reactiva, al igual que al cancelar
     this.tour.on('complete', restoreScroll);
     this.tour.on('cancel', restoreScroll);
-
+    
     console.log('EMPEZANDO TUTORIAL');
     this.tour.addStep({
       id: 'profile-step',
@@ -150,11 +150,16 @@ export class UsersProfileComponent implements OnInit, OnDestroy {
 
   //Desuscribirse de los observables
   ngOnDestroy(): void {
+
     //TUTORIAL
     this.tutorialSubscription.unsubscribe();
     if (this.tour) {
       this.tour.complete();
     }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    } 
 
     this.suscriptionService.unsubscribeAll();
   }
@@ -232,14 +237,14 @@ export class UsersProfileComponent implements OnInit, OnDestroy {
     const sus = this.usersService.getUserById2(this.authService.getUser().id).subscribe({
       next: (user: GetuserDto) => {
         let roles = user.roles.map(role => " " + role);
-
+        
 
         this.formProfile.patchValue({
           name: user.name,
           lastName: user.lastname,
           email: user.email || 'N/A',
           username: user.username,
-          phoneNumber: user.phone_number == null ? 'N/A' : String(user.phone_number),
+          phoneNumber: user.phone_number == null ?  'N/A': String(user.phone_number),
           dni: user.dni || 'N/A',
           dniType: user.dni_type || 'N/A',
           avatar_url: user.avatar_url,
@@ -277,11 +282,11 @@ export class UsersProfileComponent implements OnInit, OnDestroy {
   //Obtener un lote por id
   getPlotById() {
     const sus = this.plotsService
-      .getPlotsByUserId(this.authService.getUser().id)
+      .getPlotById(this.authService.getUser().id)
       .subscribe({
-        next: (plot: GetPlotDto[]) => {
-          this.plots = plot;
-          //this.plots.push(plot);
+        next: (plot: GetPlotDto) => {
+          this.plots = [];
+          this.plots.push(plot);
         },
       });
 
