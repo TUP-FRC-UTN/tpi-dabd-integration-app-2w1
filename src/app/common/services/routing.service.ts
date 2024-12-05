@@ -65,6 +65,13 @@ export class RoutingService {
           roles: ['SuperAdmin', 'Gerente general'],
         },
         {
+          icon: 'bi-send',
+          name: 'Solicitudes',
+          title: 'Solicitudes de compra',
+          route: 'main/plots/requests',
+          roles: ['SuperAdmin', 'Gerente general'],
+        },
+        {
           icon: 'bi-key-fill',
           name: 'Propietarios',
           title: 'Listado de propietarios',

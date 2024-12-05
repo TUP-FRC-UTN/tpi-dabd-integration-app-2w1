@@ -2,7 +2,7 @@ import { CommonModule, JsonPipe, NgFor } from '@angular/common';
 import { Component, importProvidersFrom, Inject, OnInit } from '@angular/core';
 import { Form, FormBuilder, FormGroup, FormsModule, NgForm, PatternValidator, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Ciudad, Provincia } from '../../Models/emp-provincia';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { Provider } from '../../../iep-inventory/models/provider';
 import { Supplier } from '../../../iep-inventory/models/suppliers';
 import { AddressDto, Charge, DocumentTypeEnum, PostEmployeeDto } from '../../Models/emp-post-employee-dto';
@@ -13,6 +13,8 @@ import { Router, RouterLink } from '@angular/router';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { AuthService } from '../../../../users/users-servicies/auth.service';
 import { ChargeService } from '../../services/charge.service';
+import Shepherd from 'shepherd.js';
+import { TutorialService } from '../../../../common/services/tutorial.service';
 declare var bootstrap: any; // Añadir esta declaración al principio
 
 
@@ -26,7 +28,26 @@ declare var bootstrap: any; // Añadir esta declaración al principio
 export class IEPFormPostEmployeesComponent implements OnInit {
  
   
-  constructor(private serviceCombos: EmpPostEmployeeService , private router : Router,private userService: AuthService, private fb: FormBuilder,private cargoService: ChargeService,) {
+  constructor(private serviceCombos: EmpPostEmployeeService , private router : Router,private userService: AuthService, private fb: FormBuilder,private cargoService: ChargeService, private tutorialService: TutorialService
+  ) {
+    this.tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: {
+          enabled: true,
+        },
+        arrow: false,
+        canClickTarget: false,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 10,
+        scrollTo: {
+          behavior: 'smooth',
+          block: 'center'
+        }
+      },
+      keyboardNavigation: false,
+      useModalOverlay: true,
+      
+    }); 
     const currentDate = new Date();
     // Definir la fecha mínima (3 meses en el pasado)
     const minDate = new Date();
@@ -44,6 +65,183 @@ export class IEPFormPostEmployeesComponent implements OnInit {
       description: ['', Validators.required],
       
     });
+  }
+
+  //TUTORIAL
+  tutorialSubscription = new Subscription();
+  private tour: Shepherd.Tour;
+
+  startTutorial() {
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    // CÓDIGO PARA PREVENIR SCROLLEO DURANTE TUTORIAL
+    const preventScroll = (e: Event) => {
+      e.preventDefault();
+    };
+
+    const restoreScroll = () => {
+      document.body.style.overflow = 'auto';
+      window.removeEventListener('wheel', preventScroll);
+      window.removeEventListener('touchmove', preventScroll);
+    };
+
+    // Al empezar, lo desactiva
+    this.tour.on('start', () => {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('wheel', preventScroll, { passive: false });
+      window.addEventListener('touchmove', preventScroll, { passive: false });
+    });
+
+    // Al completar lo reactiva, al igual que al cancelar
+    this.tour.on('complete', restoreScroll);
+    this.tour.on('cancel', restoreScroll);
+
+
+    this.tour.addStep({
+      id: 'general-step',
+      title: 'Crear un empleado',
+      text: 'En este formulario podrá crear un nuevo empleado con sus datos correspondientes.',
+      attachTo: {
+        element: '#form-container',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Siguiente',
+          action: this.tour.next,
+        }
+      ]
+    });
+
+    this.tour.addStep({
+      id: 'personal-data-step',
+      title: 'Datos personales',
+      text: 'Ingrese acá los datos personales del empleado.',
+      attachTo: {
+        element: '#personal-data',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'contact-data-step',
+      title: 'Contacto',
+      text: 'Ingrese acá el teléfono y E-mail del empleado.',
+      attachTo: {
+        element: '#contact-data',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'address-step',
+      title: 'Domicilio',
+      text: 'Ingrese acá la dirección del empleado, seleccionando provincia y localidad.',
+      attachTo: {
+        element: '#address',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'contract-data-step',
+      title: 'Contrato',
+      text: 'Indique si el contrato es tercerizado o no. En caso de serlo, seleccione el proveedor. En caso de no serlo, indique el salario. Luego seleccione el cargo que corresponda (en caso de no existir, puede crear uno nuevo). Y por ultimo indique la fecha de inicio del mismo.',
+      attachTo: {
+        element: '#contract-data',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+      
+    });
+    
+    this.tour.addStep({
+      id: 'work-days-step',
+      title: 'Días y Horarios laborales',
+      text: 'Seleccione qué dias de la semana trabajará el empleado y especifique el horario de inicio y fin de los mismos.',
+      attachTo: {
+        element: '#work-days',
+        on: 'auto'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Siguiente',
+          action: this.tour.next
+        }
+      ]
+      
+    });
+
+    this.tour.addStep({
+      id: 'submit-step',
+      title: 'Registrar',
+      text: 'Por último, haga click en el botón verde para registrar el empleado.',
+      attachTo: {
+        element: '#submit-button',
+        on: 'top'
+      },
+      buttons: [
+        {
+          text: 'Anterior',
+          action: this.tour.back
+        },
+        {
+          text: 'Finalizar',
+          action: this.tour.complete
+        }
+      ]
+      
+    });
+
+    this.tour.start();
   }
 
   isInfoModalVisible: boolean = false;
@@ -434,6 +632,24 @@ dniChange(): void {
    this.loadProvincias();
    this.loadCharges();
    console.log(this.provincias);
+    //TUTORIAL
+    this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
+      () => {
+        this.startTutorial();
+      }
+    ); 
+  }
+
+  ngOnDestroy(): void {
+    //TUTORIAL
+    this.tutorialSubscription.unsubscribe();
+    if (this.tour) {
+      this.tour.complete();
+    }
+
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
   }
 
     // Modal management methods

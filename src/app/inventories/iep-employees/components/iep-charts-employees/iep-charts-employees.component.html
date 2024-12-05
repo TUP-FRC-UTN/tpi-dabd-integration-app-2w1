@@ -2,7 +2,7 @@
 
 <!-- Filtors -->
 <div class="container my-2 p-2 border border-2 rounded shadow-lg">
-    <div class="row">
+    <div id="d1" class="row">
         <!-- Filtro de fechas -->
         <div class="col d-flex gap-3">
             <div class="col">
@@ -63,13 +63,13 @@
     </div>
 </div>
 
-<div class="container">
+<div id="d2" class="container">
     
     <!-- Grilla del dashboard -->
     <div class="row">
 
         <!-- KPI LIMITE 5-->
-        <div class="col-2 gap-2 d-flex flex-column justify-content-center">
+        <div id="d5" class="col-2 gap-2 d-flex flex-column justify-content-center">
             <!-- KPI 1 -->
             <app-custom-kpi [value]="kpiPresente" title="Asistencias"
             [customStyles]="{ 'background-color': '#b3f5bc' }" icon="bi-person-check"
@@ -87,7 +87,7 @@
         <div class="col-10">
             <div class="row mb-2">
                 <!-- Grafico pie asistencias -->
-                <div class="col-6">
+                <div id="d3" class="col-6">
                     <div class="card border-0 shadow-lg  rounded-4 h-100">
                       <div class="card-body">
                         <h4 class="card-title align-items-center">Porcentaje asistencias</h4>       
@@ -106,7 +106,7 @@
                     </div>
                   </div>
             </div>
-            <div class="row">
+            <div id="d4" class="row">
                 <!-- Grafico barra llamados -->
                 <div class="col ">
                     <div class="card border-0 shadow-lg  rounded-4 h-100">

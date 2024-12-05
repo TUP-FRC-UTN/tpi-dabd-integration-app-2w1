@@ -1,10 +1,12 @@
 import { AfterViewInit, ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterOutlet } from '@angular/router';
 import { PlotService } from '../../../users/users-servicies/plot.service';
 import { GetPlotModel } from '../../../users/users-models/plot/GetPlot';
 import { CommonModule } from '@angular/common';
 import { RoutingService } from '../../services/routing.service';
+import { PostBuyRequestDto } from '../../../users/users-models/plot/PostBuyRequestDto';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-landing-page',
@@ -17,6 +19,8 @@ export class LandingPageComponent implements OnInit {
   lotes: GetPlotModel[] = [];
   selectedPlot: GetPlotModel | null = null;
   selectedPath: HTMLElement | null = null;
+  selectedPng: string | null = null;
+  
   //Injects
   private routingService = inject(RoutingService);
   private plotService = inject(PlotService);
@@ -50,15 +54,20 @@ export class LandingPageComponent implements OnInit {
   constructor(private fb: FormBuilder, private cdRef: ChangeDetectorRef) {
     this.formMessage = this.fb.group({
       name: new FormControl('', [Validators.required]),
-      email: new FormControl('', [Validators.required, Validators.email]),
-      message: new FormControl('', [Validators.required])
+      email: new FormControl('', [Validators.email]),
+      phone: new FormControl('', [Validators.minLength(10),
+        Validators.maxLength(20),  Validators.pattern(/^\d+$/)]),
+      observations: new FormControl(''),
+      plot_id: new FormControl(this.selectedPlot?.id)
     })
+    
   }
 
 
   //Init
   ngOnInit(): void {
     this.getPlots();
+    this.formMessage.setValidators(this.emailOrPhoneValidator);
   }
 
 
@@ -76,14 +85,11 @@ export class LandingPageComponent implements OnInit {
       const pathElement = svgDoc?.getElementById(lote.plot_number.toString());
       if (pathElement) {
         switch (lote.plot_state) {
-          case 'Habitado':
-            pathElement.setAttribute('fill', '#FFE6A9');
-            break;
-          case 'En construccion':
-            pathElement.setAttribute('fill', '#DEAA79');
-            break;
           case 'Disponible':
             pathElement.setAttribute('fill', '#B1C29E');
+            break;
+          default:
+            pathElement.setAttribute('fill', '#DEAA79');
             break;
         }
 
@@ -101,9 +107,11 @@ export class LandingPageComponent implements OnInit {
 
         // Setteo de evento de clic
         pathElement.addEventListener('click', () => {
-          this.selectedPlot = this.lotes.find(l => l.id === lote.id)!;
+          this.selectedPlot = this.lotes.find(l => l.id === lote.id) || null;
+
           this.selectedPath = pathElement.cloneNode(true) as HTMLElement;
-          console.log(this.selectedPlot);
+          this.selectedPng = this.convertPathToPngV2();
+          this.formMessage.reset();
           this.cdRef.detectChanges();
         });
 
@@ -141,6 +149,16 @@ export class LandingPageComponent implements OnInit {
     })
   }
 
+  emailOrPhoneValidator(control: AbstractControl): { [key: string]: boolean } | null {
+    const email = control.get('email')?.value;
+    const phone = control.get('phone')?.value;
+
+    if (!email && !phone) {
+      return { emailOrPhoneRequired: true };
+    }
+    return null;
+  }
+
   //Método para redireccionar
   redirect(path: string) {
     this.routingService.redirect('/login')
@@ -152,7 +170,7 @@ export class LandingPageComponent implements OnInit {
     const control = this.formMessage.get(controlName);
     return {
       'is-invalid': control?.invalid && (control?.dirty || control?.touched),
-      'is-valid': control?.valid
+      'is-valid': control?.valid  && (control?.dirty || control?.touched)
     }
   }
 
@@ -167,10 +185,15 @@ export class LandingPageComponent implements OnInit {
     const errorMessages: { [key: string]: string } = {
       required: 'Este campo no puede estar vacío.',
       email: 'Formato de correo electrónico inválido.',
+      pattern: 'Solo se permiten números.',
+      minlength: `El campo debe tener al menos 10 caracteres.`,
+      maxlength: `El campo debe tener como máximo 20 caracteres.`,
+      emailOrPhoneRequired: 'Debe ingresar al menos un correo electrónico o un número de teléfono.'
     };
 
     return errorMessages[errorKey] || 'Error desconocido';
   }
+  
 
   clearPlot() {
     this.selectedPlot = null;
@@ -235,4 +258,75 @@ export class LandingPageComponent implements OnInit {
     return `translate(${translateX}, ${translateY})`;
   }
 
+  convertPathToPngV2(width: number = 150, height: number = 150): string {
+    debugger
+    const pathD = this.selectedPath?.getAttribute('d');
+    if (!pathD) {
+      throw new Error('Path no definido.');
+    }
+    console.log('Path d:', pathD);
+    const { minX, minY, maxX, maxY } = this.extractPathCoordinates(pathD);
+
+    // Crear un canvas temporal
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      throw new Error('No se pudo obtener el contexto del canvas.');
+    }
+
+    // Escalar y trasladar para ajustar el path al canvas
+    const scaleX = width / (maxX - minX);
+    const scaleY = height / (maxY - minY);
+    const scale = Math.min(scaleX, scaleY); // Mantener proporción
+
+    const translateX = -minX * scale;
+    const translateY = -minY * scale;
+
+    ctx.setTransform(scale, 0, 0, scale, translateX, translateY);
+
+    // Dibujar el path en el canvas
+    const svgPath = new Path2D(pathD);
+    ctx.fillStyle = this.selectedPath?.getAttribute('fill') as string || '#000000';
+    ctx.fill(svgPath);
+    // Configurar y aplicar el contorno (stroke)
+    ctx.lineWidth = 0.5; // Grosor del contorno
+    ctx.strokeStyle = '#343A40'; // Color del contorno (puedes cambiarlo)
+    ctx.stroke(svgPath)
+
+    // Convertir el canvas a una imagen en formato base64
+    return canvas.toDataURL('image/png');
+  }
+
+  //----------------------------------Acciones----------------------------------
+
+  //Envía el formulario
+  postRequest(){
+    if(this.formMessage.valid){
+      const formData = this.formMessage.value as PostBuyRequestDto;
+      this.plotService.postBuyRequest(formData).subscribe({
+        next: () => {
+          console.log('Solicitud enviada');
+          this.formMessage.reset();
+          Swal.fire({
+            icon: 'success',
+            title: '¡Éxito!',
+            text: 'La solicitud ha sido enviada correctamente.',
+            confirmButtonText: 'Aceptar'
+          });
+        },
+        error: (err) => {
+          console.error('Error al enviar la solicitud', err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Algo salió mal',
+            text: 'Intentelo de nuevo más tarde.',
+            confirmButtonText: 'Aceptar'
+          });
+        }
+      });
+    }
+  }
 }

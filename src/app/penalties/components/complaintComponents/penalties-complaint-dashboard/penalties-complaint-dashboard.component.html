@@ -1,7 +1,7 @@
 <!--Si ves esto es porque anda bien en nanvar y tenes que borrar este div -->
-<div class="container my-2 p-2 border border-2 rounded shadow-lg">
+<div class="container my-2 p-2 border border-2 rounded shadow-lg" id="filters">
   <!-- Fila de botones de filtro -->
-  <div class="row">
+  <div class="row" >
     <!-- Filtors -->
     <div class="col d-flex gap-3">
       @if (status == 0) {
@@ -116,12 +116,12 @@
 
     <!-- KPIs Generales-->
     <div class="col-2 gap-2 d-flex flex-column justify-content-center">
-      <app-custom-kpi [value]="totalComplaints" title="Denuncias" subTitle="en el periodo"
+      <app-custom-kpi [value]="totalComplaints" title="Denuncias totales" subTitle="en el periodo"
         tooltip="Total de denuncias en el periodo" [customStyles]="{ 'background-color': '#D6F6FF' }"
         icon="bi-flag-fill" formatPipe="number">
       </app-custom-kpi>
 
-      <app-custom-kpi [value]="averageComplaintsPerMonth" title="Denuncias" subTitle="en el periodo"
+      <app-custom-kpi [value]="averageComplaintsPerMonth" title="Denuncias mensuales" subTitle="en el periodo"
         tooltip="Promedio de denuncias en el periodo" [customStyles]="{ 'background-color': '#FFE699' }"
         icon="bi-calendar-day" formatPipe="number">
       </app-custom-kpi>
@@ -132,7 +132,7 @@
       <div class="row mb-2">
         <!-- Grafico 1 -->
         <div class="col">
-          <div class="card border-0 shadow-lg rounded-4 h-100">
+          <div class="card border-0 shadow-lg rounded-4 h-100" id="chartSanctionsByState">
             <div class="card-body">
               <h4 class="card-title align-items-center">
                 Denuncias por Estado
@@ -158,7 +158,7 @@
         </div>
         <!-- Grafico 2 -->
         <div class="col">
-          <div class="card border-0 shadow-lg rounded-4 h-100">
+          <div class="card border-0 shadow-lg rounded-4 h-100" id="chartSanctionsByReason">
             <div class="card-body">
               <h4 class="card-title align-items-center">
                 Denuncias por Motivo<button type="button"
@@ -185,7 +185,7 @@
       <div class="row">
         <!-- Grafico 3 -->
         <div class="col">
-          <div class="card border-0 shadow-lg rounded-4 h-100">
+          <div class="card border-0 shadow-lg rounded-4 h-100" id="chartCompare">
             <div class="card-body">
               <h4 class="card-title align-items-center">
                 Comparación del Período

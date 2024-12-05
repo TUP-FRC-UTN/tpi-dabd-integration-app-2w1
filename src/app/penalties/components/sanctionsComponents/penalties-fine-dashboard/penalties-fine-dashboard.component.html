@@ -1,5 +1,5 @@
 <!--Si ves esto es porque anda bien en nanvar y tenes que borrar este div -->
-<div class="container my-2 p-2 border border-2 rounded shadow-lg">
+<div class="container my-2 p-2 border border-2 rounded shadow-lg" id="filters">
   <!-- Fila de botones de filtro -->
   <div class="row">
     <div class="col d-flex gap-3">
@@ -108,13 +108,13 @@
   @if (status == 0) {
   <div class="row">
     <!-- KPIs generales-->
-    <div class="col-2 gap-2 d-flex flex-column justify-content-center">
+    <div class="col-2 gap-2 d-flex flex-column justify-content-center" id="kpis">
       <app-custom-kpi [value]="totalFines" title="Multas totales" subTitle="en el período"
         tooltip="Total de multas en el período" [customStyles]="{ 'background-color': '#D6F6FF' }" icon="bi-flag-fill"
         formatPipe="number">
       </app-custom-kpi>
 
-      <app-custom-kpi [value]="averageFinesPerMonth" title="Multas promedio" subTitle="por dia"
+      <app-custom-kpi [value]="averageFinesPerMonth" title="Multas promedio" subTitle="por mes"
         tooltip="Promedio de multas diarias en el período" [customStyles]="{ 'background-color': '#FFE699' }"
         icon="bi-calendar-day" formatPipe="number">
       </app-custom-kpi>
@@ -139,7 +139,7 @@
       <div class="row mb-2">
         <!-- Grafico 1 -->
         <div class="col">
-          <div class="card border-0 shadow-lg rounded-4 h-100">
+          <div class="card border-0 shadow-lg rounded-4 h-100" id="chartSanctionsByState">
             <div class="card-body">
               <h4 class="card-title align-items-center">
                 Multas por Estado
@@ -164,7 +164,7 @@
         </div>
         <!-- Grafico 2 -->
         <div class="col">
-          <div class="card border-0 shadow-lg rounded-4 h-100">
+          <div class="card border-0 shadow-lg rounded-4 h-100" id="chartSanctionsByReason">
             <div class="card-body">
               <h4 class="card-title align-items-center">
                 Multas por Motivo
@@ -190,7 +190,7 @@
       <div class="row">
         <!-- Grafico 3 -->
         <div class="col">
-          <div class="card border-0 shadow-lg rounded-4 h-100">
+          <div class="card border-0 shadow-lg rounded-4 h-100" id="chartCompare">
             <div class="card-body">
               <h4 class="card-title align-items-center">
                 Comparación del Período
@@ -224,12 +224,12 @@
             <div class="col-3 gap-2 d-flex flex-column justify-content-center">
               <app-custom-kpi [value]="stateWithHighestPercentage.percentage" title="Estado Mayor"
                 [subTitle]="stateWithHighestPercentage.state" tooltip="Total del Período"
-                [customStyles]="{ 'background-color': '#D6F6FF' }" icon="bi-percent" formatPipe="percent">
+                [customStyles]="{ 'background-color': '#D6F6FF' }" icon="bi-percent" formatPipe="percentage">
               </app-custom-kpi>
 
               <app-custom-kpi [value]="stateWithLowestPercentage.percentage" title="Estado Menor"
                 [subTitle]="stateWithLowestPercentage.state" tooltip="Total del Período"
-                [customStyles]="{ 'background-color': '#FFE699' }" icon="bi-percent" formatPipe="percent">
+                [customStyles]="{ 'background-color': '#FFE699' }" icon="bi-percent" formatPipe="percentage">
               </app-custom-kpi>
             </div>
             <div class="col-9">
@@ -262,13 +262,13 @@
           <hr />
           <div class="row">
             <div class="col-3 gap-2 d-flex flex-column justify-content-center">
-              <app-custom-kpi [value]="0" title="Mayor Cantidad" [subTitle]="dayWithMostComplaintsName"
-                tooltip="Promedio" [customStyles]="{ 'background-color': '#E2CBF7' }" icon="bi bi-clock"
-                formatPipe="string"></app-custom-kpi>
+              <app-custom-kpi [value]="dayWithMostComplaintsName" title="Dia con mayor cantidad" subTitle="de la semana"
+                tooltip="Promedio" [customStyles]="{ 'background-color': '#E2CBF7' }" icon="bi-clock"
+                formatPipe="text"></app-custom-kpi>
 
-              <app-custom-kpi [value]="0" title="Menor Cantidad" [subTitle]="dayWithLeastComplaintsName"
-                tooltip="Promedio" [customStyles]="{ 'background-color': '#F9FFB5' }" icon="bi bi-clock"
-                formatPipe="string"></app-custom-kpi>
+              <app-custom-kpi [value]="dayWithLeastComplaintsName" title="Dia con menor cantidad" subTitle="de la semana"
+                tooltip="Promedio" [customStyles]="{ 'background-color': '#F9FFB5' }" icon="bi-clock-fill"
+                formatPipe="text"></app-custom-kpi>
             </div>
             <div class="col-2"></div>
             <div class="col-7">

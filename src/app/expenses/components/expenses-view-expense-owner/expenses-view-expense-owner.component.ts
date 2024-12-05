@@ -72,6 +72,10 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
         canClickTarget: false,
         modalOverlayOpeningPadding: 10,
         modalOverlayOpeningRadius: 10,
+        scrollTo: {
+          behavior: 'smooth',
+          block: 'center'
+        }
       },
       keyboardNavigation: false,
 
@@ -121,6 +125,29 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
     if (this.tour) {
       this.tour.complete();
     }
+
+    // CÓDIGO PARA PREVENIR SCROLLEO DURANTE TUTORIAL
+    const preventScroll = (e: Event) => {
+      e.preventDefault();
+    };
+
+    const restoreScroll = () => {
+      document.body.style.overflow = 'auto';
+      window.removeEventListener('wheel', preventScroll);
+      window.removeEventListener('touchmove', preventScroll);
+    };
+
+    // Al empezar, lo desactiva
+    this.tour.on('start', () => {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('wheel', preventScroll, { passive: false });
+      window.addEventListener('touchmove', preventScroll, { passive: false });
+    });
+
+    // Al completar lo reactiva, al igual que al cancelar
+    this.tour.on('complete', restoreScroll);
+    this.tour.on('cancel', restoreScroll);
+    
     this.tour.addStep({
       id: 'table-step',
       title: 'Tabla de gastos',
@@ -234,12 +261,14 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
     });
   }
   loadBillsFiltered() {
+    this.isLoading = true
     const dataTable = $('#myTable').DataTable();
     //this.bills es la lista filtrada por fecha desde la API, esa no se toca
     let billsFiltered = this.filteredByType(this.bills.slice());
     billsFiltered = this.filteredByCategiries(billsFiltered);
     billsFiltered = this.filteredByProviders(billsFiltered);
     dataTable.clear().rows.add(billsFiltered).draw();
+    this.isLoading = false
   }
   clearFiltered() {
 
@@ -392,12 +421,12 @@ export class ViewOwnerExpenseComponent implements OnInit, OnDestroy {
         {
           data: 'amount',
           title: 'Monto',
-          className: 'align-middle',
+          className: 'align-middle text-end',
           render: (data) => {
             let formattedAmount = new Intl.NumberFormat('es-AR', {
               minimumFractionDigits: 2
             }).format(data);
-            return `<div>$ ${formattedAmount} </div>`;
+            return `<div class="text-end">$ ${formattedAmount} </div>`;
           }
         },
         {

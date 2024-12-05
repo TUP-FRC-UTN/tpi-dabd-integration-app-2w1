@@ -24,7 +24,8 @@ export class IepSuppliersFormComponent implements OnInit,OnDestroy {
   tutorialSubscription = new Subscription();
   private tour: Shepherd.Tour;
 
-  constructor(private fb: FormBuilder, private supplierService: SuppliersService, private router: Router, private userService: AuthService, private tutorialService: TutorialService
+  constructor(private fb: FormBuilder, private supplierService: SuppliersService, private router: Router, private userService: AuthService
+    , private tutorialService: TutorialService
   ) {
     this.tour = new Shepherd.Tour({
       defaultStepOptions: {
@@ -35,6 +36,10 @@ export class IepSuppliersFormComponent implements OnInit,OnDestroy {
         canClickTarget: false,
         modalOverlayOpeningPadding: 10,
         modalOverlayOpeningRadius: 10,
+        scrollTo: {
+          behavior: 'smooth',
+          block: 'center'
+        }
       },
       keyboardNavigation: false,
       useModalOverlay: true,
@@ -62,7 +67,7 @@ export class IepSuppliersFormComponent implements OnInit,OnDestroy {
       name: ['', Validators.required],
       cuit: ['', [
         Validators.required, this.validarCUIT()]],
-      phoneNumber: ['', [Validators.required, Validators.pattern('[1-9]{10}$')]],
+      phoneNumber: ['', [Validators.required, Validators.pattern('[0-9]{10}$')]],
       createdUser:[this.userService.getUser().id],
       email: ['', [Validators.required, Validators.email, this.emailDomainValidator]],
       supplierType: ['OTHER', Validators.required],
@@ -89,6 +94,29 @@ export class IepSuppliersFormComponent implements OnInit,OnDestroy {
     if (this.tour) {
       this.tour.complete();
     }
+
+    // CÓDIGO PARA PREVENIR SCROLLEO DURANTE TUTORIAL
+    const preventScroll = (e: Event) => {
+      e.preventDefault();
+    };
+
+    const restoreScroll = () => {
+      document.body.style.overflow = 'auto';
+      window.removeEventListener('wheel', preventScroll);
+      window.removeEventListener('touchmove', preventScroll);
+    };
+
+    // Al empezar, lo desactiva
+    this.tour.on('start', () => {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('wheel', preventScroll, { passive: false });
+      window.addEventListener('touchmove', preventScroll, { passive: false });
+    });
+
+    // Al completar lo reactiva, al igual que al cancelar
+    this.tour.on('complete', restoreScroll);
+    this.tour.on('cancel', restoreScroll);
+    
     this.tour.addStep({
       id: 'table-step',
       title: 'Formulario para alta de proveedor',
@@ -308,7 +336,7 @@ export class IepSuppliersFormComponent implements OnInit,OnDestroy {
         // Verifica que los primeros 2 dígitos sean un tipo válido (20, 23, 24, 27, 30, 33, 34)
         const tipo = parseInt(cuilLimpio.substring(0, 2), 10);
         console.log(tipo);
-        const tiposValidos = [30, 33, 34];
+        const tiposValidos = [20, 23, 24, 27, 30, 33, 34];
         if (!tiposValidos.includes(tipo)) {
           console.log("no es valido")
           return { cuilInvalido: true };

@@ -8,6 +8,7 @@ import { UsersGraphicPlotsStatsComponent } from "./users-components/dashboard/us
 import { UsersGraphicPlotComponent } from "./users-components/dashboard/users-graphic-plot/users-graphic-plot.component";
 import { authGuard } from "./guards/auth.guard";
 import { roleGuard } from "../users/guards/role.guard";
+import { UsersBuyRequestComponent } from "./users-components/plots/users-buy-request/users-buy-request.component";
 
 export const PLOT_ROUTES: Routes = [
   {
@@ -18,6 +19,7 @@ export const PLOT_ROUTES: Routes = [
       { path: 'list', component: UsersListPlotsComponent },
       { path: 'add', component: UsersNewPlotComponent },
       { path: 'edit/:id', component: UsersUpdatePlotComponent },
+      { path: 'requests', component: UsersBuyRequestComponent },
       { path: 'dashboard', component: UsersReportComponent },
       { path: 'dashboard/plot-blocks', component: UsersGraphicBlocksComponent },
       { path: 'dashboard/plot-info', component: UsersGraphicPlotsStatsComponent },
