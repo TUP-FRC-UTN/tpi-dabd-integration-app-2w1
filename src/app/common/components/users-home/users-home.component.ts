@@ -413,6 +413,7 @@ export class UsersHomeComponent implements OnInit, OnDestroy {
       .getAllByUser(this.authService.getUser().id)
       .subscribe({
         next: (notifications: LandingNotification[]) => {
+          notifications.reverse();
           this.notifications = notifications.slice(0, 3);
         },
         error: (err) => {

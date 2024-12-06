@@ -5,6 +5,7 @@ import { IepSupplierUpdateComponent } from "./iep-inventory/components/iep-suppl
 import { IepSuppliersFormComponent } from "./iep-inventory/components/iep-suppliers-form/iep-suppliers-form.component";
 import { authGuard } from "../users/guards/auth.guard";
 import { roleGuard } from "../users/guards/role.guard";
+import { IepChartsInventoryComponent } from "./iep-inventory/components/iep-charts-inventory/iep-charts-inventory.component";
 
 export const PROVIDERS_ROUTES: Routes = [
     {
@@ -15,7 +16,7 @@ export const PROVIDERS_ROUTES: Routes = [
             { path: "suppliers", component: IepSupplierListComponent },
             { path: "create-supplier", component: IepSuppliersFormComponent },
             { path: "supplier-update/:id", component: IepSupplierUpdateComponent },
-            { path: 'dashboard', component: InventoryEmployeeProviderHomeComponent },
+            { path: 'dashboard', component: IepChartsInventoryComponent },
         ]
     }
 ];
