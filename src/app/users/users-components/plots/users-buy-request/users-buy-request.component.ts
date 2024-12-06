@@ -45,6 +45,10 @@ export class UsersBuyRequestComponent implements OnInit, OnDestroy {
         canClickTarget: false,
         modalOverlayOpeningPadding: 10,
         modalOverlayOpeningRadius: 10,
+        scrollTo: {
+          behavior: 'smooth',
+          block: 'center'
+          }
       },
       keyboardNavigation: false,
 
@@ -228,7 +232,7 @@ export class UsersBuyRequestComponent implements OnInit, OnDestroy {
     this.tour.addStep({
       id: 'edit-step',
       title: 'Filtros',
-      text: 'Desde acá podrá filtrar los lotes. También puede exportar la lista a Excel o PDF, o borrar los filtros aplicados con el botón de basura.',
+      text: 'Desde acá buscar entre las solicitudes También puede exportar la lista a Excel o PDF.',
       attachTo: {
         element: '#filters',
         on: 'auto',
@@ -247,11 +251,11 @@ export class UsersBuyRequestComponent implements OnInit, OnDestroy {
 
     this.tour.addStep({
       id: 'profile-step',
-      title: 'Acciones',
-      text: 'Desde acá puede ver las acciones disponibles para cada lote. Puede editar el perfil, borrar el usuario o ver más información.',
+      title: 'Estado',
+      text: 'Acá se muestra si la solicitudo ya fue atendida o no.',
 
       attachTo: {
-        element: '#actions',
+        element: '.contacted',
         on: 'auto',
       },
       buttons: [
@@ -268,11 +272,11 @@ export class UsersBuyRequestComponent implements OnInit, OnDestroy {
 
     this.tour.addStep({
       id: 'profile-step',
-      title: 'Agregar',
-      text: 'Para agregar una propiedad, pulse este botón y será enviado al alta de lotes.',
+      title: 'Acciones',
+      text: 'En esta columna, se puede marcar la solicitud como ya atendida. Al hacerlo, será enviada al fondo de la lista.',
 
       attachTo: {
-        element: '#addPlot',
+        element: '.actions',
         on: 'auto',
       },
       buttons: [
@@ -355,12 +359,12 @@ export class UsersBuyRequestComponent implements OnInit, OnDestroy {
         {
           data: 'contacted',
           title: 'Estado',
-          className: 'align-middle',
+          className: 'align-middle text-center contacted',
           render: (data) => {
             if(data){
-              return `<div>Contactado</div>`
+              return `<div class="d-flex justify-content-center"><span class='badge rounded-pill text-bg-success'>Contactado</span></div>`
             }else{
-              return `<div>No Contactado</div>`
+              return `<div class="d-flex justify-content-center"><span class='badge rounded-pill text-bg-danger'>No Contactado</span></div>`
             }
           }
         },
@@ -368,9 +372,9 @@ export class UsersBuyRequestComponent implements OnInit, OnDestroy {
           title: "Acciones",
           data: null,
           orderable: false,
-          className: 'text-center',
+          className: 'text-center actions',
           render: function (data, type, row) {
-            return (data.contacted ? `<button type="button" class="btn btn-light text-primary bi-check-all fs-5" disabled></button>`: `<button type="button" class="btn-changeState btn btn-light bi-check fs-5" title="Marcar como contactado" data-action="changeState" data-id="${data.id}"></button>`);
+            return (data.contacted ? `<button type="button" class="btn btn-light text-primary bi-check-all fs-5  border boder-2" disabled></button>`: `<button type="button" class="btn-changeState btn btn-light bi-check fs-5 border boder-2" data-action="changeState" data-id="${data.id}"></button>`);
           }
         }
       ],

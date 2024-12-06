@@ -23,13 +23,8 @@
 
       <!-- Status Select -->
       <div class="col-4 col-xxl-3">
-        <app-custom-select 
-        [options]="listStatus" 
-        [placeholder]="'Seleccionar Estado'"
-        (selectedOptionsChange)="updateState($event)" 
-        [multiple]="true" 
-        [selectedOptions]="selectedFilters"
-        />
+        <app-custom-select [options]="listStatus" [placeholder]="'Seleccionar Estado'"
+          (selectedOptionsChange)="updateState($event)" [multiple]="true" [selectedOptions]="selectedFilters" />
       </div>
 
       <!-- Date Range -->
@@ -50,7 +45,7 @@
           <button class="btn btn-primary bi-funnel-fill" data-bs-toggle="modal" title="Filtros Avanzados"
             data-bs-target="#filtrosAvanzados"></button>
           <button class="btn btn-secondary bi-trash" title="Limpiar Filtros" (click)="cleanFilters()"></button>
-          <button class="btn btn-warning text-light"id="facturacion"(click)="openMultipliersModal()">
+          <button class="btn btn-warning text-light" id="facturacion" (click)="openMultipliersModal()">
             Facturación
           </button>
           <button class="btn btn-success bi-file-earmark-excel" title="Exportar a Excel"
@@ -228,21 +223,11 @@
           </div>
           <div class="col-md-8">
             <div class="input-group">
-              <input
-                type="number"
-                id="generationDayInput"
-                [(ngModel)]="generationDay"
-                class="form-control"
-                min="1"
-                max="28"
-                [class.is-invalid]="!isValidGenerationDay()"
-                [disabled]="
+              <input type="number" id="generationDayInput" [(ngModel)]="generationDay" class="form-control" min="1"
+                max="28" [class.is-invalid]="!isValidGenerationDay()" [disabled]="
                   !!fieldModified && fieldModified !== 'generationDay'
-                "
-                (focus)="onFieldFocus('generationDay')"
-                (blur)="onFieldBlur()"
-                (ngModelChange)="onFieldChange('generationDay')"
-              />
+                " (focus)="onFieldFocus('generationDay')" (blur)="onFieldBlur()"
+                (ngModelChange)="onFieldChange('generationDay')" />
               <span class="input-group-text">del mes</span>
             </div>
             <div class="form-text" [class.text-danger]="!isValidGenerationDay()">
@@ -250,7 +235,7 @@
             </div>
           </div>
         </div>
-      </div>    
+      </div>
 
       <!-- Porcentaje de late payment. -->
       <div class="mb-3">
@@ -326,28 +311,26 @@
     <div class="row">
       <div class="col">
         <label>Fecha Inicio</label>
-        <input type="date" class="form-control"
-          [(ngModel)]="modalFilter.from" 
-          (ngModelChange)="validateDates()"
-          [max]="maxDate" 
-          placeholder="Fecha desde" />
+        <input type="date" class="form-control" [(ngModel)]="modalFilter.from" (ngModelChange)="validateDates()"
+          [max]="maxDate" placeholder="Fecha desde" />
       </div>
       <div class="col">
         <label>Fecha Fin</label>
-        
-        <input type="date" class="form-control ms-2"
-          [(ngModel)]="modalFilter.until" 
-          (ngModelChange)="validateDates()"
-          [min]="modalFilter.from" 
-          [max]="maxDate"
-          placeholder="Fecha hasta" />
+
+        <input type="date" class="form-control ms-2" [(ngModel)]="modalFilter.until" (ngModelChange)="validateDates()"
+          [min]="modalFilter.from" [max]="maxDate" placeholder="Fecha hasta" />
       </div>
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-primary" (click)="confirmDateRange()" [disabled]="!validateDates()">
+    <button class="btn btn-primary" (click)="confirmDateRange()" [disabled]="!validateDates()"
+      [disabled]="awaitingResponse">
       Confirmar
     </button>
+    @if (awaitingResponse) {
+    <div class="spinner-border text-primary" role="status" style="margin-left:1em">
+      <span class="visually-hidden ">Loading...</span>
+    </div>}
   </div>
 </ng-template>
 
@@ -583,7 +566,7 @@
   </div>
 </div>
 <!-- Ver Más Modal -->
- 
+
 <div class="modal fade" id="viewMoreModal" tabindex="-1" aria-labelledby="viewMoreModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -630,10 +613,12 @@
             <div class="col-md-6">
               <div class="">
                 <div class="card-body">
-                  <p><strong>Fecha de primer vencimiento:</strong> {{ selectedExpense.first_expiration_date | date: 'dd/MM/yyyy'
+                  <p><strong>Fecha de primer vencimiento:</strong> {{ selectedExpense.first_expiration_date | date:
+                    'dd/MM/yyyy'
                     }}</p>
-                      <p><strong>Monto del primer vencimiento:</strong> ${{ selectedExpense.first_expiration_amount | number: '1.2-2' }}</p>
-                      <p><strong>Fecha de segundo vencimiento:</strong> {{ selectedExpense.second_expiration_date | date:
+                  <p><strong>Monto del primer vencimiento:</strong> ${{ selectedExpense.first_expiration_amount |
+                    number: '1.2-2' }}</p>
+                  <p><strong>Fecha de segundo vencimiento:</strong> {{ selectedExpense.second_expiration_date | date:
                     'dd/MM/yyyy' }}</p>
                   <p><strong>Monto del segundo Vencimiento:</strong> ${{ selectedExpense.second_expiration_amount }}</p>
                 </div>
