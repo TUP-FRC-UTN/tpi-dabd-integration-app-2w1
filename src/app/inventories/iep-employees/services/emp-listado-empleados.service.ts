@@ -67,13 +67,14 @@ export class EmpListadoEmpleadosService {
     );
   }
 
-  putAttendances(id: number, state: string, justification: string): Observable<any> {
+  putAttendances(id: number, state: string, justification: string, userId: number): Observable<any> {
     // Inicializa nuevos parámetros en cada ejecución
     let params = new HttpParams()
         .set('id', id.toString())
         .set('state', state)
-        .set('justification', justification);
-    
+        .set('justification', justification)
+        .set('userid', userId);
+
     return this.http.put(`${this.EMPLOYEE_BASE_URL}/attendances/putState`, null, { params });
   }
 

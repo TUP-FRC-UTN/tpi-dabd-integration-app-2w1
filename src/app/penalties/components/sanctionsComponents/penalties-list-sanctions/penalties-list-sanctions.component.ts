@@ -297,7 +297,7 @@ export class PenaltiesSanctionsListComponent implements OnInit, OnDestroy {
             let formattedAmount = data != null ? '$' + new Intl.NumberFormat('es-AR', {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2
-            }).format(data) : '';
+            }).format(data) : ' N/A ';
             return `<div class="text-end">${formattedAmount}</div>`;
           }
         },

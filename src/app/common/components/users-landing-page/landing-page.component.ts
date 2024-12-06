@@ -82,7 +82,7 @@ export class LandingPageComponent implements OnInit {
     svgDoc?.getElementById('entry')?.setAttribute('fill', '#6C757D');
 
     this.lotes.forEach(lote => {
-      const pathElement = svgDoc?.getElementById(lote.plot_number.toString());
+      const pathElement = svgDoc?.getElementById(lote.id.toString());
       if (pathElement) {
         switch (lote.plot_state) {
           case 'Disponible':

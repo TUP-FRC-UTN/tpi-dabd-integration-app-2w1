@@ -3,56 +3,63 @@
     <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
 </div>
 <div class="modal-body">
-    <form class="d-flex flex-column justify-content-center align-items-center"
-     [formGroup]="reactiveForm" (ngSubmit)="transferPlot()">
+    <form class="d-flex flex-column justify-content-center align-items-center" [formGroup]="reactiveForm"
+        (ngSubmit)="transferPlot()">
 
-        <div class="mb-3">
-            <div class="d-flex justify-content-center align-items-center">
-                <label class="col-form-label me-3" style="min-width: 100px;" >Propietario Actual</label>
-                <div class="">
-                    <input type="text" class="form-control w-100" formControlName="actualOwner" style="min-width: 300px; max-width: 3ch;"/>
+        <div class="row">
+
+            <div class="col-12">
+                <div class="row">
+                    <label for="" class="col-form-label col-4">Propietario Actual</label>
+                    <div class="col-8">
+                        <input type="text" class="form-control w-100" formControlName="actualOwner"
+                            style="min-width: 300px; max-width: 3ch;" />
+                    </div>
                 </div>
+
             </div>
-        </div>
 
-        <div class="align-self-center">
-            <i class="bi bi-arrow-down fs-1"></i>
-        </div>
+            <div class="text-center w-100">
+                <i class="bi-arrow-down fs-1"></i>
+            </div>
 
-        <div class="m-3">
-            <div class="d-flex justify-content-center align-items-center">
-                <label class=" col-form-label me-3"  style="min-width: 100px;">Nuevo Propietario</label>
-                <div class="">
-                    <app-custom-select  style="min-width: 300px; max-width: 300px;" class="w-100" 
-                    [options]="owners" [selectedOptions]="reactiveForm.get('newOwner')?.value"
-                    (selectedOptionsChange)="reactiveForm.get('newOwner')?.setValue($event)" />
+            <div class="col-12">
+                <div class="row">
+                    <label for="" class="col-form-label col-4">Nuevo Propietario</label>
+                    <div class="col-8">
+                        <app-custom-select [options]="owners" [selectedOptions]="reactiveForm.get('newOwner')?.value"
+                            (selectedOptionsChange)="reactiveForm.get('newOwner')?.setValue($event)" />
+                    </div>
                 </div>
+
             </div>
         </div>
 
         @if(confirm){
-            <div class="m-3">
-                <div class="alert alert-danger" role="alert">
-                    {{confirmAction()}}
-                  </div>
+        <div class="m-3">
+            <div class="alert alert-danger" role="alert">
+                {{confirmAction()}}
             </div>
+        </div>
         }
-        
+
 
         <div class="row mb-3 align-self-end mt-3">
             <div class="col-auto">
-              <button type="button" class="btn btn-secondary"  (click)="activeModal.dismiss('Cross click')">Cancelar</button>
+                <button type="button" class="btn btn-secondary"
+                    (click)="activeModal.dismiss('Cross click')">Cancelar</button>
             </div>
             @if(confirm){
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-success" [disabled]="reactiveForm.invalid">Guardar</button>
-                  </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-success" [disabled]="reactiveForm.invalid">Guardar</button>
+            </div>
             }@else {
-                <div class="col-auto">
-                    <button type="button" class="btn btn-success" (click)="confirmAction()" [disabled]="reactiveForm.invalid">Siguiente</button>
-                  </div>
+            <div class="col-auto">
+                <button type="button" class="btn btn-success" (click)="confirmAction()"
+                    [disabled]="reactiveForm.invalid">Siguiente</button>
+            </div>
             }
-            
-          </div>
+
+        </div>
     </form>
 </div>

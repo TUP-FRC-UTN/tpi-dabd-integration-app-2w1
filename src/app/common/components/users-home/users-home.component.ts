@@ -131,7 +131,7 @@ export class UsersHomeComponent implements OnInit, OnDestroy {
     svgDoc?.getElementById('entry')?.setAttribute('fill', '#6C757D');
 
     this.plots.forEach(plot => {
-      const pathElement = svgDoc?.getElementById(plot.plot_number.toString());
+      const pathElement = svgDoc?.getElementById(plot.id.toString());
       if (pathElement) {
         switch (plot.plot_state) {
           case 'Habitado':

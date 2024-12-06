@@ -539,7 +539,7 @@ export class IepAttendancesComponent implements OnInit, OnDestroy{
 
   confirmarJustificacion(){
     if(this.justificationPutText){
-      this.empleadoService.putAttendances(this.id, this.nuevoEstado, this.justificationPutText).subscribe({
+      this.empleadoService.putAttendances(this.id, this.nuevoEstado, this.justificationPutText, this.mockid.getUser().id).subscribe({
         next: (response) => {
           console.log('Asistencia actualizada:', response);
           this.loadAsistencias();
