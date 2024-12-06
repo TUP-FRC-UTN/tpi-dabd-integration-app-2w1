@@ -350,8 +350,8 @@ export class UsersUpdateUserComponent implements OnInit, OnDestroy {
   //-----------------------------------------------------Funciones-----------------------------------------------------
 
   filterRoles(list: any[]) {
-    let blockOptionsForOwner: string[] = ["Propietario", "SuperAdmin", "Gerente general"];
-    let blockOptionsForManager: string[] = ["Propietario", "SuperAdmin", "Familiar mayor", "Familiar menor"];
+    let blockOptionsForOwner: string[] = ["Propietario", "SuperAdmin", "Gerente general", "Gerente finanzas", "Seguridad", "Gerente inventario", "Gerente empleados", "Gerente multas"];
+    let blockOptionsForManager: string[] = ["Propietario", "SuperAdmin", "Familiar mayor", "Familiar menor", "Co-Propietario", "Inquilino"];
     this.blockedRoles = [];
 
     let blockOptions: any[] = [];
@@ -365,11 +365,15 @@ export class UsersUpdateUserComponent implements OnInit, OnDestroy {
 
       return true;
     });
+
+    console.log("a");
+    console.log(filteredList);
+    
     return filteredList;
   }
 
   filterUserRoles(list: any[]) {
-    let blockOptionsForOwner: string[] = ["Propietario", "SuperAdmin", "Gerente general"];
+    let blockOptionsForOwner: string[] = ["Propietario", "SuperAdmin", "Gerente general", "Co-Propietario"];
     let blockOptionsForManager: string[] = ["Propietario", "SuperAdmin", "Familiar mayor", "Familiar menor"];
     this.blockedRoles = [];
 
@@ -383,6 +387,7 @@ export class UsersUpdateUserComponent implements OnInit, OnDestroy {
       }
       return true;
     });
+
     return filteredList;
   }
 
