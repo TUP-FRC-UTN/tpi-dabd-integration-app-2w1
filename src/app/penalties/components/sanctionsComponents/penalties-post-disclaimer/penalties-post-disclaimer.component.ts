@@ -113,7 +113,7 @@ export class PenaltiesPostDisclaimerComponent implements OnInit, OnDestroy {
     // Al completar lo reactiva, al igual que al cancelar
     this.tour.on('complete', restoreScroll);
     this.tour.on('cancel', restoreScroll);
-    
+
     this.tour.addStep({
       id: 'table-step',
       title: 'Alta de Descargo',
@@ -149,7 +149,7 @@ export class PenaltiesPostDisclaimerComponent implements OnInit, OnDestroy {
         }
       ]
     });
-    
+
     this.tour.addStep({
       id: 'subject-step',
       title: 'Boton de registro',
@@ -240,11 +240,15 @@ export class PenaltiesPostDisclaimerComponent implements OnInit, OnDestroy {
     this.plotService.getPlotById(this.fine.report.plotId).subscribe({
       next: (data) => {
         plotName = `Bloque ${data.block_number}, Lote ${data.plot_number}`;
+        console.log('Nombre de la propiedad: ', plotName);
+        console.log('Motivo de la multa: ', reason);
+        
+        let notificationMessage = 'La multa sobre la propiedad: ' + plotName + ' - motivo: ' + reason.reportReason + ' ha sido apelada';
+        this.notifyDisclaimer(notificationMessage);
       },
       error: (e) => { console.log('Error al consultar getPlotById', e) }
     })
-    let notificationMessage = 'La multa sobre la propiedad: ' + plotName + ' - motivo: ' + reason + ' ha sido apelada';
-    this.notifyDisclaimer(notificationMessage);
+
   }
 
   notifyDisclaimer(notificationMessage: string) {
