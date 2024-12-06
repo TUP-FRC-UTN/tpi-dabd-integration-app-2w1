@@ -354,7 +354,7 @@ export class UsersBuyRequestComponent implements OnInit, OnDestroy {
           data: 'observations',
           title: 'Observaciones',
           className: 'align-middle',
-          render: (data) => `<div>${data || 'N/A'}</div>`
+          render: (data) => `<div title="${data}">${data ? (data.length < 25 ? data : data.slice(0, 25) + '...') : 'N/A'}</div>`
         },
         {
           data: 'contacted',
