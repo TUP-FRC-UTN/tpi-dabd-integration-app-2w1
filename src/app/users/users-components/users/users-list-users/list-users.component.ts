@@ -97,185 +97,12 @@ export class ListUsersComponent implements OnInit, OnDestroy {
   placeholder: string = 'Seleccione un rol';
   estadoRoles: { [id: string]: boolean } = {};
   userModal: UserGet = new UserGet();
-
   ngOnInit() {
     this.loadRoles();
     this.loadAllPlots();
 
     //Trae todos los usuarios
-    const sus = this.apiService.getAllUsers().subscribe({
-      next: (data: UserGet[]) => {
-        //Cambiar guiones por barras en la fecha de nacimiento
-        this.users = data.map((user) => ({
-          ...user,
-          datebirth: (user.datebirth ? user.datebirth.replace(/-/g, '/') : 'N/A'),
-          create_date: user.create_date.replace(/-/g, '/'),
-        }));
-
-        //Inicializar DataTables después de cargar los datos
-        setTimeout(() => {
-          const table = $('#myTable').DataTable({
-            paging: true,
-            searching: true,
-            ordering: true,
-            lengthChange: true,
-            lengthMenu: [5, 10, 25, 50],
-            order: [[0, 'asc']],
-            pageLength: 5,
-            columns: [
-              // {
-              //   title: 'Fecha de Creación',
-              //   className: 'text-start',
-              //   width: '20%',
-              //   render: (data, type, row, meta) => {
-              //     if (type === 'display') {
-              //       // Mostrar la fecha formateada en la tabla
-              //       return moment(data, 'DD/MM/YYYY').format('DD/MM/YYYY');
-              //     } else {
-              //       // Usar un formato que DataTables pueda ordenar correctamente
-              //       return moment(data, 'DD/MM/YYYY').toDate();
-              //     }
-              //   }
-              // }
-              // ,
-
-              { title: 'Nombre', width: '20%' },
-              { title: 'Documento', className: 'text-end', width: '20%' },
-              { title: 'Rol', className: 'text-center', width: '30%' },
-              {
-                title: 'Lotes',
-                className: 'text-start',
-                width: '15%',
-                render: (data) => {
-                  let plotNumber: GetPlotDto[] = [];
-
-                  data.forEach((d: any) => {
-                    const plot = this.plots.find(
-                      (plot: GetPlotDto) => plot.id == d
-                    );
-                    if (plot) {
-                      plotNumber.push(plot);
-                    }
-                  });
-
-                  if (plotNumber != undefined) {
-                    if (plotNumber.length > 0) {
-                      var plots: string = '';
-                      for (let i = 0; i < plotNumber.length; i++) {
-                        plots = plots + plotNumber[i].plot_number + ', ';
-                        // borrar la ultima letra del plots
-                      }
-                      plots = plots.substring(0, plots.length - 2);
-                      return plots;
-                    } else {
-                      return 'Sin lote';
-                    }
-                  }
-                  return 'Sin lote';
-                },
-              },
-              {
-                title: 'Acciones',
-                orderable: false,
-                width: '15%',
-                className: 'text-center',
-                render: (data, type, row, meta) => {
-                  const userId = this.users[meta.row].id;
-                  return `
-                    <div class="dropdown-center d-flex text-center justify-content-center" >
-                      <button class="btn btn-light border border-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="actions">
-                        <i class="bi bi-three-dots-vertical"></i>
-                      </button>
-                      <ul class="dropdown-menu">
-                        <li><a class="dropdown-item view-user hover" data-id="${meta.row}">Ver más</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item edit-user" data-id="${userId}">Editar</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item delete-user" data-id="${meta.row}">Eliminar</a></li>
-                      </ul>
-                    </div>
-                  `;
-                },
-              },
-            ],
-            dom: '<"mb-3"t>' + '<"d-flex justify-content-between"lp>',
-            data: this.users.map((user) => [
-              // user.create_date,
-              `${user.lastname}, ${user.name}`,  //Nombre completo
-              user.dni,                                //Documento
-              this.showRole(user.roles, user.id),              //Roles
-              user.plot_id,                                //Nro. de lote (puedes ajustar esto)                 
-              '<button class="btn btn-info">Ver más</button>'  //Ejemplo de acción
-            ]),
-            language: {
-              lengthMenu: '_MENU_',
-              zeroRecords: 'No se encontraron resultados',
-              info: 'Mostrando página _PAGE_ de _PAGES_',
-              infoEmpty: 'No hay registros disponibles',
-              infoFiltered: '(filtrado de _MAX_ registros totales)',
-              search: 'Buscar:',
-              loadingRecords: 'Cargando...',
-              processing: 'Procesando...',
-              emptyTable: 'No hay datos disponibles en la tabla',
-            },
-          });
-
-          //Alinear la caja de búsqueda a la derecha
-          const searchInputWrapper = $('#myTable_filter');
-          searchInputWrapper.addClass('d-flex justify-content-start');
-
-          //Desvincular el comportamiento predeterminado de búsqueda
-          $('#myTable_filter input').unbind();
-          $('#myTable_filter input').bind('input', (event) => {
-            //Usar función de flecha aquí
-            const searchValue = (event.target as HTMLInputElement).value; //Acceder al valor correctamente
-
-            //Comienza a buscar solo si hay 3 o más caracteres
-            if (searchValue.length >= 3) {
-              table.search(searchValue).draw();
-            } else {
-              table.search('').draw(); //Limpia la búsqueda si hay menos de 3 caracteres
-            }
-          });
-
-          //Asignar el evento click a los botones "Ver más"
-          //Asignar el evento click a los botones "Ver más"
-          $('#myTable').on('click', '.view-user', (event) => {
-            const id = $(event.currentTarget).data('id');
-            const userId = this.users[id].id; //Obtén el ID real del usuario
-            this.openModal('info', userId); //Pasa el ID del usuario al abrir el modal
-          });
-
-          $('#myTable').on('click', '.delete-user', (event) => {
-            const id = $(event.currentTarget).data('id');
-            const userId = this.users[id].id; //Obtén el ID real del usuario
-            this.openModalEliminar(userId); //Pasa el ID del usuario al abrir el modal
-          });
-
-          //Asignar el evento click a los botones "Editar"
-          $('#myTable').on('click', '.edit-user', (event) => {
-            const userId = $(event.currentTarget).data('id');
-            this.redirectEdit(userId); //Redirigir al método de edición
-          });
-        }, 0); //Asegurar que la tabla se inicializa en el próximo ciclo del evento
-      },
-      error: (error) => {
-        console.error('Error al cargar los usuarios:', error);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Hubo un problema al cargar los usuarios. Por favor, inténtalo más tarde.',
-          showConfirmButton: true,
-          confirmButtonText: 'Aceptar',
-          allowOutsideClick: false,
-          allowEscapeKey: false,
-        });
-        this.routingService.redirect('/main', 'Página Principal');
-      },
-    });
-
-    //Agregar suscripción
-    const aux = this.suscriptionService.addSuscription(sus);
+    
 
     //TUTORIAL
     this.tutorialSubscription = this.tutorialService.tutorialTrigger$.subscribe(
@@ -284,7 +111,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
       }
     );
 
-    this.tutorialSubscription.add(aux);
+
   }
 
   startTutorial() {
@@ -416,6 +243,181 @@ export class ListUsersComponent implements OnInit, OnDestroy {
     this.plotService.getAllPlots().subscribe({
       next: (data: GetPlotDto[]) => {
         this.plots = data;
+        const sus = this.apiService.getAllUsers().subscribe({
+          next: (data: UserGet[]) => {
+            //Cambiar guiones por barras en la fecha de nacimiento
+            this.users = data.map((user) => ({
+              ...user,
+              datebirth: (user.datebirth ? user.datebirth.replace(/-/g, '/') : 'N/A'),
+              create_date: user.create_date.replace(/-/g, '/'),
+            }));
+    
+            //Inicializar DataTables después de cargar los datos
+            setTimeout(() => {
+              console.log("plots:",this.plots)
+              const table = $('#myTable').DataTable({
+                paging: true,
+                searching: true,
+                ordering: true,
+                lengthChange: true,
+                lengthMenu: [5, 10, 25, 50],
+                order: [[0, 'asc']],
+                pageLength: 5,
+                columns: [
+                  // {
+                  //   title: 'Fecha de Creación',
+                  //   className: 'text-start',
+                  //   width: '20%',
+                  //   render: (data, type, row, meta) => {
+                  //     if (type === 'display') {
+                  //       // Mostrar la fecha formateada en la tabla
+                  //       return moment(data, 'DD/MM/YYYY').format('DD/MM/YYYY');
+                  //     } else {
+                  //       // Usar un formato que DataTables pueda ordenar correctamente
+                  //       return moment(data, 'DD/MM/YYYY').toDate();
+                  //     }
+                  //   }
+                  // }
+                  // ,
+    
+                  { title: 'Nombre', width: '20%' },
+                  { title: 'Documento', className: 'text-end', width: '20%' },
+                  { title: 'Rol', className: 'text-center', width: '30%' },
+                  {
+                    title: 'Lotes',
+                    className: 'text-start',
+                    width: '15%',
+                    render: (data) => {
+                      let plotNumber: GetPlotDto[] = [];
+    
+                      data.forEach((d: any) => {
+                        const plot = this.plots.find(
+                          (plot: GetPlotDto) => plot.id == d
+                        );
+                        if (plot) {
+                          plotNumber.push(plot);
+                        }
+                      });
+    
+                      if (plotNumber != undefined) {
+                        if (plotNumber.length > 0) {
+                          var plots: string = '';
+                          for (let i = 0; i < plotNumber.length; i++) {
+                            plots = plots + plotNumber[i].plot_number + ', ';
+                            // borrar la ultima letra del plots
+                          }
+                          plots = plots.substring(0, plots.length - 2);
+                          return plots;
+                        } else {
+                          return 'Sin lote';
+                        }
+                      }
+                      return 'Sin lote';
+                    },
+                  },
+                  {
+                    title: 'Acciones',
+                    orderable: false,
+                    width: '15%',
+                    className: 'text-center',
+                    render: (data, type, row, meta) => {
+                      const userId = this.users[meta.row].id;
+                      return `
+                        <div class="dropdown-center d-flex text-center justify-content-center" >
+                          <button class="btn btn-light border border-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="actions">
+                            <i class="bi bi-three-dots-vertical"></i>
+                          </button>
+                          <ul class="dropdown-menu">
+                            <li><a class="dropdown-item view-user hover" data-id="${meta.row}">Ver más</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item edit-user" data-id="${userId}">Editar</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item delete-user" data-id="${meta.row}">Eliminar</a></li>
+                          </ul>
+                        </div>
+                      `;
+                    },
+                  },
+                ],
+                dom: '<"mb-3"t>' + '<"d-flex justify-content-between"lp>',
+                data: this.users.map((user) => [
+                  // user.create_date,
+                  `${user.lastname}, ${user.name}`,  //Nombre completo
+                  user.dni,                                //Documento
+                  this.showRole(user.roles, user.id),              //Roles
+                  user.plot_id,                                //Nro. de lote (puedes ajustar esto)                 
+                  '<button class="btn btn-info">Ver más</button>'  //Ejemplo de acción
+                ]),
+                language: {
+                  lengthMenu: '_MENU_',
+                  zeroRecords: 'No se encontraron resultados',
+                  info: 'Mostrando página _PAGE_ de _PAGES_',
+                  infoEmpty: 'No hay registros disponibles',
+                  infoFiltered: '(filtrado de _MAX_ registros totales)',
+                  search: 'Buscar:',
+                  loadingRecords: 'Cargando...',
+                  processing: 'Procesando...',
+                  emptyTable: 'No hay datos disponibles en la tabla',
+                },
+              });
+    
+              //Alinear la caja de búsqueda a la derecha
+              const searchInputWrapper = $('#myTable_filter');
+              searchInputWrapper.addClass('d-flex justify-content-start');
+    
+              //Desvincular el comportamiento predeterminado de búsqueda
+              $('#myTable_filter input').unbind();
+              $('#myTable_filter input').bind('input', (event) => {
+                //Usar función de flecha aquí
+                const searchValue = (event.target as HTMLInputElement).value; //Acceder al valor correctamente
+    
+                //Comienza a buscar solo si hay 3 o más caracteres
+                if (searchValue.length >= 3) {
+                  table.search(searchValue).draw();
+                } else {
+                  table.search('').draw(); //Limpia la búsqueda si hay menos de 3 caracteres
+                }
+              });
+    
+              //Asignar el evento click a los botones "Ver más"
+              //Asignar el evento click a los botones "Ver más"
+              $('#myTable').on('click', '.view-user', (event) => {
+                const id = $(event.currentTarget).data('id');
+                const userId = this.users[id].id; //Obtén el ID real del usuario
+                this.openModal('info', userId); //Pasa el ID del usuario al abrir el modal
+              });
+    
+              $('#myTable').on('click', '.delete-user', (event) => {
+                const id = $(event.currentTarget).data('id');
+                const userId = this.users[id].id; //Obtén el ID real del usuario
+                this.openModalEliminar(userId); //Pasa el ID del usuario al abrir el modal
+              });
+    
+              //Asignar el evento click a los botones "Editar"
+              $('#myTable').on('click', '.edit-user', (event) => {
+                const userId = $(event.currentTarget).data('id');
+                this.redirectEdit(userId); //Redirigir al método de edición
+              });
+            }, 0); //Asegurar que la tabla se inicializa en el próximo ciclo del evento
+          },
+          error: (error) => {
+            console.error('Error al cargar los usuarios:', error);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Hubo un problema al cargar los usuarios. Por favor, inténtalo más tarde.',
+              showConfirmButton: true,
+              confirmButtonText: 'Aceptar',
+              allowOutsideClick: false,
+              allowEscapeKey: false,
+            });
+            this.routingService.redirect('/main', 'Página Principal');
+          },
+        });
+    
+        //Agregar suscripción
+        const aux = this.suscriptionService.addSuscription(sus);
+        this.tutorialSubscription.add(aux);
       },
       error: (error) => {
         console.error('Error al cargar los lotes:', error);
