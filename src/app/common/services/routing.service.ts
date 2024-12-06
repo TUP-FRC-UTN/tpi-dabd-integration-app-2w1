@@ -66,8 +66,8 @@ export class RoutingService {
         },
         {
           icon: 'bi-send',
-          name: 'Solicitudes',
-          title: 'Solicitudes de compra',
+          name: 'Interesados',
+          title: 'Potenciales clientes',
           route: 'main/plots/requests',
           roles: ['SuperAdmin', 'Gerente general'],
         },

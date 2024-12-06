@@ -172,7 +172,6 @@ export class UsersHomeComponent implements OnInit, OnDestroy {
 
   //
   convertPathToPngV2(width: number = 150, height: number = 150): string {
-    debugger
     const pathD = this.selectedPath?.getAttribute('d');
     if (!pathD) {
       throw new Error('Path no definido.');

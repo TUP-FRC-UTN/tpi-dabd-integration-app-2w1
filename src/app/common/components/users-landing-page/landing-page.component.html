@@ -86,7 +86,7 @@
                 <div class="col-6">
                     <div>
                         <object id="mapa" type="image/svg+xml" data="landingPlotsMap.svg"
-                            style="height: 750px;"></object>
+                            style="width: 100%; height: 100%;"></object>
                     </div>
                 </div>
                 <div class="col-6">
@@ -139,60 +139,73 @@
                         </div>
 
                     </div>
-                    
+
                     <div class="card verticalAnimation" [ngClass]="{'expanded': formMessage.get('plot_id')?.value}">
                         <div class="card-header d-flex justify-content-between">
                             <h5>Realice una consulta sobre el lote {{selectedPlot?.plot_number}}</h5>
-                            <button class="btn btn-light bi-x-lg border border-2" (click)="formMessage.reset()"></button>
+                            <button class="btn btn-light bi-x-lg border border-2"
+                                (click)="formMessage.reset()"></button>
                         </div>
                         <div class="card-body">
-                            <form class="px-3" [formGroup]="formMessage" (submit)="postRequest()">
+                            <form [formGroup]="formMessage" (submit)="postRequest()">
                                 <div class="row mb-3">
                                     <label class="col-form-label col-3">Nombre</label>
                                     <div class="col-9">
-                                        <input type="text" class="form-control col-auto" formControlName="name" [ngClass]="onValidate('name')">
-                                        @if(formMessage.get('name')?.invalid && (formMessage.get('name')?.dirty || formMessage.get('name')?.touched)){
-                                            <div class="text-danger">{{showError('name')}}</div>
+                                        <input type="text" class="form-control col-auto" formControlName="name"
+                                            [ngClass]="onValidate('name')">
+                                        @if(formMessage.get('name')?.invalid && (formMessage.get('name')?.dirty ||
+                                        formMessage.get('name')?.touched)){
+                                        <div class="text-danger">{{showError('name')}}</div>
                                         }
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <label class="col-form-label col-3">Email</label>
                                     <div class="col-9">
-                                        <input type="email" class="form-control col-auto" formControlName="email" [ngClass]="onValidate('email')">
-                                        @if(formMessage.get('email')?.invalid && (formMessage.get('email')?.dirty || formMessage.get('email')?.touched)){
-                                            <div class="text-danger">{{showError('email')}}</div>
+                                        <input type="email" class="form-control col-auto" formControlName="email"
+                                            [ngClass]="onValidate('email')">
+                                        @if(formMessage.get('email')?.invalid && (formMessage.get('email')?.dirty ||
+                                        formMessage.get('email')?.touched)){
+                                        <div class="text-danger">{{showError('email')}}</div>
                                         }
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <label class="col-form-label col-3">Teléfono</label>
                                     <div class="col-9">
-                                        <input type="tel" class="form-control col-auto" formControlName="phone" [ngClass]="onValidate('phone')">
-                                        @if(formMessage.get('phone')?.invalid && (formMessage.get('phone')?.dirty || formMessage.get('phone')?.touched)){
-                                            <div class="text-danger">{{showError('phone')}}</div>
+                                        <input type="tel" class="form-control col-auto" formControlName="phone"
+                                            [ngClass]="onValidate('phone')">
+                                        @if(formMessage.get('phone')?.invalid && (formMessage.get('phone')?.dirty ||
+                                        formMessage.get('phone')?.touched)){
+                                        <div class="text-danger">{{showError('phone')}}</div>
                                         }
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <label class="col-3 col-form-label">Observaciones</label>
                                     <div class="col-9">
-                                        <textarea class="form-control col-auto" formControlName="observations" cols="2" style="resize: none;"></textarea>
-                                        @if(formMessage.get('observations')?.invalid && (formMessage.get('observations')?.dirty || formMessage.get('observations')?.touched)){
-                                            <div class="text-danger">{{showError('observations')}}</div>
+                                        <textarea class="form-control col-auto" formControlName="observations" cols="2"
+                                            style="resize: none;"></textarea>
+                                        @if(formMessage.get('observations')?.invalid &&
+                                        (formMessage.get('observations')?.dirty ||
+                                        formMessage.get('observations')?.touched)){
+                                        <div class="text-danger">{{showError('observations')}}</div>
                                         }
                                     </div>
                                 </div>
-                                @if(formMessage.invalid && (formMessage.get('email')?.dirty || formMessage.get('email')?.touched || formMessage.get('phone')?.dirty || formMessage.get('phone')?.touched)){
-                                    <div class="text-danger text-center mt-3">
-                                        Debe ingresar al menos un email o un teléfono de contacto.
-                                    </div>
+                                @if(formMessage.invalid && (formMessage.get('email')?.dirty ||
+                                formMessage.get('email')?.touched || formMessage.get('phone')?.dirty ||
+                                formMessage.get('phone')?.touched)){
+                                <div class="text-danger text-center mt-3">
+                                    Debe ingresar al menos un email o un teléfono de contacto.
+                                </div>
                                 }
                                 <div class="text-end">
-                                    <button type="submit" class="btn btn-light border border-2" [disabled]="formMessage.invalid">Enviar</button>
+                                    <button type="submit" class="btn btn-light border border-2"
+                                        [disabled]="formMessage.invalid">Enviar</button>
                                 </div>
                             </form>
-                           
+
                         </div>
                     </div>
 

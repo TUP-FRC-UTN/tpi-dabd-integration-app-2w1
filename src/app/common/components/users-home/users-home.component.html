@@ -79,16 +79,16 @@
           <div class="card-header custom-header p-3">
             <h3 class="mb-0 fs-5 text-center text-dark">Mapa del lugar</h3>
           </div>
-          <div>
-            <object id="mapa" type="image/svg+xml" data="plotsMap.svg" style="height: 750px;"></object>
-          </div>
+            <div class="p-1">
+            <object id="mapa" type="image/svg+xml" data="plotsMap.svg" style="width: 100%; height: 100%;"></object>
+            </div>
         </div>
       </div>
 
       <div class="col-12 col-md-6">
         <div class="card important-numbers-card border border-2 rounded-3 shadow-lg mt-3" id="plot">
           <div class="card-header custom-header p-3">
-            <h3 class="fs-5 text-center text-dark">Datos de lote: {{(selectedPlot ? selectedPlot.id + ' - Manzana: ' + selectedPlot.block_number : '')}}</h3>
+            <h3 class="fs-5 text-center text-dark">Datos de lote: {{(selectedPlot ? selectedPlot.id : '')}}</h3>
           </div>
           <!-- Lote seleccionado -->
           <div class="row">
